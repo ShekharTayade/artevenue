@@ -1,0 +1,306 @@
+{% load static %}
+{% load widget_tweaks %}
+
+                                    <div class="w3-container">
+									
+										{% for hidden in businessprofile_form.hidden_fields %}
+										  {{ hidden }}
+										{% endfor %}									
+									
+										<div class = "row">
+											<div class = "col-sm-6 ">
+												<div class="form-group">
+													{{ businessprofile_form.contact_name.label_tag }}
+													{% if businessprofile_form.is_bound %}
+														{% if businessprofile_form.contact_name.errors %}
+												
+															{% render_field businessprofile_form.contact_name class="form-control is-invalid" %}
+															{% for error in businessprofile_form.contact_name.errors %}
+																<div class="invalid-feedback">
+																  {{ error }}
+																</div>
+															{% endfor %}
+												
+														{% else %}
+															{% render_field businessprofile_form.contact_name class="form-control is-valid" %}
+														{% endif %}
+													{% else %}
+														{% render_field businessprofile_form.contact_name class="form-control" %}
+													{% endif %}
+												
+													{% if businessprofile_form.contact_name.help_text %}
+														<small class="form-text text-muted">
+															{{ businessprofile_form.contact_name.help_text }}
+														</small>
+													{% endif %}
+												</div>
+											</div>
+											<div class = "col-sm-6">
+												<div class="form-group">
+													{{ businessprofile_form.phone_number.label_tag }}
+													{% if businessprofile_form.is_bound %}
+														{% if businessprofile_form.phone_number.errors %}
+												
+															{% render_field businessprofile_form.phone_number class="form-control is-invalid" %}
+															{% for error in businessprofile_form.phone_number.errors %}
+																<div class="invalid-feedback">
+																  {{ error }}
+																</div>
+															{% endfor %}
+												
+														{% else %}
+															{% render_field businessprofile_form.phone_number class="form-control is-valid" %}
+														{% endif %}
+													{% else %}
+														{% render_field businessprofile_form.phone_number class="form-control" %}
+													{% endif %}
+												
+													{% if businessprofile_form.phone_number.help_text %}
+														<small class="form-text text-muted">
+															{{ businessprofile_form.phone_number.help_text }}
+														</small>
+													{% endif %}
+												</div>
+											</div>
+
+										</div>
+
+										<div class = "row">
+											<div class = "col-sm-6">
+												<div class="form-group">
+													{{ businessprofile_form.company.label_tag }}
+													{% if businessprofile_form.is_bound %}
+														{% if businessprofile_form.company.errors %}
+												
+															{% render_field businessprofile_form.company class="form-control is-invalid" %}
+															{% for error in businessprofile_form.company.errors %}
+																<div class="invalid-feedback">
+																  {{ error }}
+																</div>
+															{% endfor %}
+												
+														{% else %}
+															{% render_field businessprofile_form.company class="form-control is-valid" %}
+														{% endif %}
+													{% else %}
+														{% render_field businessprofile_form.company class="form-control" %}
+													{% endif %}
+												
+													{% if businessprofile_form.company.help_text %}
+														<small class="form-text text-muted">
+															{{ businessprofile_form.company.help_text }}
+														</small>
+													{% endif %}
+												</div>
+											</div>
+											<div class = "col-sm-6">
+												<div class="form-group">
+													{{ businessprofile_form.gst_number.label_tag }}
+													{% if businessprofile_form.is_bound %}
+														{% if businessprofile_form.gst_number.errors %}
+												
+															{% render_field businessprofile_form.gst_number class="form-control is-invalid" %}
+															{% for error in businessprofile_form.gst_number.errors %}
+																<div class="invalid-feedback">
+																  {{ error }}
+																</div>
+															{% endfor %}
+												
+														{% else %}
+															{% render_field businessprofile_form.gst_number class="form-control is-valid" %}
+														{% endif %}
+													{% else %}
+														{% render_field businessprofile_form.gst_number class="form-control" %}
+													{% endif %}
+												
+													{% if businessprofile_form.gst_number.help_text %}
+														<small class="form-text text-muted">
+															{{ businessprofile_form.gst_number.help_text }}
+														</small>
+													{% endif %}
+												</div>
+											</div>
+										</div>
+
+
+										
+										<div class = "row">
+
+											<div class = "col-sm-12">
+												<label> Company Address</label>
+											</div>
+											<div class = "col-sm-6">
+												<div class="form-group">
+													{% if businessprofile_form.is_bound %}
+														{% if businessprofile_form.address_1.errors %}
+												
+															{% render_field businessprofile_form.address_1    class="form-control is-invalid" %}
+															{% for error in businessprofile_form.address_1.errors %}
+																<div class="invalid-feedback">
+																  {{ error }}
+																</div>
+															{% endfor %}
+												
+														{% else %}
+															{% render_field businessprofile_form.address_1    class="form-control is-valid" %}
+														{% endif %}
+													{% else %}
+														{% render_field businessprofile_form.address_1    class="form-control" %}
+													{% endif %}
+												
+													{% if businessprofile_form.address_1.help_text %}
+														<small class="form-text text-muted">
+															{{ businessprofile_form.address_1.help_text }}
+														</small>
+													{% endif %}
+												</div>
+											</div>	
+											<div class = "col-sm-6">
+												<div class="form-group">
+													{% if businessprofile_form.is_bound %}
+														{% if businessprofile_form.address_2.errors %}
+												
+															{% render_field businessprofile_form.address_2    class="form-control is-invalid" %}
+															{% for error in businessprofile_form.address_2.errors %}
+																<div class="invalid-feedback">
+																  {{ error }}
+																</div>
+															{% endfor %}
+												
+														{% else %}
+															{% render_field businessprofile_form.address_2    class="form-control is-valid" %}
+														{% endif %}
+													{% else %}
+														{% render_field businessprofile_form.address_2    class="form-control" %}
+													{% endif %}
+												
+													{% if businessprofile_form.address_2.help_text %}
+														<small class="form-text text-muted">
+															{{ businessprofile_form.address_2.help_text }}
+														</small>
+													{% endif %}
+												</div>														
+
+											</div>
+										</div>
+										<div class = "row">
+											<div class="col-md-3">
+												<div class = "form-group">
+													Pin Code
+													{% if businessprofile_form.is_bound %}
+														{% if businessprofile_form.pin_code.errors %}
+												
+															{% render_field businessprofile_form.pin_code class="form-control is-invalid"  %}
+															{% for error in businessprofile_form.pin_code.errors %}
+																<div class="invalid-feedback">
+																  {{ error }}
+																</div>
+															{% endfor %}
+												
+														{% else %}
+															{% render_field businessprofile_form.pin_code class="form-control is-valid" %}
+														{% endif %}
+													{% else %}
+														{% render_field businessprofile_form.pin_code class="form-control" %}
+													{% endif %}
+												
+													{% if businessprofile_form.pin_code.help_text %}
+														<small class="form-text text-muted">
+															{{ businessprofile_form.pin_code.help_text }}
+														</small>
+													{% endif %}
+												</div>
+
+											</div>
+											<div class = "col-sm-5">
+							
+												<div class="form-group">
+													City
+													{% if businessprofile_form.is_bound %}
+														{% if businessprofile_form.city.errors %}
+												
+															{% render_field businessprofile_form.city class="form-control is-invalid" %}
+															{% for error in businessprofile_form.city.errors %}
+																<div class="invalid-feedback">
+																  {{ error }}
+																</div>
+															{% endfor %}
+												
+														{% else %}
+															{% render_field businessprofile_form.city class="form-control is-valid" %}
+														{% endif %}
+													{% else %}
+														{% render_field businessprofile_form.city class="form-control" %}
+													{% endif %}
+												
+													{% if businessprofile_form.city.help_text %}
+														<small class="form-text text-muted">
+															{{ businessprofile_form.city.help_text }}
+														</small>
+													{% endif %}
+												</div>													
+												
+											</div>
+											<div class="col-md-4">
+												<div class="form-group">
+													State
+													{% if businessprofile_form.is_bound %}
+														{% if businessprofile_form.state.errors %}
+												
+															{% render_field businessprofile_form.state class="form-control is-invalid" %}
+															{% for error in businessprofile_form.state.errors %}
+																<div class="invalid-feedback">
+																  {{ error }}
+																</div>
+															{% endfor %}
+												
+														{% else %}
+															{% render_field businessprofile_form.state class="form-control is-valid" %}
+														{% endif %}
+													{% else %}
+														{% render_field businessprofile_form.state class="form-control" %}
+													{% endif %}
+												
+													{% if businessprofile_form.state.help_text %}
+														<small class="form-text text-muted">
+															{{ businessprofile_form.state.help_text }}
+														</small>
+													{% endif %}
+												</div>													  
+											  
+											</div>
+										</div>
+									
+										<div class = "row">
+											<div class="col-md-3">
+
+												<div class="form-group">
+													Country
+													{% if businessprofile_form.is_bound %}
+														{% if businessprofile_form.country.errors %}
+												
+															{% render_field businessprofile_form.country class="form-control is-invalid"  %}
+															{% for error in businessprofile_form.country.errors %}
+																<div class="invalid-feedback">
+																  {{ error }}
+																</div>
+															{% endfor %}
+												
+														{% else %}
+															{% render_field businessprofile_form.country class="form-control is-valid" %}
+														{% endif %}
+													{% else %}
+														{% render_field businessprofile_form.country class="form-control" %}
+													{% endif %}
+												
+													{% if businessprofile_form.country.help_text %}
+														<small class="form-text text-muted">
+															{{ businessprofile_form.country.help_text }}
+														</small>
+													{% endif %}
+												</div>						
+											</div>
+
+										</div>
+
+                                    </div>

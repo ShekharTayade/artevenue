@@ -1,0 +1,168 @@
+{% load static %}
+<!-- Top slim bar with tagline, login, register etc-->
+	<div class="head-top">
+		<div class="head-info">
+			<ul>
+				<li class="home_head"><a href="{% url 'index' %}">Home</a></li>
+				<li class="phone_head"><a data-backdrop="static" data-keyboard="false" data-toggle="modal" data-target="#phone-help">Support</a></li>
+			</ul>
+		</div>
+
+
+		<div id="phone-help" tabindex="-1" role="dialog" aria-labelledby="Support" aria-hidden="true" class="modal fade">
+			<div class="modal-dialog modal-sm">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">Contact Number</h5>
+						<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
+					</div>
+					<div class="modal-body">	
+						We are here to help!<br />
+						Please call: {{ecom_site.support_phonenumber }}<br />
+						<small>Timing: {{ecom_site.phone_support_start_time}} to {{ecom_site.phone_support_end_time}}</small>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="head-right-nav">
+			<ul>
+				{% if user.is_authenticated %}
+				<li><a href="#" data-toggle="dropdown">
+								<i class="fa fa-user-circle-o nfa-2x"></i>
+								{{user.username}}
+					</a>
+					<!-- drop down for logged in user -->
+					<ul class="dropdown-menu dropdown-menu-login pull-right" >
+						<li><a href="{% url 'logout' %}">Logout</a></li>
+						<li> <a href="{% url 'password_change' %}">Change Password</a></li>   
+						<li class="dropdown-divider"></li>
+						<li><a href="{% url 'my_account' %}">My Account</a></li>
+						<li><a href="{% url 'my_orders' %}">My Orders</a></li>
+					</ul>
+				</li>
+				{% else %}
+				<li><a href="" data-toggle="modal" data-target="#login-modal">Login</a></li>				
+				<li><a href="{% url 'register' %}">Sign Up</a></li>
+				{% endif %}
+			</ul>
+		</div>
+		
+		<!-- Login Modal -->
+		<div id="login-modal" tabindex="-1" role="dialog" aria-labelledby="Login" aria-hidden="true" class="modal fade">
+			<div class="modal-dialog modal-md">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">Customer login</h5>
+						<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
+					</div>
+					<div class="modal-body">
+						<form action = "{% url 'login'%}" method="post" accept-charset="UTF-8" role="form" method="POST">
+							 {% csrf_token %}
+							<div class="form-group">
+								<p>Please Enter Your User Name or Email and password</p>
+								<div class = "row">
+									<div class ="col-sm-5">
+										<input name = "username" type="text" class="form-control" placeholder="Username">
+									</div>
+									<div class ="col-sm-1 text-center">
+										OR
+									</div>
+									<div class ="col-sm-6">
+										<input id="email-modal" name = "email" type="text" placeholder="email" class="form-control">
+									</div>
+								</div>
+							</div>
+							<div class="form-group">
+								<input id="password-modal" name = "password" type="password" placeholder="password" class="form-control">
+							</div>
+							<input name="remember" type="checkbox" value="Remember Me" checked> Remember Me						
+							<input hidden id="curr_pg" name="curr_pg" value="{{request.path}}" >						
+							<!-- To check if user is not authenticated and display an error message if not autheticated -->
+							<!-- The view returns a value "invalid" in invalid key if use if not authenticated. -->
+							<p>
+								<div class="text-center">
+									<button type = "submit" class="btn btn-primary"><i class="fa fa-sign-in"></i> Log in</button>
+								</div>
+
+								<div class="text-center">
+									<a class = " text-secondary" href="{% url 'password_reset' %}">Forgot Username/Password</a>
+								</div>
+							</p>
+							<div id = "show-loginerror">
+							</div>
+						</form>
+						<hr>
+						<p>
+							Login Using Your Social Media Account
+						</p>
+						<div class = "well">
+							<div class = "row">
+								<div class="col-sm-3 text-center">
+									<a class="btn auth-provider-button hover-on" href="">
+									  <img src="{% static 'img/facebook_logo.svg' %}" alt="Facebook Login" style="height:38px;border:0;">
+									</a>
+								</div>
+								<div class="col-sm-3 text-center">
+									<a class="btn auth-provider-button hover-on" href="">
+									  <img src="{% static 'img/google_logo.svg' %}" alt="Google Login" style="height:38px;border:0;">
+									</a>
+								</div>
+								<div class="col-sm-3 text-center">
+									<a class="btn auth-provider-button hover-on" href="">
+									  <img src="{% static 'img/twitter_Logo.svg' %}" alt="Twitter Login" style="height:38px;border:0;">
+									</a>
+								</div>
+								<div class="col-sm-3 text-center">
+									<a class="btn auth-provider-button hover-on" href="">
+									  <img src="{% static 'img/instagram_logo.jpg' %}" alt="Instagram Login" style="height:38px;border:0;">
+									</a>
+								</div>
+							</div>
+						</div>
+						<hr>
+					
+						
+						<p class="text-center text-muted">Not registered yet?</p>
+						<p class="text-center text-muted"><a href=""><strong  class = "text-primary">Register now</strong></a>
+						! It is easy, done in a minute and gives you access to special offrers, discounts!</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- END: Login modal -->
+		
+		
+		<!-- Change Password Modal -->
+		<div id="changepassword-modal" tabindex="-1" role="dialog" aria-labelledby="Login" aria-hidden="true" class="modal fade">
+			<div class="modal-dialog modal-sm">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title"></h5>
+						<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
+					</div>
+					<div class="modal-body">	
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h3 class="panel-title">
+								Change Password
+								</h3>
+							</div>
+							<div class="panel-body">
+								<form method="post" novalidate action = "{% url 'password_change' %}">
+									{% csrf_token %}
+									{% include 'includes/form.html' %}
+									<!--<button type="submit" class="btn btn-success">Change password</button>-->
+									<input class="btn btn-lg btn-primary btn-block" type="submit" value="Change">
+								</form>
+
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+
+
+	</div>

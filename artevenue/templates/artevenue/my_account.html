@@ -1,0 +1,142 @@
+{% extends 'eStore/estore_base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+        <div class="container">
+			<div class="row">
+				<!-- breadcrumb-->
+				<div class="col-sm-12">
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+							<li aria-current="page" class="breadcrumb-item active">My Account</li>
+						</ol>
+					</nav>
+				</div>
+			</div>
+			<div class="row">
+				<div class = "col-sm-12">
+					<div class="box">
+						<div class = "row">
+							<div class = "col-sm-9">
+								<h1>My Account</h1>
+								<p>Maintain account details</p>
+							</div>
+							<div class = "col-sm-3">
+								<br />
+								<a class = "pull-right btn btn-secondary" href="{% url 'my_orders' %}">
+									Go to My Orders
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-12">
+					<form method = "post">
+						{% csrf_token %}
+
+						<div class="row">
+							<div class="col-sm-4">
+								<div class="card">
+									<h3> Arte'venue Account</h3>
+
+									{% for hidden in user_form.hidden_fields %}
+									  {{ hidden }}
+									{% endfor %}
+
+									{% for field in user_form.visible_fields %}
+									  <div class="form-group">
+										<label for="{{ field.id_for_label }}">{{ field.label }}</label>
+										{{ field|add_class:'form-control' }}
+										{% for error in field.errors %}
+										  <span class="help-block">{{ error }}</span>
+										{% endfor %}
+									  </div>
+									{% endfor %}
+								</div>
+							</div>
+							{% if businessprofile_form %}
+							<div class="col-sm-8">
+								<div class="card">
+									<h3> Business Profile</h3>
+									{% include 'eStore/business_profile_form_include.html' %}
+								</div>
+							</div>
+							{% endif %}
+						</div>	
+						<div class="row">
+							{% if shipping_form %}
+							<div class="col-sm-6">
+								<div class="card">
+									<h3> Shipping Address</h3>
+
+									{% for hidden in shipping_form.hidden_fields %}
+									  {{ hidden }}
+									{% endfor %}
+
+									{% for field in shipping_form.visible_fields %}
+									  <div class="form-group">
+										<label for="{{ field.id_for_label }}">{{ field.label }}</label>
+										{{ field|add_class:'form-control' }}
+										{% for error in field.errors %}
+										  <span class="help-block">{{ error }}</span>
+										{% endfor %}
+									  </div>
+									{% endfor %}
+								</div>
+							</div>
+							{% endif %}
+
+							{% if billing_form %}
+							<div class="col-sm-6">
+								<div class="card">
+									<h3> Billing Address</h3>
+
+									{% for hidden in billing_form.hidden_fields %}
+									  {{ hidden }}
+									{% endfor %}
+
+									{% for field in billing_form.visible_fields %}
+									  <div class="form-group">
+										<label for="{{ field.id_for_label }}">{{ field.label }}</label>
+										{{ field|add_class:'form-control' }}
+										{% for error in field.errors %}
+										  <span class="help-block">{{ error }}</span>
+										{% endfor %}
+									  </div>
+									{% endfor %}
+								</div>
+							</div>
+							{% endif %}
+						</div>
+						<div class = "col-sm-12 mt-3">
+							<div class = "text-center">
+								<button class = "btn btn-primary " type="submit">Save Changes</button>
+							</div>			
+						</div>							
+					</form>
+				</div>
+			</div>
+
+		</div>
+	{% include 'eStore/message-modal_ok.html' %}
+	
+	{% endblock sitecontent %}
+
+	
+	{% block jscripts %}
+		<script>
+		$( document ).ready(function() {
+
+			if ("{{msg}}" == "SUCCESS"){
+				$("#msg").html("Changes are Saved");
+				$("#msg-modal").modal("show");
+			}	
+		});
+		</script>
+	{% endblock jscripts %}
+			
+	

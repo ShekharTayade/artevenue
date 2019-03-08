@@ -1,0 +1,68 @@
+{% load static %}
+<!-- Featured Products  Header -->
+{% if ecom_site.show_featured_section %}
+<div id="collections">
+	<div class="mt-4 mb-4 py-2">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12">
+					<h1 class="mb-0 text-center">{{ecom_site.featured_header}}</h1>
+					<div class = "text-center">
+						<span class = "section-text">
+						</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Featured items slider -->
+<div class="product-slider owl-carousel owl-theme">
+	{% for c in trending_categories %}
+		<div class="item">  
+				{% with 'img/'|add:c.url as image_static %}
+				<div class="front"  style="margin:0px 2px 0px 2px !important;">
+					<a href="{% url 'category_stock_images' c.category_id %}"> 
+						<img src="{% static image_static %}" alt="{{c.name}}" class="img-fluid img-container-cat">
+					</a>
+				</div>
+				{% endwith %}
+				<div class="mt-2 trending-cat text text-center">
+					<h5>
+						<a href="{% url 'category_stock_images' c.category_id %}">{{ c.name|title }}</a>
+					</h5>
+				</div>
+				
+		</div>
+	{% endfor %}
+</div> 
+
+
+
+	<!-- <section class="tranding_section">
+		<div class="container">
+			<hgroup class="hgroup_2 text-center"><h2>Trending Categories </h2></hgroup>
+
+				<div class="heroSlider-fixed">	
+					<div class="slider responsive text-center">
+						{% for c in trending_categories %}
+						<div>
+							{% with 'img/'|add:c.url as image_static %}
+							<div class="trend_column">
+								<div class="trend_inner">
+									<img src="{% static image_static %}" class="img-fluid">
+									<div class="overlay">
+									</div>
+								</div>
+							</div>
+							
+							<h5><a href="{% url 'category_stock_images' c.category_id %}">{{ c.name|title }}</a></h5>
+							{% endwith %}
+						</div>
+						{% endfor %}
+					</div>
+				</div>
+		</div>
+	</section> -->
+{% endif %}

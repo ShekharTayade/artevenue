@@ -1,0 +1,78 @@
+{% load static %}
+<!-- Featured Category  Header -->
+<!-- <div id="collections">
+	<div class="mt-2 mb-3 py-2">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12">
+					<h2 class="mb-0 text-center">Curated</h2>
+					<div class = "text-center">
+						<span class = "section-text">
+						</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div> -->
+
+<!-- Featured items slider -->
+<!-- <div class="container">
+	<div class="product-slider owl-carousel owl-theme">
+		{% for c in featured_collection %}
+		<div class="item">  
+					{% with 'img/'|add:c.url as image_static %}
+					<div class="front"  style="margin:0px 2px 0px 2px !important;">
+						<a href="{% url 'category_products' c.category_id %}"> 
+							<img src="{% static image_static %}" alt="{{c.name}}" class="img-fluid img-container-cat">
+						</a>
+					</div>
+					{% endwith %}
+					<div class="text text-center">
+						<h5>
+							<a href="{% url 'category_products' c.category_id %}">{{ c.name }}</a>
+						</h5>
+					</div>
+					
+		</div>
+		{% endfor %}
+	</div>						
+</div> -->
+
+
+<section class="curated_section">
+	<div class="container">
+		<div class="hgroup_2 text-center"><h2 class = "mb-2 text-center">Curated</h2></div>
+		
+		<div class="row">
+			<div class="col-lg-4 col-md-4 col-sm-12 col-12">	
+				<div class="curted_coumn text-center">
+					<div class="curted_pic">
+						<img src="{% static 'img/curated_1.jpg' %}" class="img-fluid">
+					</div>
+					
+					<h3>Art Over Centuries</h3>
+				</div>
+			</div>
+			
+			<div class="col-lg-4 col-md-4 col-sm-12 col-12">	
+				<div class="curted_coumn text-center">
+					<div class="curted_pic">
+						<img src="{% static 'img/curated_2.jpg' %}" class="img-fluid">
+					</div>
+					
+					<h3>Timesless Collection of Grand Masters</h3>
+				</div>
+			</div>
+			<div class="col-lg-4 col-md-4 col-sm-12 col-12">	
+				<div class="curted_coumn text-center">
+					<div class="curted_pic">
+						<img src="{% static 'img/curated_3.jpg' %}" class="img-fluid">
+					</div>
+					
+					<h3>Pop Culture Collection</h3>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>

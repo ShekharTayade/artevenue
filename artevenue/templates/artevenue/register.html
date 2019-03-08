@@ -1,0 +1,79 @@
+
+<!-- READ THE INSTRUCTIONS BELOW BEFORE USING THIS TEMPLATE
+ 1. Start your page with this template and modify. Rename this template with HTML name and then modify.
+ 2. We keep as it is the header portion of the page (which is top hidden block and the navigation) 
+    and the footer portion (footer block) on each page.
+ 3. Override only the "slide-show", "features", and "jointhem-blog" blocks on each page
+ 4. Keep the top "hidden" clock and the nav-bar as it is, which forms the header section of the page.
+ 5. Overriding the parent blocks will start from "slide-show" block 
+ 6. Keep the <div>s  given below as it is in the "slide-show" and "features" blocks to keep the same styling matching the home page. 
+    If overriding the parent block without any content then remove the <div>s too, just keep block and endblock. 
+ 7. For most of the pages, you can keep the title of the page in "slide-show" block and put all the content in "features" block. 
+    The "jointhem-blog" block can be kept empty.
+ 8. PLEASE REMEBER :- 
+    TO OVERRIDE A BLOCK USE THE CORRESPONDING BLOCK AND <div>s, 
+    TO KEEP THE BLOCK EMPTY JUST USE THE BLOCK OPEN AND ENDBLOCK, 
+    AND TO KEEP ABLOCK AS IT IS DON'T USE THE BLOCK NAMES HERE SO THOSE BLOCKS FROM PARENT WILL BE USED AS IT IS. 
+ -->
+
+<!-- Extend the home page to keep the same styling for header and footer sections. -->
+
+{% extends 'eStore/eStore_base.html' %}
+{% load widget_tweaks %}
+{% load static %}
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+    <div id="highlighted-slider" class="container ccontainer">
+        <div class="box box-default">
+            <div class="box-header with-border row">
+				<div class="col-md-2" >
+					<h3>Register </h3>
+				</div>
+				<div class="col-md-10" >
+					<div class="quote-leftbar" >
+						Sign up with us and get exciting offers, early intimations of sales and promotions.
+						Sign up below...
+					</div>
+				</div>				
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-6" style = "background-image: url({% static 'img/register_pic.jpg' %})">
+                    <form method="post" novalidate">
+                        {% csrf_token %}
+						<input hidden name="curr_pg" value="{{request.path}}" >						
+						<div class="panel panel-default cpanel cpanel-default">
+							<div class="w3-container">
+									{% for hidden in form.hidden_fields %}
+									  {{ hidden }}
+									{% endfor %}
+
+									{% for field in form.visible_fields %}
+									  <div class="form-group">
+										<label class = "control-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+										{{ field|add_class:'form-control' }}
+										{% for error in field.errors %}
+										  <span class="help-block">{{ error }}</span>
+										{% endfor %}
+									  </div>
+									{% endfor %}
+
+							</div>
+							<!-- <button type="submit" class="btn btn-primary">Sign Me Up</button> -->
+						</div>
+
+						<div class="text-center" style="margin-top: 0px;margin-bottom: 3px;">
+							<button type="submit" class="btn btn-primary" style="border-radius: 0;width: 150px">Register Me</button>
+						</div>
+                        
+                    </form>
+				</div>
+            </div>
+        </div>
+    </div>
+	{% endblock sitecontent %}
+	
+	
+	{% block jscripts %}
+	{% endblock jscripts %}
+	

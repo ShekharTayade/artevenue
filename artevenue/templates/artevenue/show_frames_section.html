@@ -1,0 +1,74 @@
+{% load static %}
+<!-- Featured Products  Header -->
+{% if ecom_site.show_frame_my_art_section %}
+<!--
+<div id="collections">
+	<div class="mt-2 mb-3 py-2">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12">
+					<h2 class="mb-0 text-center">{{ecom_site.frame_my_art_header}}</h2>
+					<div class = "text-center">
+						<span class = "section-text">
+							Upload your art/photo, browse the frames, choose the one you like.<br />
+							And we deliver it to you!!
+						</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<div class="container">
+	<div class="product-slider owl-carousel owl-theme">
+		{% for f in show_frames%}
+		<div class="item">  
+			<div class="flip-container">
+				<div class="flipper">
+					{% with 'img/'|add:f.url as image_static %}
+					<div class="front"  style="margin:0px 2px 0px 2px !important;">
+						<a href="{% url 'show_frames' f.frame_id %}"> 
+							<img src="{% static image_static %}" alt="{{f.frame__name}}" class="img-fluid img-container-frames-section">
+						</a>
+					</div>
+					{% endwith %}
+					<div class="text text-center">
+						<h5>
+							<a href="{% url 'show_frames' f.frame_id %}">{{ f.frame__name }}</a>
+						</h5>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+		{% endfor %}
+	</div>						
+</div>
+
+-->
+
+<section class="main_banner">
+	<div class="container-fluid">	
+		<a href = "{% url 'user_image' %}">
+		<div class="row">
+			<div class="col-lg-6 col-md-12 col-sm-12 col-12 align-self-center">
+				<div class="say_pic">
+					<img src="{% static 'img/frame_photo.jpg' %}" class="img-fluid">
+				</div>
+			</div>
+			
+			<div class="col-lg-6 col-md-12 col-sm-12 col-12 align-self-center">
+				<div class="say_colum text-center">
+				  <hgroup class="hgroup"><h1>Frame My Photos</h1></hgroup>
+				  <p>Upload your art/photo, browse the frames, choose the one you like. And we deliver it to you.</p>
+				</div>
+			</div>
+		</div>
+		</a>
+	</div>
+</section>
+
+
+{% endif %}

@@ -1,0 +1,149 @@
+{% load utils %}
+
+							<p class="text-muted">
+								{% if count > 0 %} 
+									{{ count }} order(s) found between {{startDt|date:'d-M-Y'}} and {{endDt|date:'d-M-Y'}} 
+								{% else %} 
+									No orders found between {{startDt|date:'d-M-Y'}} and {{endDt|date:'d-M-Y'}} 
+								{% endif %}
+							</p>
+							
+							{% for o in orders %}
+							<h3>Order Number : {{o.order_number}}</h3>
+							<h4>Dated : {{o.order_date}}</h4>
+							
+							<div class="table table-responsive">
+								<table id = "ordTbl" class="table table-responsive table-striped">
+									<thead>
+										<tr>
+											<th width="15%">Name</th>
+											<th width="30%">Details</th>
+											<th width="15%" style="text-align:right">Unit Price</th>
+											<th width="10%" style="text-align:right">Quantity</th>
+											<th width="15%" style="text-align:right">Discount</th>
+											<th width="15%" style="text-align:right">Total</th>
+										</tr>
+									</thead>
+									<tbody>
+										{% for i in order_items_list %}
+										{% if i.order_id != o.order_id %}
+											<!-- Nothing -->
+											
+										{% else %}
+										<tr>
+											{% if i.product__product_image__url %}
+												<td><img src = "{{i.product__product_image__url}}" style = "width:75px; height:75px; object-fit:contain;">
+													<br />
+													<div class = "pull-left">
+														<button type ="button" style = "padding-left:0px;"  class = "btn btn-link" onclick = "getFramedImg('{{i.product_id}}', '{{i.image_width}}', '{{i.moulding_id}}', '{{i.mount.color}}','{{i.mount_size}}', '{{i.product__product_image__url}}');">
+															{{i.product__name}}
+														</button>
+													</div>
+												</td>
+											{% else %}
+											
+												<td><img src = "{{MEDIA_URL}}{{i.user_image__image_to_frame}}" style = "width:75px; height:75px; object-fit:contain;">
+													<br />
+													<div class = "pull-left">
+														<button style="padding-left:0px;" type ="button" class = "btn btn-link pull-left" onclick = "getFramedUserImg('{{i.user_image_id}}', '{{i.image_width}}', '{{i.moulding_id | default_if_none:0}}', '{{i.mountcolor | default_if_none:0}}','{{i.mount_size | default_if_none:0}}', '{{i.user_image__image_to_frame | default_if_none:""}}');">
+															{{i.user_image__image_to_frame__name|truncatechars:15 }}
+														</button>
+													</div>
+												</td>
+											
+											{% endif %}
+											<td>
+												{% with width=i.moulding__width_inches %}
+
+												<small>Print on {{i.print_medium_id|title}}, 
+												{% if i.moulding_id %}
+													Frame {{i.moulding__name }} Total Size: 
+													{{ i.image_width|add_width:width }}" X {{i.image_height|add_width:width }}" 
+												{% else %}
+													Image Size : {{ i.image_width }}" X {{i.image_height }}" 
+												{% endif %}
+												
+												{% if i.mount_id %}
+													, {{i.mount_size }}" {{i.mount__name|title }} Mount  
+												{% endif %}
+												{% if i.acrylic_id %}
+													, Acrylic 
+												{% endif %}
+												</small>
+												{% endwith %}
+											</td>
+											<td style = "text-align:right">
+												{{i.item_unit_price}}
+											</td>
+											<td style = "text-align:right">
+												{{i.quantity}}
+											</td>
+											<td style = "text-align:right">
+											
+												{% if i.promotion__discount_type == "PERCENTAGE" %}
+													{{i.promotion__discount_value|floatformat}}%
+												{% else %}
+													{{i.promotion__discount_value|floatformat}}
+												{% endif %}
+											</td>
+											<td style = "text-align:right">{{i.item_total|floatformat}}</td>
+
+										</tr>
+										{% endif %}
+										{% endfor %}
+										
+									</tbody>
+									<tfoot>
+										<tr>
+											<th colspan="4"><small>Shipping & Handing</small></th>
+											<th colspan="2" style = "text-align:right">
+												<small>{{o.shipping_cost|floatformat}}</small>
+											</th>
+											<th></th>
+										</tr>
+										<tr>
+											<th colspan="4"><small>Discount</small></th>
+											<th colspan="1" style = "text-align:right">
+												{% if o.order_discount_amt %} <small>- ({{o.order_discount_amt|floatformat}})</small>{% endif %}
+											</th>
+											<th></th>
+										</tr>
+										<tr>
+											<th colspan="4">Order Total</th>
+											<th colspan="2" style = "text-align:right">
+												<i class = "fa fa-inr"> </i> {{o.order_total|floatformat}}
+											</th>
+											<th></th>
+										</tr>
+									</tfoot>
+								</table>
+							</div>
+							<hr>
+							{% endfor orders %}
+							
+							
+							{% if orders.number %}
+							<div class="box info-bar">
+								<div class="row">
+									<div class="col-md-12 col-lg-12 products-showing">
+										<div class = "text-center">
+											{% if orders.has_previous %}
+												<button type = "button" class="btn btn-sm btn-primary" onclick="get_orders('1');"><i class="fa fa-chevron-left"></i> First</button>  
+												<button type = "button" class="btn btn-sm btn-primary"  onclick="get_orders('{{ orders.previous_page_number }}');">Prev</button>
+											{% else %}
+												<button type = "button" class="btn btn-sm btn btn-secondary disabled" href="#"><i class = "fa fa-chevron-left"></i> First</button>
+												<button type = "button" class="btn btn-sm btn btn-secondary disabled"  href="#">Prev</button>
+											{% endif %}
+											Showing Page {{ orders.number }} of {{ orders.paginator.num_pages }}
+											{% if orders.has_next %}
+												<button type = "button" class="btn btn-sm btn-primary" onclick="get_orders('{{ orders.next_page_number }}');">Next</button>
+												<button type = "button" class="btn btn-sm btn-primary" onclick="get_orders('{{ orders.paginator.num_pages }}');">Last <i class = "fa fa-chevron-right"></i></button>
+											{% else %}
+												<button type = "button" class="btn btn-sm btn-secondary disabled" href="#">Next</button>
+												<button type = "button" class="btn btn-sm btn-secondary disabled" href="#">Last <i class = "fa fa-chevron-right"></i></button>
+											{% endif %}				
+										</div>
+									</div>
+								</div>
+							</div>
+							{% endif %}

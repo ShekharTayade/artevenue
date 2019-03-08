@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+
+{% load static %}
+<html>
+	{% block html-head %}
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<title>{{ecom_site.html_meta_title}}</title>
+		<!--** Pick up from DB (ecom_site_title)-->
+		
+		<meta name="{{ecom_site.html_meta_name}}" content="">
+		<!--** Pick up from DB (description)-->
+
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="robots" content="all,follow">
+		<!-- Bootstrap CSS-->
+		<link rel="stylesheet" href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}">
+		<!-- Font Awesome CSS-->
+		<link rel="stylesheet" href="{% static 'vendor/font-awesome/css/font-awesome.min.css' %}">
+		<!-- Google fonts - Roboto -->
+		<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:400,500,700,300,100">
+		<!-- owl carousel-->
+		<link rel="stylesheet" href="{% static 'vendor/owl.carousel/assets/owl.carousel.css' %}">
+		<link rel="stylesheet" href="{% static 'vendor/owl.carousel/assets/owl.theme.default.css' %}">
+		<!-- theme stylesheet-->
+		<link rel="stylesheet" href="{% static 'css/style.default.css' %}" id="theme-stylesheet">
+
+		<!-- Custom stylesheet - for your changes-->
+		<link rel="stylesheet" href="{% static  'css/custom.css' %}">
+		<!-- Favicon-->
+		<link rel="shortcut icon" href="{% static 'favicon.png' %}">
+		
+		<!-- Goole Font -->
+		<link href="https://fonts.googleapis.com/css?family=Dosis" rel="stylesheet">
+		
+		<!-- Tweaks for older IEs--><!--[if lt IE 9]>
+		<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+		<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script><![endif]-->
+		
+		<!-- JavaScript files-->
+		<script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+		<script src="{% static 'vendor/popper.js/umd/popper.min.js' %}"> </script>
+		<script src="{% static 'vendor/bootstrap/js/bootstrap.min.js' %}"></script>
+		<script src="{% static 'vendor/jquery.cookie/jquery.cookie.js' %}"> </script>
+		<script src="{% static 'vendor/owl.carousel/owl.carousel.min.js' %}"></script>
+		<script src="{% static 'vendor/owl.carousel2.thumbs/owl.carousel2.thumbs.js' %}"></script>
+		<script src="https://maps.googleapis.com/maps/api/js"></script>
+		<script src="{% static 'js/front.js' %}"></script>	
+
+		<!-- imagezoom (https://github.com/fat/zoom.js) -->
+		<link href="{% static 'vendor/zoom.js-master/css/zoom.css' %}" rel="stylesheet">	
+		<script src="{% static 'vendor/zoom.js-master/js/zoom.js' %}"></script>
+		<script src="{% static 'vendor/zoom.js-master/js/transition.js' %}"></script>
+		
+	</head>
+	{% endblock html-head %}
+
+	<body>
+		<!-- Header Section with top slim line, logo/search/cart and menu-->
+		{% block siteheader %}
+		<header class="header mb-2">
+
+		
+			<!-- Top slim bar with tagline, login, register etc-->
+			<div id="top">
+
+				<div class="container">
+					<div class="row">
+						<div class="col-lg-6 mb-3 mb-lg-0 text-white">
+							<a href = "{% url 'index' %}">Home</a>
+							<!--** pick up from DB (ecom_site_tagline)-->
+
+							<!--** only if the phone help is enabled in DB -->
+							{% if ecom_site.phone_support_available %}
+								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								<a class = "text-white clickable" data-toggle="modal" data-target="#phone-help">
+									<i class="fa fa-phone"></i>&nbsp;Help								
+								</a> 
+								<!--** pick up from DB (Link to Phone number display, if enabled)-->
+							{% endif %}
+						</div>
+						<div id="phone-help" tabindex="-1" role="dialog" aria-labelledby="Login" aria-hidden="true" class="modal fade">
+							<div class="modal-dialog modal-sm">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h5 class="modal-title">Contact Number</h5>
+										<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
+									</div>
+									<div class="modal-body">	
+										We are here to help!<br />
+										Please call: {{ecom_site.support_phonenumber }}<br />
+										<small>Timing: {{ecom_site.phone_support_start_time}} to {{ecom_site.phone_support_end_time}}</small>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-6 text-center text-lg-right">
+							<ul class="menu list-inline mb-0">
+								<li class="list-inline-item clickable"><a data-toggle="modal" data-target="#login-modal">Login</a></li>
+								<li class="list-inline-item"><a href="{% url 'register' %}">Register</a></li>
+								<li class="list-inline-item"><a href="{% url 'contact_us' %}">Contact</a></li>
+							</ul>
+						</div>
+					</div>
+				</div>
+				
+				<!-- Login Modal -->
+				<div id="login-modal" tabindex="-1" role="dialog" aria-labelledby="Login" aria-hidden="true" class="modal fade">
+					<div class="modal-dialog modal-sm">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title">Customer login</h5>
+								<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
+							</div>
+							<div class="modal-body">
+								<form action="customer-orders.html" method="post">
+									<div class="form-group">
+										<input id="email-modal" type="text" placeholder="email" class="form-control">
+									</div>
+									<div class="form-group">
+										<input id="password-modal" type="password" placeholder="password" class="form-control">
+									</div>
+									<p class="text-center">
+										<button class="btn btn-primary"><i class="fa fa-sign-in"></i> Log in</button>
+									</p>
+								</form>
+								<p class="text-center text-muted">Not registered yet?</p>
+								<p class="text-center text-muted"><a href="register.html"><strong>Register now</strong></a>! It is easy and done in 1 minute and gives you access to special discounts and much more!</p>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- END: Login modal -->
+			</div>
+			<!-- END: Top slim bar with punchline, login, register etc-->
+			
+			
+			<!-- Navigation - Logo, menu, search and cart buttons -->
+			<nav class="navbar navbar-expand-lg">
+
+				<div class="container">
+		
+					<!-- ecom site logo -->
+					<a href="{% url 'index' %}" class="navbar-brand home">
+						<img src="{% static 'img/arteavenue.png' %}" alt="logo" class="d-none d-md-inline-block">
+						<img src="{% static 'img/logo-small.png' %}" alt="{{ecom_site.store_name}}" class="d-inline-block d-md-none">
+						<span class="sr-only">{{ecom_site.store_name}} - go to homepage</span>
+					</a>
+					<!--** logo.png to have store logo,  get company short name from DB, use in "alt" and "sr_Only" -->
+	  
+					<!-- Search and Cart buttons -->
+					<div class="navbar-buttons">
+					
+						<button type="button" data-toggle="collapse" data-target="#search" class="btn btn-outline-secondary navbar-toggler">
+							<span class="sr-only">Toggle search</span>
+							<i class="fa fa-search"></i>
+						</button>
+						<a href="{% url 'basket' %}" class="btn btn-outline-secondary navbar-toggler">
+							<i class="fa fa-shopping-cart"></i>
+						</a>
+					</div>
+					<!-- END - Search and Cart buttons -->
+					
+					
+					<!-- Menu -->
+					<button type="button" data-toggle="collapse" data-target="#navigation" class="btn btn-outline-secondary navbar-toggler">
+						<span class="sr-only">Toggle navigation</span>
+						<i class="fa fa-align-justify"></i>
+					</button>
+					
+					<!--** Navigation to be picked up from DB -->
+					<div id="navigation" class="collapse navbar-collapse">
+						<ul class="navbar-nav mr-auto">
+							{% for main in level0_menuitems %}
+							<li class="nav-item dropdown menu-large">
+								<a href="#" data-toggle="dropdown" data-hover="dropdown" data-delay="200" class="dropdown-toggle nav-link">
+									{{main.name}}<b class="caret"></b>
+								</a>
+								{% if level1_menuitems %}
+								<ul class="dropdown-menu megamenu">
+									<li>
+										<div class="row">
+											{% for level1 in level1_menuitems %}
+											
+											<div class="col-md-6 col-lg-3">
+												<h5><a href="{% url 'category_products' level1.category_id %}" class="nav-link">{{level1.name}}</a></h5>
+												<ul class="list-unstyled mb-3">
+												{% for level2 in level2_menuitems %}
+												{% if level2.parent_id == level1.category_id %}
+													<li class="nav-item"><a href="{% url 'category_products' level2.category_id %}" class="nav-link">{{level2.name}}</a></li>
+												{% endif %}
+												{% endfor level2_menu %}
+												</ul>
+											</div>
+
+											{% endfor level1_menu %}
+										</div>
+									</li>
+								</ul>
+								{% endif %}
+							</li>
+							{% endfor main_menu %}
+						</ul>
+						<div class="navbar-buttons d-flex justify-content-end">
+							<!-- /.nav-collapse-->
+							<div id="search-not-mobile" class="navbar-collapse collapse"></div>
+								<a data-toggle="collapse" href="#search" class="btn navbar-btn d-none d-lg-inline-block"><span class="sr-only">Toggle search</span><i class="fa fa-search"></i>
+							</a>
+							<div id="basket-overview" class="navbar-collapse collapse d-none d-lg-block">
+								<a href="{% url 'show_cart' %}" class="btn btn-primary navbar-btn"><i class="fa fa-shopping-cart"></i><span id="itemsincart">{% if usercart %} {{usercart.quantity}} {%else%} 0 {%endif %} items in cart </span></a>
+							</div>
+						</div>
+					</div>
+					
+			
+				</div>
+			</nav>
+			<!-- END: Navigation - Logo, menu, search and cart buttons -->
+
+			<!-- Search open up -->
+			<div id="search" class="collapse">
+				<div class="container">
+					<form role="search" class="ml-auto">
+						<div class="input-group">
+							<input type="text" placeholder="Search" class="form-control">
+							<div class="input-group-append">
+								<button type="button" class="btn btn-primary"><i class="fa fa-search"></i></button>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+			<!-- END - Search open up -->
+			
+		</header>
+		{% endblock siteheader %}
+		<!-- END: Header Section with top slim line, logo/search/cart and menu-->
+
+
+		<div id="all">
+			<div id="content" class= " h-25" style="background-color:#fff">
+				{% block sitecontent %}
+			
+				<div id = "headln">
+					THIS DIWALI BRING MORE HAPPINESS, DECORATE YOUR WALLS 
+				</div>
+				
+				{% if ecom_site.show_promotion_section %}
+				<!-- Set the bacground image for the main slider -->
+				<div class = "container">
+					<div class = "row">
+						<div class = "col-md-9" style = "padding:0px;">
+							<div id = "main-slider-img">
+								<!-- Main Slider -->
+								<!--<div class="container">-->
+									<div class="row">
+										<div class="col-md-12">
+											<div id="main-slider" class="owl-carousel owl-theme">
+												{% for slide in slide_array %}
+												<div class="item">
+													{% with 'img/'|add:slide as image_static %}
+													<img src="{% static image_static %}" alt="Image" class="img-fluid">
+													{% endwith %}								
+												</div>
+												{% endfor slide_array %}
+											</div>
+										</div>
+									</div>
+								<!-- </div> -->
+								<!-- END: Main Slider -->
+							</div>
+						</div>
+						<div class = "col-md-3" style = "padding:0px;">
+							<div class = "main-img">
+								<img src="{% static 'img/main-image/img-1.jpg' %}" alt="Image" class="img-fluid main-slider-img">
+							</div>
+							<div class = "main-img">
+								<img src="{% static 'img/main-image/img-2.jpg' %}" alt="Image" class="img-fluid main-slider-img">
+							</div>
+						</div>
+					</div>
+				</div>
+				{% endif %}
+		
+
+				<!-- Featured Products  Header -->
+				{% if ecom_site.show_featured_section %}
+				<div id="featured-art">
+					<div class="box py-2">
+						<div class="container">
+							<div class="row">
+								<div class="col-md-12">
+									<h2 class="mb-0">{{ecom_site.featured_header}}</h2>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- END: Featured Products  Header -->		
+
+
+				<!-- Featured items slider -->
+				<div class="container">
+					<div class="product-slider owl-carousel owl-theme">
+						{% for f in featured_prods %}
+						<div class="item">  
+							<div class="flip-container">
+								<div class="flipper">
+									<div class="front"  style="margin:0px 2px 0px 2px !important;">
+										<a href="{% url 'product_details' f.product_id %}"> 
+											{% with 'img/'|add:f.url as image_static %}
+											<img src="{% static image_static %}" alt="{{i.url}}" class="img-fluid">
+											{% endwith %}								
+										</a>
+									</div>
+									<div class="text text-center">
+										<h3>
+											<a href="{% url 'product_details' f.product_id %}">{{ f.name }}</a>
+										</h3>
+										<p class="price"> 
+										  <del>{{f.del_price}}</del><i class="fa fa-inr" aria-hidden="true">&nbsp;</i>{{ f.price }}
+										</p>
+									</div>
+
+									{% if f.sale_tag %}
+									<div class="ribbon sale">
+										<div class="theribbon">SALE</div>
+										<div class="ribbon-background"></div>
+									</div>
+									{% endif %}
+									
+									{% if f.new_tag %}
+									<!-- /.ribbon-->
+									<div class="ribbon new">
+										<div class="theribbon">NEW</div>
+										<div class="ribbon-background"></div>
+									</div>
+									<!-- /.ribbon-->
+									{% endif %}
+									
+									
+								</div>
+							</div>
+						</div>
+						{% endfor %}
+					</div>						
+				</div>
+				
+				<!-- Featured items slider -->
+				<div class="container">
+					<div class="product-slider owl-carousel owl-theme">
+						{% for f in featured_prod %}
+						{% for i in featured_prod_img %}
+
+						<div class="item">
+							<div class="product">
+								<div class="flip-container">
+									<div class="flipper">
+										<div class="front">
+											<a href="{% url 'product_details' i.product_id %}"> 
+												{% with 'img/'|add:i.url as image_static %}
+												<img src="{% static image_static %}" alt="{{i.url}}" class="img-fluid">
+												{% endwith %}								
+											</a>
+										</div>
+										<div class="back">
+											<a href="{% url 'product_details' i.product_id %}">
+												{% with 'img/'|add:i.url as image_static %}
+												<img src="{% static image_static %}" alt="{{i.url}}" class="img-fluid">
+												{% endwith %}								
+											</a>
+										</div>
+									</div>
+								</div>
+								<a href="{% url 'product_details' i.product_id %}" class="invisible">
+									{% with 'img/'|add:i.url as image_static %}
+									<img src="{% static img_static %}" alt="" class="img-fluid">
+									{% endwith %}
+								</a>
+								<div class="text">
+									<h3>
+										<a href="{% url 'product_details' i.product_id %}">{{ f.name }}</a>
+									</h3>
+									<p class="price"> 
+									  <del>{{f.del_price}}</del><i class="fa fa-inr" aria-hidden="true">&nbsp;</i>{{ f.price }}
+									</p>
+								</div>
+								  <!-- /.text-->
+								  
+								{% if f.sale_tag %}
+								<div class="ribbon sale">
+									<div class="theribbon">SALE</div>
+									<div class="ribbon-background"></div>
+								</div>
+								{% endif %}
+								
+								{% if f.new_tag %}
+								<!-- /.ribbon-->
+								<div class="ribbon new">
+									<div class="theribbon">NEW</div>
+									<div class="ribbon-background"></div>
+								</div>
+								<!-- /.ribbon-->
+								{% endif %}
+								
+							</div>
+							<!-- /.product-->
+						</div>
+						<!-- /.item-->
+						{% endfor featured_prod_img %}
+						{% endfor featured_prod %}
+					</div>
+				</div>
+				{% endif %}
+				<!-- END: Featured items slider -->
+
+				{% if ecom_site.show_frame_my_art_section %}
+				<!-- Frame My Art Header -->
+				<div id="frame-my-art">
+					<div class="box py-4">
+						<div class="container">
+							<div class="row">
+								<div class="col-md-12">
+									<h2 class="mb-0">{{ecom_site.frame_my_art_header}}</h2>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- END - Featured Products  Header -->
+				</div>
+
+				{% for a in frame_my_art_slides %}
+				<div class="container">
+					<div class="row" style = "margin-bottom: 15px">
+						<!-- New Arivals Slider -->
+						<div ="col-sm-4" style = "padding:0px 15px 0px 15px">
+							<a href= "{% url 'show_frame' %}">
+								<img class = "thumbnail" src="{{f.img_frame}}" alt="" class="img-fluid">
+							</a>
+						</div>
+						<!-- END - New Arivals Slider -->
+					</div>
+				</div>
+				{% endfor rame_my_art_slides %}
+				{% endif %}
+				
+
+				<div class="container">
+					<div class="row" style = "margin: 15px 0px 15px 0px;">
+						<!-- classic art -->
+						<a href= "{% url 'show_frame' %}">
+							<img src="{% static 'img/showcase-category/classic-art.jpg' %}" alt="" class="img-fluid">
+						</a>
+					</div>
+				</div>
+
+				{% if prod_collections %}
+				<!-- Collections -->
+				<div id="collections">
+					<div class="box py-2">
+						<div class="container">
+							<div class="row">
+								<div class="col-md-12">
+									<h2 class="mb-0 text-center">Explore Collections</h2>
+									<div class = "text-center">
+										<span class = "section-text">
+											We have a wide variety of art in our collection.<br/>
+											Browse the collections, select the art you like, and we will deliver it to you.
+										</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- END - collection header -->
+				</div>
+
+				<div class="container">
+					<div class="row" style = "margin-bottom: 15px">
+						<div class="collection-slider owl-carousel owl-theme">
+							{% for c in prod_collections %}
+							<div class = "item" style="margin:0px 2px 0px 2px !important;">
+							<!-- Collection Slider -->
+								<a href= "{% url 'show_collection' c.collection_id %}">
+									{% with 'img/'|add:c.url as image_static %}
+									<img src="{% static image_static %}" alt="Collection-Img" class="img-fluid main-slider-img">
+									{% endwith %}
+								</a>
+								<div class="collection-header">
+									{{ c.name }}
+								</div>
+								<div class="collection-text">
+									{{c.description}}
+								</div>
+							</div>
+							{% endfor rame_my_art_slides %}
+						</div>
+						<!-- Collections Slider -->
+					</div>
+				</div>
+				{% endif %}
+
+
+				
+					
+				
+				{% endblock sitecontent %}
+				<!-- -------------------------------------------------------- -->
+				<!-- FOOTER -->
+				<!-- -------------------------------------------------------- -->
+				<div id="footer">
+					<div class="container">
+						<div class="row">
+							<div class="col-lg-3 col-md-6">
+								<ul class="list-unstyled">
+									<li><a href="{%url 'about_us' %}">About us</a></li>
+									<li><a href="{% url 'terms_conditions' %}">Terms and conditions</a></li>
+									<li><a href="{% url 'faq' %}">FAQ</a></li>
+								</ul>
+								<hr>
+								<h4 class="mb-3">User section</h4>
+								<ul class="list-unstyled">
+									<li>
+										<a href="#" data-toggle="modal" data-target="#login-modal">Login</a>
+									</li>
+									<li><a href="{% url 'register' %}">Register</a></li>
+								</ul>
+							</div>
+							<!-- /.col-lg-3-->
+							<div class="col-lg-3 col-md-6">
+								<!-- an empty grid, can be used for anything -->
+								&nbsp;
+							</div>
+							<!-- /.col-lg-3-->
+							<div class="col-lg-3 col-md-6">
+								<h4 class="mb-3">Where to find us:</h4>
+								<p><strong>{{ ecom_site.store_name }}</strong><br>
+								{{ ecom_site.store_address1 }}<br>
+								{% if ecom_site.store_address2 %}
+								{{ ecom_site.store_address2 }}<br>
+								{% endif %}
+								{{ ecom_site.store_city }}<br>
+								{{ ecom_site.store_zip }} &nbsp;{{ ecom_site.store_country }}<br>
+								</p><a href="{% url 'contact_us' %}">Go to contact page</a>
+								<hr class="d-block d-md-none">
+							</div>
+							<!-- /.col-lg-3-->
+							<div class="col-lg-3 col-md-6">
+								<p class="social"><a href="#" class="facebook external"><i class="fa fa-facebook"></i></a><a href="#" class="twitter external"><i class="fa fa-twitter"></i></a><a href="#" class="instagram external"><i class="fa fa-instagram"></i></a><a href="#" class="gplus external"><i class="fa fa-google-plus"></i></a><a href="#" class="email external"><i class="fa fa-envelope"></i></a></p>
+							</div>
+						<!-- /.col-lg-3-->
+						</div>
+					<!-- /.row-->
+					</div>
+				<!-- /.container-->
+				</div>
+				<!-- /#footer-->
+				<!-- *** FOOTER END ***-->
+    
+    
+				<!--COPYRIGHT -->
+				<div id="copyright">
+					<div class="container">
+						<div class="row">
+							<div class="col-lg-6 mb-2 mb-lg-0">
+								<p class="text-center text-lg-left">©{{ecom_site.copyright_year}} {{ecom_site.store_name}}.</p>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+			</div>
+		</div>
+		<!-- *** COPYRIGHT END ***-->
+
+	<script>
+	// ---- Add Product to Cart ----//
+	function addProdToCart(prod_id, qty) {
+		var cart_qty;
+		// Update the cart
+		$.ajax({
+				url: "{% url 'update_cart' %}", 
+				data: {'prod_id':prod_id, 'qty':qty}, 
+				dataType: 'text', 
+			success: function (data) {
+				data = JSON.parse(data);
+				cart_qty = data.cart_qty;
+				alert(data.msg); 
+
+				//Update items in cart
+				$("#itemsincart").html(cart_qty + " items in cart"); 
+			},
+			error: function(xhr){
+				alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+			}
+		});
+		
+	}	
+	</script>	
+	
+
+		
+	</body>
+	
+	
+</html>

@@ -1,0 +1,21 @@
+product_id	name	description	price	available_on	updated_at	is_published	seo_description	seo_title	charge_taxes	tax_rate	featured	has_variants	product_type_id	store_id	tax_id	part_number
+7	Image 7	Image 7 Description	8500.00	2018-01-01	2018-01-01 00:00:00+05:30	t			t		f	f		2		
+8	Image 8	Image 8 Description	8500.00	2018-01-01	2018-01-01 00:00:00+05:30	t			t		f	f		2		
+9	Image 9	Image 9 Description	8500.00	2018-01-01	2018-01-01 00:00:00+05:30	t			t		f	f		2		
+10	Image 10	Image 10 Description	3500.00	2018-01-01	2018-01-01 00:00:00+05:30	t			t		f	f		2		
+11	Image 11	Image 11 Description	4000.00	2018-01-01	2018-01-01 00:00:00+05:30	t			t		f	f		2		
+12	Image 12	Image 12 Description	3300.00	2018-01-01	2018-01-01 00:00:00+05:30	t			t		f	f		2		
+13	Image 13	Image 13 Description	2300.00	2018-01-01	2018-01-01 00:00:00+05:30	t			t		f	f		2		
+14	Image 14	Image 14 Description	6500.00	2018-01-01	2018-01-01 00:00:00+05:30	t			t		f	f		2		
+15	Image 15	Image 15 Description	3000.00	2018-01-01	2018-01-01 00:00:00+05:30	t			t		f	f		2		
+16	Image 16	Image 16 Description	2200.00	2018-01-01	2018-01-01 00:00:00+05:30	t			t		f	f		2		
+17	Image 17	Image 17 Description	8000.00	2018-01-01	2018-01-01 00:00:00+05:30	t			t		f	f		2		
+18	Image 18	Image 18 Description	8700.00	2018-01-01	2018-01-01 00:00:00+05:30	t			t		f	f		2		
+19	Image 19	Image 19 Description	7500.00	2018-01-01	2018-01-01 00:00:00+05:30	t			t		f	f		2		
+20	Image 20	Image 20 Description	11100.00	2018-01-01	2018-01-01 00:00:00+05:30	t			t		f	f		2		
+21	Image 21	Image 20 Description	11100.00	2018-01-01	2018-01-01 00:00:00+05:30	t			t		f	f		2		
+22	Image 22	Image 20 Description	11100.00	2018-01-01	2018-01-01 00:00:00+05:30	t			t		f	f		2		
+23	Image 23	Image 20 Description	11100.00	2018-01-01	2018-01-01 00:00:00+05:30	t			t		f	f		2		
+24	Image 24	Image 20 Description	11100.00	2018-01-01	2018-01-01 00:00:00+05:30	t			t		f	f		2		
+25	Image 25	Image 20 Description	11100.00	2018-01-01	2018-01-01 00:00:00+05:30	t			t		f	f		2		
+26	Image 26	Image 20 Description	11100.00	2018-01-01	2018-01-01 00:00:00+05:30	t			t		f	f		2		

@@ -1,0 +1,86 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+        <div class="container">
+			<div class="row">
+				<!-- breadcrumb-->
+				<div class="col-lg-12">
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+							<li aria-current="page" class="breadcrumb-item active">Approved Business Account</li>
+						</ol>
+					</nav>
+				</div>
+
+				<div class="row">
+					<div class = "col-sm-12">
+						<div class="box">
+							{% if accnt %}
+								<h1>Business Account Approved</h1>
+								<p>This business account is now registered and specified commission will apply
+								for the orders booking with this account</p>
+							{% else %}
+								<h1>You seem to have arrived here without approving any business account</h1>
+							{% endif %}
+						</div>
+					</div>
+					<div class="row">
+						<div class="card">
+							{% if accnt %}
+							<div class="container">
+								<h3><b>{{accnt.company|title}}</b></h3> 
+								<p><b>{{accnt.contact_name|title}}</b><br /> 
+									{{accnt.phone_number}} | {{accnt.user.email}}<br /> 
+									{{accnt.address_1}} {{accnt.address_2}}<br />
+									{{accnt.city}} {{accnt.state}} {{accnt.pin_code_id}}
+								</p>
+								<p> GST Number: {{accnt.gst_number}}</p>
+							</div>
+							<div class = "justify-content-center"> 
+								<div class = "text-center">
+									<div class = "row">
+										<div class = "col-sm-2">
+										</div>
+										<div class = "col-sm-8">
+											<div class="form-group">	
+												<label>Profile Selected</label>
+												<input disabled class = "form-control" name = "profile_group" 
+													id = "profile_group" value = "{{accnt.profile_group.name}}">
+											</div>
+											<div class="form-group">	
+												<label>Approval Date</label>
+												<input disabled class = "form-control"  name = "approval_date" id = "approval_date"
+													value = "{{accnt.approval_date|date:'Y-m-d'}}" type = "date">
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							{% endif %}
+							<div class = "form-group">
+								<a class="btn btn-primary mb-2" href="{% url 'pending_business_accounts'%}">
+									<i class="fa fa-chevron-left"></i>Go to back to Approval 
+								</a>
+							</div>
+							<div class = "form-group">
+								<a class="btn btn-primary mb-2" href="{% url 'index'%}">
+									Go to Home Page <i class="fa fa-chevron-right"></i>
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+			</div>
+		</div>
+				
+	{% endblock sitecontent %}
+
+	
+	{% block jscripts %}
+
+	{% endblock jscripts %}
+			
+	

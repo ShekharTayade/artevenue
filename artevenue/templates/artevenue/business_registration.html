@@ -1,0 +1,90 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+
+	
+    <div id="highlighted-slider" class="container ccontainer">
+            <div class="row">
+                <div class="col-md-12">
+					Already have a business account? 	
+						<li class="list-inline-item clickable"><a data-toggle="modal" data-target="#login-modal"><span style = "color:blue"> Login here</span></a></li>
+				</div>
+			</div>
+        <div class="box box-default">
+            <div class="box-header with-border row">
+                <div class="col-md-3" ><h3>Business-Sign Up</i></h3></div>
+				<div class="col-md-9" >
+					<div class="quote-leftbar" >
+						Do you have volume requirements, are you a business or supplying to a business?
+						Create a business account with us and get exciting benefits. Sign up below...
+					</div>
+				</div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+						<input hidden name="curr_pg" value="{{request.path}}" >		
+                        <div class="row">						
+                            <div class="col-sm-4" style="border: 1px solid lightgrey; border-radius: 10px; padding: 5px 10px 10px 10px;">
+                                <div class="panel panel-default cpanel cpanel-default">
+                                    <div class="w3-container pref-head">
+                                        <h4>
+                                            Arte'venue Business Account
+                                        </h4>
+                                    </div>
+                                    <div class="w3-container">
+                                        {% include 'includes/form.html' %}
+                                    </div>
+                                    <!-- <button type="submit" class="btn btn-primary">Sign Me Up</button> -->
+                                </div>
+                            </div>
+                            
+                            <div class="col-sm-8" style="border: 1px solid lightgrey; border-radius: 10px; padding: 5px 10px 10px 10px;;">
+                                <div class="panel panel-default cpanel cpanel-default">
+								
+									{% include 'artevenue/business_profile_form_include.html' %}
+									
+                                </div>
+                            </div>
+							<div class = "col-sm-12 mt-3">
+								<div class = "text-center">
+									<button class = "btn btn-primary " type="submit">Sign Up</button>
+								</div>			
+							</div>											
+							
+							
+                        </div>
+
+                    </form>        
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+	
+	{% endblock sitecontent %}
+
+	
+	{% block jscripts %}
+	<script>
+    $(document).ready( function(){
+
+        $( "#id_date_of_birth" ).datepicker({
+                dateFormat: "yy-mm-dd",
+                defaultDate: "-17y",
+                changeMonth: true,
+                changeYear: true,
+                onClose: function( selectedDate ) {
+                    $( "#id_birth_date" ).datepicker( "option", "minDate", selectedDate );
+                    }
+        });
+    });
+	</script>
+	{% endblock jscripts %}
+			
+	

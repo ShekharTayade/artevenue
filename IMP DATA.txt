@@ -1,0 +1,20 @@
+Digital Ocean:
+~~~~~~~~~~~~~~~~~
+Droplet: ArteVenue
+IP: 139.59.78.215
+
+root pwd - 54vmartevenue100m
+User - Id: artevenue 	Pwd: projuser_art
+
+
+User HOME:  /home/artevenue/
+PROJECT HOME: /home/artevenue/artevenue/
+VIRTUAL ENV : /home/artevenue/artevenueenv/
+
+
+
+POSTGRESQL:
+~~~~~~~~~~
+DB Name: artevenue
+User: artevenue pwd: arte_user_venue
+

@@ -1,0 +1,57 @@
+{% load static %}
+<div id="footer">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-3 col-md-6">
+				<ul class="list-unstyled">
+					<li><a href="{%url 'about_us' %}">About us</a></li>
+					<li><a href="{% url 'terms_conditions' %}">Terms and conditions</a></li>
+					<li><a href="{% url 'faq' %}">FAQ</a></li>
+				</ul>
+			</div>
+			<!-- /.col-lg-3-->
+			<div class="col-lg-3 col-md-6">
+				<h4 class="mb-3">User section</h4>
+				{% if user.is_authenticated %}
+					<ul class="list-unstyled">
+						<li><a href="{% url 'my_account' %}">My Account</a></li>
+						<li><a href="{% url 'my_orders' %}">My Orders</a></li>
+						<li class="dropdown-divider"></li>
+						<li><a href="{% url 'logout' %}">Logout</a></li>
+						<li> <a href="{% url 'password_change' %}">Change Password</a></li>   
+					</ul>
+				{% else %}
+					<ul class="list-unstyled">
+						<li>
+							<a href="#" data-toggle="modal" data-target="#login-modal">Login</a>
+						</li>
+						<li><a href="{% url 'register' %}">Sign Up</a></li>
+					</ul>
+				{% endif %}
+			</div>
+			<!-- /.col-lg-3-->
+			<div class="col-lg-3 col-md-6">
+				<h4 class="mb-3">Where to find us:</h4>
+				<p><strong>{{ ecom_site.store_name }}</strong><br>
+				{{ ecom_site.store_address1 }}<br>
+				{% if ecom_site.store_address2 %}
+				{{ ecom_site.store_address2 }}<br>
+				{% endif %}
+				{{ ecom_site.store_city }}<br>
+				{{ ecom_site.store_zip }} &nbsp;{{ ecom_site.store_country }}<br>
+				</p><a href="{% url 'contact_us' %}">Go to contact page</a>
+				<hr class="d-block d-md-none">
+			</div>
+			<!-- /.col-lg-3-->
+			<div class="col-lg-3 col-md-6">
+				<p class="social"><a href="#" class="facebook external"><i class="fa fa-facebook"></i></a><a href="#" class="twitter external"><i class="fa fa-twitter"></i></a><a href="#" class="instagram external"><i class="fa fa-instagram"></i></a><a href="#" class="gplus external"><i class="fa fa-google-plus"></i></a><a href="#" class="email external"><i class="fa fa-envelope"></i></a></p>
+			</div>
+		<!-- /.col-lg-3-->
+		</div>
+	<!-- /.row-->
+	</div>
+<!-- /.container-->
+</div>
+<!-- /#footer-->
+<!-- *** FOOTER END ***-->
+  

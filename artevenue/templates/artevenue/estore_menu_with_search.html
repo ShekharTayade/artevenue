@@ -1,0 +1,128 @@
+{% load static %}
+<!-- Navigation - Logo, menu, search and cart buttons -->
+<nav class="navbar navbar-expand-lg">
+
+	<!-- ecom site logo -->
+	<a href="{% url 'index' %}" class="navbar-brand home">
+		<img src="{% static 'img/logo.png' %}" alt="logo" class="d-none d-md-inline-block">
+		<img src="{% static 'img/logo_mobile.png' %}" alt="{{ecom_site.store_name}}" class="d-inline-block d-md-none">
+		<span class="sr-only">{{ecom_site.store_name}} - go to homepage</span>
+	</a>
+	
+	<!-- Search and Cart buttons -->
+	<div class="navbar-buttons">
+	
+		<button type="button" data-toggle="collapse" data-target="#search" class="btn btn-outline-secondary navbar-toggler">
+			<span class="sr-only">Toggle search</span>
+			<i class="fa fa-search"></i>
+		</button>
+		<a href="{% url 'show_cart' %}" class="btn btn-outline-secondary navbar-toggler">
+			<i class="fa fa-shopping-cart"></i>
+		</a>
+	</div>
+	<!-- END - Search and Cart buttons -->
+	
+	
+	<!-- Menu -->
+	<button type="button" data-toggle="collapse" data-target="#navigation" class="btn btn-outline-secondary navbar-toggler">
+		<span class="sr-only">Toggle navigation</span>
+		<i class="fa fa-align-justify"></i>
+	</button>
+
+		  
+	<!--** Navigation to be picked up from DB -->
+	<div id="navigation" class="collapse navbar-collapse">
+		<ul class="navbar-nav mr-auto">
+			{% for main in level0_menuitems %}
+				{% if main.name|upper == 'ART' %}
+			
+				<li class="nav-item dropdown menu-large">
+					<a href="#" data-toggle="dropdown" data-hover="dropdown" data-delay="200" class="dropdown-toggle nav-link">
+						{{main.name}}<b class="caret"></b>
+					</a>
+					{% if level1_menuitems %}
+					<ul class="dropdown-menu megamenu">
+						<li>
+							<div class="row">
+								{% for level1 in level1_menuitems %}
+							
+								{% if forloop.counter == 7 %}
+									<div class="col-md-12 col-lg-12" 
+										style = "border-bottom : 1px dotted #555; padding-bottom:5px; margin-bottom:10px;">
+										<h4>More Categories</h4>
+									</div>
+								{% endif %}
+								<div class="col-md-4 col-lg-2">
+									<a href="{% url 'category_stock_images' level1.category_id %}" class="nav-link">
+										{% if forloop.counter < 7 %}
+											{% if level1.url %}
+												{% with 'img/'|add:level1.url as image_static %}
+												<img class = "img-in-menu " src = "{% static image_static %}" >
+												{% endwith %}
+											{% endif %}
+										{% endif %}
+										<div class = "text-center">
+											<h5>{{level1.name|title}} <span class = "menu-badge">{{level1.product_product_category__count}}</span></h5>
+										</div>
+									</a>
+									<ul class="list-unstyled mb-3">
+									{% for level2 in level2_menuitems %}
+									{% if level2.parent_id == level1.category_id %}
+										<li class="nav-item"><a href="{% url 'category_stock_images' level2.category_id %}" class="nav-link">{{level2.name|title}}</a></li>
+									{% endif %}
+									{% endfor level2_menu %}
+									</ul>
+								</div>
+
+
+								{% endfor level1_menu %}
+
+								<div class="col-md-6 col-lg-3">
+									<h5><a style = "color:black !important; text-decoration:underline;" href="{% url 'show_all_categories' %}" class="nav-link"><i class = ""></i>Show All<i class = ""></i></a></h5>
+								</div>
+
+							</div>
+						</li>
+					</ul>
+					{% endif %}
+				</li>
+				{% endif %}
+			{% endfor %}
+			
+
+			<li><a href="{% url 'user_image' %}">Frame</a></li>
+			<li><a href="">Sale</a></li>
+			<li><a href="{% url 'show_wishlist' %}">Wish List</a></li>
+			<li><a href="{% url 'business_registration' %}">For Business</a></li>
+
+		</ul>	
+		
+		<div class="navbar-buttons d-flex justify-content-end">
+			<form role="search" class="form-inline search_form" action = "{% url 'products_by_keywords' %}">
+					<input type="text" placeholder="Ex. Blue Abstract" id ="keywords" name="keywords" class="form-control" required>
+					<button class="btn btn-outline-success" type="submit"><img src="{% static 'img/search_head.png' %}"></button>
+			</form>
+		
+			<!-- /.nav-collapse-->
+			<div id="basket-overview" class="navbar-collapse collapse d-none d-lg-block">
+				<a href="{% url 'show_cart' %}" class="cart_top d-xl-block d-lg-block d-none"><img src="{% static 'img/cart_icon.png' %}"><span id="itemsincart">{% if usercart %} {{usercart.quantity}} {%else%} 0 {%endif %}</span></a>
+				
+			</div>
+		</div>
+		
+	
+	</div>
+</nav>
+<!-- Search open up -->
+<div id="search" class="collapse">
+	<div class="container">
+		<form role="search" action = "{% url 'products_by_keywords' %}">
+			<div class="input-group">
+				<input type="text" placeholder="Ex. Blue Abstract" id ="keywords" name="keywords" class="form-control" required>
+				<div class="input-group-append">
+					<button type="submit" class="btn btn-primary"><i class="fa fa-search"></i></button>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>

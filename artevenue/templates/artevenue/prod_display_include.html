@@ -1,0 +1,50 @@
+					
+					<h5>{{prods.paginator.count}} results found</h5>
+
+					
+					<div class="row">
+						{% for prod in prods %}
+						<div class="col-lg-3 col-md-6">
+							<div class = "prod-details">
+								<div class="img-container">
+									<a href="{% url 'stock_image_detail' prod.product_id %}">
+										<img src="{{prod.url}}" alt="" class="img-fluid image-display" >
+									</a>
+								</div>
+
+								<div class="text text-center" style = "margin-top: 5px;">
+									<h4><a href="">{{prod.name}}</a></h4>
+									<p class="price"> 
+										<del></del>
+									</p>
+								</div>
+							</div>
+						</div>
+						<!-- END of Products -->
+						{% endfor prods %}
+
+					</div>
+
+					<div class="box info-bar">
+						<div class="row">
+							<div class="col-md-12 col-lg-12 products-showing">
+								<div class = "text-center">
+									{% if prods.has_previous %}
+										<a class="btn btn-sm btn-primary" href="?page=1&sort={{sortOrder}}&show={{show}}">&laquo; First</a>
+										<a class="btn btn-sm btn-primary"  href="?page={{ prods.previous_page_number }}&sort={{sortOrder}}">Prev</a>
+									{% else %}
+										<a class="btn btn-sm btn btn-secondary disabled" href="#">&laquo; First</a>
+										<a class="btn btn-sm btn btn-secondary disabled"  href="#">Prev</a>
+									{% endif %}
+									Showing Page {{ prods.number }} of {{ prods.paginator.num_pages }}
+									{% if prods.has_next %}
+										<a class="btn btn-sm btn-primary" href="?page={{ prods.next_page_number }}&sort={{sortOrder}}&show={{show}}">Next</a>
+										<a class="btn btn-sm btn-primary" href="?page={{ prods.paginator.num_pages }}&sort={{sortOrder}}&show={{show}}">Last &raquo;</a>
+									{% else %}
+										<a class="btn btn-sm btn-secondary disabled" href="#">Next</a>
+										<a class="btn btn-sm btn-secondary disabled" href="#">Last &raquo;</a>
+									{% endif %}				
+								</div>
+							</div>
+						</div>
+					</div>

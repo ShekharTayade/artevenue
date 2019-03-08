@@ -1,0 +1,158 @@
+{% extends 'eStore/estore_base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+        <div class="container">
+			<div class="row">
+
+				<!-- breadcrumb-->
+				<div class="col-lg-12">
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+							<li aria-current="page" class="breadcrumb-item active">Contact Us</li>
+						</ol>
+					</nav>
+				</div>
+
+				<div class="col-lg-3">
+
+					<button type="button" data-toggle="collapse" data-target="#cat_navigation" class="btn btn-outline-secondary navbar-toggler full-width-btn" style="width:100% !important;">
+						<span class="sr-only">Toggle navigation</span>
+						<i class="fa fa-align-justify"></i>Contact Us
+					</button>
+
+				
+					 <!--
+					 *** CATEGORIES AND FILTERS ***
+					_________________________________________________________
+					-->
+					<div id = "cat_navigation" class="collapse show navbar-collapse">
+						<div class="card sidebar-menu mb-4">
+							<!--<div class="card-header">
+								<h3 class="h4 card-title">Categories</h3>
+							</div>-->
+							<div class="card-body">
+								<ul class="nav nav-pills flex-column">
+									<li><a href="#" class="nav-link">Contact</a></li>
+									<li><a href="#locateus" class="nav-link">Locate us</a></li>
+									<li><a href="#contactform" class="nav-link">Write to us</a></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /.col-md-3-->
+	
+
+
+				<div class="col-lg-9">
+					<div id="contact" class="box">
+						<h1>Contact</h1>
+						<p class="lead">Are you curious about something? Do you have some kind of problem with our site, products, orders etc.?</p>
+						<p>Please feel free to contact us using any of the following means</p>
+						<hr>
+						<div class="row">
+							<div class="col-md-4">
+								<h3><i class="fa fa-map-marker"></i> Address</h3>
+								<p><strong>{{ ecom_site.store_name }}</strong><br>
+								{{ ecom_site.store_address1 }}<br>
+								{% if ecom_site.store_address2 %}
+								{{ ecom_site.store_address2 }}<br>
+								{% endif %}
+								{{ ecom_site.store_city }}<br>
+								{{ ecom_site.store_zip }} &nbsp;{{ ecom_site.store_country }}<br>
+							</div>
+							<!-- /.col-sm-4-->
+							<div class="col-md-4">
+								<h3><i class="fa fa-phone"></i> Phone Support</h3>
+								<p class="text-muted">Please use this number to reach us between {{ecom_site.phone_support_start_time}} to {{ecom_site.phone_support_end_time}}. We will be happy to help you.</p>
+								<p><strong>{{ecom_site.support_phonenumber }}</strong></p>
+							</div>
+							<!-- /.col-sm-4-->
+							<div class="col-md-4">
+								<h3><i class="fa fa-envelope"></i> Electronic support</h3>
+								<p class="text-muted">Please feel free to write an email to us at -</p>
+								<ul>
+								  <li><strong><a href="mailto:">info@arteavenue.com</a></strong></li>
+								</ul>
+							</div>
+							<!-- /.col-sm-4-->
+						</div>
+						<!-- /.row-->
+						<hr>
+						<div id = "locateus"> <h3><i class="fa fa-map-marker"></i> Locate Us:</h3></div>
+						<div id="map"></div>
+						<hr>
+						<div id = "contactform">
+							<h2>Contact form</h2>
+						</div>
+						<div class="row justify-content-center">
+							<div class = "col-3">
+								<input type = "checkbox"> I am not a robot
+							</div>
+							<div class="col-8">
+								<form method="post" novalidate action = "{% url 'contact_msg' %}">
+									{% csrf_token %}
+									<input hidden name="curr_pg" value="{{request.path}}" >						
+									<div class="panel panel-default cpanel cpanel-default">
+										<div class="w3-container">
+												{% for hidden in form.hidden_fields %}
+												  {{ hidden }}
+												{% endfor %}
+
+												{% for field in form.visible_fields %}
+												  <div class="form-group">
+													<label class = "control-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+													{{ field|add_class:'form-control' }}
+													{% for error in field.errors %}
+													  <span class="help-block">{{ error }}</span>
+													{% endfor %}
+												  </div>
+												{% endfor %}
+
+										</div>
+										<!-- <button type="submit" class="btn btn-primary">Sign Me Up</button> -->
+									</div>
+
+									<div class="text-center" style="margin-top: 0px;margin-bottom: 3px;">
+										<button type="submit" class="btn btn-primary" style="border-radius: 0;width: 150px">Send Message</button>
+									</div>
+									
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /.col-md-9-->
+
+			</div>
+		</div>
+	{% endblock sitecontent %}
+
+	
+	{% block jscripts %}
+    <script>
+      function initialize() {
+              var mapOptions = {
+                  zoom: 15,
+                  center: new google.maps.LatLng(12.9708491, 77.59885489999999),
+                  mapTypeId: google.maps.MapTypeId.ROAD,
+                  scrollwheel: false
+              }
+              var map = new google.maps.Map(document.getElementById('map'),
+                  mapOptions);
+      
+              var myLatLng = new google.maps.LatLng(12.9708491, 77.59885489999999);
+              var marker = new google.maps.Marker({
+                  position: myLatLng,
+                  map: map
+              });
+          }
+      
+          google.maps.event.addDomListener(window, 'load', initialize);
+    </script>
+	{% endblock jscripts %}
+			
+	
