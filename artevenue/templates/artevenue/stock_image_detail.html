@@ -162,15 +162,15 @@
 											</div>
 											{% for m in mounts %}
 											<div class = "col-1 mr-1">
-												<div class = "mount" 
+												<button class = "btn mount" 
 													id = "mnt_{{m.mount_id}}"
-													style = "background-color:{{m.color}};" 
+													style = "border:1px solid grey; background-color:{{m.color}};" 
 													data-toggle="tooltip" 
 													title = "{{m.name}}"  
 													onclick = "set_mount('{{m.mount_id}}');
 															   set_mount_color('{{m.color}}');
 															   ">
-												</div>
+												</button>
 											</div>
 											{% endfor %}
 										</div>

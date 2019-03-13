@@ -503,7 +503,7 @@ ul.slick-dots li.slick-active button {
     margin-right: auto;
     left: 0;
     right: 0;
-    background: url(../images/heading_bottom.png) no-repeat;
+    background: url(../img/heading_bottom.png) no-repeat;
     background-position: center;
 }
 
@@ -664,7 +664,7 @@ ul.footer-address li:before {
 }
 
 li.house:before{
-	background: url(../images/location_bottom.png) no-repeat;
+	background: url(../img/location_bottom.png) no-repeat;
     background-position: center;
 }
 

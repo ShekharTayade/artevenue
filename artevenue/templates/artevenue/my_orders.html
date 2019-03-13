@@ -1,4 +1,4 @@
-{% extends 'eStore/eStore_base.html' %}
+{% extends 'artevenue/estore_base.html' %}
 {% load static %}
 {% load widget_tweaks %}
 	<!-- Only Override the site content block -->
@@ -54,7 +54,7 @@
 						</div>
 						<div class="box info-bar">
 							<div id = "orders_table">
-								{% include 'eStore/orders_table.html' %}
+								{% include 'artevenue/orders_table.html' %}
 							</div>
 							
 							<div class="row">
@@ -77,7 +77,7 @@
 			</div>
         </div>
     </div>
-	{% include 'eStore/message-modal_ok.html' %}
+	{% include 'artevenue/message-modal_ok.html' %}
 	{% endblock sitecontent %}
 
 

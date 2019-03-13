@@ -1,4 +1,4 @@
-{% extends 'eStore/estore_base.html' %}
+{% extends 'artevenue/estore_base.html' %}
 {% load static %}
 {% load widget_tweaks %}
 	<!-- Only Override the site content block -->
@@ -62,7 +62,7 @@
 							<div class="col-sm-8">
 								<div class="card">
 									<h3> Business Profile</h3>
-									{% include 'eStore/business_profile_form_include.html' %}
+									{% include 'artevenue/business_profile_form_include.html' %}
 								</div>
 							</div>
 							{% endif %}
@@ -122,7 +122,7 @@
 			</div>
 
 		</div>
-	{% include 'eStore/message-modal_ok.html' %}
+	{% include 'artevenue/message-modal_ok.html' %}
 	
 	{% endblock sitecontent %}
 

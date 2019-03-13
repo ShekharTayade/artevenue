@@ -15,6 +15,8 @@ today = datetime.date.today()
 def importImageData_NEW(request): 
 
 	file = 'C:/eCom_Platform/project/eComPlatform/eStore/static/image_data/pod_data.csv'
+	#file = settings.STATIC_ROOT + '/image_data/pod_data.csv'
+	
 	cnt = 0
 	'''Get Product type (IMAGE) '''
 	prod_type = Product_type.objects.filter(product_type_id__iexact = "IMAGE", store = ecom).first()
@@ -32,7 +34,11 @@ def importImageData_NEW(request):
 			if cnt == 0:
 				cnt = cnt + 1
 				continue
-
+			if cnt < 81178:
+				cnt = cnt + 1
+				continue
+			
+				
 			if row[0]:
 				#prod = Product.objects.filter(product_id = int(row[0])).first()
 				newprod = Stock_image(
@@ -145,10 +151,9 @@ def importImageData_NEW(request):
 				'''
 					
 			cnt = cnt + 1
-			print(cnt)
 			
-			if cnt > 5000:
-				break
+			#if cnt > 5000:
+			#	break
 				
 	return render(request, "artevenue/import_image_data.html")
 	
