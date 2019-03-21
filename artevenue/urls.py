@@ -59,17 +59,26 @@ urlpatterns = [
 	url(r'^faq/$', views.faq, name='faq'),
 
 
-	path('category_stock_images/<int:cat_id>/', views.category_stock_images, name='category_stock_images'),
-	url(r'^show_all_categories/$', views.show_categories, name='show_all_categories'),
-
-    url(r'^user_image/$', views.user_image, name='user_image'),
-    url(r'^products_by_keywords/$', views.search_products_by_keywords, name='products_by_keywords'),
 
 	path('product/<int:prod_id>/', views.stock_image_detail, name='stock_image_detail'),	
+    url(r'^products_by_keywords/$', views.search_products_by_keywords, name='products_by_keywords'),
+	path('category_stock_images/<int:cat_id>/', views.category_stock_images, name='category_stock_images'),
+	url(r'^show_all_categories/$', views.show_categories, name='show_all_categories'),
+	
+    url(r'^user_image/$', views.user_image, name='user_image'),
+ 	url(r'^ajax/get_user_image_id/$', views.get_user_image_id, name='get_user_image_id'),
+	url(r'^ajax/upload_user_image/$', views.upload_user_image, name='upload_user_image'),
+	url(r'^ajax/show_mouldings_for_user_image/$', views.show_mouldings_for_user_image, name='show_mouldings_for_user_image'),
+ 	url(r'^ajax/get_FramedUserImage/$', views.get_FramedUserImage, name='get_FramedUserImage'),
+ 	url(r'^ajax/get_FramedUserImage_by_id/$', views.get_FramedUserImage_by_id, name='get_FramedUserImage_by_id'),
 	
 	url(r'^ajax/sync_cart_session_user/$', views.sync_cart_session_user, name='sync_cart_session_user'),
     url(r'^show_cart/$', views.show_cart, name='show_cart'),
 	url(r'^ajax/add_to_cart/$', views.add_to_cart, name='add_to_cart'),
+	url(r'^ajax/delete_cart_item/$', views.delete_cart_item, name='delete_cart_item'),
+	url(r'^ajax/update_cart_item/$', views.update_cart_item, name='update_cart_item'),
+ 	url(r'^ajax/apply_voucher/$', views.apply_voucher, name='apply_voucher'),
+
 
 	url(r'^ajax/show_mouldings/$', views.show_mouldings, name='show_mouldings'),
 	#url(r'^ajax/get_addr_pin_city_state/$', views.get_addr_pin_city_state, name='get_addr_pin_city_state'),
@@ -87,9 +96,18 @@ urlpatterns = [
  	url(r'^ajax/get_acrylic_price/$', views.get_acrylic_price, name='get_acrylic_price'),
  	url(r'^ajax/get_item_price/$', views.get_item_price, name='get_item_price'),
  	url(r'^ajax/get_FramedImage/$', views.get_FramedImage, name='get_framed_image'),
+ 	url(r'^ajax/get_FramedUserImage_by_id/$', views.get_FramedUserImage_by_id, name='get_FramedUserImage_by_id'),
  	#url(r'^ajax/apply_voucher/$', views.apply_voucher, name='apply_voucher'),
 	
+	url(r'^checkout_step1/$', views.checkout_step1_address, name='checkout_step1_address'),
+	url(r'^checkout_step2/$', views.checkout_saveAddr_shippingMethod, name='checkout_saveAddr_shippingMethod'),
+	url(r'^checkout_step3/$', views.checkout_step3_order_review, name='checkout_step3_order_review'),
 	
+
+	url(r'^ajax/get_addr_pin_city_state/$', views.get_addr_pin_city_state, name='get_addr_pin_city_state'),
+	url(r'^ajax/validate_address/$', views.validate_address, name='validate_address'),
+
+
 	
 	] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

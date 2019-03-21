@@ -1,0 +1,183 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+        <div class="container" id = "cart-display" >
+			{% include 'artevenue/cart_include.html' %}
+			
+			<p id="info"></p>
+		</div>
+		{% include 'artevenue/cart-empty-message.html' %}
+		
+		{% include 'artevenue/cart-removed-message.html' %}
+
+		{% include 'artevenue/show-product.html' %}
+		
+	{% endblock sitecontent %}
+
+	
+	
+	{% block jscripts %}
+	
+		<script>
+		
+		function updateItemQty(cart_item_id, val){
+			
+			var obj = JSON.parse(document.getElementById(cart_item_id).textContent);
+			
+			// add uupdated qty to the json obj
+			obj['updated_qty'] = val;
+			
+			var value = JSON.stringify(obj);
+			
+			$.ajax({
+				url: "{% url 'update_cart_item' %}", 
+				data: value, 
+				dataType: 'text', 
+				type: 'post',
+				success: function (data) {
+					data = JSON.parse(data);
+					cart_qty = data.msg;
+					//Update items in cart
+					if (data = "SUCCESS") {
+						// Update the display
+						show_cart();
+					} else {
+						alert(data);
+					}
+				},
+				error: function(xhr){
+					alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+				}
+			});
+			
+			
+		}
+		
+		function deleteItem(cart_item_id, sub_total, tax, cart_total, item_total){
+			
+			var conf = confirm("Are you sure you want to delete this item?!");
+			
+			if (conf) {
+				$.ajax({
+					url: "{% url 'delete_cart_item' %}", 
+					data: {'cart_item_id':cart_item_id, 'sub_total':sub_total, 'tax':tax, 
+					'cart_total':cart_total, 'item_total':item_total}, 
+					dataType: 'text', 
+					type: 'post',
+					success: function (data) {
+						data = JSON.parse(data);
+						cart_qty = data.msg;
+						//Update items in cart
+						if (data = "SUCCESS") {
+							// Update the display
+							show_cart();
+							$('#item-remove').modal('show');
+						} else {
+							alert(data);
+						}
+					},
+					error: function(xhr){
+						alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+					}
+				});
+			}
+			
+		}
+
+		function show_cart(){
+		
+			// Let's update the cart view
+			$.ajax({
+				url: '{% url "show_cart" %}', 
+				dataType: 'text', 
+				type: 'POST',
+				success: function (data) {
+					$("#cart-display").html(data);
+
+				},
+				error: function(xhr){
+					alert("An error occured: " + xhr.status + " " + xhr.statusText + " Apologies for the inconvenience!! Please let us know the details and we will be happy to help sort it out."); 
+					return;
+				}
+			});				
+		}
+		
+		function validate_checkout(){
+			// Get cart total
+			var cart_total = $("#cart_total").html();
+			if (cart_total == null ) {
+				$("#msg-emptycart").modal("show");
+				return false;
+			}
+			if ( parseFloat(cart_total) <= 0 ){
+				$("#msg-emptycart").modal("show");
+				return false;
+			} else {
+				return true;
+			}
+		
+		}
+		
+		function applyVoucher(cart_id, v_code, cart_total) {
+			// Let's update the cart view
+			$.ajax({
+				url: '{% url "apply_voucher" %}', 
+				data: {'cart_id':cart_id, 'voucher_code':v_code, 'cart_total':cart_total},
+				dataType: 'text', 
+				type: 'POST',
+				success: function (data) {
+					response = JSON.parse(data); 
+					console.log(response.status);
+					
+					switch(response.status) {
+					  case "SUCCESS":
+							$("#voucher-msg").html("Congratulations! " + response.disc_amount + " discount applied.");
+							
+							//Existing disc from the product promotions
+							disc_amt = parseFloat($("#disc_amt").html());
+							if ( isNaN(disc_amt) ) {
+								disc_amt = 0;
+							}
+							cart_total = parseFloat($("#cart_total").html());
+							
+							// Add the disc through voucher
+							disc_amt = disc_amt + parseFloat( response.disc_amount );
+							cart_total = cart_total - parseFloat( response.disc_amount );
+							
+							$("#disc_amt").html(disc_amt);
+							$("#cart_total").html(cart_total);
+							$("#disc_amt_nv").val(disc_amt);
+							$("#cart_total_nv").val(cart_total);
+							$("#vouch_text").html( "(You have used voucher " + v_code + ". Discount of <i class = 'fa fa-inr'></i> " +  response.disc_amount + " is applied).");
+							break;
+					  case "INVALID-CODE":
+							$("#voucher-msg").html("Entered Code is invalid");
+							break;
+					  case "USER-MISMATCH":
+							$("#voucher-msg").html("Entered Code is not valid for you.");
+							break;
+					  case "USED":
+							$("#voucher-msg").html("You have already used this code.");
+							break;
+					  case "ONLY-ONE":
+							$("#voucher-msg").html("You can use only one voucher/coupan per order.");
+							break;
+					  default:
+							$("#voucher-msg").html("Sorry! We have encounter an error in applying this code.");
+					}					
+					
+				},
+				error: function(xhr){
+					alert("An error occured: " + xhr.status + " " + xhr.statusText + " Apologies for the inconvenience!! Please let us know the details and we will be happy to help sort it out."); 
+					return;
+				}
+			});							
+			
+		
+		}
+
+		
+		
+		</script>
+	{% endblock jscripts %}

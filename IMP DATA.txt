@@ -11,6 +11,9 @@ User HOME:  /home/artevenue/
 PROJECT HOME: /home/artevenue/artevenue/
 VIRTUAL ENV : /home/artevenue/artevenueenv/
 
+WEBSITE HOME: /home/artevenue/website  (Pull from git here, then collectstatic)
+
+s. Key = o817o&i=cm1*0@15vqlfs$1c6dcsnoixi09nr*#61u*91agt
 
 
 POSTGRESQL:

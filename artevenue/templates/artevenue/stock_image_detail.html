@@ -12,6 +12,8 @@
 						<ol class="breadcrumb">
 							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
 							<li class="breadcrumb-item"><a href="{% url 'show_all_categories' %}">Categories</a></li>
+							<li class="breadcrumb-item active"><a href="{% url 'category_stock_images' product_category.stock_image_category_id %}">{{ product_category.stock_image_category.name }}</a></li>
+							<li class="breadcrumb-item active">{{ product.product_id }}</li>
 						</ol>
 					</nav>
 				</div>
@@ -35,7 +37,7 @@
 								<div class = "col-md-12">
 									<div class= "pull-left">
 										<span id = "prod-name">{{ product.name }}</span><br />
-										<span id = "artist"> {%if artist %} By {{artist}} {% endif %} </span>
+										<span id = "artist"> {%if product.artist %} By {{product.artist}} {% endif %} </span>
 									</div>
 									<div class="price pull-right">
 										<div id = "promo-display" style = "display:none">
@@ -87,6 +89,13 @@
 												</option>
 												{% endfor printmedium %}
 											</select>
+											<div style = "margin-top:5px; font: 0.85rem 'Roboto', sans-serif;" id="stretched" class = "checkbox pull-right" style = "display:none;">
+												<label class="checkbox-inline">
+													<input id="in_stretched" name="in_stretched"
+														onchange = "set_stretched()"
+														type = "checkbox"> Stretched? <i class = "fa fa-question-circle-o" rel="tooltip" title="Check this box if would like the Canvas to be stretched" id="strt"></i>
+												</label>
+											</div>
 										</div>
 									</div>
 								</div>
@@ -293,6 +302,17 @@
 			{% endif %}
 			
 			set_print_medium('PAPER');
+
+			$('#in_stretched').change(function() {
+				if (this.checked){
+					set_stretch('{{stretches.stretch_id}}');
+				} else {
+					set_stretch('0');
+				}
+				//Calculate the price
+				calc_total_price();
+			});			
+			
 		});
 		
 		
@@ -334,8 +354,8 @@
 				set_size_slider(16);
 			}
 		}				
-		
-		
+
+			
 		function set_print_medium(pm_id){
 			print_medium_id = pm_id;
 			if (pm_id == "CANVAS") {
@@ -344,12 +364,17 @@
 				{% for m in mounts %}
 					$("#mnt_{{m.mount_id}}").hide();
 				{% endfor %}
-				set_stretch('{{stretches.stretch_id}}')
+				$("#stretched").show();
+				if (document.getElementById('in_stretched').checked) {				
+					set_stretch('{{stretches.stretch_id}}');
+				} else {
+					set_stretch('0');
+				}
 				set_mount("0");
 				set_mount_size("1");
 				set_mount_color("0");
-				set_acrylic("{{acrylics.acrylic_id}}");
-				set_board("{{boards.board_id}}");
+				set_acrylic("0");
+				set_board("0");
 				
  			} else {
 				$("#acrylic-select").show();
@@ -358,12 +383,16 @@
 					$("#mnt_{{m.mount_id}}").show();
 				{% endfor %}
 				// Remove stretch
+				$("#stretched").hide();
 				set_stretch('0');
 				set_moulding( moulding_id );
 				set_acrylic("{{acrylics.acrylic_id}}");
 				set_board("{{boards.board_id}}");
 			}
+			//Calculate the price
+			calc_total_price();			
 		}
+
 		function set_moulding(m_id){
 			moulding_id = m_id;
 			if ( moulding_id != '0' &&  moulding_id != '') {
@@ -529,6 +558,27 @@
 		//Get Print Medium
 		var print_medium = $('#print-medium-select').val();
 		
+		// Set the pricing compoenents appropriately:
+		if (print_medium_id == 'PAPER') {
+			if (moulding_id == '0' || moulding_id == '' || moulding_id == null){
+				acrylic_id = '0';
+				board_id = '0';
+				mount_id = '0';
+			}
+			stretch_id = '0';
+		} else {
+			if (document.getElementById('in_stretched').checked) {				
+				set_stretch('{{stretches.stretch_id}}');
+			} else {
+				set_stretch('0');
+			}
+				
+			acrylic_id = '0';
+			board_id = '0';
+			mount_id = '0';
+		}
+			
+			
 		// Form the pricing components
 		json = '{ ' + 
 				'"IMAGE": {"WIDTH":' + currwidth + ', "HEIGHT":' + currheight + '}, ' + 
@@ -538,7 +588,8 @@
 				'"MOUNT": {"ID" :' + mount_id + ', "SIZE":' + mount_size + '}, ' +
 				'"BOARD": {"ID" :' + board_id + ', "SIZE":' + sqin + '}, ' +
 				'"STRETCH": {"ID" :' + stretch_id + ', "SIZE":' + rnin + '}, ' +
-				'"PRODUCT": {"ID" :' + product_id + ', "SIZE":' + rnin + '} ' +
+				'"PRODUCT": {"ID" :' + product_id + ', "SIZE":' + rnin + '}, ' +
+				'"PRODUCT_TYPE": {"ID" :"STOCK-IMAGE", "SIZE":' + rnin + '} ' +
 				'}';			
 		
 		
@@ -637,15 +688,20 @@
 					'stretch_size':stretch_size, 
 					'total_price':total_price, 'image_width':currwidth, 'image_height':currheight,
 					'discount':discount, 'promotion_id':promotion_id, 'disc_amt':disc_amt,
-					'item_unit_price':item_unit_price}, 
+					'item_unit_price':item_unit_price, 'prod_type':'STOCK-IMAGE'}, 
 			dataType: 'text', 
 				type: 'POST',
 			success: function (data) {
 				data = JSON.parse(data);
-				cart_qty = data.cart_qty;
-				//Update items in cart
-				$("#itemsincart").html(cart_qty + " items in cart"); 
-				$('#msg-modal').modal('show');
+				if (data.msg.toUpperCase() != 'SUCCESS'){
+						alert("Sorry, a system error occured: " + data.msg);
+				} else {					
+						
+					cart_qty = data.cart_qty;
+					//Update items in cart
+					$("#itemsincart").html(cart_qty); 
+					$('#msg-modal').modal('show');
+				}
 			},
 			error: function(xhr){
 				alert("An error occured: " + xhr.status + " " + xhr.statusText); 

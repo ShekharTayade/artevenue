@@ -231,7 +231,19 @@
 	
 	<script>
 		var isBreakpoint = function(viewport_size){
-		  return $('.device-' + viewport_size).is(':visible')
+		  //return $('.device-' + viewport_size).is(':visible');
+		  if (viewport_size == 'xs'){
+			return window.innerWidth < 768;
+		  }
+		  if (viewport_size == 'sm'){
+			return window.innerWidth < 991;
+		  }
+		  if (viewport_size == 'md'){
+			return window.innerWidth < 1199;
+		  }
+		  if (viewport_size == 'lg'){
+			return window.innerWidth > 1199;
+		  }
 		}	
 	
 		jQuery(document).ready(function(){

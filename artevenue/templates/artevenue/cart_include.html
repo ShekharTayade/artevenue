@@ -1,0 +1,208 @@
+{% load utils %}	
+	
+			<div class="row">
+
+				<div class="col-lg-12">
+				  <!-- breadcrumb-->
+				  <nav aria-label="breadcrumb">
+					<ol class="breadcrumb">
+						<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+						<li aria-current="page" class="breadcrumb-item active">Shopping cart</li>
+					</ol>
+				  </nav>
+				</div>
+
+
+				<div id="cart" class="col-lg-8">
+					<div class="box">
+						<form method="post" id = "checkoutform" onsubmit = "return validate_checkout();" action="{% url 'checkout_step1_address' %}">
+							{% csrf_token %}
+							<!-- Invisible field to hold the cart id -->
+							<input hidden id = "cart_id" name = "cart_id" value = "{{usercart.cart_id }}">
+							<!-- Hidden fields for sub_total and tax -->
+							<input hidden id = "sub_total" name = "sub_total" value = "{{usercart.cart_sub_total|floatformat}}">
+							<input hidden id = "tax" name = "tax" value = "{{usercart.cart_tax|floatformat}}">
+							<input hidden id = "disc_amt_nv" name = "disc_amt_nv" value = "{{usercart.cart_disc_amt|floatformat}}">
+							<input hidden id = "cart_total_nv" name = "cart_total_nv" value = "{{usercart.cart_total|floatformat}}">
+							<h1>Shopping cart</h1>
+							<p class="text-muted">You currently have {% if usercart %} {{usercart.quantity}} {% else %} 0 {% endif %} item(s) in your cart.</p>
+							<div class="table table-responsive">
+								<table id = "cartTbl" class="table table-responsive">
+									<thead>
+										<tr>
+											<th width="15%">Name</th>
+											<th width="45%">Details</th>
+											<th width="10%">Quantity</th>
+											<th width="10%">Unit Price</th>
+											<th width="10%">Disc</th>
+											<th width="10%">Total</th>
+											<th width="5%"></th>
+										</tr>
+									</thead>
+									<tbody>
+										{% for i in usercartitems %}
+										<tr>
+											<td><img src = "{% if i.product_type == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product__image_to_frame}} {% else %} {{i.product__thumbnail_url}} {% endif %}" style = "width:75px; height:75px; object-fit:contain;">
+												<br />
+
+												<div class = "pull-left">
+													<button style="padding-left:0px;" type ="button" class = "btn btn-link pull-left" onclick = "getFramedImg('{{i.product_id}}', '{{i.image_width}}', '{{i.moulding_id | default_if_none:0}}', '{{i.mount__color | default_if_none:0}}','{{i.mount_size | default_if_none:0}}', '{{i.product__url | default_if_none:""}}');">
+														{{i.product__name|truncatechars:15 }}
+													</button>
+												</div>
+											</td>
+											<td>
+												{% with width=i.moulding__width_inches %}
+
+												<small>Print on {{i.print_medium_id|title}}, 
+												{% if i.moulding_id %}
+													Frame {{i.moulding__name }} Total Size: 
+													{{ i.image_width|add_width:width }}" X {{i.image_height|add_width:width }}" 
+												{% else %}
+													Image Size : {{ i.image_width }}" X {{i.image_height }}" 
+												{% endif %}
+												
+												{% if i.mount_id %}
+													, {{i.mount_size }}" {{i.mount__name|title }} Mount  
+												{% endif %}
+												{% if i.acrylic_id %}
+													, Acrylic 
+												{% endif %}
+												</small>
+												{% endwith %}
+											</td>
+											<td style = "text-align:right">
+												<input type="number" value="{{i.quantity}}" class="form-control"
+													onchange = 'updateItemQty("{{i.cart_item_id}}", $(this).val());'>
+											</td>
+											<td>{{i.item_unit_price}}</td>
+											<td style = "text-align:right">
+											
+												{% if i.promotion__discount_type == "PERCENTAGE" %}
+													{{i.promotion__discount_value|floatformat}}%
+												{% else %}
+													{{i.promotion__discount_value|floatformat}}
+												{% endif %}
+											</td>
+											<td style = "text-align:right">{{i.item_total|floatformat}}</td>
+											<td>
+												<!-- <a data-toggle="tooltip" title="Change!" href="{% url 'stock_image_detail' i.product_id %}?cart_item_id={{i.cart_item_id}}" >
+													<i class= "fa fa-edit"></i>
+												</a> -->
+												<a style = "cursor: pointer; color:red;" data-toggle="tooltip" title="Remove from Cart!" 
+													onclick="deleteItem('{{i.cart_item_id}}', '{{sub_total|floatformat}}', '{{total_tax|floatformat}}', '{{usercart.cart_total|floatformat}}', '{{i.item_total|floatformat}}');">
+													
+													<i class="fa fa-trash-o"></i>
+												</a>
+											</td>
+										</tr>
+										{% endfor usercartitems %}
+										
+									</tbody>
+									<tfoot>
+										<tr>
+											<th colspan="4">Total</th>
+											<th colspan="2" style = "text-align:right">{{total_bare|floatformat}}</th>
+											<th></th>
+										</tr>
+									</tfoot>
+								</table>
+							</div>
+
+							<!--convert python data to json -->
+							{% for j in usercartitems %}
+								{{ j|json_script:j.cart_item_id }}			
+							{% endfor usercartitems %}
+							
+
+							<!-- /.table-responsive-->
+							<div class="box-footer d-flex justify-content-between flex-column flex-lg-row">
+								<div class="left"><a href="{% url 'index' %}" class="btn btn-outline-secondary">
+									<i class="fa fa-chevron-left"></i> Continue shopping</a>
+								</div>
+								<div class="right">
+									<button 
+										id = "checkout_btn"
+										type="submit" 
+										class="btn btn-primary" 
+										form = "checkoutform" 
+										value="submit">
+											Proceed to checkout <i class="fa fa-chevron-right"></i>
+									</button>
+								</div>
+							</div>
+						</form>
+					</div>
+					<!-- /.box-->
+
+				</div> 
+				<!-- /.col-lg-8-->
+
+					
+				<div class="col-lg-4">
+					<div id="order-summary" class="box">
+						<div class="box-header">
+							<h3 class="mb-0">Cart summary</h3>
+						</div>
+						<div class="table-responsive">
+							<table class="table">
+								<tbody>
+									<tr>
+										<td>Cart subtotal</td>
+										<th class="pull-right">{{usercart.cart_sub_total|floatformat}}</th>
+									</tr>
+									<tr>
+										<td>Tax</td>
+										<th class="pull-right">{{usercart.cart_tax|floatformat}}</th>
+									</tr>
+
+								
+									<tr>
+										<td>Shipping & handling</td>
+										<th><span class="pull-right">{{shipping_cost}}</span></th>
+									</tr>
+									<tr class="total">
+										<td>Total</td>
+										<th class="pull-right"><i class = "fa fa-inr"> </i> <span id ="cart_total" >{{usercart.cart_total|floatformat|default:"0"}}</span></th>
+									</tr>
+
+									<tr>
+										<td>Discount</td>
+										<th id = "disc_amt" style = "color:green" class="pull-right">
+											{{usercart.cart_disc_amt|floatformat}}
+										</th>
+										 
+									</tr>									</tbody>
+							</table>
+							{% if usercart.voucher %} 
+								<div id "vouch_text" style ="color: #999; font-size: 0.6rem; text-align:right">
+									(You have used voucher {{ usercart.voucher.voucher_code }}. 
+									Discount of <i class = "fa fa-inr"></i> {{usercart.voucher_disc_amount |floatformat }} is applied)
+								</div>
+							{% endif %}
+						</div>
+					</div>
+										
+					<div class="box">
+						<div class="box-header">
+							<h4 class="mb-0">Coupan/eGift code</h4>
+						</div>
+						<p class="text-muted">If you have a coupon/eGift code, please enter it in the box below.</p>
+						<form>
+							<div class="input-group">
+								<input id = "v_code" type="text" class="form-control"><span class="input-group-append">
+								<button onclick = "applyVoucher( '{{usercart.cart_id}}', $('#v_code').val(),'{{usercart.cart_total}}');" type="button" class="btn btn-primary"><i class="fa fa-gift"></i></button></span>
+							</div>
+							<div id="coupan-text"></div>
+							<!-- /input-group-->
+						</form>
+						<div style = "color:red" id="voucher-msg"></div>
+					</div>
+				</div>
+				<!-- /.col-md-4-->
+
+			</div>
+
+			<script>
+				updateCartItemsNum("{{usercart.quantity}}");
+			</script>

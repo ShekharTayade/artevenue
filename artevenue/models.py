@@ -344,7 +344,7 @@ class Product_type(models.Model):
 	tax = models.ForeignKey(Tax, models.CASCADE, null=True)
 
 	def __str__(self):
-		return self.name		
+		return self.product_type_id		
 		
 		
 class Stock_image(models.Model):
@@ -699,7 +699,6 @@ class Moulding_image(models.Model):
 ###################
 class Cart(models.Model):
 	cart_id = models.AutoField(primary_key=True, null=False)
-	product_type = models.ForeignKey('Product_type', models.CASCADE, null=False) 
 	store = models.ForeignKey(Ecom_site, models.PROTECT)
 	session_id = models.CharField(max_length = 40, blank=True, default='') # to store the session_key in case of anonymous user
 	user = models.ForeignKey(User, on_delete=models.PROTECT, null=True)
@@ -715,7 +714,7 @@ class Cart(models.Model):
 	updated_date = models.DateTimeField(auto_now=True, null=False)	
 
 	def __str__(self):
-		return self.cart_id
+		return str(self.cart_id)
 
 	class Meta:
 		unique_together = ("cart_id", "session_id", "user")	
@@ -769,7 +768,8 @@ class Cart_original_art(Cart_item):
 ####### A DB View for Cart_item_view : This will hold all the cart items 
 class Cart_item_view(models.Model):
 	cart_item_id = models.AutoField(primary_key=True, null=False) 
-	cart = models.ForeignKey('Cart', models.CASCADE, null=False) 
+	cart = models.ForeignKey('Cart', models.DO_NOTHING, null=False) 
+	product = models.ForeignKey(Product_view, models.PROTECT, null=False)
 	promotion = models.ForeignKey(Promotion, models.PROTECT, null=True)
 	quantity = models.IntegerField(null=False)
 	item_unit_price = models.DecimalField(max_digits=12, decimal_places=2, null=False, default=0)
@@ -793,8 +793,8 @@ class Cart_item_view(models.Model):
 	image_height = models.DecimalField(max_digits=3, decimal_places=0, blank=False, null=False)	
 	created_date = models.DateTimeField(auto_now_add=True, null=False)	
 	updated_date = models.DateTimeField(auto_now=True, null=False)	
-	product_id = models.IntegerField(null=False)
-
+	product_type = models.ForeignKey(Product_type, models.PROTECT, null=False) 
+	
 	class Meta:
 		managed = False
 		db_table = 'cart_item_view'	
@@ -941,19 +941,54 @@ class Order_items (models.Model):
 	def __str__(self):
 		return str(self.order_id) + str(order_item_id)
 		
-class Order_stock_image(Cart_item):
+class Order_stock_image(Order_items):
 	stock_image = models.ForeignKey('Stock_image', models.CASCADE, null=False)
 
-class Order_user_image(Cart_item):
+class Order_user_image(Order_items):
 	user_image = models.ForeignKey('User_image', models.CASCADE, null=False)
 
-class Order_stock_collage(Cart_item):
+class Order_stock_collage(Order_items):
 	stock_collage = models.ForeignKey('Stock_collage', models.CASCADE, null=False)
 
-class Order_original_art(Cart_item):
+class Order_original_art(Order_items):
 	original_art = models.ForeignKey('Original_art', models.CASCADE, null=False)
-	
 
+
+class Order_items_view (models.Model):
+	order_item_id = models.AutoField(primary_key=True, null=False)
+	order = models.ForeignKey(Order,on_delete=models.PROTECT, null=False)
+	cart_item = models.ForeignKey(Cart_item, on_delete=models.PROTECT, null=False)
+	product = models.ForeignKey(Product_view, models.PROTECT, null=False)
+	promotion = models.ForeignKey(Promotion, models.PROTECT, null=True)
+	quantity = models.IntegerField(null=False)
+	item_unit_price = models.DecimalField(max_digits=12, decimal_places=2, null=False, default=0)
+	item_sub_total = models.DecimalField(max_digits=12, decimal_places=2,  null=False, default=0)
+	item_disc_amt  = models.DecimalField(max_digits=12, decimal_places=2,  null=False, default=0)
+	item_tax  = models.DecimalField(max_digits=12, decimal_places=2,  null=False, default=0)
+	item_total = models.DecimalField(max_digits=12, decimal_places=2,  null=False, default=0)
+	moulding = models.ForeignKey(Moulding,on_delete=models.PROTECT, null=True)
+	moulding_size = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	print_medium = models.ForeignKey(Print_medium, models.PROTECT, null=False, default='PAPER')
+	print_medium_size = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	mount = models.ForeignKey(Mount, models.PROTECT, null=True)
+	mount_size = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	board = models.ForeignKey(Board, models.PROTECT, null=True)
+	board_size = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	acrylic = models.ForeignKey(Acrylic, models.PROTECT, null=True)
+	acrylic_size = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	stretch = models.ForeignKey(Stretch, models.PROTECT, null=True)
+	stretch_size = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	image_width = models.DecimalField(max_digits=3, decimal_places=0, blank=False, null=False)
+	image_height = models.DecimalField(max_digits=3, decimal_places=0, blank=False, null=False)	
+	created_date = models.DateTimeField(auto_now_add=True, null=False)	
+	updated_date = models.DateTimeField(auto_now=True, null=False)	
+	product_type = models.ForeignKey(Product_type, models.PROTECT, null=False) 	
+
+	class Meta:
+		managed = False
+		db_table = 'order_items_view'		
+
+	
 class Order_shipping (models.Model):
 	order_shipping_id = models.AutoField(primary_key=True, null=False)
 	store = models.ForeignKey(Ecom_site, models.CASCADE, null=False)

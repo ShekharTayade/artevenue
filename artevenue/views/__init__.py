@@ -5,6 +5,7 @@ from .product_views import *
 from .frame_views import *
 from .image_views import *
 from .cart_views import *
+from .checkout_views import *
 from .wishlist_views import *
 from .user_image_views import *
 from .profile_group_views import *

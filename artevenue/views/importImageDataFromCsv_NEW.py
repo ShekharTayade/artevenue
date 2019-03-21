@@ -19,7 +19,7 @@ def importImageData_NEW(request):
 	
 	cnt = 0
 	'''Get Product type (IMAGE) '''
-	prod_type = Product_type.objects.filter(product_type_id__iexact = "IMAGE", store = ecom).first()
+	prod_type = Product_type.objects.filter(product_type_id__iexact = "STOCK-IMAGE", store = ecom).first()
 	'''Get Tax code for IMAGE '''
 	prod_tax = Tax.objects.filter(name__iexact = "STOCK-IMAGE", store = ecom).first()
 	tax_rate = prod_tax.tax_rate
@@ -59,7 +59,7 @@ def importImageData_NEW(request):
 					has_variants = False,
 					aspect_ratio = int(row[6]) / int(row[7]),
 					image_type = row[9],
-					orientation = row[8],
+					orientation = row[8].strip().title(),
 					max_width = row[6],
 					max_height = row[7],
 					min_width = 4,

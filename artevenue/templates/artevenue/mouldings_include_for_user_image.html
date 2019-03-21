@@ -1,0 +1,22 @@
+				{% load static %}
+				<div class = "row">
+					{% for f in mouldings_show %}
+							<div >
+								{% with 'img/'|add:f.url as image_static %}
+								<div class="frame-image" >
+									<a onclick = "set_moulding('{{f.moulding_id}}');"> 
+										<img src='{{user_instance.image_to_frame.url}}' alt="{{f.mouldings__name}}" class="img-fluid"
+										style = "border : 10px solid transparent; padding : 0px; border-image : url({% static image_static %}) {{f.border_slice}} round;" >
+									</a>
+									
+									<!--<div class="text text-center" onclick = "applyFrame('{{f.moulding_id}}','{{f.border_slice}}', '{% static image_static %}')"> -->
+									<div class="text text-center" onclick = "set_moulding('{{f.moulding_id}}')">
+										<h5>
+											<a>{{ f.moulding__name }}</a>
+										</h5>
+									</div>
+								</div>
+								{% endwith %}
+							</div>
+						{% endfor %}
+					</div>

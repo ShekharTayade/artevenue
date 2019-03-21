@@ -80,18 +80,17 @@ def sync_cart_session_user(request, sessionid):
 			try:
 			
 				# Check if the user already has a cart open
-				userid = User.objects.get(username = request.user)
+				user = User.objects.get(username = request.user)
 
-				cart = Cart.objects.filter(user = userid, cart_status = "AC")
+				cart = Cart.objects.filter(user = user, cart_status = "AC")
 				# User already has a cart open, then return
 				if cart:
 					# Abondon the existing session cart & return back
 					updcart = Cart(
 						cart_id = sessioncart.cart_id,
-						product_type_id = sessioncart.product_type_id,
 						store = sessioncart.store,
 						session_id = sessioncart.session_id,
-						user_id = userid,
+						user = user,
 						voucher = sessioncart,
 						voucher_disc_amount = sessioncart.voucher_disc_amount,
 						quantity = sessioncart.quantity,
@@ -108,11 +107,10 @@ def sync_cart_session_user(request, sessionid):
 				# Update the session Cart with current user id
 				updcart = Cart(
 						cart_id = sessioncart.cart_id,
-						product_type_id = sessioncart.product_type_id,
 						store = sessioncart.store,
 						session_id = sessioncart.session_id,
-						user_id = userid,
-						voucher = sessioncart,
+						user = user,
+						voucher = sessioncart.voucher,
 						voucher_disc_amount = sessioncart.voucher_disc_amount,
 						quantity = sessioncart.quantity,
 						cart_sub_total = sessioncart.cart_sub_total,

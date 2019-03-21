@@ -156,9 +156,9 @@
 			function updateCartItemsNum(num){
 			
 				{% if usercart %}
-					$('#itemsincart').html(num + " items in cart");
+					$('#itemsincart').html(num);
 				{% else %}
-					$('#itemsincart').html("0 items in cart");
+					$('#itemsincart').html("");
 				{% endif %}
 			}
 			
@@ -178,6 +178,7 @@
 				});
 			}
 		</script>
+		
 		<script>
 			// In case of invalid login, let's trigger the login modal
 			$(document).ready(function(){

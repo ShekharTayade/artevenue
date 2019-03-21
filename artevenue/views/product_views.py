@@ -25,22 +25,27 @@ def category_stock_images(request, cat_id):
 
 	sortOrder = request.GET.get("sort")
 	show = request.GET.get("show")
-		
+	
 	prod_categories = Stock_image_category.objects.filter(store_id=settings.STORE_ID, trending = True )
 	
 	category_prods = Stock_image_stock_image_category.objects.filter(
 			stock_image_category_id = cat_id).values('stock_image_id')
 	
 	product_cate = get_object_or_404 (Stock_image_category, category_id = cat_id)
-
-	
-	if sortOrder == None:
-		None
+			
+	dt =  today.day
+	if dt >= 1 and dt <= 5:
+		products = Stock_image.objects.filter(product_id__in = category_prods, 
+			is_published = True).order_by('?')
+	elif dt > 5 and dt <= 10:
+		products = Stock_image.objects.filter(product_id__in = category_prods, 
+			is_published = True).order_by('product_id')
+	elif dt > 10 and dt <= 20:
+		products = Stock_image.objects.filter(product_id__in = category_prods, 
+			is_published = True).order_by('name')
 	else:
-		if sortOrder == "PRICEUP":
-			products = Stock_image.objects.filter(product_id__in = category_prods, is_published = True).order_by('price')
-		else:
-			products = Stock_image.objects.filter(product_id__in = category_prods, is_published = True).order_by('-price')
+		products = Stock_image.objects.filter(product_id__in = category_prods, 
+		is_published = True).order_by('part_number')
 			
 	if request.is_ajax():
 		#Apply the user selected filters -
@@ -53,8 +58,7 @@ def category_stock_images(request, cat_id):
 		size_key = None
 		size_val = None
 		width = 0
-		products = Stock_image.objects.filter(product_id__in = category_prods, is_published = True)
-	
+		
 		t_f = Q()
 		for majorkey, subdict in json_data.items():
 			#######################################
@@ -85,11 +89,6 @@ def category_stock_images(request, cat_id):
 		print (t_f)
 		products = products.filter( t_f )	
 						
-					
-	else :
-	
-		products = Stock_image.objects.filter(product_id__in = category_prods, is_published = True)
-
 
 	prod_filters = ['ORIENTATION', 'ARTIST', 'IMAGE-TYPE']	
 	prod_filter_values ={}
@@ -99,7 +98,7 @@ def category_stock_images(request, cat_id):
 		 or_arr.append ( v['orientation'] )
 	prod_filter_values['ORIENTATION'] = or_arr 
 		 
-	artist_values = Stock_image.objects.values('artist').distinct()
+	artist_values = Stock_image.objects.values('artist').distinct().order_by('artist')
 	ar_arr = []
 	for a in artist_values:
 		ar_arr.append(a['artist'] )
@@ -282,7 +281,7 @@ def stock_image_detail(request, prod_id):
 	printmedium = Print_medium.objects.all()
 			
 	# Get image price on paper and canvas
-	per_sqinch_price = get_per_sqinch_price(prod_id)
+	per_sqinch_price = get_per_sqinch_price(prod_id, 'STOCK-IMAGE')
 	per_sqinch_paper = per_sqinch_price['per_sqin_paper']
 	per_sqinch_canvas = per_sqinch_price['per_sqin_canvas']
 
@@ -323,18 +322,25 @@ def stock_image_detail(request, prod_id):
 		'cart_item':cart_item_view} )	
 
 	
-def get_per_sqinch_price(prod_id):
+def get_per_sqinch_price(prod_id, prod_type):
 
-	prod = Stock_image.objects.filter(product_id = prod_id).first()
-	publisher_price = Publisher_price.objects.filter(publisher_id = prod.publisher )
-	
-	per_sqin_paper = 0
-	per_sqin_canvas = 0
-	for p in publisher_price:
-		if p.print_medium_id == "PAPER" :
-			per_sqin_paper = p.price
-		if p.print_medium_id == "CANVAS" :
-			per_sqin_canvas = p.price
+	if prod_type == 'STOCK-IMAGE':
+
+		prod = Stock_image.objects.filter(product_id = prod_id).first()
+		publisher_price = Publisher_price.objects.filter(publisher_id = prod.publisher )
+		
+		per_sqin_paper = 0
+		per_sqin_canvas = 0
+		for p in publisher_price:
+			if p.print_medium_id == "PAPER" :
+				per_sqin_paper = p.price
+			if p.print_medium_id == "CANVAS" :
+				per_sqin_canvas = p.price
+				
+	elif prod_type == 'USER-IMAGE':
+		per_sqin_paper = 2
+		per_sqin_canvas = 3
+	 
 	 
 	return ({'per_sqin_paper':per_sqin_paper, 'per_sqin_canvas' : per_sqin_canvas})
 
@@ -425,9 +431,12 @@ def get_item_price (request):
 				if subkey == "ID":
 					prod_id = value
 
+			if majorkey.upper().strip() == "PRODUCT_TYPE":
+				if subkey == "ID":
+					prod_type = value
 					
 	# Get image price on paper and canvas
-	per_sqinch_price = get_per_sqinch_price(prod_id)
+	per_sqinch_price = get_per_sqinch_price(prod_id, prod_type)
 	per_sqinch_paper = per_sqinch_price['per_sqin_paper']
 	per_sqinch_canvas = per_sqinch_price['per_sqin_canvas']
 					
@@ -546,11 +555,10 @@ def get_item_price_by_cart_item (cart_item_id):
 	msg = ""
 	
 	# Get prod data.
-	cart_item = Cart_stock_image.objects.filter(cart_item_id = cart_item_id).first()
-	
-					
+	cart_item = Cart_item_view.objects.filter(cart_item_id = cart_item_id).first()
+
 	# Get image price on paper and canvas
-	per_sqinch_price = get_per_sqinch_price(cart_item.product_id)
+	per_sqinch_price = get_per_sqinch_price(cart_item.product_id, cart_item.product_type_id)
 	per_sqinch_paper = per_sqinch_price['per_sqin_paper']
 	per_sqinch_canvas = per_sqinch_price['per_sqin_canvas']
 					
