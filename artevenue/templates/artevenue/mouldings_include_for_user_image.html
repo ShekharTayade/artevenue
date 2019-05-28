@@ -1,4 +1,5 @@
 				{% load static %}
+				{% load utils %}
 				<div class = "row">
 					{% for f in mouldings_show %}
 							<div >
@@ -6,7 +7,15 @@
 								<div class="frame-image" >
 									<a onclick = "set_moulding('{{f.moulding_id}}');"> 
 										<img src='{{user_instance.image_to_frame.url}}' alt="{{f.mouldings__name}}" class="img-fluid"
-										style = "border : 10px solid transparent; padding : 0px; border-image : url({% static image_static %}) {{f.border_slice}} round;" >
+										style = "border : 10px solid transparent; 
+										padding : 0px; 
+										border-image : url({% static image_static %}) {{f.border_slice}} round; 
+										box-shadow: 3px 4px 4px 0 #d3d3d3, 3px 6px 4px 0#d3d3d3; 
+										{% if forloop.counter|get_mountcolor != 'none' %}
+											padding:10px; 
+											background-color:{{ forloop.counter|get_mountcolor}};
+										{% endif %}
+										">
 									</a>
 									
 									<!--<div class="text text-center" onclick = "applyFrame('{{f.moulding_id}}','{{f.border_slice}}', '{% static image_static %}')"> -->

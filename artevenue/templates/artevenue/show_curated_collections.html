@@ -1,0 +1,39 @@
+{% load static %}
+<section class="curated_section">
+	<div class="hgroup_2 text-center">
+		<h2 class = "mt-4 text-center">Curated</h2>
+	</div>
+	
+	<div class="text-center">
+	<div class="row px-bottom" style="margin:0px;">
+		<div class = "col-lg-6 mb-1" style="padding:0px !important;">
+			<div class="curted_pic">
+				<a href = "{% url 'curated_collections' 1 %}">
+					<div class="text-center" style = "color: #665d6f; font-family:Helvetica, sans-serif !important; font-size:1.3rem !important;">
+						Art Over Centuries
+					</div>
+					<div class="text-center" style = "color: #665d6f; font-family:Helvetica, sans-serif !important; font-size:0.8rem !important;">
+						Timeless collections of the grand masters
+					</div>
+					<img src="{% static 'img/curated/curated_art_over_centuries_1.jpg' %}" class="img-fluid">
+				</a>
+			</div>
+		</div>
+		<div class = "col-lg-6 mb-1" style="padding:0px !important;">
+			<div class="curted_pic">
+				<a href = "{% url 'curated_collections' 2 %}">
+					<div class="text-center" style = "color: #665d6f; font-family:Helvetica, sans-serif; font-size:1.3rem;">
+						Photography
+					</div>
+					<div class="text-center" style = "color: #665d6f; font-family:Helvetica, sans-serif; font-size:0.8rem;">
+						Moments captured through lens
+					</div>
+					
+					<img src="{% static 'img/curated/curated_photography_1.jpg' %}" class="img-fluid">
+				</a>
+			</div>
+		</div>	
+	</div>
+	</div>
+
+</section>

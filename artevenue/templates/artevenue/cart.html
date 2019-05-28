@@ -142,17 +142,17 @@
 							cart_total = parseFloat($("#cart_total").html());
 							
 							// Add the disc through voucher
-							disc_amt = disc_amt + parseFloat( response.disc_amount );
-							cart_total = cart_total - parseFloat( response.disc_amount );
+							disc_amt = parseFloat( response.disc_amount );
+							cart_total = ( response.cart_total );
 							
 							$("#disc_amt").html(disc_amt);
 							$("#cart_total").html(cart_total);
 							$("#disc_amt_nv").val(disc_amt);
 							$("#cart_total_nv").val(cart_total);
-							$("#vouch_text").html( "(You have used voucher " + v_code + ". Discount of <i class = 'fa fa-inr'></i> " +  response.disc_amount + " is applied).");
+							$("#vouch_text").html( "(You have used coupan " + v_code + ". Discount of <i class = 'fa fa-inr'></i> " +  response.disc_amount + " is applied).");
 							break;
 					  case "INVALID-CODE":
-							$("#voucher-msg").html("Entered Code is invalid");
+							$("#voucher-msg").html("Entered Code is invalid (You need to be logged in and using correct code)");
 							break;
 					  case "USER-MISMATCH":
 							$("#voucher-msg").html("Entered Code is not valid for you.");
@@ -161,7 +161,42 @@
 							$("#voucher-msg").html("You have already used this code.");
 							break;
 					  case "ONLY-ONE":
-							$("#voucher-msg").html("You can use only one voucher/coupan per order.");
+							$("#voucher-msg").html("You can use only one coupan per order.");
+							break;
+					  case "SUCCESS-":
+							if (response.voucher_bal_amount > 0 ) {
+								$("#voucher-msg").html("Congratulations! " + response.disc_amount + " discount applied. You have Rs. " + response.voucher_bal_amount + " balance left." );
+							} else {
+								$("#voucher-msg").html("Congratulations! " + response.disc_amount + " discount is applied." );
+							}
+							//Existing disc from the product promotions
+							disc_amt = parseFloat($("#disc_amt").html());
+							if ( isNaN(disc_amt) ) {
+								disc_amt = 0;
+							}
+							cart_total = parseFloat($("#cart_total").html());
+							
+							// Add the disc through voucher
+							disc_amt = parseFloat( response.disc_amount );
+							//cart_total = cart_total - parseFloat( response.disc_amount );
+							cart_total = parseFloat( response.cart_total );
+							
+							$("#disc_amt").html(disc_amt);
+							$("#cart_total").html(cart_total);
+							$("#disc_amt_nv").val(disc_amt);
+							$("#cart_total_nv").val(cart_total);
+							$("#vouch_text").html( "(You have used coupan " + v_code + ". Discount of <i class = 'fa fa-inr'></i> " +  response.disc_amount + " is applied).");
+							break;
+							
+					   case	'NO-MORE':
+							$("#voucher-msg").html("No more discount is applicable.");
+							break;
+					   
+					   case 'DOESNOT-APPLY':
+							$("#voucher-msg").html("This coupan doesn't apply to you. Please ensure you have logged as the eligible user or check the code you have entered.");
+							break;
+					   case 'NO-BALANCE':
+							$("#voucher-msg").html("Sorry, you have no balance left in this coupan.");
 							break;
 					  default:
 							$("#voucher-msg").html("Sorry! We have encounter an error in applying this code.");

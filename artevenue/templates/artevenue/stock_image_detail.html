@@ -41,12 +41,12 @@
 									</div>
 									<div class="price pull-right">
 										<div id = "promo-display" style = "display:none">
-											<i class="fa fa-inr" aria-hidden="true">&nbsp;</i><small id = "item_unit_price" style = "color:red; text-decoration: line-through;">{{product.price|floatformat}}</small>
-											<i class="fa fa-inr" aria-hidden="true">&nbsp;</i><span id = "item_total_price" style = "color:green; text-decoration: underline;">{{product.price|floatformat}}</span>
+											<i class="fa fa-inr" aria-hidden="true">&nbsp;</i><small id = "item_unit_price" style = "color:red; text-decoration: line-through;">{{product.price|floatformat:"0"}}</small>
+											<i class="fa fa-inr" aria-hidden="true">&nbsp;</i><span id = "item_total_price" style = "color:green; text-decoration: underline;">{{product.price|floatformat:"0"}}</span>
 											<br /><span id = "disc" style = "font-size:0.75rem;" class = "pull-right text-muted"></span>
 										</div>	
 										<div id = "no-disc">
-											<i class="fa fa-inr" aria-hidden="true">&nbsp;</i><span id="prod-price">{{product.price|floatformat}}</span>
+											<i class="fa fa-inr" aria-hidden="true">&nbsp;</i><span id="prod-price">{{product.price|floatformat:"0"}}</span>
 										</div>
 										<div id = "item_unit_price_nv" style = "display:none;"></div>
 										<div id = "promotion_id_nv" style = "display:none;"></div>
@@ -72,8 +72,22 @@
 											<!-- Size Slider -->
 											<div id = "size-title"> Choose Image Size: <small style = "color:#828282">(inches)</small></div>
 											<div id="size-slider"></div>
-											<div id="size"></div>
-											<!-- End slider -->
+											<!-- <div id="size">
+											</div> -->
+											<div class = "row">
+												<div class = "col-sm-6">
+													<div class = "form-group">
+														<label>Width</label>
+														<input class = "form-control" name = "i_width" id = "i_width" type = "number" value="16">
+													</div>
+												</div>
+												<div class = "col-sm-6">
+													<div class = "form-group">
+														<label>Height</label>
+														<input class = "form-control" name = "i_height" id = "i_height" type = "number"> 
+													</div>
+												</div>
+											</div>
 										</div>
 										<div class = "col-sm-6">
 											<div id = "size-title">
@@ -92,7 +106,7 @@
 											<div style = "margin-top:5px; font: 0.85rem 'Roboto', sans-serif;" id="stretched" class = "checkbox pull-right" style = "display:none;">
 												<label class="checkbox-inline">
 													<input id="in_stretched" name="in_stretched"
-														onchange = "set_stretched()"
+														onchange = "set_stretch()"
 														type = "checkbox"> Stretched? <i class = "fa fa-question-circle-o" rel="tooltip" title="Check this box if would like the Canvas to be stretched" id="strt"></i>
 												</label>
 											</div>
@@ -137,7 +151,8 @@
 							<div class = "box">
 								<div class = "row mb-3">
 									<div class="col-sm-12">
-										<a style = "font-size:1rem; color:#4d4d4d; text-decoration:underline;" href = "#moulding-show"> Choose Frame</a>
+										<a class = "pull-left" style = "font-size:1rem; color:#4d4d4d; text-decoration:underline;" href = "#moulding-show"> Choose Frame</a>
+										<button class = "btn btn-link pull-right" style = "font-size:1rem; color:#4d4d4d; text-decoration:underline;" onclick="removeFrame();"> Remove Frame</button>
 									</div>
 								</div>
 								<hr>
@@ -152,10 +167,10 @@
 									</div>
 									<div class = "row ml-1 mb-3">
 										<div class = "row">
-											<div class = "col-sm-2">
+											<div class = "col-sm-5">
 												Width (Inches)
 											</div>
-											<div class = "col-sm-3">
+											<div class = "col-sm-5">
 												<input class = "form-control" 
 													type = "number"  
 													onchange="set_mount_size(this.value, this.value, this.value, this.value, this.value);" 
@@ -270,7 +285,25 @@
 	
 	
 	{% block jscripts %}
-
+	<script>
+		var isBreakpoint = function(viewport_size){
+		  //return $('.device-' + viewport_size).is(':visible');
+		  if (viewport_size == 'xs'){
+			return window.innerWidth < 768;
+		  }
+		  if (viewport_size == 'sm'){
+			return window.innerWidth < 991;
+		  }
+		  if (viewport_size == 'md'){
+			return window.innerWidth < 1199;
+		  }
+		  if (viewport_size == 'lg'){
+			return window.innerWidth > 1199;
+		  }
+		}
+	</script>
+	
+	
 	<script>
 
 		// Global variables to store IDs of pricing components
@@ -421,13 +454,19 @@
 			mount_w_top = mnt_w_top;
 			mount_w_bottom = mnt_w_bottom;
 			if (mount_size != '0' && mount_size != null && mount_size != 'None') {
-				getFramedImg ('{{product.product_id}}', moulding_id, mount_color, mount_size);
-				calc_total_price();
+				if (print_medium_id == 'PAPER') {
+					getFramedImg ('{{product.product_id}}', moulding_id, mount_color, mount_size);
+					calc_total_price();
+				}
 			}
 		}		
 		function set_mount_color(mnt_color) {
-			if (mnt_color != '' && mnt_color != null && mnt_color != 'None') {
-				mount_color = mnt_color;
+			if (mnt_color != '' && mnt_color != null && mnt_color != 'None' ) {
+				if (print_medium_id == 'PAPER') {
+					mount_color = mnt_color;
+				} else {
+					mount_color = '0';
+				}
 				if (moulding_id != '0' && moulding_id != '' && moulding_id != 'None') {
 					getFramedImg ('{{product.product_id}}', moulding_id, mount_color, mount_size);	
 					calc_total_price();
@@ -446,15 +485,16 @@
 			stretch_id = strt_id;
 		}
 		
-		
-		
-		
 		function startMagnify(){
-			magnify("prod-img", 3);			
+			if (isBreakpoint('xs')==false) {
+				magnify("prod-img", 3);
+			}
 		}
 		
 		function stopMagnify(){
-			removeGlass();
+			if (isBreakpoint('xs')==false) {
+				removeGlass();
+			}
 		}
 		
 		function getFramedImg (prod_id, moulding_id, mount_color, mount_size) {
@@ -510,9 +550,21 @@
 	<script>
 		var minsize = 4;
 		var maxsize = 0;
+		var ratio = 0;
 		if ("{{product.aspect_ratio}}" != "NA"){
 			ratio = parseFloat("{{product.aspect_ratio}}");
 		}
+		
+		$( "#i_width" ).change(function() {
+			currwidth = $(this).val();
+			set_size_slider(currwidth);
+		});
+		$( "#i_height" ).change(function() {
+			currheight = $(this).val();
+			currwidth = Math.round(currheight * ratio);
+			set_size_slider(currwidth);
+		});
+		
 		function set_size_slider(isize) {
 
 			maxsize = parseFloat("{{product.max_width}}");
@@ -527,7 +579,9 @@
 				change:function(event, ui){
 					var currwidth = ui.value;
 					var currheight = Math.round(currwidth / ratio);
-					$("#size").html("Width: " + currwidth + ", Height: " + currheight);
+					//$("#size").html("Width: " + currwidth + ", Height: " + currheight);
+					$("#i_width").val(currwidth);
+					$("#i_height").val(currheight);
 					
 					// Apply the moulding when the size changes
 					print_medium_id = $('#print-medium-select').val();
@@ -653,7 +707,11 @@
 	<script>
 	function addProdToCart(prod_id, qty) {
 		var cart_qty;
-		var total_price = $("#item_total_price_nv").html();
+		var total_price = $("#item_total_price_nv").html();	
+		if (total_price == '0'){
+			alert("Sorry, this product is not available.");
+			return;
+		}			
 		var discount = $("#disc").html();
 		var promotion_id = $("#promotion_id_nv").html();
 		var disc_amt = $("#disc_amt_nv").html();
@@ -708,6 +766,68 @@
 			}
 		});
 	}
+	
+	
+		// ---- Add Product to Cart ----//
+		function addProdToWishlist(prod_id, qty) {
+			var cart_qty;
+			var total_price = $("#item_total_price_nv").html();
+			if (total_price == '0'){
+				alert("Sorry, this product is not available.");
+				return;
+			}
+			var discount = $("#disc").html();
+			var promotion_id = $("#promotion_id_nv").html();
+			var disc_amt = $("#disc_amt_nv").html();
+			var item_unit_price = $("#item_unit_price_nv").html();
+	
+			var img = document.getElementById('prod-img');
+			var width = img.naturalWidth;
+			var height = img.naturalHeight;
+			var ratio = width/height;		
+			var img = document.getElementById('prod-img');
+			var currwidth = parseFloat($("#size-slider").slider("value"));
+			var currheight = Math.round(currwidth / ratio);
+			var sqin = currwidth * currheight;
+			
+			print_medium_id = $('#print-medium-select').val();
+			print_medium_size = sqin;
+			moulding_size = (currwidth + currheight) * 2;
+			acrylic_size = currwidth * currheight;
+			board_size = currwidth * currheight;
+			stretch_size = (currwidth + currheight) * 2;
+			
+			// Update the cart
+			$.ajax({
+				url: "{% url 'add_to_wishlist' %}", 
+				data: { 'prod_id':prod_id,'qty':qty, 
+						'width':currwidth, 'height':currheight, 'moulding_id': moulding_id,
+						'moulding_size' : moulding_size,
+						'print_medium_id':print_medium_id, 'print_medium_size':print_medium_size, 
+						'mount_id':mount_id, 'mount_size':mount_size,
+						'mount_w_left' : mount_w_left, 'mount_w_right':mount_w_right, 
+						'mount_w_top':mount_w_top, 'mount_w_bottom' : mount_w_bottom, 
+						'acrylic_id':acrylic_id, 'acrylic_size':acrylic_size,
+						'board_id':board_id, 'board_size':board_size, 'stretch_id':stretch_id,
+						'stretch_size':stretch_size, 
+						'total_price':total_price, 'image_width':currwidth, 'image_height':currheight,
+						'discount':discount, 'promotion_id':promotion_id, 'disc_amt':disc_amt,
+						'item_unit_price':item_unit_price,  'prod_type':'STOCK-IMAGE'}, 
+				dataType: 'text', 
+					type: 'POST',
+				success: function (data) {
+					data = JSON.parse(data);
+					cart_qty = data.cart_qty;
+					//Update items in cart
+					$('#msg-wishlist-modal').modal('show');
+				},
+				error: function(xhr){
+					alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+				}
+			});
+
+		}				
+	
 	</script>
 	{% endblock jscripts %}	
 		

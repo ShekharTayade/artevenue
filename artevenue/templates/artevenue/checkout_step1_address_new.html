@@ -20,8 +20,8 @@
 			<div class="col-lg-12">
 				<div id="order-summary" class="box">
 					<div class="box-header">
-						<h3 class="mb-0">Order summary: <small>Order No. {{order_id}}</small></h3>
-						<span class="text-muted">Shipping and handing costs will be added based on the shipping method.</span>
+						<h3 class="mb-0">Order No. {{order_number}}</h3>
+						<span class="text-muted"><small>(Shipping and handling costs will be added based on the shipping method.)</small></span>
 					</div>
 					<div class = "row">
 						<div class = "col-xs-12 col-md-3">
@@ -364,7 +364,7 @@
 							
 							<!-- /.row-->
 							<div class="box-footer d-flex justify-content-between"><a href="{% url 'show_cart' %}" class="btn btn-outline-secondary"><i class="fa fa-chevron-left"></i>Back to Cart</a>
-								<button type="submit" class="btn btn-primary">
+								<button id = "btn-delMethod" type="submit" class="btn btn-primary">
 									Continue to Delivery Method<i class="fa fa-chevron-right"></i>
 								</button>
 							</div>
@@ -383,6 +383,17 @@
 	
 	
 	{% block jscripts %}
+	<script>
+	$(document).ready(function(){
+		{% if order_total %}
+			$("#btn-delMethod").prop('disabled', false);
+		{% else %}
+			$("#btn-delMethod").prop('disabled', true);
+		{% endif %}
+	});
+	
+	</script>
+
 	
 	<script>
 		function autocomplete(inp, arr) {

@@ -113,7 +113,7 @@
 
 			var to_dt = today.getDate();
 			var to_mn = today.getMonth();
-			var to_mn = fm_mn;
+			var to_mn = to_mn + 1; //Javascript month start from 0
 			var to_yy = today.getFullYear();			
 			
 			document.getElementById("todate").value = ( parseInt(to_yy) + "-" + zeroPad(to_mn) + "-" + zeroPad(to_dt) );

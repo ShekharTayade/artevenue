@@ -2,14 +2,23 @@ from django.shortcuts import render, get_object_or_404
 from datetime import datetime
 import datetime
 from django.db import IntegrityError, DatabaseError, Error
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render,redirect
+from django.contrib import messages
 
 from artevenue.models import Ecom_site, Cart
-from artevenue.forms import contactUsForm
+from artevenue.forms import contactUsForm, referralForm, egiftForm
 
 from artevenue.models import Pin_code, City, State, Country, Pin_city_state_country
-
+from artevenue.models import Referral, Egift_card_design, Egift
 from django.http import HttpResponse
 from django.conf import settings
+from django.core.mail import send_mail, EmailMultiAlternatives, EmailMessage
+
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+import urllib
+import json
 
 from .cart_views import *
 
@@ -83,9 +92,11 @@ def sync_cart_session_user(request, sessionid):
 				user = User.objects.get(username = request.user)
 
 				cart = Cart.objects.filter(user = user, cart_status = "AC")
-				# User already has a cart open, then return
+				# User already has a cart open
 				if cart:
-					# Abondon the existing session cart & return back
+					# Abondon the existing session cart
+					cnt = cart.update(cart_status = 'AB', updated_date = datetime.datetime.now())
+					'''
 					updcart = Cart(
 						cart_id = sessioncart.cart_id,
 						store = sessioncart.store,
@@ -102,9 +113,13 @@ def sync_cart_session_user(request, sessionid):
 						created_date = sessioncart.created_date
 					)						
 					updcart.save()
-					return JsonResponse({"status":"CARTOPEN"})
+					'''
+					##return JsonResponse({"status":"CARTOPEN"})
 			
 				# Update the session Cart with current user id
+				cnt_s = Cart.objects.filter(cart_id = sessioncart.cart_id).update(
+						user = user, updated_date = datetime.datetime.now())
+				'''
 				updcart = Cart(
 						cart_id = sessioncart.cart_id,
 						store = sessioncart.store,
@@ -122,7 +137,11 @@ def sync_cart_session_user(request, sessionid):
 				)						
 				
 				updcart.save()
-
+				'''
+				## Check is any order exists based on this cart, update it with the user
+				order = Order.objects.filter(cart_id = sessioncart.cart_id).update(
+					user = user, updated_date = datetime.datetime.now())
+				
 			finally:
 				return JsonResponse({"status":"NOUSER"})
 				
@@ -204,4 +223,185 @@ def validate_address(request):
 		msg.append("SUCCESS")
 	
 	return JsonResponse({'msg':msg})
+
+@login_required
+def refer_us(request):
+	msg = ''
+	if request.method == 'POST':
+		form = referralForm(request.POST, user=request.user)
+
+		# get the token submitted in the form
+		recaptcha_response = request.POST.get('g-recaptcha-response')
+		url = 'https://www.google.com/recaptcha/api/siteverify'
+		payload = {
+			'secret': settings.GOOGLE_RECAPTCHA_SECRET_KEY,
+			'response': recaptcha_response
+		}
+		data = urllib.parse.urlencode(payload).encode()
+		req = urllib.request.Request(url, data=data)
+
+		# verify the token submitted with the form is valid
+		response = urllib.request.urlopen(req)
+		result = json.loads(response.read().decode())
+
+		# result will be a dict containing 'success' and 'action'.
+		# it is important to verify both
+		if (not result['success']) or (not result['action'] == 'referus'):
+			msg = 'Invalid reCAPTCHA. Please try again.'
+			return render(request, "artevenue/refer_us.html", {'form':form,
+				'msg':msg})
+		else :
+			if form.is_valid():		
+				refer = form.save(commit=False)			
+				refer.referred_by = request.user
+				refer.referred_date = today
+				refer.save()
+				return redirect('refer_confirm', ref_id=refer.id)  
+	else:
+		form = referralForm(user=request.user)
 		
+	return render(request, "artevenue/refer_us.html", {'form':form, 'msg':msg})
+
+@login_required	
+def refer_confirm(request, ref_id):
+	
+	try:
+		referral = Referral.objects.get(id = ref_id)
+		name = referral.name
+	except Referral.DoesNotExist:
+		name = "XXX"
+		referral = None
+	
+	# Send mail
+	subject = 'Your friend has a referred us, Artevenue.com. Log on and get rewarded!'
+	html_message = render_to_string('artevenue/referral_email.html', 
+			{'referral': referral, 'host':request.get_host()})
+	plain_message = strip_tags(html_message)
+	from_email = 'support@artevenue.com'
+	to = referral.email_id
+
+	#cnt = send_mail(subject, plain_message, from_email, [to], html_message=html_message)
+
+	msg = EmailMultiAlternatives(subject, plain_message, from_email, [to])
+	msg.attach_alternative(html_message, "text/html")
+	
+	
+	#msg = EmailMessage(subject, html_message, from_email, [to])
+	#msg.content_subtype = "html"  # Main content is now text/html
+
+	msg.send()	
+	
+	return render(request, "artevenue/refer_confirm.html", {'name':name})
+	
+
+@login_required
+def egift_card(request):
+	msg = ''
+
+	if request.method == 'POST':
+		gift_rec_id = request.GET.get('gift_rec_id','')
+		 
+		if gift_rec_id:
+			gift = Egift.objects.get(gift_rec_id=gift_rec_id)
+			form = egiftForm(request.POST  or None, instance=gift)
+		else:
+			form = egiftForm(request.POST, giver=request.user)
+			
+
+		# get the token submitted in the form
+		recaptcha_response = request.POST.get('g-recaptcha-response')
+		url = 'https://www.google.com/recaptcha/api/siteverify'
+		payload = {
+			'secret': settings.GOOGLE_RECAPTCHA_SECRET_KEY,
+			'response': recaptcha_response
+		}
+		data = urllib.parse.urlencode(payload).encode()
+		req = urllib.request.Request(url, data=data)
+
+		# verify the token submitted with the form is valid
+		response = urllib.request.urlopen(req)
+		result = json.loads(response.read().decode())
+
+		# result will be a dict containing 'success' and 'action'.
+		# it is important to verify both
+		if (not result['success']) or (not result['action'] == 'egift'):
+			msg = 'Invalid reCAPTCHA. Please try again.'
+			return render(request, "artevenue/egift_card.html", {'form':form,
+				'msg':msg})
+		else :
+			if form.is_valid():		
+				gift = form.save(commit=False)			
+				gift.giver = request.user
+				gift.gift_date = today
+				gift.save()
+				return redirect('egift_card_review', gift_rec_id=gift.gift_rec_id)  
+	else:
+		gift_rec_id = request.GET.get('gift_rec_id','')
+		if gift_rec_id != '':
+			gift = Egift.objects.get(gift_rec_id=gift_rec_id)	
+			form = egiftForm(instance=gift)		
+		else:
+			form = egiftForm(giver=request.user, initial=({'gift_date':  today}) )
+	
+	# Card Designs
+	designs = Egift_card_design.objects.all()
+	
+	return render(request, "artevenue/egift_card.html", {'form':form, 'msg':msg,
+			'designs':designs})
+
+def egift_card_review(request, gift_rec_id):
+	msg = ''
+	gift = Egift.objects.get(gift_rec_id=gift_rec_id)	
+	form = egiftForm(instance = gift)
+
+	# Card Designs
+	designs = Egift_card_design.objects.all()
+	
+	return render(request, "artevenue/egift_card_review.html", {'form':form, 'msg':msg,
+			'designs':designs, 'gift':gift})
+	
+
+
+def send_order_emails():
+
+	cus_paymnt = Payment_details.objects.filter(cust_email_sent = False)
+	##### SEND EMAIL TO CUSTOMER
+	for p in cus_paymnt:
+		order = Order.objects.get(order_id = p.order_id)
+		subject = "Arte'Venue Order placed successfully. Order No: " + order.order_number
+		html_message = render_to_string('artevenue/order_print.html', 
+				{'orders': order, 'email_id':p.email_id})
+		plain_message = strip_tags(html_message)
+		from_email = 'support@artevenue.com'
+		to = p.email_id
+		msg = EmailMultiAlternatives(subject, plain_message, from_email, [to])
+		msg.attach_alternative(html_message, "text/html")
+		msg.send()	
+	
+	if cus_paymnt:
+		cus_paymnt.update(cust_email_sent = True)
+
+	fac_paymnt = Payment_details.objects.filter(factory_email_sent = False)
+	##### SEND EMAIL TO CUSTOMER
+	for p in fac_paymnt:
+		order = Order.objects.get(order_id = p.order_id)
+		subject = "Order No: " + order.order_number
+		html_message = render_to_string('artevenue/factory_order_email.html', 
+				{'referral': referral, 'host':request.get_host()})
+		plain_message = strip_tags(html_message)
+		from_email = 'support@artevenue.com'
+		to = "factory@artevenue.com"
+		msg = EmailMultiAlternatives(subject, plain_message, from_email, [to])
+		msg.attach_alternative(html_message, "text/html")
+		msg.send()	
+
+	if fac_paymnt:
+		fac_paymnt.update(cust_email_sent = True)
+
+		
+	return
+		
+
+
+			
+	

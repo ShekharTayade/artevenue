@@ -7,7 +7,7 @@
 {% load show_main_slider_section from prod_template_tags %}
 {% load show_featured_products_section from prod_template_tags %}
 {% load show_trending_categories from prod_template_tags %}
-{% load show_featured_collections from prod_template_tags %}
+{% load show_curated_collections from prod_template_tags %}
 {% load show_create_your_space from prod_template_tags %}
 {% load show_egift from prod_template_tags %}
 {% load show_referral from estore_base %}
@@ -90,7 +90,8 @@
 
 		<!-- JQuery DataTables -->
 		<script type="text/javascript" src="{% static 'vendor/DataTables/datatables.min.js' %}"></script>
-
+		
+		<script src="https://www.google.com/recaptcha/api.js?render=6Le2ZqAUAAAAAIAvZ7dRPJkj5zLI2IYAxfPktXqE"></script>
 		
 	</head>
 	{% endblock html-head %}
@@ -100,21 +101,18 @@
 		{% block siteheader %}
 		<header class="header">
 			
+			<!-- Admin Menu-->
+			{% admin_menu request %}
 			
 			<!-- Top slim bar with tagline, login, register etc-->
 			{% topbar request messsages %}
-
-			<!-- Admin Menu-->
-			{% admin_menu request %}
 				
-			
 			<!-- Navigation - Logo, menu, search and cart buttons -->
 			{% menubar request%}
 			<!-- END: Navigation - Logo, menu, search and cart buttons -->
 		</header>
 		{% endblock siteheader %}
 		<!-- END: Header Section with top slim line, logo/search/cart and menu-->
-
 
 		<div id="all">
 			<div id="content" class= "" style="background-color:#fff">
@@ -125,21 +123,18 @@
 				{% show_trending_categories %}
 				
 				<!-- END: Featured Products  Header -->						
-				{% show_featured_collections %}
+				{% show_curated_collections %}
 
 				{% show_frame_my_art request %}
 			
-				{% show_create_your_space request %}
 
 				{% show_egift request %}
 				
-				{% show_referral %}
-
 				{% endblock sitecontent %}
 
 				{% site_footer request %}
 				<!-- *** FOOTER END ***-->
-    
+	
 				<!--COPYRIGHT -->
 				{% copy_right request %}
 				
@@ -184,16 +179,26 @@
 			$(document).ready(function(){
 				{% if messages %}
 					{% for message in messages %}
-						{% if message.tags %} 
+						{% if message.tags != 'info' %} 
 							$('#show-loginerror').html("<div class='alert alert-danger'><button type='button' class='close' data-dismiss='alert'></button>{{message}}</div>");
 						{% endif %}
 					{% endfor %}
 				
 					$('#login-modal').modal('show'); 
 				{% endif %}
+				show_persistant_menu_on_click();
 				
 			});		
+			
+			function show_persistant_menu_on_click(){
+				$('ul.navbar-nav li.dropdown').hover(function() {
+				  $(this).find('.dropdown-menu').stop(true, true).delay(200).fadeIn(500);
+				}, function() {
+				  $(this).find('.dropdown-menu').stop(true, true).delay(200).fadeOut(500);
+				});	
+			}
 		</script>
+		
 	</body>
 	
 </html>

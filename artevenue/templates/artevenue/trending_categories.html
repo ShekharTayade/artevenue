@@ -18,7 +18,7 @@
 </div>
 
 <!-- Featured items slider -->
-<div class="product-slider owl-carousel owl-theme">
+<div class="product-slider owl-carousel owl-theme px-bottom">
 	{% for c in trending_categories %}
 		<div class="item">  
 				{% with 'img/'|add:c.url as image_static %}
@@ -36,33 +36,5 @@
 				
 		</div>
 	{% endfor %}
-</div> 
-
-
-
-	<!-- <section class="tranding_section">
-		<div class="container">
-			<hgroup class="hgroup_2 text-center"><h2>Trending Categories </h2></hgroup>
-
-				<div class="heroSlider-fixed">	
-					<div class="slider responsive text-center">
-						{% for c in trending_categories %}
-						<div>
-							{% with 'img/'|add:c.url as image_static %}
-							<div class="trend_column">
-								<div class="trend_inner">
-									<img src="{% static image_static %}" class="img-fluid">
-									<div class="overlay">
-									</div>
-								</div>
-							</div>
-							
-							<h5><a href="{% url 'category_stock_images' c.category_id %}">{{ c.name|title }}</a></h5>
-							{% endwith %}
-						</div>
-						{% endfor %}
-					</div>
-				</div>
-		</div>
-	</section> -->
+</div>
 {% endif %}

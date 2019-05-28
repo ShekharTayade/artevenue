@@ -15,8 +15,8 @@ $(function () {
         items: 1,
 		responsiveClass:true,
         nav: false,
-		navText: ["<i class='fa fa-chevron-left' aria-hidden='true'></i>","<i class='fa fa-chevron-right' aria-hidden='true'></i>"],
-        dots: true,
+		//navText: ["",""],
+        //dots: true,
 		loop:true,
         autoplay: true,
         autoplayHoverPause: true,
@@ -24,6 +24,8 @@ $(function () {
 		autoheight:true,
 		autowidth:true,
 		//width: 300
+		
+		
     });
 
 
@@ -38,16 +40,16 @@ $(function () {
 
 
     $('.product-slider').owlCarousel({
-        items: 2,
+        items: 3,
         dots: true,
-        nav: true,
-		navText: ["<i class='fa fa-chevron-left' aria-hidden='true'></i>","<i class='fa fa-chevron-right' aria-hidden='true'></i>"],
+        nav: false,
+		//navText: ["<i class='fa fa-chevron-left' aria-hidden='true'></i>","<i class='fa fa-chevron-right' aria-hidden='true'></i>"],
 		loop:true,
         autoplay: true,
 		autoWidth: false,
         responsive: {
             480: {
-                items: 2
+                items: 3
             },
             765: {
                 items: 4

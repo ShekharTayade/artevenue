@@ -242,3 +242,6 @@ MOULDING_ROOT = os.path.join(BASE_DIR, 'artevenue/static/img/')
 TMP_FILES = os.path.join(BASE_DIR, 'artevenue/static/tmp/')
 CSS_FILES = os.path.join(BASE_DIR, 'artevenue/static/css/')
 VENDOR_FILES = os.path.join(BASE_DIR, 'artevenue/static/vendor/')
+EGIFT_DESIGNS = os.path.join(BASE_DIR, 'artevenue/static/img/')
+
+GOOGLE_RECAPTCHA_SECRET_KEY = '6Le2ZqAUAAAAALbzG6uSjImGZ2hHY_B6r_Cug74i'

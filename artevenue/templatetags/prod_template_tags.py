@@ -91,19 +91,7 @@ def show_trending_categories():
 	trending_cat = Stock_image_category.objects.filter(trending = True)
 	
 	
-	return {'trending_categories':trending_cat, 'ecom_site':ecom}	
-
-
-@register.inclusion_tag('artevenue/curated_categories.html')
-def show_curated_categories():
-
-	ecom = get_object_or_404 (Ecom_site, store_id=settings.STORE_ID )
-	
-	'''Get trending categories'''
-	featured_cat = Stock_image_category.objects.filter(featured_collection = True)
-	
-	
-	return {'featured_collection':featured_cat, 'ecom_site':ecom}		
+	return {'trending_categories':trending_cat, 'ecom_site':ecom}		
 	
 @register.inclusion_tag('artevenue/show_frames_section.html')
 def show_frame_my_art(request):
@@ -119,22 +107,17 @@ def show_create_your_space(request):
 	ecom = get_object_or_404 (Ecom_site, store_id=settings.STORE_ID )
 	
 	return {'ecom_site':ecom}	
-
 	
 @register.inclusion_tag('artevenue/show_egift_section.html')
 def show_egift(request):
 	ecom = get_object_or_404 (Ecom_site, store_id=settings.STORE_ID )
 	
 	return {}	
-
 	
-@register.inclusion_tag('artevenue/featured_categories.html')
-def show_featured_collections():
+@register.inclusion_tag('artevenue/show_curated_collections.html')
+def show_curated_collections():
 
-	ecom = get_object_or_404 (Ecom_site, store_id=settings.STORE_ID )
-	
 	'''Get trending categories'''
-	featured_cat = Stock_image_category.objects.filter(featured_collection = True)
+	#featured_cat = Stock_image_category.objects.filter(featured_collection = True)	
 	
-	
-	return {'featured_collection':featured_cat, 'ecom_site':ecom}	
+	return {}

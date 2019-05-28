@@ -1,17 +1,75 @@
+{% load static %}
 {% load utils %}
+							<div class="row">
 
-							<p class="text-muted">
-								{% if count > 0 %} 
-									{{ count }} order(s) found between {{startDt|date:'d-M-Y'}} and {{endDt|date:'d-M-Y'}} 
-								{% else %} 
-									No orders found between {{startDt|date:'d-M-Y'}} and {{endDt|date:'d-M-Y'}} 
-								{% endif %}
-							</p>
-							
+								<p class="text-muted">
+									{% if count > 0 %} 
+										{{ count }} order(s) found {% if startDt != '' %} between {{startDt|date:'d-M-Y'}} and {{endDt|date:'d-M-Y'}} {% endif %} 
+									{% else %} 
+										No orders found {% if startDt %} between {{startDt|date:'d-M-Y'}} and {{endDt|date:'d-M-Y'}} {% endif %}
+									{% endif %}
+								</p>
+							</div>	
 							{% for o in orders %}
-							<h3>Order Number : {{o.order_number}}</h3>
-							<h4>Dated : {{o.order_date}}</h4>
-							
+							<h3 style = "color:blue"}>Order Number : {{o.order_number}}
+							</h3>
+							<h4>Dated : {{o.order_date}}  | Status: {{ o.get_order_status_display }}							
+							</h4>
+						
+							<div class = "row">
+								{% if o.order_shipping %}
+								<div class = "col-6 box">
+								<strong>Shipping Address:</strong><br />
+									{{o.order_shipping.full_name}} 
+									{% if o.order_shipping.Company %}
+										, {{o.order_shipping.Company}}
+									{% endif %}
+									<br />
+									{{o.order_shipping.address_1}}
+									{% if o.order_shipping.address_2 %}
+										{{o.order_shipping.address_2 }}
+									{% endif %}
+									{% if o.order_shipping.address_1 or o.order_shipping.address_2 %}
+										<br />
+									{% endif %}
+									{% if o.order_shipping.land_mark %}
+										{{o.order_shipping.land_mark}}
+										<br />
+									{% endif %}
+									
+									{{o.order_shipping.city}} {{o.order_shipping.state}} {{o.order_shipping.pin_code_id}}
+									<br />
+									Ph: {{o.order_shipping.phone_number}} Email: {{o.order_shipping.email_id}}
+								</div>
+								{% endif %}
+
+								{% if o.order_billing %}
+								<div class = "col-6 box">
+								<strong>Billing Address:</strong><br />
+									{{o.order_billing.full_name}} 
+									{% if o.order_billing.Company %}
+										, {{o.order_billing.Company}}
+									{% endif %}
+									<br />
+									{{o.order_billing.address_1}}
+									{% if o.order_billing.address_2 %}
+										{{o.order_billing.address_2 }}
+									{% endif %}
+									{% if o.order_billing.address_1 or o.order_billing.address_2 %}
+										<br />
+									{% endif %}
+									{% if o.order_billing.land_mark %}
+										{{o.order_billing.land_mark}}
+										<br />
+									{% endif %}
+									
+									{{o.order_billing.city}} {{o.order_billing.state}} {{o.order_billing.pin_code_id}}
+									<br />
+									Ph: {{o.order_billing.phone_number}} Email: {{o.order_billing.email_id}}
+								</div>
+								{% endif %}
+
+							</div>
 							<div class="table table-responsive">
 								<table id = "ordTbl" class="table table-responsive table-striped">
 									<thead>
@@ -31,29 +89,16 @@
 											
 										{% else %}
 										<tr>
-											{% if i.product__product_image__url %}
-												<td><img src = "{{i.product__product_image__url}}" style = "width:75px; height:75px; object-fit:contain;">
-													<br />
-													<div class = "pull-left">
-														<button type ="button" style = "padding-left:0px;"  class = "btn btn-link" onclick = "getFramedImg('{{i.product_id}}', '{{i.image_width}}', '{{i.moulding_id}}', '{{i.mount.color}}','{{i.mount_size}}', '{{i.product__product_image__url}}');">
-															{{i.product__name}}
-														</button>
-													</div>
-												</td>
-											{% else %}
-											
-												<td><img src = "{{MEDIA_URL}}{{i.user_image__image_to_frame}}" style = "width:75px; height:75px; object-fit:contain;">
-													<br />
-													<div class = "pull-left">
-														<button style="padding-left:0px;" type ="button" class = "btn btn-link pull-left" onclick = "getFramedUserImg('{{i.user_image_id}}', '{{i.image_width}}', '{{i.moulding_id | default_if_none:0}}', '{{i.mountcolor | default_if_none:0}}','{{i.mount_size | default_if_none:0}}', '{{i.user_image__image_to_frame | default_if_none:""}}');">
-															{{i.user_image__image_to_frame__name|truncatechars:15 }}
-														</button>
-													</div>
-												</td>
-											
-											{% endif %}
+											<td><img src = "{% if i.product_type == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product__image_to_frame}} {% else %}  {{i.product__thumbnail_url}} {% endif %}" style = "width:75px; height:75px; object-fit:contain;">
+												<br />
+												<div class = "pull-left">
+													<button type ="button" class = "btn btn-link" style = "padding-left:0px;" onclick = "getFramedImg('{{i.product_id}}', '{{i.image_width}}', '{{i.moulding_id| default_if_none:0}}', '{{i.mount__color| default_if_none:0}}','{{i.mount_size| default_if_none:0}}', '{{i.product__url}}');">
+														{{i.product__name}}
+													</button>
+												</div>
+											</td>
 											<td>
-												{% with width=i.moulding__width_inches %}
+												{% with width=i.moulding__width_inches|add_width_frame_mount:i.mount_size %}
 
 												<small>Print on {{i.print_medium_id|title}}, 
 												{% if i.moulding_id %}
@@ -118,7 +163,8 @@
 									</tfoot>
 								</table>
 							</div>
-							<hr>
+							<div class = "mb-5" style="padding-bottom:2px; background-color:gainsboro;" >
+							</div>
 							{% endfor orders %}
 							
 							
@@ -128,16 +174,16 @@
 									<div class="col-md-12 col-lg-12 products-showing">
 										<div class = "text-center">
 											{% if orders.has_previous %}
-												<button type = "button" class="btn btn-sm btn-primary" onclick="get_orders('1');"><i class="fa fa-chevron-left"></i> First</button>  
-												<button type = "button" class="btn btn-sm btn-primary"  onclick="get_orders('{{ orders.previous_page_number }}');">Prev</button>
+												<button type = "button" class="btn btn-sm btn-primary" onclick="get_store_orders('1');"><i class="fa fa-chevron-left"></i> First</button>  
+												<button type = "button" class="btn btn-sm btn-primary"  onclick="get_store_orders('{{ orders.previous_page_number }}');">Prev</button>
 											{% else %}
 												<button type = "button" class="btn btn-sm btn btn-secondary disabled" href="#"><i class = "fa fa-chevron-left"></i> First</button>
 												<button type = "button" class="btn btn-sm btn btn-secondary disabled"  href="#">Prev</button>
 											{% endif %}
 											Showing Page {{ orders.number }} of {{ orders.paginator.num_pages }}
 											{% if orders.has_next %}
-												<button type = "button" class="btn btn-sm btn-primary" onclick="get_orders('{{ orders.next_page_number }}');">Next</button>
-												<button type = "button" class="btn btn-sm btn-primary" onclick="get_orders('{{ orders.paginator.num_pages }}');">Last <i class = "fa fa-chevron-right"></i></button>
+												<button type = "button" class="btn btn-sm btn-primary" onclick="get_store_orders('{{ orders.next_page_number }}');">Next</button>
+												<button type = "button" class="btn btn-sm btn-primary" onclick="get_store_orders('{{ orders.paginator.num_pages }}');">Last <i class = "fa fa-chevron-right"></i></button>
 											{% else %}
 												<button type = "button" class="btn btn-sm btn-secondary disabled" href="#">Next</button>
 												<button type = "button" class="btn btn-sm btn-secondary disabled" href="#">Last <i class = "fa fa-chevron-right"></i></button>

@@ -163,7 +163,7 @@ a, button, img {
 }
 
 .navbar{
-	padding: 1rem 1rem;
+/*	padding: 1rem 1rem; */
 	
 }
 .navbar-light .navbar-nav .nav-link:focus, .navbar-light .navbar-nav .nav-link:hover {
@@ -403,8 +403,8 @@ ul.slick-dots li.slick-active button {
 	font-size: 26px;
     color: #252525;
     letter-spacing: 1px;
-    padding-bottom: 26px;
-    margin-bottom: 26px;
+    /*padding-bottom: 26px;*/
+    /*margin-bottom: 26px;*/
     position: relative;
 }
 /*tranding end*/
@@ -421,10 +421,9 @@ ul.slick-dots li.slick-active button {
 
 .curted_pic {
     /*border: 10px solid #fff;*/
-    width: 100%;
+    /*width: 100%; */
     display: block;
-    margin-bottom: 20px;
-	position:relative;
+/*    margin-bottom: 20px; */
 }
 
 .curted_coumn{
@@ -434,12 +433,11 @@ ul.slick-dots li.slick-active button {
 }
 .curted_pic:before {
     /*border: 2px solid #fff;*/
-    bottom: 15px;
+    /*bottom: 15px;
     content: "";
     left: 15px;
-    position: absolute;
     right: 15px;
-    top: 15px;
+    top: 15px;*/
 /*    z-index: 1; */
 }
 .curted_coumn h3 {

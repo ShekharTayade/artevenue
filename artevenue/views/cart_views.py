@@ -6,19 +6,23 @@ from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.db import IntegrityError, DatabaseError, Error
 from django.contrib.auth.models import User
 from django.db.models import F
+from django.db.models import Count, Q, Max, Sum
+from decimal import Decimal
 
 from datetime import datetime
 import datetime
 from decimal import Decimal
 import json
 
-from artevenue.models import Cart, Stock_image, User_image, Stock_collage, Original_art
+from artevenue.models import Cart, Stock_image, User_image, Stock_collage, Original_art, Cart_item
 from artevenue.models import Product_view, Promotion, Order, Voucher, Voucher_user, Cart_item_view
 from artevenue.models import Cart_user_image, Cart_stock_image, Cart_stock_collage, Cart_original_art
-
+from artevenue.models import Order_stock_image, Order_stock_collage, Order_original_art, Order_user_image
+from artevenue.models import Referral, Egift_redemption, Egift, Order_items_view
 from .product_views import *
 from .user_image_views import *
 from .tax_views import *
+from .price_views import *
 
 today = datetime.date.today()
 ecom = get_object_or_404 (Ecom_site, store_id=settings.STORE_ID )
@@ -29,7 +33,7 @@ def show_cart(request):
 	usercart = {}
 	usercartitems = {}
 	shipping_cost = 0 
-	user_image = None
+
 	''' Let's check if the user has a cart open '''
 	try:
 		if request.user.is_authenticated:
@@ -47,8 +51,6 @@ def show_cart(request):
 		order = Order.objects.filter(cart_id = usercart.cart_id).first()
 		if order:
 			shipping_cost = order.shipping_cost
-		else:
-			shipping_cost = 0
 		
 		
 		usercartitems = Cart_item_view.objects.select_related('product', 'promotion').filter(
@@ -60,7 +62,7 @@ def show_cart(request):
 			'item_unit_price', 'item_sub_total', 'item_disc_amt', 'item_tax', 'item_total', 'product_type',
 			'product__image_to_frame'
 			).order_by('product_type')
-		
+
 	except Cart.DoesNotExist:
 			usercart = {}
 
@@ -77,15 +79,45 @@ def show_cart(request):
 		template = "artevenue/cart.html"
 	
 	total_bare = 0
-	
+	cart_total = 0
+	ref_status = '' 
+	ref_msg = ''
+	referral_disc_amount = 0
 	if usercart :
-		total_bare = usercart.cart_total  - shipping_cost - usercart.voucher_disc_amount
-	
-	return render(request, template, {'usercart':usercart, 
-		'usercartitems': usercartitems, 'shipping_cost':shipping_cost, 'total_bare':total_bare,
-		'user_image':user_image})
+		total_bare = usercart.cart_total - shipping_cost + usercart.cart_disc_amt
+		cart_total = usercart.cart_total
+		referral_disc_amount = usercart.referral_disc_amount			
+		## Check for an applicable referral
+		if request.user.is_authenticated:
+			ref = apply_referral(request, cart_total + usercart.cart_disc_amt)
+			if ref:
+				if ref['status'] == "SUCCESS":
+					ref_status = ref['status']
+					ref_msg = ref['msg']
+					referral_id = ref['referral_id']
+					referral_disc_amount = ref['disc_amt']
+					# Apply applicable referral, if not already alpplied.
+					if not usercart.referral_id :
+						cart_total = ref['cart_total']
+						cart_disc_amt = usercart.cart_disc_amt - usercart.referral_disc_amount + referral_disc_amount
 
-	
+						row = Cart.objects.filter(cart_id=usercart.cart_id).update(
+							cart_total=cart_total, referral_id = referral_id,
+							referral_disc_amount = referral_disc_amount,
+							cart_disc_amt = cart_disc_amt)
+
+						# Update the changed values	of usercart for display
+						usercart.referral_id = referral_id
+						usercart.cart_total = cart_total
+						usercart.referral_disc_amount = referral_disc_amount
+						usercart.cart_disc_amt = cart_disc_amt
+						
+		cart_total = usercart.cart_total
+			
+	return render(request, template, {'usercart':usercart, 
+		'usercartitems': usercartitems, 'shipping_cost':shipping_cost, 
+		'total_bare':total_bare, 'cart_total':cart_total, 
+		'ref_msg':ref_msg, 'ref_status':ref_status, 'referral_disc_amount':referral_disc_amount})
 	
 def show_wishlist(request):
 
@@ -102,7 +134,7 @@ def show_wishlist(request):
 @csrf_protect
 @csrf_exempt	
 def add_to_cart(request):
-
+	err_flg = False
 	prod_id = request.POST.get('prod_id', '')
 	prod_type = request.POST.get('prod_type', '')
 	qty = int(request.POST.get('qty', '0'))
@@ -114,7 +146,7 @@ def add_to_cart(request):
 	rnin = (image_width + image_height) * 2
 	
 	moulding_id = request.POST.get('moulding_id', '')
-	if moulding_id == '0' or moulding_id == 'None':
+	if moulding_id == '0' or moulding_id == 'None' or moulding_id == '' :
 		moulding_id = None
 
 	if moulding_id:
@@ -124,7 +156,7 @@ def add_to_cart(request):
 	print_medium_id = request.POST.get('print_medium_id', '')
 	print_medium_size = Decimal(request.POST.get('print_medium_size', '0'))
 	mount_id = request.POST.get('mount_id', '0')
-	if mount_id == '0' or mount_id == 'None':
+	if mount_id == '0' or mount_id == 'None' or mount_id == '':
 		mount_id = None
 	if mount_id:
 		mount_size = Decimal(request.POST.get('mount_size', '0'))
@@ -139,15 +171,15 @@ def add_to_cart(request):
 		mount_w_top = None
 		mount_w_bottom = None
 	acrylic_id = request.POST.get('acrylic_id', '0')
-	if acrylic_id == '0' or acrylic_id == 'None':
+	if acrylic_id == '0' or acrylic_id == 'None' or acrylic_id == '':
 		acrylic_id = None
 	if acrylic_id:
 		acrylic_size = sqin
 	else:
 		acrylic_size = None
 	
-	board_id = request.POST.get('board_id', '')
-	if board_id == '0' or board_id == 'None':
+	board_id = request.POST.get('board_id', '0')
+	if board_id == '0' or board_id == 'None' or board_id == '':
 		board_id = None
 	if board_id:
 		board_size = sqin
@@ -155,7 +187,7 @@ def add_to_cart(request):
 		board_size = None
 
 	stretch_id = request.POST.get('stretch_id', '0')
-	if stretch_id == '0' or stretch_id == 'None':
+	if stretch_id == '0' or stretch_id == 'None'  or stretch_id == '':
 		stretch_id = None
 	if stretch_id:
 		stretch_size = rnin
@@ -177,9 +209,7 @@ def add_to_cart(request):
 		str_disc_amt = 0
 	disc_amt = Decimal(str_disc_amt)
 
-	
 	userid = None
-
 
 	discount = request.POST.get('discount', '')
 
@@ -189,6 +219,34 @@ def add_to_cart(request):
 		promo_str = '0'
 	promo_id = int(promo_str)
 	
+	#####################################
+	#         Get the item price
+	#####################################
+	price = get_prod_price(prod_id, 
+			prod_type=prod_type,
+			image_width=image_width, image_height=image_height,
+			print_medium_id = print_medium_id,
+			acrylic_id = acrylic_id,
+			moulding_id = moulding_id,
+			mount_size = mount_size,
+			mount_id = mount_id,
+			board_id = board_id,
+			stretch_id = stretch_id)
+	total_price = price['item_price']
+	msg = price['msg']
+	cash_disc = price['cash_disc']
+	percent_disc = price['percent_disc']
+	item_unit_price = price['item_unit_price']
+	disc_amt = price['disc_amt']
+	disc_applied = price['disc_applied']
+	promotion_id = price['promotion_id']
+	#####################################
+	# END::::    Get the item price
+	#####################################	
+	if item_unit_price == 0 or item_unit_price is None:
+		err_flg = True
+		return( JsonResponse({'msg':'Price not avaiable for this image', 'cart_qty':qty}, safe=False) )
+		
 	# Get the product
 	prod = None	
 	try:
@@ -205,8 +263,10 @@ def add_to_cart(request):
 		
 	except Product_view.DoesNotExist:
 		msg = "Product " + prod_id + " does not exist"
+		err_flg = True
 		return( JsonResponse({'msg':msg, 'cart_qty':qty}, safe=False) )
 	except User_image.DoesNotExist:
+		err_flg = True
 		msg = "Couldn't find the uploaded image. Pease try again."
 		return( JsonResponse({'msg':msg, 'cart_qty':qty}, safe=False) )
 
@@ -310,25 +370,58 @@ def add_to_cart(request):
 			prod_exits_in_cart = True
 	
 		try :
+			cart_total = Decimal(usercart.cart_total) + (total_price)
+			voucher_disc_amount = usercart.voucher_disc_amount
+			# Calculate voucher discount
 			
+			if usercart.voucher_id:
+				voucher = Voucher.objects.filter(voucher_id = usercart.voucher_id).first()
+				if voucher.voucher_code:
+					res = apply_voucher_py(request, usercart.cart_id, voucher.voucher_code, cart_total)
+					vou = json.loads(res.content)		
+					if 'status' in vou:
+						status = vou['status']
+					else:
+						status = ''
+					if status == 'SUCCESS' or status == 'SUCCESS-':
+						if 'disc_amount' in vou:
+							voucher_disc_amount = vou['disc_amount'] 
+						else:
+							voucher_disc_amount = 0
+						usercart.voucher_disc_amount = Decimal(voucher_disc_amount)
+						usercart.cart_disc_amt  = usercart.referral_disc_amount + Decimal(voucher_disc_amount)
+						
+						if 'cart_total' in vou:
+							cart_total = Decimal(vou['cart_total'])
+						
 			#Update the existing cart
+			'''
 			existingusercart = Cart(
 				cart_id = usercart.cart_id,
 				store = ecom,
 				session_id = sessionid,
 				user = userid,
 				voucher_id = usercart.voucher_id,
-				voucher_disc_amount = usercart.voucher_disc_amount,
+				voucher_disc_amount = voucher_disc_amount,
+				referral = usercart.referral,
+				referral_disc_amount = usercart.referral_disc_amount,
 				quantity =  usercart.quantity + qty,
 				cart_sub_total = usercart.cart_sub_total + item_sub_total,
 				cart_disc_amt = usercart.cart_disc_amt + disc_amt,
 				cart_tax  = usercart.cart_tax + item_tax,
-				cart_total = Decimal(usercart.cart_total) + (total_price),
+				cart_total = cart_total,
 				cart_status = usercart.cart_status,
 				created_date = usercart.created_date,
 				updated_date = today
 			)
 			existingusercart.save()
+			'''
+			usercart.quantity =  usercart.quantity + qty
+			usercart.cart_sub_total = usercart.cart_sub_total + item_sub_total
+			usercart.cart_tax  = usercart.cart_tax + item_tax
+			usercart.cart_total = cart_total
+			usercart.save()
+						
 			
 			''' If the product with same moulding, print_medium etc. already exists in the cart items, then update it, else insert new item '''
 			if prod_exits_in_cart:
@@ -575,9 +668,11 @@ def add_to_cart(request):
 			cart_qty = usercart.quantity + qty
 				
 		except IntegrityError as e:
+			err_flg = True
 			msg = 'Apologies!! Could not save your cart. Please use the "Contact Us" link at the bottom of this page and let us know. We will be glad to help you.'
 
 		except Error as e:
+			err_flg = True
 			msg = 'Apologies!! Could not save your cart. Please use the "Contact Us" link at the bottom of this page and let us know. We will be glad to help you.'
 	
 	# Create a new cart
@@ -591,6 +686,8 @@ def add_to_cart(request):
 				user = userid,
 				voucher_id = None,
 				voucher_disc_amount = 0,
+				referral = None,
+				referral_disc_amount = 0,
 				quantity =  qty,
 				cart_sub_total = item_sub_total,
 				cart_disc_amt = disc_amt,
@@ -721,34 +818,41 @@ def add_to_cart(request):
 			cart_qty = qty
 			
 		except IntegrityError as e:
+			err_flg = True
 			msg = 'Apologies!! Could not save your cart. Please use the "Contact Us" link at the bottom of this page and let us know. We will be glad to help you.'
 
 		except Error as e:
+			err_flg = True
 			msg = 'Apologies!! Could not save your cart. Please use the "Contact Us" link at the bottom of this page and let us know. We will be glad to help you.'
 
+
 	# Update the status of the User_image to "MTC" (Moved to Cart)
-	if prod.product_type == "USR-IMAGE":
+	if prod.product_type_id == "USER-IMAGE":
 		try: 
 			u = User_image (
-				id = user_image.id,
-				session_id = user_image.session_id,
-				user = user_image.user,
-				image_to_frame = user_image.image_to_frame,
+				product_id = prod.product_id,
+				product_type_id = prod.product_type_id,
+				session_id = prod.session_id,
+				user = prod.user,
+				image_to_frame = prod.image_to_frame,
 				status = 'MTC',
-				created_date = user_image.created_date
+				created_date = prod.created_date
 			)
 			u.save()
 		except Error as e:
+			err_flg = True
 			msg = 'Apologies!! We had a system issue. Please use the "Contact Us" link at the bottom of this page and let us know. We will be glad to help you.'
 	
-	return( JsonResponse({'msg':msg, 'cart_qty':cart_qty}, safe=False) )
+	return( JsonResponse({'msg':msg, 'cart_qty':cart_qty, 'err_flg':err_flg}, safe=False) )
 		
 @csrf_exempt		
 def update_cart_item(request):
 	json_data = json.loads(request.body.decode("utf-8"))
 
 	# Get existing cart items
-	cart_item = Cart_item_view.objects.filter( cart_item_id = json_data['cart_item_id'], cart_id = json_data['cart_id'] ).first()
+	cart_item = Cart_item_view.objects.select_related('product', 'promotion').filter( 
+		cart_item_id = json_data['cart_item_id'], cart_id = json_data['cart_id'],
+			product__product_type_id = F('product_type_id')).first()
 
 	if not cart_item:
 		return JsonResponse({'msg':'Not cart items found for cart # ' + cart_item_id}, safe=False)	
@@ -773,7 +877,7 @@ def update_cart_item(request):
 	if c_item:
 		item_price = round(c_item['item_price'])
 		disc_amt = round(c_item['disc_amt'])
-		item_unit_price = round(c_item['item_unit_price'])
+		item_unit_price = round(c_item['item_unit_price'], -1)
 
 	# TAX Calculations
 	item_tax = 0
@@ -801,13 +905,41 @@ def update_cart_item(request):
 	item_sub_total = ( item_total / (1 + (tax_rate/100)) )
 	item_tax = item_total - item_sub_total
 	#############################################################
-
 	
+	cart_total = cart.cart_total - cart_item.item_total + item_total
+	# Calcuate referral discount
+	ref_disc_amount = 0
+	ref = apply_referral(request, cart_total)
+	if ref['status'] == 'SUCCESS':
+		cart_total = ref['cart_total']
+		ref_disc_amount = ref['disc_amt']
+	
+	# Calculate voucher discount
+	if cart.voucher_id:		
+		voucher = Voucher.objects.filter(voucher_id = cart.voucher_id).first()
+		if voucher.voucher_code:
+			res = apply_voucher_py(request, cart.cart_id, voucher.voucher_code, cart_total)
+			vou = json.loads(res.content)		
+			if 'status' in vou:
+				status = vou['status']
+			else:
+				status = ''
+			if status == 'SUCCESS' or status == 'SUCCESS-':
+				if 'disc_amount' in vou:
+					voucher_disc_amount = vou['disc_amount'] 
+				else:
+					voucher_disc_amount = 0
+				cart.voucher_disc_amount = Decimal(voucher_disc_amount)
+				cart.cart_disc_amt  = cart.referral_disc_amount + Decimal(voucher_disc_amount)
+				
+				if 'cart_total' in vou:
+					cart_total = Decimal(vou['cart_total'])
+
 	msg = "SUCESS"
 
 	# Update the cart item and the cart
 	try :
-
+		'''
 		newusercart = Cart(
 			cart_id = cart.cart_id,
 			store = cart.store,
@@ -815,16 +947,24 @@ def update_cart_item(request):
 			user_id = cart.user_id,
 			voucher_id = cart.voucher_id,
 			voucher_disc_amount = cart.voucher_disc_amount,
+			referral_id = cart.referral_id,
+			referral_disc_amount = ref_disc_amount,
 			quantity =  cart.quantity - cart_item.quantity + updated_qty,
 			cart_sub_total = cart.cart_sub_total - cart_item.item_sub_total + item_sub_total,
 			cart_disc_amt  = cart.cart_disc_amt - cart_item.item_disc_amt + disc_amt,
 			cart_tax  = cart.cart_tax - cart_item.item_tax + item_tax,
-			cart_total = cart.cart_total - cart_item.item_total + item_total,
+			cart_total = cart_total,
 			cart_status = cart.cart_status,
 			created_date = cart.created_date,
 			updated_date = today
 		)
 		newusercart.save()
+		'''		
+		cart.quantity =  cart.quantity - cart_item.quantity + updated_qty
+		cart.cart_sub_total = cart.cart_sub_total - cart_item.item_sub_total + item_sub_total
+		cart.cart_tax  = cart.cart_tax - cart_item.item_tax + item_tax
+		cart.cart_total = cart_total
+		cart.save()		
 
 		if cart_item.product_type_id == 'STOCK-IMAGE':
 			usercartitems = Cart_stock_image(
@@ -966,7 +1106,7 @@ def delete_cart_item(request):
 	item_total = request.POST.get('item_total','')
 	
 	cart_item = Cart_item_view.objects.filter(cart_item_id = cart_item_id).first()
-	
+
 	if not cart_item:
 		return JsonResponse({'msg':'Not cart items found for cart # ' + cart_item_id}, safe=False)	
 	
@@ -981,9 +1121,10 @@ def delete_cart_item(request):
 	order_item = {}
 
 	if order:
-		order_item = Order_items.objects.filter(
+		order_item = Order_items_view.objects.filter(
 					order = order,
-					product = cart_item.product,
+					product_id = cart_item.product_id,
+					product_type_id = cart_item.product_type_id,
 					moulding = cart_item.moulding,
 					moulding_size = cart_item.moulding_size,
 					item_total = cart_item.item_total,
@@ -1004,36 +1145,49 @@ def delete_cart_item(request):
 	msg = "SUCCESS"
 
 	try :
+		# Delete the cart item
+		#citm = Cart_item.objects.get(cart_item_id = cart_item.cart_item_id)
+		#citm.delete()
 
-		# If this was the last item in the cart then delete the item as well as cart
+		# Delete Order Item from respective product types
+		if order_item :
+			if order_item.product_type_id == 'STOCK-IMAGE':
+				oi = Order_stock_image.objects.get(cart_item_id = cart_item.cart_item_id)
+			if order_item.product_type_id == 'USER-IMAGE':
+				oi = Order_user_image.objects.get(cart_item_id = cart_item.cart_item_id)
+			if order_item.product_type_id == 'STOCK-COLLAGE':
+				oi = Order_stock_collage.objects.get(cart_item_id = cart_item.cart_item_id)
+			if order_item.product_type_id == 'ORIGINAL-ART':
+				oi = Order_original_art.objects.get(cart_item_id = cart_item.cart_item_id)
+		
+			oi.delete()
+			
+		
+		# Delete Cart Item from respective product types
+		if cart_item.product_type_id == 'STOCK-IMAGE':
+			ci = Cart_stock_image.objects.get(cart_item_ptr_id = cart_item.cart_item_id)
+		if cart_item.product_type_id == 'USER-IMAGE':
+			ci = Cart_user_image.objects.get(cart_item_ptr_id = cart_item.cart_item_id)
+		if cart_item.product_type_id == 'STOCK-COLLAGE':
+			ci = Cart_stock_collage.objects.get(cart_item_ptr_id = cart_item.cart_item_id)
+		if cart_item.product_type_id == 'ORIGINAL-ART':
+			ci = Cart_original_art.objects.get(cart_item_ptr_id = cart_item.cart_item_id)
+		ci.delete()	
+			
+		# If this was the last item in the cart then delete the cart as well
 		# if there are more items in the cart, then update cart quantity and remove the item
 		if num_cart_item == 1:
-			# Delete Item
-			if cart_item.product_type_id == 'STOCK-IMAGE':
-				ci = Cart_stock_image.objects.get(stock_image_id = cart_item.product_id)
-			if cart_item.product_type_id == 'USER-IMAGE':
-				ci = Cart_user_image.objects.get(user_image_id = cart_item.product_id)
-			if cart_item.product_type_id == 'STOCK-COLLAGE':
-				ci = Cart_stock_collage.objects.get(stock_collage_id = cart_item.product_id)
-			if cart_item.product_type_id == 'ORIGINAL-ART':
-				ci = Cart_original_art.objects.get(original_art_id = cart_item.product_id)
-			ci.delete()	
-				
-			cart.delete()
-
 			if order:
-				order_item.delete()
 				order.delete()
-			
+
+			if cart:
+				cart.delete()
+				
 		else :
-
-			if order_item :
-
-				order_item.delete()
-			
 			if order :
 				o = Order (
 					order_id = order.order_id,
+					order_number = order.order_number,
 					order_date = order.order_date,
 					cart_id = order.cart_id, 
 					session_id = order.session_id,
@@ -1042,6 +1196,8 @@ def delete_cart_item(request):
 					user = cart.user,
 					voucher_id = order.voucher_id,
 					voucher_disc_amount = order.voucher_disc_amount,
+					referral = order.referral,
+					referral_disc_amount = order.referral_disc_amount,
 					sub_total = order.sub_total - (cart_item.item_sub_total),
 					order_discount_amt = order.order_discount_amt - cart_item.item_disc_amt,
 					tax = order.tax - (cart_item.item_tax),
@@ -1050,12 +1206,36 @@ def delete_cart_item(request):
 					shipping_method = order.shipping_method,
 					shipper = order.shipper,
 					shipping_status = order.shipping_status,
+					created_date = order.created_date,
 					updated_date = today,
 					order_status = order.order_status	
 				)
 				o.save()
-							
+
+			cart_total = cart.cart_total - cart_item.item_total	
+			
+			# Calculate voucher discount
+			if cart.voucher_id:		
+				voucher = Voucher.objects.filter(voucher_id = cart.voucher_id).first()
+				if voucher.voucher_code:
+					res = apply_voucher_py(request, cart.cart_id, voucher.voucher_code, cart_total)
+					vou = json.loads(res.content)		
+					if 'status' in vou:
+						status = vou['status']
+					else:
+						status = ''
+					if status == 'SUCCESS' or status == 'SUCCESS-':
+						if 'disc_amount' in vou:
+							voucher_disc_amount = vou['disc_amount'] 
+						else:
+							voucher_disc_amount = 0
+						cart.voucher_disc_amount = Decimal(voucher_disc_amount)
+						cart.cart_disc_amt  = cart.referral_disc_amount + Decimal(voucher_disc_amount)
+						
+						if 'cart_total' in vou:
+							cart_total = Decimal(vou['cart_total'])
 			# update cart Qty
+			'''
 			c = Cart (
 				cart_id = cart_item.cart_id, 
 				store_id = settings.STORE_ID,
@@ -1063,21 +1243,25 @@ def delete_cart_item(request):
 				user = cart.user,
 				voucher_id = cart.voucher_id,
 				voucher_disc_amount = cart.voucher_disc_amount,
+				referral = cart.referral,
+				referral_disc_amount = cart.referral_disc_amount,
 				quantity = cart.quantity - cart_item.quantity,
 				cart_sub_total = cart.cart_sub_total - cart_item.item_sub_total,
 				cart_disc_amt  = cart.cart_disc_amt - cart_item.item_disc_amt,
 				cart_tax  = cart.cart_tax - cart_item.item_tax,
-				cart_total = cart.cart_total - cart_item.item_total,
+				cart_total = cart.cart_total,
 				cart_status = cart.cart_status,
 				created_date = cart.created_date,
 				updated_date = today
 			)
 			c.save()
-			
-			if cart_item.product_type_id == 'STOCK-IMAGE':
-				stock_img = Cart_stock_image.objects.get(stock_image_id = cart_item.product_id)
-				stock_img.delete()			
-		
+			'''
+			cart.quantity = cart.quantity - cart_item.quantity
+			cart.cart_sub_total = cart.cart_sub_total - cart_item.item_sub_total
+			cart.cart_tax  = cart.cart_tax - cart_item.item_tax
+			cart.cart_total = cart_total
+			cart.save()				
+				
 	except cart.DoesNotExist:
 		msg = "Cart does not exist"
 	
@@ -1100,16 +1284,61 @@ def apply_voucher(request):
 	voucher_code = request.POST.get('voucher_code', '')
 	cart_total = Decimal(request.POST.get('cart_total', '0'))
 
+	res = apply_voucher_py(request, cart_id, voucher_code, cart_total)
+
+	vou = json.loads(res.content)
+	
+	if 'status' in vou:
+		status = vou['status']
+	else:
+		status = ''
+	if 'disc_amount' in vou:
+		disc_amount = vou['disc_amount'] 
+	else:
+		disc_amount = 0
+	if 'cart_total' in vou:
+		cart_total = vou['cart_total']
+	if 'voucher_bal_amount' in vou:
+		voucher_bal_amount = vou['voucher_bal_amount']
+	else:
+		voucher_bal_amount = 0
+	
+	return JsonResponse({"status":status, 'disc_amount': disc_amount, 
+				'cart_total':cart_total, 'voucher_bal_amount':voucher_bal_amount})	
+
+def apply_voucher_py(request, cart_id, voucher_code, cart_total):
+	
+	status = "SUCCESS"	
+	
 	if voucher_code == '':
 		return JsonResponse({"status":"INVALID-CODE"})
-	
-	
+
+	# get logged in user
+	try: 
+		user = User.objects.get(username = request.user)
+	except User.DoesNotExist:
+		user = None	
+		
 	voucher = Voucher.objects.filter(voucher_code = voucher_code, effective_from__lte = today, 
-			effective_to__gte = today, store_id = settings.STORE_ID).first()
-			
+			effective_to__gte = today, store_id = settings.STORE_ID).first()			
+		
+	# Get the gift transaction, it there's one for the logged in user
+	try:
+		eGift = Egift.objects.get(voucher = voucher, receiver = user)		
+	except Egift.DoesNotExist:
+		eGift = {}
+	
 	if not voucher :
 		return JsonResponse({"status":"INVALID-CODE"})
 
+	cart = Cart.objects.filter(cart_id = cart_id, cart_status = "AC").first()
+	
+	# Check if voucher discount is already applied to cart
+	if cart.voucher_disc_amount:
+		applied_disc = cart.voucher_disc_amount
+	else:
+		applied_disc = 0
+	
 	voucher_user = Voucher_user.objects.filter(voucher = voucher, effective_from__lte = today, 
 			effective_to__gte = today).first()
 
@@ -1117,73 +1346,177 @@ def apply_voucher(request):
 		return JsonResponse({"status":"INVALID-CODE"})
 
 	if voucher_user.used_date != None :
-		return JsonResponse({"status":"USED"})
+		return JsonResponse({"status":"USED"})		
 		
-		
-	# get logged in user
-	try: 
-		user = User.objects.get(username = request.user)
-	except User.DoesNotExist:
-		user = None
-	
 	if voucher_user.user != user:
 		return JsonResponse({"status":"USER-MISMATCH"})
 	
 	disc_type = voucher.discount_type
 	disc_amount = 0
+	new_cart_total = 0
+	voucher_bal_amount = 0
+	avl_disc_amount = 0
+	total_disc_amount = 0
 
-	status = "SUCCESS"
-	
-	if disc_type == "PERCENTAGE":
-		disc_amount = cart_total * voucher.discount_value/100
-		cart_total = cart_total - ( cart_total * voucher.discount_value/100 )
-	elif disc_type == "CASH":
-		disc_amount = voucher.discount_value
-		cart_total = cart_total - voucher.discount_value
-
-	cart = Cart.objects.filter(cart_id = cart_id, cart_status = "AC").first()
-	if cart.voucher_id:
-		return JsonResponse({"status":"ONLY-ONE"})
+	if eGift:
+		# get the eGift transaction amount
+		eGift_redemption = Egift_redemption.objects.filter( egift = eGift 
+				).aggregate(total_redemption=Sum('redemption_amount'))
 		
-	status = "SUCCESS"
-	disc_amount = round(disc_amount)
+		if eGift_redemption['total_redemption']:
+			total_redemption = Decimal(eGift_redemption['total_redemption'])
+		else: 
+			total_redemption = 0
+		
+		if total_redemption >= eGift.gift_amount:
+			avl_disc_amount = 0
+			status = 'NO-MORE'
+		else:
+			avl_disc_amount = round(eGift.gift_amount - total_redemption - applied_disc)
 
+		# Limit discount to total cart value
+		if avl_disc_amount > cart_total: 
+			disc_amount = cart_total 
+			new_cart_total = 0
+			status = "SUCCESS-"
+		else:
+			disc_amount = avl_disc_amount
+			new_cart_total = round(cart_total - disc_amount)
+			
+		total_disc_amount = disc_amount + applied_disc
+		voucher_bal_amount = eGift.gift_amount - total_redemption - total_disc_amount
+		#if new_cart_total < 0:  # Total cart value is 0 is disc is more than cart total			
+				
+	else:
+		if voucher.all_applicability:
+			if disc_type == "PERCENTAGE":
+				disc_amount = cart_total * voucher.discount_value/100
+				new_cart_total = round(cart_total - ( cart_total * voucher.discount_value/100 ))
+			elif disc_type == "CASH":
+				disc_amount = voucher.discount_value
+				new_cart_total = round(cart_total - voucher.discount_value)
+			else: 
+				disc_amount = 0
+				new_cart_total = cart_total
+			if new_cart_total < 0:
+				# Limit the discount to the total cart value
+				new_cart_total = 0
+		else:
+			return JsonResponse({"status":"DOESNOT-APPLY"})
+			
+	#if cart.voucher_id and not eGift:
+	#	return JsonResponse({"status":"ONLY-ONE"})
+		
+	disc_amount = round(disc_amount)	
+		
 	# Update the cart with voucher
 	if cart :
 		
 		try:
+			if cart.referral_disc_amount:
+				cart_disc_amt = disc_amount + cart.referral_disc_amount
+			else:
+				cart_disc_amt = disc_amount 
+				
 			c = Cart (
 				cart_id = cart_id,
 				store = cart.store,
 				session_id = cart.session_id,
 				user = cart.user,
 				voucher_id = voucher.voucher_id,
-				voucher_disc_amount = disc_amount,
+				voucher_disc_amount = total_disc_amount,
+				referral = cart.referral,
+				referral_disc_amount = cart.referral_disc_amount,
 				quantity = cart.quantity,
 				cart_sub_total = cart.cart_sub_total,
-				cart_disc_amt  = cart.cart_disc_amt + disc_amount,
+				cart_disc_amt  = cart.referral_disc_amount + total_disc_amount,
 				cart_tax  = cart.cart_tax,
-				cart_total = cart_total,
+				cart_total = new_cart_total,
 				created_date = cart.created_date,
 				updated_date =  today,
 				cart_status = cart.cart_status
 			)
 			c.save()
 			
-			v = Voucher_user (
-				id = voucher_user.id,
-				voucher = voucher_user.voucher,
-				user = voucher_user.user,
-				effective_from = voucher_user.effective_from,
-				effective_to = voucher_user.effective_to,
-				used_date = today
-			)
-			v.save()
-			
+			# if there is no more balance left in voucher, then update the 
+			# voucher as used.
+			if voucher_bal_amount == 0:
+				v = Voucher_user (
+					id = voucher_user.id,
+					voucher = voucher_user.voucher,
+					user = voucher_user.user,
+					effective_from = voucher_user.effective_from,
+					effective_to = voucher_user.effective_to,
+					used_date = today
+				)
+				v.save()
+
+			## if it's eGift, update the records
+			'''
+			if eGift:
+				# Update gift redemption accordongly
+				e = Egift_redemption ( 
+						egift = eGift,
+						redemption_date = today,
+						redemption_amount = disc_amount)
+				e.save()				
+			'''
 		except Error as e:
 			status = 'INT-ERR'
 
-	return JsonResponse({"status":status, 'disc_amount': disc_amount, 'cart_total':cart_total})
+	return JsonResponse({"status":status, 'disc_amount': total_disc_amount, 
+				'cart_total':new_cart_total, 'voucher_bal_amount':voucher_bal_amount})
 	
+
+@csrf_exempt
+def apply_referral(request, cart_total):	
+
+	status = ''
+	disc_perc = 10
+	disc_amt = 0
+	# Get logged in user
+	if request.user.is_authenticated:
+		user = User.objects.get(username = request.user)
+	else:
+		msg = ''
+		return ({"status":"NO-USER", 'msg':msg, 'disc_perc':'0',
+			'cart_total':cart_total,'referral_id':0, 'disc_amt':0, 'disc_amt':disc_amt})
+
+	
+	## Check if it's the referrer 
+	referrer = Referral.objects.filter(referred_by = request.user)
+	for r in referrer:
+		if r.referred_by_claimed_date is None:
+			referee = User.objects.filter(email = r.email_id).first()			
+			# Check if the referee has placed any order
+			if referee: 
+				ord = Order.objects.filter(user = referee, order_status = 'PC')
+				if ord: 
+					disc_amt = ( cart_total * 10/100 )
+					new_cart_total = cart_total - disc_amt
+					status = "SUCCESS"
+					msg = "Congratulations! you get 10% off on order value for a sucessful referral for " + r.email_id + "."
+					return  ({'status':status, 'msg':msg, 
+						'disc_perc':disc_perc, 'cart_total':new_cart_total, 
+						'referral_id':referee.id, 'disc_amt':disc_amt})
+					
+
+	## Check if it's the referee 
+	referee = Referral.objects.filter(email_id = request.user.email).first()
+	if referee:
+		if referee.referee_claimed_date is None:
+			disc_amt = ( cart_total * 10/100 )
+			new_cart_total = cart_total - disc_amt
+			status = "SUCCESS"
+			msg = "Congratulations! you get 10% off on order value as a gift through a referral (" + r.referred_by.email + ")."
+			return  ({'status':status, 'msg':msg, 
+				'disc_perc':disc_perc, 'cart_total':new_cart_total, 
+				'referral_id':referee.id, 'disc_amt':disc_amt})
+		
+	# Else return no discount
+	status = "NOT-FOUND"
+	msg = "No valid referral found"
+	return  ({'status':status, 'msg':msg, 'disc_perc':'0', 
+		'cart_total':cart_total, 'referral_id':0, 'disc_amt':disc_amt})
 	
 	

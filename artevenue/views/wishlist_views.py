@@ -12,14 +12,14 @@ from decimal import Decimal
 import json
 
 from artevenue.models import Stock_image_category
-from artevenue.models import Promotion, Stock_image, User_image
-from artevenue.models import Wishlist, Wishlist_item, Tax
+from artevenue.models import Promotion, Stock_image, Product_view
+from artevenue.models import Wishlist, Wishlist_stock_image, User_image 
+from artevenue.models import Wishlist_user_image, Wishlist_stock_collage
+from artevenue.models import Wishlist_original_art, Wishlist_item_view
 
-from .frame_views import *
-from .image_views import *
 from .product_views import *
 from .tax_views import *
-from .user_image_views import *
+from .cart_views import *
 
 today = datetime.date.today()
 ecom = get_object_or_404 (Ecom_site, store_id=settings.STORE_ID )
@@ -28,7 +28,7 @@ ecom = get_object_or_404 (Ecom_site, store_id=settings.STORE_ID )
 @csrf_exempt
 def add_to_wishlist(request):
 	prod_id = request.POST.get('prod_id', '')
-	user_image_id = request.POST.get('user_image_id', '')
+	prod_type = request.POST.get('prod_type', '')
 	qty = int(request.POST.get('qty', '0'))
 
 	image_width = Decimal(request.POST.get('image_width', '0'))
@@ -104,10 +104,8 @@ def add_to_wishlist(request):
 	if str_disc_amt == '':
 		str_disc_amt = 0
 	disc_amt = Decimal(str_disc_amt)
-
 	
 	userid = None
-
 
 	discount = request.POST.get('discount', '')
 
@@ -116,15 +114,43 @@ def add_to_wishlist(request):
 	if promo_str == '':
 		promo_str = '0'
 	promo_id = int(promo_str)
+
+	#####################################
+	#         Get the item price
+	#####################################
+	price = get_prod_price(prod_id, 
+			prod_type=prod_type,
+			image_width=image_width, image_height=image_height,
+			print_medium_id = print_medium_id,
+			acrylic_id = acrylic_id,
+			moulding_id = moulding_id,
+			mount_size = mount_size,
+			mount_id = mount_id,
+			board_id = board_id,
+			stretch_id = stretch_id)
+	total_price = price['item_price']
+	msg = price['msg']
+	cash_disc = price['cash_disc']
+	percent_disc = price['percent_disc']
+	item_unit_price = price['item_unit_price']
+	disc_amt = price['disc_amt']
+	disc_applied = price['disc_applied']
+	promotion_id = price['promotion_id']
+	#####################################
+	# END::::    Get the item price
+	#####################################	
 	
-	# Get the product or User Image
-	prod = None
+	if item_unit_price == 0 or item_unit_price is None:
+		return( JsonResponse({'msg':'Price not avaiable for this image', 'cart_qty':qty}, safe=False) )
+		
+	prod = None	
 	user_image = None
-	
+	# Get the product
 	try:
 		if prod_id != '':
-			prod = Product.objects.get(product_id=prod_id, is_published = True)
-		else :
+			prod = Product_view.objects.get(product_id=prod_id, product_type = prod_type, is_published = True)
+		
+		if prod.product_type == "USER-IMAGE" or prod.product_type == "STOCK-COLLAGE":
 			if request.user.is_authenticated:
 				user = User.objects.get(username = request.user)
 				user_image = User_image.objects.filter(user = user, status = "INI").first()
@@ -132,24 +158,29 @@ def add_to_wishlist(request):
 				session_id = request.session.session_key
 				user_image = User_image.objects.filter(session_id = session_id, status = "INI").first()		
 		
-	except Product.DoesNotExist:
+	except Product_view.DoesNotExist:
 		msg = "Product " + prod_id + " does not exist"
-		return( JsonResponse({'msg':msg, 'wishlist_qty':qty}, safe=False) )
+		return( JsonResponse({'msg':msg, 'cart_qty':qty}, safe=False) )
 	except User_image.DoesNotExist:
 		msg = "Couldn't find the uploaded image. Pease try again."
-		return( JsonResponse({'msg':msg, 'wishlist_qty':qty}, safe=False) )
+		return( JsonResponse({'msg':msg, 'cart_qty':qty}, safe=False) )
 
-		
 	# TAX Calculations
 	item_tax = 0
 	item_sub_total = 0
 	taxes = get_taxes()
-	#if product exists then it's an image tax
-	if prod :
-		tax_rate = taxes['image_tax_rate']
-	else :
-		tax_rate = taxes['moulding_tax_rate']
-	
+
+	if prod.product_type_id == 'STOCK-IMAGE':
+		tax_rate = taxes['stock_image_tax_rate']
+	if prod.product_type_id == 'ORIGINAL-ART':
+		tax_rate = taxes['original_art_tax_rate']
+	if prod.product_type_id == 'USER-IMAGE':
+		tax_rate = taxes['user_image_tax_rate']
+	if prod.product_type_id == 'STOCK-COLLAGE':
+		tax_rate = taxes['stock_image_tax_rate']
+	if prod.product_type_id == 'FRAME':
+		tax_rate = taxes['frame_tax_rate']	
+		
 	# Calculate tax and sub_total
 	item_sub_total = round( total_price / (1 + (tax_rate/100)), 2 )
 	item_tax = total_price - item_sub_total
@@ -161,22 +192,14 @@ def add_to_wishlist(request):
 	# Get any discount on the product
 	if prod:
 		promo = get_product_promotion(prod_id)
-	if user_image:
-		promo = get_frame_promotion(moulding_id)
-	#promo_id = promo['promotion_id'] ### To be taken from the input to this function, so the promo code flows here
+
 	cash_disc = promo['cash_disc']
 	percent_disc = promo['percent_disc']
 	
-	# get Promotion object for adding it in the wishlist item
-	p_promotion = None
-	f_promotion = None
+	promotion = {}
 	if promo :
 		if prod:
-			p_promotion = Promotion.objects.filter(promotion_id = promo_id).first()
-		if user_image:
-			promo_id = promo['promotion_id']
-			f_promotion = Frame_promotion.objects.filter(promotion_id = promo_id).first()
-	
+			promotion = Promotion.objects.filter(promotion_id = promo_id).first()
 	
 	#################################################################################
 	##	total_price contains the price after promotion discounts. The promotion
@@ -206,13 +229,12 @@ def add_to_wishlist(request):
 		if sessionid is None:
 			request.session.create()
 			sessionid = request.session.session_key
-			wish_exists = False
+			wishlist_exists = False
 		 
 		else:
 			try:
 				# Get userwishlist by session
 				userwishlist = Wishlist.objects.get(session_id = sessionid, wishlist_status="AC")
-				#wishlist.objects.filter(session_id = sessionid)[:1]
 			except Wishlist.DoesNotExist:
 				userwishlist = {}
 				wishlist_exists = False
@@ -225,143 +247,283 @@ def add_to_wishlist(request):
 	if wishlist_exists:
 
 		''' Check if product or user image exists in wishlist '''
-		wishlist_prods = {}
-		wishlist_user_images = {}
 		if prod:
-			wishlist_prods = Wishlist_item.objects.filter(wishlist_id = userwishlist.wishlist_id, 
+			wishlist_prods = Wishlist_item_view.objects.filter(wishlist_id = userwishlist.wishlist_id, 
 						product_id = prod_id, moulding_id = moulding_id,
 						print_medium_id = print_medium_id, mount_id = mount_id,
 						mount_size = mount_size, acrylic_id = acrylic_id,
 						board_id = board_id, stretch_id = stretch_id ).first()
-		if user_image:
-			wishlist_user_images = Wishlist_item.objects.filter(wishlist_id = userwishlist.wishlist_id, 
-						user_image_id = user_image_id, moulding_id = moulding_id,
-						print_medium_id = print_medium_id, mount_id = mount_id,
-						mount_size = mount_size, acrylic_id = acrylic_id,
-						board_id = board_id, stretch_id = stretch_id ).first()
-		
+
 
 		prod_exits_in_wishlist = False 
 
-		if wishlist_prods or wishlist_user_images:
+		if wishlist_prods:
 			
 			prod_exits_in_wishlist = True
 	
 		try :
+			wishlist_total = Decimal(userwishlist.wishlist_total) + (total_price)
 			
 			#Update the existing wishlist
 			newuserwishlist = Wishlist(
 				wishlist_id = userwishlist.wishlist_id,
 				store = ecom,
+				session_id = sessionid,
 				user = userid,
+				voucher_id = userwishlist.voucher_id,
+				voucher_disc_amount = userwishlist.voucher_disc_amount,
+				referral = userwishlist.referral,
+				referral_disc_amount = userwishlist.referral_disc_amount,
+				quantity =  userwishlist.quantity + qty,
 				wishlist_sub_total = userwishlist.wishlist_sub_total + item_sub_total,
 				wishlist_disc_amt = userwishlist.wishlist_disc_amt + disc_amt,
 				wishlist_tax  = userwishlist.wishlist_tax + item_tax,
-				wishlist_total = Decimal(userwishlist.wishlist_total) + (total_price),
-				session_id = sessionid,
-				quantity =  userwishlist.quantity + qty,
-				voucher_id = userwishlist.voucher_id,
-				voucher_disc_amount = userwishlist.voucher_disc_amount,
-				updated_date = today,
-				wishlist_status = userwishlist.wishlist_status
+				wishlist_total = wishlist_total,
+				wishlist_status = userwishlist.wishlist_status,
+				created_date = userwishlist.created_date,
+				updated_date = today
 			)
 
 			newuserwishlist.save()
 			
 			''' If the product with same moulding, print_medium etc. already exists in the wishlist items, then update it, else insert new item '''
 			if prod_exits_in_wishlist:
-				userwishlistitems = Wishlist_item(
-					wishlist_item_id = wishlist_prods.wishlist_item_id,
-					wishlist = userwishlist,
-					product_id = wishlist_prods.product_id,
-					user_image = wishlist_prods.user_image,
-					promotion = wishlist_prods.promotion,
-					frame_promotion = wishlist_prods.frame_promotion,
-					quantity = wishlist_prods.quantity + qty,
-					item_unit_price = item_unit_price,
-					item_sub_total = wishlist_prods.item_sub_total + item_sub_total,
-					item_disc_amt = wishlist_prods.item_disc_amt + disc_amt,
-					item_tax  = wishlist_prods.item_tax + item_tax,
-					item_total = wishlist_prods.item_total + total_price,
-					moulding_id = moulding_id,
-					moulding_size =  mount_size,
-					print_medium_id = print_medium_id,
-					print_medium_size = print_medium_size,
-					mount_id = mount_id,
-					mount_size = mount_size,
-					board_id =  board_id,
-					board_size = board_size,
-					acrylic_id = acrylic_id,
-					acrylic_size = acrylic_size,
-					stretch_id = stretch_id,
-					stretch_size = stretch_size,
-					image_width = image_width,
-					image_height = image_height,
-					updated_date =  today
-					
-				)
+				if prod.product_type_id == 'STOCK-IMAGE':
+					userwishlistitems = Wishlist_stock_image(
+						wishlist_item_id = wishlist_prods.wishlist_item_id,
+						wishlist = userwishlist,
+						promotion = wishlist_prods.promotion,
+						quantity = wishlist_prods.quantity + qty,
+						item_unit_price = wishlist_prods.item_unit_price,
+						item_sub_total = wishlist_prods.item_sub_total + item_sub_total,
+						item_disc_amt = wishlist_prods.item_disc_amt + disc_amt,
+						item_tax  = wishlist_prods.item_tax + item_tax,
+						item_total = wishlist_prods.item_total + total_price,
+						moulding_id = moulding_id,
+						moulding_size =  mount_size,
+						print_medium_id = print_medium_id,
+						print_medium_size = print_medium_size,
+						mount_id = mount_id,
+						mount_size = mount_size,
+						board_id =  board_id,
+						board_size = board_size,
+						acrylic_id = acrylic_id,
+						acrylic_size = acrylic_size,
+						stretch_id = stretch_id,
+						stretch_size = stretch_size,
+						image_width = image_width,
+						image_height = image_height,
+						created_date = wishlist_prods.created_date,
+						updated_date =  today,
+						stock_image_id = prod.product_id
+						
+					)
+				elif prod.product_type_id == 'USER-IMAGE':
+					userwishlistitems = Wishlist_user_image(
+						wishlist_item_id = wishlist_prods.wishlist_item_id,
+						wishlist = userwishlist,
+						promotion = wishlist_prods.promotion,
+						quantity = wishlist_prods.quantity + qty,
+						item_unit_price = wishlist_prods.item_unit_price,
+						item_sub_total = wishlist_prods.item_sub_total + item_sub_total,
+						item_disc_amt = wishlist_prods.item_disc_amt + disc_amt,
+						item_tax  = wishlist_prods.item_tax + item_tax,
+						item_total = wishlist_prods.item_total + total_price,
+						moulding_id = moulding_id,
+						moulding_size =  mount_size,
+						print_medium_id = print_medium_id,
+						print_medium_size = print_medium_size,
+						mount_id = mount_id,
+						mount_size = mount_size,
+						board_id =  board_id,
+						board_size = board_size,
+						acrylic_id = acrylic_id,
+						acrylic_size = acrylic_size,
+						stretch_id = stretch_id,
+						stretch_size = stretch_size,
+						image_width = image_width,
+						image_height = image_height,
+						created_date = wishlist_prods.created_date,
+						updated_date =  today,
+						user_image_id = prod.product_id
+						
+					)
+				elif prod.product_type_id == 'STOCK-COLLAGE':
+					userwishlistitems = Wishlist_stock_collage(
+						wishlist_item_id = wishlist_prods.wishlist_item_id,
+						wishlist = userwishlist,
+						promotion = wishlist_prods.promotion,
+						quantity = wishlist_prods.quantity + qty,
+						item_unit_price = wishlist_prods.item_unit_price,
+						item_sub_total = wishlist_prods.item_sub_total + item_sub_total,
+						item_disc_amt = wishlist_prods.item_disc_amt + disc_amt,
+						item_tax  = wishlist_prods.item_tax + item_tax,
+						item_total = wishlist_prods.item_total + total_price,
+						moulding_id = moulding_id,
+						moulding_size =  mount_size,
+						print_medium_id = print_medium_id,
+						print_medium_size = print_medium_size,
+						mount_id = mount_id,
+						mount_size = mount_size,
+						board_id =  board_id,
+						board_size = board_size,
+						acrylic_id = acrylic_id,
+						acrylic_size = acrylic_size,
+						stretch_id = stretch_id,
+						stretch_size = stretch_size,
+						image_width = image_width,
+						image_height = image_height,
+						created_date = wishlist_prods.created_date,
+						updated_date =  today,
+						stock_collage_id = prod.product_id
+					)
+				elif prod.product_type_id == 'ORIGINAL-ART':
+					userwishlistitems = Wishlist_original_art(
+						wishlist_item_id = wishlist_prods.wishlist_item_id,
+						wishlist = userwishlist,
+						promotion = wishlist_prods.promotion,
+						quantity = wishlist_prods.quantity + qty,
+						item_unit_price = wishlist_prods.item_unit_price,
+						item_sub_total = wishlist_prods.item_sub_total + item_sub_total,
+						item_disc_amt = wishlist_prods.item_disc_amt + disc_amt,
+						item_tax  = wishlist_prods.item_tax + item_tax,
+						item_total = wishlist_prods.item_total + total_price,
+						moulding_id = moulding_id,
+						moulding_size =  mount_size,
+						print_medium_id = print_medium_id,
+						print_medium_size = print_medium_size,
+						mount_id = mount_id,
+						mount_size = mount_size,
+						board_id =  board_id,
+						board_size = board_size,
+						acrylic_id = acrylic_id,
+						acrylic_size = acrylic_size,
+						stretch_id = stretch_id,
+						stretch_size = stretch_size,
+						image_width = image_width,
+						image_height = image_height,
+						created_date = wishlist_prods.created_date,
+						updated_date =  today,
+						original_art_id = prod.product_id
+						
+					)				
 				userwishlistitems.save()
 			else:
 				# add new product in the wishlist
 				if prod:
-					userwishlistitems = Wishlist_item(
-						wishlist = userwishlist,
-						product_id = prod_id,
-						user_image = user_image,
-						promotion = p_promotion,
-						frame_promotion = f_promotion,
-						quantity = qty,
-						item_unit_price = item_unit_price,
-						item_sub_total = item_sub_total,
-						item_tax  = item_tax,
-						item_disc_amt = disc_amt,
-						item_total = total_price,
-						print_medium_id = print_medium_id,
-						print_medium_size = print_medium_size,
-						moulding_id = moulding_id,
-						moulding_size = moulding_size,
-						mount_id = mount_id,
-						mount_size = mount_size,
-						acrylic_id = acrylic_id,
-						acrylic_size = acrylic_size,
-						stretch_id = stretch_id,
-						stretch_size = stretch_size,
-						board_id = board_id,
-						board_size = board_size,
-						image_width = image_width,
-						image_height = image_height,
-						updated_date = today
-					)
-				elif user_image:
-					userwishlistitems = Wishlist_item(
-						wishlist = userwishlist,
-						product_id = prod_id,
-						user_image = user_image,
-						promotion = p_promotion,
-						frame_promotion = f_promotion,
-						quantity = qty,
-						item_unit_price = item_unit_price,
-						item_sub_total = item_sub_total,
-						item_tax  = item_tax,
-						item_disc_amt = disc_amt,
-						item_total = total_price,
-						print_medium_id = print_medium_id,
-						print_medium_size = print_medium_size,
-						moulding_id = moulding_id,
-						moulding_size = moulding_size,
-						mount_id = mount_id,
-						mount_size = mount_size,
-						acrylic_id = acrylic_id,
-						acrylic_size = acrylic_size,
-						stretch_id = stretch_id,
-						stretch_size = stretch_size,
-						board_id = board_id,
-						board_size = board_size,
-						image_width = image_width,
-						image_height = image_height,
-						updated_date = today
-					)
-				
+					if prod.product_type_id == 'STOCK-IMAGE' :
+						userwishlistitems = Wishlist_stock_image(
+							wishlist = userwishlist,
+							promotion = promotion,
+							quantity = qty,
+							item_unit_price = item_unit_price,
+							item_sub_total = item_sub_total,
+							item_disc_amt = disc_amt,
+							item_tax  = item_tax,
+							item_total = total_price,
+							moulding_id = moulding_id,
+							moulding_size =  mount_size,
+							print_medium_id = print_medium_id,
+							print_medium_size = print_medium_size,
+							mount_id = mount_id,
+							mount_size = mount_size,
+							board_id =  board_id,
+							board_size = board_size,
+							acrylic_id = acrylic_id,
+							acrylic_size = acrylic_size,
+							stretch_id = stretch_id,
+							stretch_size = stretch_size,
+							image_width = image_width,
+							image_height = image_height,
+							created_date = today,
+							updated_date =  today,
+							stock_image_id = prod.product_id
+						)
+					elif prod.product_type_id == 'USER-IMAGE':
+						userwishlistitems = Wishlist_user_image(
+							wishlist = userwishlist,
+							promotion = promotion,
+							quantity = qty,
+							item_unit_price = item_unit_price,
+							item_sub_total = item_sub_total,
+							item_disc_amt = disc_amt,
+							item_tax  = item_tax,
+							item_total = total_price,
+							moulding_id = moulding_id,
+							moulding_size =  mount_size,
+							print_medium_id = print_medium_id,
+							print_medium_size = print_medium_size,
+							mount_id = mount_id,
+							mount_size = mount_size,
+							board_id =  board_id,
+							board_size = board_size,
+							acrylic_id = acrylic_id,
+							acrylic_size = acrylic_size,
+							stretch_id = stretch_id,
+							stretch_size = stretch_size,
+							image_width = image_width,
+							image_height = image_height,
+							created_date = today,
+							updated_date =  today,
+							user_image_id = prod.product_id
+						)
+					elif prod.product_type_id == 'STOCK-COLLAGE':
+						userwishlistitems = Wishist_stock_collage(
+							wishlist = userwishlist,
+							promotion = promotion,
+							quantity = qty,
+							item_unit_price = item_unit_price,
+							item_sub_total = item_sub_total,
+							item_disc_amt = disc_amt,
+							item_tax  = item_tax,
+							item_total = total_price,
+							moulding_id = moulding_id,
+							moulding_size =  mount_size,
+							print_medium_id = print_medium_id,
+							print_medium_size = print_medium_size,
+							mount_id = mount_id,
+							mount_size = mount_size,
+							board_id =  board_id,
+							board_size = board_size,
+							acrylic_id = acrylic_id,
+							acrylic_size = acrylic_size,
+							stretch_id = stretch_id,
+							stretch_size = stretch_size,
+							image_width = image_width,
+							image_height = image_height,
+							created_date = today,
+							updated_date =  today,
+							stock_collage_id = prod.product_id
+						)
+					elif prod.product_type_id == 'ORIGINAL-ART':
+						userwishlistitems = Wishlist_original_art(
+							wishlist = userwishlist,
+							promotion = promotion,
+							quantity = qty,
+							item_unit_price = item_unit_price,
+							item_sub_total = item_sub_total,
+							item_disc_amt = disc_amt,
+							item_tax  = item_tax,
+							item_total = total_price,
+							moulding_id = moulding_id,
+							moulding_size =  mount_size,
+							print_medium_id = print_medium_id,
+							print_medium_size = print_medium_size,
+							mount_id = mount_id,
+							mount_size = mount_size,
+							board_id =  board_id,
+							board_size = board_size,
+							acrylic_id = acrylic_id,
+							acrylic_size = acrylic_size,
+							stretch_id = stretch_id,
+							stretch_size = stretch_size,
+							image_width = image_width,
+							image_height = image_height,
+							created_date = today,
+							updated_date =  today,
+							original_art_id = prod.product_id
+						)
+						
 				userwishlistitems.save()
 				
 			wishlist_qty = userwishlist.quantity + qty
@@ -380,80 +542,141 @@ def add_to_wishlist(request):
 
 			newuserwishlist = Wishlist(
 				store = ecom,
-				user = userid,
 				session_id = sessionid,
-				quantity =  qty,
+				user = userid,
+				voucher_id = None,
+				voucher_disc_amount = 0,
+				referral = None,
+				referral_disc_amount = 0,
+				quantity = qty,
 				wishlist_sub_total = item_sub_total,
 				wishlist_disc_amt = disc_amt,
-				wishlist_tax  = item_tax,
+				wishlist_tax  =item_tax,
 				wishlist_total = total_price,
-				updated_date = today,
-				wishlist_status = 'AC'		
+				wishlist_status = 'AC',
+				created_date = today,
+				updated_date = today
+				
 			)
 
 			newuserwishlist.save()
 			
 			if prod :
-				userwishlistitems = Wishlist_item(
-					wishlist = newuserwishlist,
-					product = prod,
-					user_image = user_image,
-					promotion = p_promotion,
-					frame_promotion = f_promotion,
-					quantity = qty,
-					item_unit_price = item_unit_price,
-					item_sub_total = item_sub_total,
-					item_tax  = item_tax,
-					item_disc_amt = disc_amt,
-					item_total = total_price,
-					print_medium_id = print_medium_id,
-					print_medium_size = print_medium_size,
-					moulding_id = moulding_id,
-					moulding_size = moulding_size,
-					mount_id = mount_id,
-					mount_size = mount_size,
-					acrylic_id = acrylic_id,
-					acrylic_size = acrylic_size,
-					stretch_id = stretch_id,
-					stretch_size = stretch_size,
-					board_id = board_id,
-					board_size = board_size,
-					image_width = image_width,
-					image_height = image_height,
-					updated_date = today
-				)
-			elif user_image:
-				userwishlistitems = Wishlist_item(
-					wishlist = newuserwishlist,
-					product_id = prod_id,
-					user_image = user_image,
-					promotion = p_promotion,
-					frame_promotion = f_promotion,
-					quantity = qty,
-					item_unit_price = item_unit_price,
-					item_sub_total = item_sub_total,
-					item_tax  = item_tax,
-					item_disc_amt = disc_amt,
-					item_total = total_price,
-					print_medium_id = print_medium_id,
-					print_medium_size = print_medium_size,
-					moulding_id = moulding_id,
-					moulding_size = moulding_size,
-					mount_id = mount_id,
-					mount_size = mount_size,
-					acrylic_id = acrylic_id,
-					acrylic_size = acrylic_size,
-					stretch_id = stretch_id,
-					stretch_size = stretch_size,
-					board_id = board_id,
-					board_size = board_size,
-					image_width = image_width,
-					image_height = image_height,
-					updated_date = today
-				)
-			
+				if prod.product_type_id == 'STOCK-IMAGE' :
+					userwishlistitems = Wishlist_stock_image(
+						wishlist = newuserwishlist,
+						promotion = promotion,
+						quantity = qty,
+						item_unit_price = item_unit_price,
+						item_sub_total = item_sub_total,
+						item_disc_amt = disc_amt,
+						item_tax  = item_tax,
+						item_total = total_price,
+						moulding_id = moulding_id,
+						moulding_size =  mount_size,
+						print_medium_id = print_medium_id,
+						print_medium_size = print_medium_size,
+						mount_id = mount_id,
+						mount_size = mount_size,
+						board_id =  board_id,
+						board_size = board_size,
+						acrylic_id = acrylic_id,
+						acrylic_size = acrylic_size,
+						stretch_id = stretch_id,
+						stretch_size = stretch_size,
+						image_width = image_width,
+						image_height = image_height,
+						created_date = today,
+						updated_date =  today,
+						stock_image_id = prod.product_id
+					)
+				elif prod.product_type_id == 'USER-IMAGE':
+					userwishlistitems = Wishlist_user_image(
+						wishlist = newuserwishlist,
+						promotion = promotion,
+						quantity = qty,
+						item_unit_price = item_unit_price,
+						item_sub_total = item_sub_total,
+						item_disc_amt = disc_amt,
+						item_tax  = item_tax,
+						item_total = total_price,
+						moulding_id = moulding_id,
+						moulding_size =  mount_size,
+						print_medium_id = print_medium_id,
+						print_medium_size = print_medium_size,
+						mount_id = mount_id,
+						mount_size = mount_size,
+						board_id =  board_id,
+						board_size = board_size,
+						acrylic_id = acrylic_id,
+						acrylic_size = acrylic_size,
+						stretch_id = stretch_id,
+						stretch_size = stretch_size,
+						image_width = image_width,
+						image_height = image_height,
+						created_date = today,
+						updated_date =  today,
+						user_image_id = prod.product_id
+					)
+				elif prod.product_type_id == 'STOCK-COLLAGE':
+					userwishlistitems = Wishist_stock_collage(
+						wishlist = newuserwishlist,
+						promotion = promotion,
+						quantity = qty,
+						item_unit_price = item_unit_price,
+						item_sub_total = item_sub_total,
+						item_disc_amt = disc_amt,
+						item_tax  = item_tax,
+						item_total = total_price,
+						moulding_id = moulding_id,
+						moulding_size =  mount_size,
+						print_medium_id = print_medium_id,
+						print_medium_size = print_medium_size,
+						mount_id = mount_id,
+						mount_size = mount_size,
+						board_id =  board_id,
+						board_size = board_size,
+						acrylic_id = acrylic_id,
+						acrylic_size = acrylic_size,
+						stretch_id = stretch_id,
+						stretch_size = stretch_size,
+						image_width = image_width,
+						image_height = image_height,
+						created_date = today,
+						updated_date =  today,
+						stock_collage_id = prod.product_id
+					)
+				elif prod.product_type_id == 'ORIGINAL-ART':
+					userwishlistitems = Wishlist_original_art(
+						wishlist = newuserwishlist,
+						promotion = promotion,
+						quantity = qty,
+						item_unit_price = item_unit_price,
+						item_sub_total = item_sub_total,
+						item_disc_amt = disc_amt,
+						item_tax  = item_tax,
+						item_total = total_price,
+						moulding_id = moulding_id,
+						moulding_size =  mount_size,
+						print_medium_id = print_medium_id,
+						print_medium_size = print_medium_size,
+						mount_id = mount_id,
+						mount_size = mount_size,
+						board_id =  board_id,
+						board_size = board_size,
+						acrylic_id = acrylic_id,
+						acrylic_size = acrylic_size,
+						stretch_id = stretch_id,
+						stretch_size = stretch_size,
+						image_width = image_width,
+						image_height = image_height,
+						created_date = today,
+						updated_date =  today,
+						original_art_id = prod.product_id
+					)
+					
 			userwishlistitems.save()
-
+			
 			wishlist_qty = qty
 			
 		except IntegrityError as e:
@@ -462,7 +685,7 @@ def add_to_wishlist(request):
 		except Error as e:
 			msg = 'Apologies!! Could not save your wishlist. Please use the "Contact Us" link at the bottom of this page and let us know. We will be glad to help you.'
 
-	# Update the status of the User_image to "MTC" (Moved to Wishlist)
+	# Update the status of the User_image to "MTC" (Moved to Cart)
 	if user_image:
 		try: 
 			u = User_image (
@@ -486,48 +709,33 @@ def show_wishlist(request):
 	userwishlistitems = {}
 	shipping_cost = 0 
 	user_image = None
+	cart_quantity = 0
 	''' Let's check if the user has a wishlist open '''
 	try:
 		if request.user.is_authenticated:
 			usr = User.objects.get(username = request.user)
 			userwishlist = Wishlist.objects.get(user = usr, wishlist_status = "AC")
+			cart_quantity = Cart.objects.filter(user = usr, cart_status = "AC").count()
 		else:
 			sessionid = request.session.session_key		
 			if sessionid is None:
 				request.session.create()
-				sessionid = request.session.session_key
-				
+				sessionid = request.session.session_key				
 			userwishlist = Wishlist.objects.get(session_id = sessionid, wishlist_status = "AC")
+			cart_quantity = Cart.objects.filter(session_id = sessionid,cart_status = "AC").count()
 
-		userwishlistitems = Wishlist_item.objects.select_related('product', 'promotion').filter(wishlist = userwishlist.wishlist_id,
-			product__product_image__image_type='THUMBNAIL').values(
+		userwishlistitems = Wishlist_item_view.objects.select_related('product', 'promotion').filter(
+				wishlist = userwishlist.wishlist_id, product__product_type_id = F('product_type_id')).values(
 			'wishlist_item_id', 'product_id', 'quantity', 'item_total', 'moulding_id',
 			'moulding__name', 'moulding__width_inches', 'print_medium_id', 'mount_id', 'mount__name',
 			'acrylic_id', 'mount_size', 'product__name', 'image_width', 'image_height',
-			'product__product_image__url', 'wishlist_id', 'promotion__discount_value', 'promotion__discount_type', 'mount__color',
-			'item_unit_price', 'item_sub_total', 'item_disc_amt', 'item_tax', 'item_total'
-			)
-		
-		# Let's get the user uploaded images, if any
-		user_image = Wishlist_item.objects.select_related('user_image', 'frame_promotion').filter(
-			wishlist = userwishlist.wishlist_id, product__isnull = True).values(
-			'wishlist_item_id', 'user_image_id', 'user_image__image_to_frame', 'quantity', 'item_total', 'moulding_id',
-			'moulding__name', 'moulding__width_inches', 'print_medium_id', 'mount_id', 'mount__name',
-			'acrylic_id', 'mount_size', 'product__name', 'image_width', 'image_height',
-			'product__product_image__url', 'wishlist_id', 'promotion__discount_value', 'promotion__discount_type', 'mount__color',
-			'item_unit_price', 'item_sub_total', 'item_disc_amt', 'item_tax', 'item_total'
-			)
-		
+			'product__thumbnail_url', 'wishlist_id', 'promotion__discount_value', 'promotion__discount_type', 'mount__color',
+			'item_unit_price', 'item_sub_total', 'item_disc_amt', 'item_tax', 'item_total', 'product_type',
+			'product__image_to_frame'
+			).order_by('product_type')		
 			
 	except Wishlist.DoesNotExist:
 			userwishlist = {}
-
-	## Get Tax rates
-	taxes = get_taxes()
-	image_tax_rate = taxes['image_tax_rate']
-	oth_tax_rate = taxes ['oth_tax_rate']
-
-
 	
 	if request.is_ajax():
 
@@ -543,18 +751,17 @@ def show_wishlist(request):
 	
 	return render(request, template, {'userwishlist':userwishlist, 
 		'userwishlistitems': userwishlistitems, 'total_bare':total_bare,
-		'user_image':user_image})
+		'user_image':user_image, 'cart_quantity':cart_quantity})
 
 @csrf_exempt	
 def delete_wishlist_item(request):
-
 	wishlist_item_id = request.POST.get('wishlist_item_id','')
 	sub_total = request.POST.get('sub_total','')
 	wishlist_total = request.POST.get('wishlist_total','')
 	tax = request.POST.get('tax','')
 	item_total = request.POST.get('item_total','')
 	
-	wishlist_item = Wishlist_item.objects.filter(wishlist_item_id = wishlist_item_id).first()
+	wishlist_item = Wishlist_item_view.objects.filter(wishlist_item_id = wishlist_item_id).first()
 	
 	if not wishlist_item:
 		return JsonResponse({'msg':'Not wishlist items found for wishlist # ' + wishlist_item_id}, safe=False)	
@@ -563,53 +770,40 @@ def delete_wishlist_item(request):
 	wishlist = Wishlist.objects.filter(wishlist_id = wishlist_item.wishlist_id, wishlist_status = "AC").first()
 	
 	# number of items in the wishlist
-	num_wishlist_item = Wishlist_item.objects.filter(wishlist = wishlist).count()
-
-	
-	## Get Tax rates
-	taxes = get_taxes()
-	image_tax_rate = taxes['image_tax_rate']
-	oth_tax_rate = taxes ['oth_tax_rate']
-	
-	net_oth_price = 0
-	oth_tax = 0
-	net_image_price = 0
-	image_tax = 0
+	num_wishlist_item = Wishlist_item_view.objects.filter(wishlist = wishlist).count()
 	
 	msg = "SUCCESS"
 	
 	try :
-
+		# Delete Cart Item from respective product types
+		if wishlist_item.product_type_id == 'STOCK-IMAGE':
+			ci = Wishlist_stock_image.objects.get(wishlist_item_id = wishlist_item.wishlist_item_id)
+		if wishlist_item.product_type_id == 'USER-IMAGE':
+			ci = Wishlist_user_image.objects.get(wishlist_item_id = wishlist_item.wishlist_item_id)
+		if wishlist_item.product_type_id == 'STOCK-COLLAGE':
+			ci = Wishlist_stock_collage.objects.get(wishlist_item_id = wishlist_item.wishlist_item_id)
+		if wishlist_item.product_type_id == 'ORIGINAL-ART':
+			ci = Wishlist_original_art.objects.get(wishlist_item_id = wishlist_item.wishlist_item_id)
+		ci.delete()	
+		
 		# If this was the last item in the wishlist then delete the item as well as wishlist
 		# if there are more items in the wishlist, then update wishlist quantity and remove the item
 		if num_wishlist_item == 1:
-			# Delete Item
-			wishlist_item.delete()
+			# Delete Whishlist
 			wishlist.delete()
 			
 		else :
-			# update wishlist Qty
-			c = Wishlist (
-				wishlist_id = wishlist_item.wishlist_id, 
-				quantity = wishlist.quantity - wishlist_item.quantity,
-				store_id = settings.STORE_ID,
-				session_id = wishlist.session_id,
-				user = wishlist.user,
-				wishlist_total = wishlist.wishlist_total - wishlist_item.item_total,
-				updated_date = today,
-				wishlist_status = wishlist.wishlist_status,
-				wishlist_sub_total = wishlist.wishlist_sub_total - wishlist_item.item_sub_total,
-				wishlist_disc_amt  = wishlist.wishlist_disc_amt - wishlist_item.item_disc_amt,
-				wishlist_tax  = wishlist.wishlist_tax - wishlist_item.item_tax,
-				voucher_id = wishlist.voucher_id,
-				voucher_disc_amount = wishlist.voucher_disc_amount,
-				
-			)
-			c.save()
-			
-			wishlist_item.delete()
-			
-		
+			# update wishlist Qty & amounts
+			c = Wishlist.objects.filter( wishlist_id = wishlist_item.wishlist_id).update(
+					quantity = wishlist.quantity - wishlist_item.quantity,
+					wishlist_total = wishlist.wishlist_total - wishlist_item.item_total,
+					wishlist_status = wishlist.wishlist_status,
+					wishlist_sub_total = wishlist.wishlist_sub_total - wishlist_item.item_sub_total,
+					wishlist_disc_amt  = wishlist.wishlist_disc_amt - wishlist_item.item_disc_amt,
+					wishlist_tax  = wishlist.wishlist_tax - wishlist_item.item_tax,
+					created_date = wishlist.created_date,	
+					updated_date = today)
+						
 	except wishlist.DoesNotExist:
 		msg = "Wishlist does not exist"
 	
@@ -622,3 +816,102 @@ def delete_wishlist_item(request):
 	
 	
 	return JsonResponse({'msg':msg}, safe=False)
+
+
+@csrf_exempt
+def move_all_items_to_cart(request, wishlist_id):
+
+	if not wishlist_id:
+		wishlist_id = request.POST.get('wishlist_id', '')
+		
+	if wishlist_id == '':
+		return 'Invalid request'
+		
+	try:
+		wishlist = Wishlist.objects.get(wishlist_id = wishlist_id)
+	except Wishlist.DoesNotExist:
+		wishlist = None
+		
+	if not wishlist :
+		return 'Invalid request'	
+	
+	wishlistitems = Wishlist_item_view.objects.get(wishlist_id = wishlist_id)
+
+	for w in wishlist:
+		move_item_to_cart(request, w.wishlist_item_id)
+
+	
+
+@csrf_exempt
+def move_item_to_cart(request, wishlist_item_id = None):
+	if not wishlist_item_id:
+		wishlist_item_id = request.POST.get('wishlist_item_id', '')
+		
+	if wishlist_item_id == '':
+		return 'Invalid request'
+		
+	items_count = 0
+	try:
+		wishlistitem = Wishlist_item_view.objects.get(wishlist_item_id = wishlist_item_id)
+		wishlist = Wishlist.objects.filter(wishlist_id = wishlistitem.wishlist_id)
+		items_count = Wishlist_item_view.objects.filter(wishlist_id = wishlistitem.wishlist_id).count()
+	except Wishlist_item_view.DoesNotExist:
+		wishlistitem = None
+		
+	if not wishlistitem :
+		return 'Invalid request'
+	
+	#from django.test.client import RequestFactory
+	#request = RequestFactory().post('/')
+	request.POST = request.POST.copy()
+		
+	request.POST['prod_id'] = wishlistitem.product_id
+	request.POST['prod_type'] = wishlistitem.product_type_id
+	request.POST['qty'] = '1'
+	request.POST['image_width'] = wishlistitem.image_width	
+	request.POST['image_height'] = wishlistitem.image_height
+	request.POST['moulding_id'] = wishlistitem.moulding_id or ''
+	request.POST['print_medium_id'] = wishlistitem.print_medium_id or ''
+	request.POST['mount_size'] = wishlistitem.mount_size or ''
+	request.POST['mount_w_left'] = ''
+	request.POST['mount_w_right'] = ''
+	request.POST['mount_w_top'] = ''
+	request.POST['mount_w_bottom'] = ''
+	request.POST['acrylic_id'] = wishlistitem.acrylic_id or ''
+	request.POST['board_id'] = wishlistitem.board_id or ''
+	request.POST['stretch_id'] = wishlistitem.stretch_id or ''
+	
+	request.POST['item_unit_price'] = wishlistitem.item_unit_price or ''
+	request.POST['total_price'] = wishlistitem.item_total or ''
+	request.POST['disc_amt'] = wishlistitem.item_disc_amt or ''
+	request.POST['discount'] = ''
+	request.POST['promotion_id'] = wishlistitem.promotion_id or ''
+	
+	err_flg = False
+	res = json.loads( add_to_cart(request).content )
+	
+	if not res['err_flg'] :
+		if wishlistitem.product_type_id == 'STOCK-IMAGE':
+			w = Wishlist_stock_image.objects.filter(wishlist_item_id = wishlistitem.wishlist_item_id)
+		if wishlistitem.product_type_id == 'ORIGINAL-ART':
+			w = Wishlist_user_image.objects.filter(wishlist_item_id = wishlistitem.wishlist_item_id)
+		if wishlistitem.product_type_id == 'USER-IMAGE':
+			w = Wishlist_stock_collage.objects.filter(wishlist_item_id = wishlistitem.wishlist_item_id)
+		if wishlistitem.product_type_id == 'STOCK-COLLAGE':
+			w = Wishlist_original_art.objects.filter(wishlist_item_id = wishlistitem.wishlist_item_id)
+		w.delete()
+		
+		if items_count == 1:
+			wishlist.delete()
+		else:
+			wl = wishlist.update(quantity = quantity - wishlistitem.quantity, 
+				wishlist_sub_total = wishlist_sub_total - wishlistitem.item_sub_total,
+				wishlist_tax = wishlist_tax - wishlistitem.item_tax,
+				wishlist_total = wishlist_total - wishlistitem.item_total)
+				
+	else:
+		err_flg = True
+		
+	return JsonResponse({'msg':'Item removed from your wish list', 'err_flg':err_flg}, safe=False)
+
+

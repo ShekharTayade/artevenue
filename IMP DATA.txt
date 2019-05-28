@@ -9,7 +9,7 @@ User - Id: artevenue 	Pwd: projuser_art
 
 User HOME:  /home/artevenue/
 PROJECT HOME: /home/artevenue/artevenue/
-VIRTUAL ENV : /home/artevenue/artevenueenv/
+VIRTUAL ENV : /home/artevenue/artevenue/artevenueenv/
 
 WEBSITE HOME: /home/artevenue/website  (Pull from git here, then collectstatic)
 
@@ -21,3 +21,64 @@ POSTGRESQL:
 DB Name: artevenue
 User: artevenue pwd: arte_user_venue
 
+
+APPLICATION Super User
+~~~~~~~~~~~~~~~~~~~~~~
+id: artevenue_super 
+pwd: 0803_ns_9102
+
+
+DEPLOYMENT SPECIFICS
+~~~~~~~~~~~~~~~~~~~
+
+
+1. .env grants acess to artevenue.com, .localhost, 127.0.0.1
+
+2.  Grant access to all folders to artevenue user:
+
+	While /home/artevenue/website folder run -	
+	sudo chwon -R --recursive artevenue:artevenue
+3. APPLICATION ERROR LOG: /var/log/syslog
+
+
+PSFTP:
+~~~~~~~~~
+1. change into local directory from where to transfer files
+2. Open psftp
+3. change remote directory to where the files are to be copied
+4. run command - mput *.*    to caopy all file
+
+
+DATABASE REFERESH:
+~~~~~~~~~~~~~~~~~~~
+Drop all tables -
+DROP SCHEMA public CASCADE;
+CREATE SCHEMA public;
+
+GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO public;
+
+
+TO CONNECT AS 'postgres' user: 
+	sudo -u postgres psql           & then
+	\c artevenue		      to connect to artevenue DB
+	
+	
+RECAPTCHA:
+~~~~~~~~~~~~~~~~~~~
+Site Key - 6Le2ZqAUAAAAAIAvZ7dRPJkj5zLI2IYAxfPktXqE
+Secret Key - 6Le2ZqAUAAAAALbzG6uSjImGZ2hHY_B6r_Cug74i
+
+GoDaddy:
+~~~~~~~~~~~~~~~~~~~~~
+login-
+	username: dugarneeraj1976
+	pwd: Nsj211001
+	
+Customer ID: 186164730
+	    Pin: 2107
+
+Support -
+	support@artevenue.com / $1arte_venue
+	
+	

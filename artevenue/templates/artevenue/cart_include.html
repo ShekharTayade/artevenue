@@ -51,8 +51,8 @@
 													</button>
 												</div>
 											</td>
-											<td>
-												{% with width=i.moulding__width_inches %}
+											<td>												
+												{% with width=i.moulding__width_inches|add_width_frame_mount:i.mount_size %}
 
 												<small>Print on {{i.print_medium_id|title}}, 
 												{% if i.moulding_id %}
@@ -163,7 +163,7 @@
 									</tr>
 									<tr class="total">
 										<td>Total</td>
-										<th class="pull-right"><i class = "fa fa-inr"> </i> <span id ="cart_total" >{{usercart.cart_total|floatformat|default:"0"}}</span></th>
+										<th class="pull-right"><i class = "fa fa-inr"> </i> <span id ="cart_total" >{{usercart.cart_total|floatformat:"0"|default:"0"}}</span></th>
 									</tr>
 
 									<tr>
@@ -172,14 +172,26 @@
 											{{usercart.cart_disc_amt|floatformat}}
 										</th>
 										 
-									</tr>									</tbody>
+									</tr>									
+								</tbody>
 							</table>
-							{% if usercart.voucher %} 
-								<div id "vouch_text" style ="color: #999; font-size: 0.6rem; text-align:right">
-									(You have used voucher {{ usercart.voucher.voucher_code }}. 
-									Discount of <i class = "fa fa-inr"></i> {{usercart.voucher_disc_amount |floatformat }} is applied)
+							<ul>
+							{% if usercart.referral_disc_amount > 0 %} 
+								<li>
+								<div id "vouch_text" style ="color: #999; font-size: 0.6rem;">
+									{{ref_msg}}
 								</div>
+								</li>
 							{% endif %}
+							{% if usercart.voucher %} 
+								<li>
+								<div id "vouch_text" style ="color: #999; font-size: 0.6rem;">
+									You have used voucher {{ usercart.voucher.voucher_code }}. 
+									Discount of <i class = "fa fa-inr"></i> {{usercart.voucher_disc_amount |floatformat }} is applied
+								</div>
+								</li>
+							{% endif %}
+							</ul>
 						</div>
 					</div>
 										

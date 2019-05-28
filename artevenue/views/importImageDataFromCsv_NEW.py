@@ -1,6 +1,7 @@
 from artevenue.models import Stock_image_category, Product_type, Tax
 from artevenue.models import Stock_image, Stock_image_stock_image_category
 from artevenue.models import Ecom_site, Publisher_price, Publisher
+from artevenue.models import Stock_image_error, Stock_image_category_error, Publisher_error
 import csv
 
 from django.contrib.staticfiles.templatetags.staticfiles import static
@@ -8,13 +9,14 @@ from datetime import datetime
 import datetime
 from django.shortcuts import render, get_object_or_404
 from django.conf import settings
+from decimal import Decimal
 
 ecom = get_object_or_404 (Ecom_site, store_id=settings.STORE_ID )
 today = datetime.date.today()
 
 def importImageData_NEW(request): 
 
-	file = 'C:/eCom_Platform/project/eComPlatform/eStore/static/image_data/pod_data.csv'
+	file = 'C:/artevenue/DATA/POD_File/POD_File.csv'
 	#file = settings.STATIC_ROOT + '/image_data/pod_data.csv'
 	
 	cnt = 0
@@ -34,46 +36,54 @@ def importImageData_NEW(request):
 			if cnt == 0:
 				cnt = cnt + 1
 				continue
-			if cnt < 81178:
-				cnt = cnt + 1
-				continue
 			
 				
 			if row[0]:
 				#prod = Product.objects.filter(product_id = int(row[0])).first()
-				newprod = Stock_image(
-					store = ecom,
-					product_id = int(row[0]),
-					name = row[4],
-					description = '',
-					price = 0,
-					available_on = today,
-					updated_at = today,
-					part_number = row[3],
-					product_type = prod_type,
-					is_published = True,
-					seo_description = '',
-					seo_title  = '',
-					charge_taxes = True,
-					featured = False,
-					has_variants = False,
-					aspect_ratio = int(row[6]) / int(row[7]),
-					image_type = row[9],
-					orientation = row[8].strip().title(),
-					max_width = row[6],
-					max_height = row[7],
-					min_width = 4,
-					publisher = row[1],
-					artist = row[5],
-					colors = '',
-					key_words = row[13],
-					url = row[11],
-					thumbnail_url = row[12]			
-				)
+				try:
+					newprod = Stock_image(
+						store = ecom,
+						product_id = int(row[0]),
+						name = row[4],
+						description = '',
+						price = 0,
+						available_on = today,
+						updated_at = today,
+						part_number = row[3],
+						product_type = prod_type,
+						is_published = True,
+						seo_description = '',
+						seo_title  = '',
+						charge_taxes = True,
+						featured = False,
+						has_variants = False,
+						aspect_ratio = Decimal(row[6]) / Decimal(row[7]),
+						image_type = row[9],
+						orientation = row[8].strip().title(),
+						max_width = row[6],
+						max_height = row[7],
+						min_width = 4,
+						publisher = row[1],
+						artist = row[5],
+						colors = '',
+						key_words = row[13],
+						url = row[11],
+						thumbnail_url = row[12]			
+					)
 
-				newprod.save()
-						
+					newprod.save()
 
+				except Exception as error:
+					err_flag = True
+					print (error)
+					err = Stock_image_error (
+						row_id = int(row[0]),
+						name = row[4],
+						error = error,
+						created_date = datetime.datetime.now(),
+						updated_date = datetime.datetime.now()		
+					)
+					err.save()
 				'''					'''
 				''' Categories 		'''
 				'''					'''
@@ -81,46 +91,83 @@ def importImageData_NEW(request):
 				prod_category = Stock_image_category.objects.filter(name__iexact = row[14]).first()
 				if prod_category is None:
 					# Insert
-					prod_cat = Stock_image_category(
-							store = ecom,
-							name = row[14],
-							description = '',
-							background_image = '',
-							parent = None,
-							trending = False,
-							url = '',
-							featured_collection = False
-					)
-					prod_cat.save()
-					prod_category = prod_cat
-				
-				prod_prod_cat = Stock_image_stock_image_category.objects.filter(stock_image_id = row[0]).first()
-				if prod_prod_cat :
-					prod_cat = Stock_image_stock_image_category(
-						id = prod_prod_cat.id,
-						stock_image_id = row[0],
-						stock_image_category = prod_category
-					)
-				else :
-					prod_cat = Stock_image_stock_image_category(
-						stock_image_id = row[0],
-						stock_image_category = prod_category
-					)
-				prod_cat.save()					
+					try:
+						prod_cat = Stock_image_category(
+								store = ecom,
+								name = row[14],
+								description = '',
+								background_image = '',
+								parent = None,
+								trending = False,
+								url = '',
+								featured_collection = False
+						)
+						prod_cat.save()
+						prod_category = prod_cat
+
+					except Exception as error:
+						err_flag = True
+						print (error)
+						err = Stock_image_category_error (
+							row_id = int(row[0]),
+							category_name = row[14],
+							error = error,
+							created_date = datetime.datetime.now(),
+							updated_date = datetime.datetime.now()		
+						)
+						err.save()
 					
+				prod_prod_cat = Stock_image_stock_image_category.objects.filter(stock_image_id = row[0]).first()
+				
+				try:
+					if prod_prod_cat :
+						prod_cat = Stock_image_stock_image_category(
+							id = prod_prod_cat.id,
+							stock_image_id = row[0],
+							stock_image_category = prod_category
+						)
+					else :
+						prod_cat = Stock_image_stock_image_category(
+							stock_image_id = row[0],
+							stock_image_category = prod_category
+						)
+					prod_cat.save()					
+					
+				except Exception as error:
+					err_flag = True
+					print (error)
+					err = Stock_image_stock_image_category_error (
+						row_id = int(row[0]),
+						stock_image_category = prod_category,
+						error = error,
+						created_date = datetime.datetime.now(),
+						updated_date = datetime.datetime.now()		
+					)
+					err.save()
 				'''					'''
 				''' Publisher Price '''
 				'''					'''
-				
-				publisher = Publisher.objects.filter(publisher_id = row[1]).first()
-				if not publisher:
-					pub = 	Publisher( 
+				try:
+					publisher = Publisher.objects.filter(publisher_id = row[1]).first()
+					if not publisher:
+						pub = 	Publisher( 
+							publisher_id = row[1],
+							publisher_name = row[2],
+							publisher_group = 'XXX'
+						)
+						pub.save()
+				except Exception as error:
+					err_flag = True
+					print (error)
+					err = Publisher_error (
+						row_id = int(row[0]),
 						publisher_id = row[1],
 						publisher_name = row[2],
-						publisher_group = 'XXX'
+						error = error,
+						created_date = datetime.datetime.now(),
+						updated_date = datetime.datetime.now()		
 					)
-					pub.save()
-
+					err.save()				
 				'''
 				publ_price = Publisher_price.objects.filter(publisher_id = row[1], 
 					print_medium_id = 'PAPER').first()

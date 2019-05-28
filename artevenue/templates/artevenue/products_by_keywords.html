@@ -60,25 +60,26 @@
 							<div class="card-body" style = "max-height:200px; width:auto; overflow:auto; margin-bottom:30px;">
 								<h3 class="card-title">{{ pf|title }}</h3>
 								<form id= "f_{{pf}}" role="form">
-									{% for f in prod_filter_values %}
-									{% if f.name == pf %}
 									<div class="form-group" style="margin-bottom:0.25em !important;">
 										<div class="checkbox filter-class">
-											<input class = "{{pf}}" type="checkbox" />
-											{% if pf == 'IMAGE-TYPE' %}
-												<label style="display:none">{{f.value}}</label>{% if f.value == '1' %} Fine Art {% elif f.value == '0' %} Photo {% endif %}
-											{% else %}
-												<label>{{f.value}}</label>
+											{% for key, value in prod_filter_values.items %}
+											{% if key == pf %}
+												{% for val in value %}
+												<input class = "{{pf}}" type="checkbox" />
+													{% if pf == 'IMAGE-TYPE' %}
+														<label style="display:none">{{val}}</label>{% if val == '1' %} Fine Art {% elif val == '0' %} Photo {% endif %}<br />
+													{% else %}
+														<label>{{val}}</label><br />
+													{% endif %}
+												{% endfor %}
 											{% endif %}
+											{% endfor prod_filter_values %}
 										</div>
 									</div>
-									{% endif %}
-									{% endfor prod_filter_values %}
 									<button type = "button" class="btn btn-secondary btn-sm pull-left" onclick = "getAllFilters()"><i class="fa fa-pencil"></i> Apply</button>
 									<button type = "button" class="btn btn-sm btn-outline-secondary pull-right" onclick = "clearFilter('{{pf}}')"><i class="fa fa-times-circle"></i> Clear</button>
 								</form>
 							</div>
-							
 							{% endfor prod_filters %}
 							<div class="card-body" style = "max-height:200px; width:auto; overflow:auto; margin-bottom:30px;">
 								<h3 class="card-title">Size</h3>
@@ -141,7 +142,7 @@
 							<div class="col-md-12 col-lg-12 products-number-sort">
 								<form class="form-inline d-block d-lg-flex justify-content-between flex-column flex-md-row">
 									<div class="products-number">
-										<strong>Show</strong><a href="?page={{prods.number}}&sort={{sortOrder}}&show=50" class="btn btn-sm {% if show == '50' or show == None %} btn-primary {% else %} btn-outline-secondary {% endif %}">50</a><a href="?page={{prods.number}}&sort={{sortOrder}}&show=100" class="btn btn-sm {% if show == '100' %} btn-primary {% else %} btn-outline-secondary {% endif %}">100</a><a href="?page={{prods.number}}&sort={{sortOrder}}&show=ALL" class="btn btn-sm {% if show == 'ALL' %} btn-primary {% else %} btn-outline-secondary {% endif %}">All</a><span>results/page</span>
+										<strong>Show</strong><a href="?page={{prods.number}}&keywords={{ikeywords}}&show=50" class="btn btn-sm {% if show == '50' or show == None %} btn-primary {% else %} btn-outline-secondary {% endif %}">50</a><a href="?page={{prods.number}}&keywords={{ikeywords}}&show=100" class="btn btn-sm {% if show == '100' %} btn-primary {% else %} btn-outline-secondary {% endif %}">100</a><a href="?page={{prods.number}}&keywords={{ikeywords}}&show=ALL" class="btn btn-sm {% if show == 'ALL' %} btn-primary {% else %} btn-outline-secondary {% endif %}">All</a><span>results/page</span>
 									</div>
 
 								</form>
@@ -187,12 +188,15 @@
 				$(".{{pf}}").each(function () {
 					var val = $(this).next('label').text();
 					var sts = $(this).is(":checked");
-					if (valcnt == 0){
-						rec = rec + '"' + val.trim() + '": ' + ' " ' + sts + '"';
-					} else {
-						rec = rec + ', "' + val.trim() + '": ' + ' " ' + sts + '"';
+					if (sts) {
+						if (valcnt == 0){
+							rec = rec + '"' + val.trim() + '": ' + ' " ' + sts + '"';
+						} else {
+							rec = rec + ', "' + val.trim() + '": ' + ' " ' + sts + '"';
+						}
+						valcnt = valcnt + 1;
 					}
-					valcnt = valcnt + 1;
+					
 				});
 				filter = filter + rec + ' }';
 				fcnt = fcnt + 1;
@@ -206,10 +210,9 @@
 			}
 
 			if ("{{ikeywords}}" != "") {
-				rec = ', "SEARCH": {"KEYWORDS" : ' + ' "{{ikeywords}}"';
+				rec = ', "SEARCH": {"KEY-WORDS" : ' + ' "{{ikeywords}}"';
 				filter = filter + rec + ' }';
 			}
-
 			
 			filter = filter + '}';
 			

@@ -1,0 +1,98 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+        <div class="container">
+			<div class="row">
+				<!-- breadcrumb-->
+				<div class="col-lg-12">
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+							<li aria-current="page" class="breadcrumb-item active">Payment Confirmation</li>
+						</ol>
+					</nav>
+				</div>
+
+				<div class="col-lg-12">
+				<div class = "row">
+					<div class="box">
+						<h1>Payment Confirmation</h1>
+						<p>Thank you, {{firstname}}!</p>
+					</div>
+				</div>
+				<div class="row">
+					<div class="box">
+						<form id ="submit-form" method = "post" action = "{% url 'payment_submit' %}">
+							{% csrf_token %}
+							<p> Your payment of  <i class = "fa fa-inr"> {{amount|floatformat}}</i> is received. You will shortly receive an email.</p>
+							<p> Please visit <a href="{% url 'contact_us' %}">Contact Us</a> page in case of any help required. Please quote the order number and your email in all communication.</p>
+							<p> Your Order is: </p>
+							
+							<div class="col-lg-12">
+								<div id="order-summary" class="box">
+									<div class="box-header">
+										<h3 class="mb-0">Order No. {{order.order_number}}</h3> <a href = ""> Track It Here</a>
+									</div>
+									<div class = "row">
+										<div class = "col-sm-3">
+											<div class = "col-sm-12">		
+												<strong>Order subtotal</strong>
+											</div>
+											<div class = "col-sm-12">		
+												<span class = "ord-row">{{order.sub_total|floatformat}}</span>
+											</div>
+										</div>
+										<div class = "col-sm-2">
+											<div class = "col-sm-12">		
+												<strong>Tax</strong>
+											</div>
+											<div class = "col-sm-12">		
+												<span class = "ord-row">{{order.tax|floatformat}}</span>
+											</div>
+										</div>
+										<div class = "col-sm-3">
+											<div class = "col-sm-12">		
+												<strong>Shipping & handling</strong>
+											</div>
+											<div class = "col-sm-12">		
+												<span id ="s-h" class = "ord-row">{{order.shipping_cost|floatformat}}</span>
+											</div>
+										</div>
+										<div class = "col-sm-2">
+											<div class = "col-sm-12">		
+												<strong>Order Total</strong>
+											</div>
+											<div class = "col-sm-12">		
+												<span id ="ord-total" class = "ord-row"><strong>{{order.order_total|floatformat}}</strong></span>
+											</div>
+										</div>
+										{% if order.order_discount_amt %}
+										<div class = "col-sm-2">
+											<div class = "col-sm-12">		
+												<strong>Your Saving</strong>
+											</div>
+											<div class = "col-sm-12">		
+												<span style = "color:green">{{order.order_discount_amt|floatformat}}</span>
+											</div>
+										</div>
+										{% endif %}
+									</div>
+											
+								</div>					
+							</div>
+
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+				
+	{% endblock sitecontent %}
+
+	
+	{% block jscripts %}
+
+	{% endblock jscripts %}
+			
+	

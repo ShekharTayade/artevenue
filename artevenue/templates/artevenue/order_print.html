@@ -1,0 +1,205 @@
+{% load utils %}
+{% load static %}
+
+{% for o in orders %}
+<h3 style = "color:blue"}>Order Number : {{o.order_number}}
+	{{ o.get_order_status_display }}
+</h3>
+<h4>Order Date : {{o.order_date}}</h4>
+<hr>
+
+<div class = "row">
+	{% if o.order_shipping %}
+	<div style = "left:10px;">
+		<strong>Shipping Address:</strong><br />
+		{{o.order_shipping.full_name}} 
+		{% if o.order_shipping.Company %}
+			, {{o.order_shipping.Company}}
+		{% endif %}
+		<br />
+		{{o.order_shipping.address_1}}
+		{% if o.order_shipping.address_2 %}
+			{{o.order_shipping.address_2 }}
+		{% endif %}
+		{% if o.order_shipping.address_1 or o.order_shipping.address_2 %}
+			<br />
+		{% endif %}
+		{% if o.order_shipping.land_mark %}
+			{{o.order_shipping.land_mark}}
+			<br />
+		{% endif %}
+		
+		{{o.order_shipping.city}} {{o.order_shipping.state}} {{o.order_shipping.pin_code_id}}
+		<br />
+		Ph: {{o.order_shipping.phone_number}} Email: {{o.order_shipping.email_id}}
+	</div>
+	{% endif %}
+
+	{% if o.order_billing %}
+	<div style = "left:600px; right:0px;">
+		<strong>Billing Address:</strong><br />
+		{{o.order_billing.full_name}} 
+		{% if o.order_billing.Company %}
+			, {{o.order_billing.Company}}
+		{% endif %}
+		<br />
+		{{o.order_billing.address_1}}
+		{% if o.order_billing.address_2 %}
+			{{o.order_billing.address_2 }}
+		{% endif %}
+		{% if o.order_billing.address_1 or o.order_billing.address_2 %}
+			<br />
+		{% endif %}
+		{% if o.order_billing.land_mark %}
+			{{o.order_billing.land_mark}}
+			<br />
+		{% endif %}
+		
+		{{o.order_billing.city}} {{o.order_billing.state}} {{o.order_billing.pin_code_id}}
+		<br />
+		Ph: {{o.order_billing.phone_number}} Email: {{o.order_billing.email_id}}
+	</div>
+	{% endif %}
+
+</div>
+<hr>
+<div class="table table-responsive">
+	<table id = "ordTbl" class="table table-responsive table-striped">
+		<thead>
+			<tr>
+				<th width="15%">Name</th>
+				<th width="30%">Details</th>
+				<th width="15%" style="text-align:right">Unit Price</th>
+				<th width="10%" style="text-align:right">Quantity</th>
+				<th width="15%" style="text-align:right">Discount</th>
+				<th width="15%" style="text-align:right">Tax</th>
+				<th width="15%" style="text-align:right">Item Total</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for i in order_items_list %}
+			{% if i.order_id != o.order_id %}
+				<!-- Nothing -->
+				
+			{% else %}
+			<tr>
+				<td><img src = "{% if i.product_type == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product__image_to_frame }} {% else %}  {{i.product__thumbnail_url}} {% endif %}" style = "width:75px; height:75px; object-fit:contain;" alt="Uploaded Image">
+					<br />
+					<div class = "pull-left">
+						<button type ="button" class = "btn btn-link" style = "padding-left:0px;" onclick = "getFramedImg('{{i.product_id}}', '{{i.image_width}}', '{{i.moulding_id| default_if_none:0}}', '{{i.mount__color| default_if_none:0}}','{{i.mount_size| default_if_none:0}}', '{{i.product__url}}');">
+							{{i.product__name}}
+						</button>
+					</div>
+				</td>
+				<td>
+					{% with width=i.moulding__width_inches|add_width_frame_mount:i.mount_size %}
+
+					<small>Print on {{i.print_medium_id|title}}, 
+					{% if i.moulding_id %}
+						Frame {{i.moulding__name }} Total Size: 
+						{{ i.image_width|add_width:width }}" X {{i.image_height|add_width:width }}" 
+					{% else %}
+						Image Size : {{ i.image_width }}" X {{i.image_height }}" 
+					{% endif %}
+					
+					{% if i.mount_id %}
+						, {{i.mount_size }}" {{i.mount__name|title }} Mount  
+					{% endif %}
+					{% if i.acrylic_id %}
+						, Acrylic 
+					{% endif %}
+					</small>
+					{% endwith %}
+				</td>
+				<td style = "text-align:right">
+					<small>{{i.item_sub_total}}</small>
+				</td>
+				<td style = "text-align:right">
+					<small>{{i.quantity}}</small>
+				</td>
+				<td style = "text-align:right">
+				
+					{% if i.promotion__discount_type == "PERCENTAGE" %}
+						<small>{{i.promotion__discount_value|floatformat}}</small>
+					{% else %}
+						<small>{{i.promotion__discount_value|floatformat}}</small>
+					{% endif %}
+				</td>
+				<td style = "text-align:right">
+					<small>{{i.item_tax}}</small>
+				</td>
+				<td style = "text-align:right">{{i.item_total|floatformat}}</td>
+
+			</tr>
+			{% endif %}
+			{% endfor %}
+			
+		</tbody>
+		<tfoot>
+			<tr>
+				<th colspan="4"><small>Order Sub Total</small></th>
+				<th colspan="2" style = "text-align:right">
+					<small>{{o.sub_total|floatformat}}</small>
+				</th>
+				<th></th>
+			</tr>
+			<tr>
+				<th colspan="4"><small>Shipping & Handing</small></th>
+				<th colspan="2" style = "text-align:right">
+					<small>{{o.shipping_cost|floatformat}}</small>
+				</th>
+				<th></th>
+			</tr>
+			<tr>
+				<th colspan="4"><small>Discount</small></th>
+				<th colspan="1" style = "text-align:right">
+					{% if o.order_discount_amt %} <small>- ({{o.order_discount_amt|floatformat}})</small>{% endif %}
+				</th>
+				<th></th>
+			</tr>
+			<tr>
+				<th colspan="4">Tax</th>
+				<th colspan="2" style = "text-align:right">
+					<small>{{o.tax|floatformat}}</small>
+				</th>
+				<th></th>
+			</tr>
+			<tr>
+				<th colspan="4">Order Total</th>
+				<th colspan="2" style = "text-align:right">
+					<i class = "fa fa-inr"> </i> {{o.order_total|floatformat}}
+				</th>
+				<th></th>
+			</tr>
+		</tfoot>
+	</table>
+</div>
+<hr>
+{% endfor orders %}
+
+
+{% if orders.number %}
+<div class="box info-bar">
+	<div class="row">
+		<div class="col-md-12 col-lg-12 products-showing">
+			<div class = "text-center">
+				{% if orders.has_previous %}
+					<button type = "button" class="btn btn-sm btn-primary" onclick="get_store_orders('1');"><i class="fa fa-chevron-left"></i> First</button>  
+					<button type = "button" class="btn btn-sm btn-primary"  onclick="get_store_orders('{{ orders.previous_page_number }}');">Prev</button>
+				{% else %}
+					<button type = "button" class="btn btn-sm btn btn-secondary disabled" href="#"><i class = "fa fa-chevron-left"></i> First</button>
+					<button type = "button" class="btn btn-sm btn btn-secondary disabled"  href="#">Prev</button>
+				{% endif %}
+				Showing Page {{ orders.number }} of {{ orders.paginator.num_pages }}
+				{% if orders.has_next %}
+					<button type = "button" class="btn btn-sm btn-primary" onclick="get_store_orders('{{ orders.next_page_number }}');">Next</button>
+					<button type = "button" class="btn btn-sm btn-primary" onclick="get_store_orders('{{ orders.paginator.num_pages }}');">Last <i class = "fa fa-chevron-right"></i></button>
+				{% else %}
+					<button type = "button" class="btn btn-sm btn-secondary disabled" href="#">Next</button>
+					<button type = "button" class="btn btn-sm btn-secondary disabled" href="#">Last <i class = "fa fa-chevron-right"></i></button>
+				{% endif %}				
+			</div>
+		</div>
+	</div>
+</div>
+{% endif %}

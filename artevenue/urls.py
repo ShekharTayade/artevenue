@@ -39,6 +39,7 @@ urlpatterns = [
 	url(r'^store_orders/$', views.store_orders, name='store_orders'),	
 	url(r'^ajax/get_store_orders/$', views.get_store_orders, name='get_store_orders'),	
 	url(r'^store_order_pdf/$', views.get_store_orders, name='get_store_orders'),
+	url(r'^find_orders/$', views.find_orders, name='find_orders'),	
 
 	url(r'^import_image_data/$', views.importImageData_NEW, name='import_image_data'),
 
@@ -53,6 +54,14 @@ urlpatterns = [
 	
     url(r'^contact_us/$', views.contact_us, name='contact_us'),	
     url(r'^contact_msg/$', views.contact_msg, name='contact_msg'),	
+
+    url(r'^refer_us/$', views.refer_us, name='refer_us'),	
+    path('refer_confirm/<int:ref_id>/', views.refer_confirm, name='refer_confirm'),	
+
+    url(r'^egift_card/$', views.egift_card, name='egift_card'),	
+    path('egift_card_review/<int:gift_rec_id>/', views.egift_card_review, name='egift_card_review'),	
+    #path('refer_confirm/<int:ref_id>/', views.refer_confirm, name='refer_confirm'),	
+	
 	
     url(r'^about_us/$', views.about_us, name='about_us'),
     url(r'^terms_conditions/$', views.terms_conditions, name='terms_conditions'),
@@ -64,6 +73,8 @@ urlpatterns = [
     url(r'^products_by_keywords/$', views.search_products_by_keywords, name='products_by_keywords'),
 	path('category_stock_images/<int:cat_id>/', views.category_stock_images, name='category_stock_images'),
 	url(r'^show_all_categories/$', views.show_categories, name='show_all_categories'),
+	url(r'^all_stock_images/$', views.all_stock_images, name='all_stock_images'),
+	path('curated_collections/<int:cat_id>/', views.curated_collections, name='curated_collections'),	
 	
     url(r'^user_image/$', views.user_image, name='user_image'),
  	url(r'^ajax/get_user_image_id/$', views.get_user_image_id, name='get_user_image_id'),
@@ -71,6 +82,8 @@ urlpatterns = [
 	url(r'^ajax/show_mouldings_for_user_image/$', views.show_mouldings_for_user_image, name='show_mouldings_for_user_image'),
  	url(r'^ajax/get_FramedUserImage/$', views.get_FramedUserImage, name='get_FramedUserImage'),
  	url(r'^ajax/get_FramedUserImage_by_id/$', views.get_FramedUserImage_by_id, name='get_FramedUserImage_by_id'),
+ 	url(r'^ajax/remove_user_image/$', views.remove_user_image, name='remove_user_image'),
+
 	
 	url(r'^ajax/sync_cart_session_user/$', views.sync_cart_session_user, name='sync_cart_session_user'),
     url(r'^show_cart/$', views.show_cart, name='show_cart'),
@@ -87,8 +100,8 @@ urlpatterns = [
 	
 	url(r'^ajax/add_to_wishlist/$', views.add_to_wishlist, name='add_to_wishlist'),
     url(r'^show_wishlist/$', views.show_wishlist, name='show_wishlist'),
-	#url(r'^ajax/delete_wishlist_item/$', views.delete_wishlist_item, name='delete_wishlist_item'),
-
+	url(r'^ajax/delete_wishlist_item/$', views.delete_wishlist_item, name='delete_wishlist_item'),
+	url(r'^ajax/move_item_to_cart/$', views.move_item_to_cart, name='move_item_to_cart'),
 	
 	url(r'^ajax/get_moulding_price/$', views.get_moulding_price, name='get_moulding_price'),
  	url(r'^ajax/get_mount_price/$', views.get_mount_price, name='get_mount_price'),
@@ -107,6 +120,9 @@ urlpatterns = [
 	url(r'^ajax/get_addr_pin_city_state/$', views.get_addr_pin_city_state, name='get_addr_pin_city_state'),
 	url(r'^ajax/validate_address/$', views.validate_address, name='validate_address'),
 
+	url(r'^payment_details/$', views.payment_details, name='payment_details'),
+	url(r'^payment_submit/$', views.payment_submit, name='payment_submit'),
+	url(r'^payment_done/$', views.payment_done, name='payment_done'),
 
 	
 	] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,22 +1,28 @@
 				{% load static %}
+				{% load utils %}
 				<div class = "row">
 					{% for f in mouldings_show %}
-							<div >
+						<div class="frame-image" >
+							<a onclick = "set_moulding('{{f.moulding_id}}');"> 
 								{% with 'img/'|add:f.url as image_static %}
-								<div class="frame-image" >
-									<a onclick = "set_moulding('{{f.moulding_id}}');"> 
-										<img src="{% if product.url %} {{product.url}} {% else %} {{main_img}} {% endif %}" alt="{{f.mouldings__name}}" class="img-fluid"
-										style = "border : 10px solid transparent; padding : 0px; border-image : url({% static image_static %}) {{f.border_slice}} round;" >
-									</a>
-									
-									<!--<div class="text text-center" onclick = "applyFrame('{{f.moulding_id}}','{{f.border_slice}}', '{% static image_static %}')"> -->
-									<div class="text text-center" onclick = "set_moulding('{{f.moulding_id}}')">
-										<h5>
-											<a>{{ f.moulding__name }}</a>
-										</h5>
-									</div>
-								</div>
+								<img src="{% if product.url %} {{product.url}} {% else %} {{main_img}} {% endif %}" alt="{{f.mouldings__name}}" class="f_images img-fluid"
+									 style = "
+										border-image : url({% static image_static %}) {{f.border_slice}} round !important; 
+										border:10px solid transparent; 
+										box-shadow: 3px 4px 4px 0 #d3d3d3, 3px 6px 4px 0#d3d3d3; 
+										{% if forloop.counter|get_mountcolor != 'none' %}
+											padding:10px; 
+											background-color:{{ forloop.counter|get_mountcolor}};
+										{% endif %}
+										">
 								{% endwith %}
-							</div>
-						{% endfor %}
-					</div>
+							
+								<span class="text text-center" onclick = "set_moulding('{{f.moulding_id}}')">
+									<h5>
+										{{ f.moulding__name }}
+									</h5>
+								</span>
+							</a>
+						</div>
+					{% endfor %}
+				</div>

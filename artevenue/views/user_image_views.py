@@ -230,3 +230,13 @@ def show_mouldings_for_user_image(request):
 	return render(request, "artevenue/mouldings_include_for_user_image.html", {
 		'mouldings_apply':mouldings_apply, 'mouldings_show':mouldings_show,
 		'user_instance':user_instance} )
+
+@csrf_exempt
+def remove_user_image(request):	
+	user_image_id = request.POST.get('user_image_id', '')	
+	
+	if user_image_id:
+		User_image.objects.filter(product_id = user_image_id).delete()
+	
+	img_str = ''
+	return HttpResponse(img_str)

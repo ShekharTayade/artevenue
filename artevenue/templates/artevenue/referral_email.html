@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="robots" content="all,follow">
+		<!-- Bootstrap CSS-->
+		<link rel="stylesheet" href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}">
+				
+		<!-- Font Awesome CSS-->
+		<link rel="stylesheet" href="{% static 'vendor/font-awesome/css/font-awesome.min.css' %}">
+		<!-- Google fonts - Roboto -->
+		<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:400,500,700,300,100">
+		<!-- Custom stylesheet -->
+		<link rel="stylesheet" href="{% static  'css/custom.css' %}">
+		<!-- theme stylesheet-->
+		<link rel="stylesheet" href="{% static 'css/style.default.css' %}" id="theme-stylesheet">
+		<!-- theme stylesheet-->
+		<link rel="stylesheet" href="{% static 'css/home-page-style.css' %}" id="theme-stylesheet">
+
+	</head>
+
+	<body>
+        <div class="container">
+			<div class="row">
+				<img src = "http://artevenue.com/static/img/homepage.png" alt="www.artevenue.com">
+			</div>
+			<div class = "row">
+				<div id="contact" class="box">
+					<h3>Hi {{referral.name}},</h3>
+				</div>
+				<p class="lead">{{referral.referred_by.first_name}} {{referral.referred_by.last_name}} has referred us to you and you get 10% off on your first order. 
+					As you place your first order, {{referral.referred_by.first_name}} {{referral.referred_by.last_name}} also gets 10% off on her/his next order.
+				</p>
+				<p>Arte'Venue has large collection of artwork from across the world.
+				We can customize the size, frame and deliver to your door step.
+				You can even have your own photos/art work printed, framed and 
+				delivered to you.</p>
+				<p> So go ahead and log on to <a href = "www.artevenue.com">Arte'Venue</a>, 10% off awaits you!<br />
+				<small> (Please make sure that you sign up and login using your email: {{referral.email_id}})</small>
+				</p>
+				
+				<p>You have recived this mail as your contact 
+					{{referral.referred_by.first_name}} {{referral.referred_by.last_name}} 
+					 ({{referral.referred_by.email}}) has referred us.<br />
+				</p>
+				<p>
+					 Here's what {{referral.referred_by.first_name}} {{referral.referred_by.last_name}} says to you -<br />
+					 {{referral.message}}
+				</p>
+				<br/>
+				<br/>
+				<p>With warm regards,<br />
+				Team Arte'Venue<br/>
+				www.artevenue.com
+				</p>
+				<img src = "http://artevenue.com/static/img/logo_mobile.png" alt="Arte'venue Logo">
+				
+			</div>
+		</div>
+
+	</body>
+</html>

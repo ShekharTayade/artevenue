@@ -27,43 +27,63 @@
         <div class="box box-default">
             <div class="box-header with-border row">
 				<div class="col-md-2" >
-					<h3>Register </h3>
+					<h3>Sign Up </h3>
 				</div>
 				<div class="col-md-10" >
 					<div class="quote-leftbar" >
-						Sign up with us and get exciting offers, early intimations of sales and promotions.
-						Sign up below...
+						Sign up with us and get exciting offers, early intimations of sales and promotions.<br />
+						Please sign up below...
 					</div>
 				</div>				
             </div>
 
             <div class="row justify-content-center">
-                <div class="col-6">
+                <div class="col-12">
                     <form method="post" novalidate">
                         {% csrf_token %}
 						<input hidden name="curr_pg" value="{{request.path}}" >						
+						<input hidden id="signup-recaptcha" name="signup-recaptcha">	
+							                                  
 						<div class="panel panel-default cpanel cpanel-default">
 							<div class="w3-container">
-									{% for hidden in form.hidden_fields %}
-									  {{ hidden }}
-									{% endfor %}
-
-									{% for field in form.visible_fields %}
-									  <div class="form-group">
-										<label class = "control-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-										{{ field|add_class:'form-control' }}
-										{% for error in field.errors %}
-										  <span class="help-block">{{ error }}</span>
+								<div class = "row">
+									<div class = "col-2">
+										<img id = "prod-img" src = "{% static 'img/signup_pic.jpg' %}" class = "image-fluid">
+									</div>
+									<div class = "col-1">
+									</div>
+									<div class = "col-8">
+										{% if msg %}
+											<p style="font-size:1.2rem; color:red">{{msg}}</p>
+										{% endif %}
+										{% for hidden in form.hidden_fields %}
+										  {{ hidden }}
 										{% endfor %}
-									  </div>
-									{% endfor %}
 
+										{% for field in form.visible_fields %}
+										  <div class="form-group">
+											<label class = "control-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+											{{ field|add_class:'form-control' }}
+											{% for error in field.errors %}
+											  <span class="help-block">{{ error }}</span>
+											{% endfor %}
+										  </div>
+										{% endfor %}
+									</div>
+								</div>
 							</div>
-							<!-- <button type="submit" class="btn btn-primary">Sign Me Up</button> -->
+							<div class="text-center">
+								<small><input id = "tnc" name="tnc" type="checkbox" value="" checked onchange="activateButton(this);"> I have read and understood the Arte'Venue <a href="">terms of usage</a> and <a href="">privacy policy</a></small>
+								<div id="tnc_err" style="display:none;" class="alert alert-danger">
+									<button type="button" class="close float:left" data-dismiss="">×</button>
+										To signup please read and accept terms and conditions!
+								</div>
+							</div>
 						</div>
 
+						
 						<div class="text-center" style="margin-top: 0px;margin-bottom: 3px;">
-							<button type="submit" class="btn btn-primary" style="border-radius: 0;width: 150px">Register Me</button>
+							<button id = "submit-btn" type="submit" class="btn btn-primary" style="border-radius: 0;width: 150px">Sign Me Up</button>
 						</div>
                         
                     </form>
@@ -75,5 +95,53 @@
 	
 	
 	{% block jscripts %}
+	<script>
+	  grecaptcha.ready(function() {
+		  grecaptcha.execute('6Le2ZqAUAAAAAIAvZ7dRPJkj5zLI2IYAxfPktXqE', {action: 'signup'}).then(function(token) {
+			$("#signup-recaptcha").val(token);
+		  });
+	  });
+	</script>
+
+		<script> 
+			function displayTnC() {
+				$('#terms').modal('show');
+			}
+		</script>
+		
+		<script>
+			function checkTnC() {
+				var chkbox = document.getElementById("tnc");
+				var sts = chkbox.checked
+				var msg = document.getElementById("tnc_err");
+				if (sts) {
+					msg.style.display = "none";
+				} else {
+					msg.style.display = "block";
+				}
+			}
+		</script>
+		<script>
+			function activateButton(element) {
+
+				checkTnC();
+				sts = element.checked;
+				if(sts) {        
+					document.getElementById("submit-btn").disabled = false;
+					
+				}
+				else  {
+					document.getElementById("submit-btn").disabled = true;
+				}
+			}   
+		</script>
+
+		<script>
+		   $(document).ready(function () {
+				activateButton($("#tnc"));
+			});
+		</script>		
+		
+	
 	{% endblock jscripts %}
 	

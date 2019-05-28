@@ -1,0 +1,212 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+
+    <div id="all">
+		<div id="content">
+			<div class="container">
+				<div class = "row">
+					<div class="col-lg-12">
+						<!-- breadcrumb-->
+						<nav aria-label="breadcrumb">
+							<ol class="breadcrumb">
+								<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+								<li aria-current="page" class="breadcrumb-item active">Store Orders</li>
+							</ol>
+						</nav>
+					</div>
+				</div>
+				<div class = "row">
+					<div class = "col-sm-12">
+						<div class="box">
+							<h3>Store Orders</h3>
+							<p>Search orders by date range.</p>
+						</div>
+					</div>				
+					<div class = "col-lg-12">
+						<div class="box info-bar">
+							<div class = "row">
+								<div class = "col-sm-5 col-lg-3">
+									<div class="form-group">
+										<label>From:</label>
+										<input name = "fromdate" id = "fromdate" 
+											class = "form-control" type="date" onchange = "copy_date('FROMDATE');"/>
+									</div>
+								</div>
+								<div class = "col-sm-5 col-lg-3">
+									<div class="form-group">
+										<label>To:</label>
+										<input name = "todate" id = "todate" 
+											class = "form-control" type="date" onchange = "copy_date('TODATE');" />
+									</div>
+								</div>
+								<div class = "col-sm-2 col-lg-2">
+									<div class="form-group">
+										<label>&nbsp; </label><br />
+										<button type="button" id = "date-submit" 
+										class = "btn btn-primary"
+										onclick = "get_store_orders('1', 'NO');">Submit</button>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="box info-bar">
+							<div id = "orders_table">
+								{% include 'artevenue/orders_table.html' %}
+							</div>
+							
+							<div class="row">
+								<form method = "POST" action = "{% url 'get_store_orders'%}" id = "getpdf">
+									<input hidden name = "printpdf" value = "YES">
+									<input hidden name = "fromdate" id = "fromdate_pdf" value = "$('#fromdate').val();">
+									<input hidden name = "todate" id = "todate_pdf" value = "$('#todate').val();">
+									<div class="form-group">
+										<button type="submit" id = "submit_pdf" 
+										class = "btn btn-primary" form = "getpdf">
+										Download PDF</button>
+									</div>	
+								</form>
+							</div>							
+							
+						</div>						
+					</div>
+					
+				</div>
+			</div>
+        </div>
+    </div>
+	{% include 'artevenue/message-modal_ok.html' %}
+	{% endblock sitecontent %}
+
+
+	{% block jscripts %}
+		<script>
+		function getButtons(){
+			// Get the export buttons
+			entTable = $('#ordTbl').DataTable( {
+				fixedHeader: true,
+				responsive: true,
+				select: false,
+				paging: true,
+				dom: '<"top"f>Brt<"bottom"ilp><"clear">',
+				buttons: [
+				   'copy', 'excel', 'pdf', 'print'
+				]
+			} );
+		}
+		</script>
+	
+	<script>
+		$( document ).ready(function() {
+			var today = new Date();
+
+			var from_dt = new Date();
+			from_dt.setDate( from_dt.getDate() - 7) 
+			var fm_dt = from_dt.getDate();
+			var fm_mn = from_dt.getMonth();
+			var fm_mn = fm_mn + 1; //Javascript month start from 0
+			var fm_yy = from_dt.getFullYear();			
+			document.getElementById("fromdate").value = ( parseInt(fm_yy) + "-" + zeroPad(fm_mn) + "-" + zeroPad(fm_dt) );
+			document.getElementById("fromdate_pdf").value = ( parseInt(fm_yy) + "-" + zeroPad(fm_mn) + "-" + zeroPad(fm_dt) );
+
+			var to_dt = today.getDate();
+			var to_mn = today.getMonth();
+			var to_mn = to_mn + 1;
+			var to_yy = today.getFullYear();			
+			
+			document.getElementById("todate").value = ( parseInt(to_yy) + "-" + zeroPad(to_mn) + "-" + zeroPad(to_dt) );
+			document.getElementById("todate_pdf").value = ( parseInt(to_yy) + "-" + zeroPad(to_mn) + "-" + zeroPad(to_dt) );
+		
+		
+			// Trigger the inital fetch of orders
+			document.getElementById("date-submit").click();
+
+		});
+	
+		function get_store_orders(page, printpdf){
+		
+			var execute_ajax = false;
+			var query_data = {};
+			//Get the from, to dates
+			var fm_d = new Date(document.getElementById("fromdate").value);
+			if (fm_d > new Date()) {
+				$("#msg").html("From Date can't be greatrer than today");
+				$("#msg-modal").modal("show");
+				return;
+			}
+			var fm_dt = fm_d.getDate();
+			var fm_mn = fm_d.getMonth();
+			var fm_mn = fm_mn + 1; //Javascript month start from 0
+			var fm_yy = fm_d.getFullYear();			
+			var from_date = fm_yy + "-" + fm_mn + "-" + fm_dt;
+			  
+			var to_d = new Date(document.getElementById("todate").value);
+			var to_dt = to_d.getDate();
+			var to_mn = to_d.getMonth();
+			var to_mn = to_mn + 1; //Javascript month start from 0
+			var to_yy = to_d.getFullYear();			
+			var to_date = to_yy + "-" + to_mn + "-" + to_dt;
+			
+			if ( to_d < fm_d ) {
+				$("#msg").html("To Date can't be earlier than From Date");
+				$("#msg-modal").modal("show");
+				return;
+			}
+			query_data = {'fromdate':from_date, 'todate':to_date, 'page':page, 'printpdf':printpdf}
+
+			$.ajax({
+				url: "{% url 'get_store_orders' %}", 
+				dataType: 'text',
+				data: query_data,
+				type: 'POST',
+				success: function (data) {
+					if (printpdf == "NO") {
+						$("#orders_table").html(data);
+						//getButtons();
+					}
+				},
+				error: function(xhr){
+					alert("An error occured: " + xhr.status + " " + xhr.statusText + " Apologies for the inconvenience!! Please let us know the details and we will be happy to help sort it out."); 
+					return;
+				}
+			});	
+		}
+		
+		
+		function zeroPad(val){
+			if(val < 10){
+				ret = "0" + String(val);
+			} else {
+				ret = String(val);
+			}
+			return ret;
+		}
+	</script>
+
+	
+	<script>
+	function copy_date(type){
+		if (type == "FROMDATE") {
+			var fm_d = new Date(document.getElementById("fromdate").value);
+			var fm_dt = fm_d.getDate();
+			var fm_mn = fm_d.getMonth();
+			var fm_mn = fm_mn + 1; //Javascript month start from 0
+			var fm_yy = fm_d.getFullYear();			
+			var from_date = fm_yy + "-" + fm_mn + "-" + fm_dt;
+			$('#fromdate_pdf').val(from_date);
+		} 
+		if (type == "TODATE") {
+			var to_d = new Date(document.getElementById("todate").value);
+			var to_dt = to_d.getDate();
+			var to_mn = to_d.getMonth();
+			var to_mn = to_mn + 1; //Javascript month start from 0
+			var to_yy = to_d.getFullYear();			
+			var to_date = to_yy + "-" + to_mn + "-" + to_dt;
+			$('#todate_pdf').val(to_date);
+		}
+	}
+	</script>
+
+	{% endblock jscripts %}

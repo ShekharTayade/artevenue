@@ -2,66 +2,66 @@
 <!-- Top slim bar with tagline, login, register etc-->
 <div id="top">
 
-		<div class="row" style = "padding:5px 0;">
-			<div class="col-6 mb-0 mb-lg-0 text-white">
-				<ul class="menu list-inline mb-0">
-					<li class="list-inline-item clickable"><a href = "{% url 'index' %}">Home</a></li>
-					<!--** pick up from DB (ecom_site_tagline)-->
+	<div class="row" style = "padding:5px 0;">
+		<div class="col-6 mb-0 mb-lg-0 text-white">
+			<ul class="menu list-inline mb-0">
+				<li class="list-inline-item clickable"><a href = "{% url 'index' %}">Home</a></li>
+				<!--** pick up from DB (ecom_site_tagline)-->
 
-					<!--** only if the phone help is enabled in DB -->
-					{% if ecom_site.phone_support_available %}
-						<li class="list-inline-item clickable">					
-							<a class = "text-white" data-toggle="modal" data-target="#phone-help">
-								<i class="fa fa-phone"></i>&nbsp;Support								
-							</a>
-						</li>
-						<!--** pick up from DB (Link to Phone number display, if enabled)-->
-					{% endif %}
-				</ul>
-			</div>
-			<div id="phone-help" tabindex="-1" role="dialog" aria-labelledby="Login" aria-hidden="true" class="modal fade">
-				<div class="modal-dialog modal-sm">
-					<div class="modal-content">
-						<div class="modal-header">
-							<h5 class="modal-title">Contact Number</h5>
-							<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
-						</div>
-						<div class="modal-body">	
-							We are here to help!<br />
-							Please call: {{ecom_site.support_phonenumber }}<br />
-							<small>Timing: {{ecom_site.phone_support_start_time}} to {{ecom_site.phone_support_end_time}}</small>
-						</div>
+				<!--** only if the phone help is enabled in DB -->
+				{% if ecom_site.phone_support_available %}
+					<li class="list-inline-item clickable">					
+						<a class = "text-white" data-toggle="modal" data-target="#phone-help">
+							<i class="fa fa-phone"></i>&nbsp;Support								
+						</a>
+					</li>
+					<!--** pick up from DB (Link to Phone number display, if enabled)-->
+				{% endif %}
+			</ul>
+		</div>
+		<div id="phone-help" tabindex="-1" role="dialog" aria-labelledby="Login" aria-hidden="true" class="modal fade">
+			<div class="modal-dialog modal-sm">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">Contact Number</h5>
+						<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
+					</div>
+					<div class="modal-body">	
+						We are here to help!<br />
+						Please call: {{ecom_site.support_phonenumber }}<br />
+						<small>Timing: {{ecom_site.phone_support_start_time}} to {{ecom_site.phone_support_end_time}}</small>
 					</div>
 				</div>
 			</div>
-			
-			<div class="col-6 text-center text-lg-right">
-				<ul class="menu list-inline mb-0">
-					{% if user.is_authenticated %}
-					<li class="list-inline-item clickable">
-						<a href="#" data-toggle="dropdown">
-							<i class="fa fa-user-circle-o nfa-2x"></i>
-							{{user.username}}
-						</a>
-						<!-- drop down for logged in user -->
-						<ul class="dropdown-menu dropdown-menu-login pull-right" >
-							<li><a href="{% url 'logout' %}">Logout</a></li>
-							<li> <a href="{% url 'password_change' %}">Change Password</a></li>   
-							<li class="dropdown-divider"></li>
-							<li><a href="{% url 'my_account' %}">My Account</a></li>
-							<li><a href="{% url 'my_orders' %}">My Orders</a></li>
-						</ul>
+		</div>
+		
+		<div class="col-6 text-center text-lg-right">
+			<ul class="menu list-inline mb-0">
+				{% if user.is_authenticated %}
+				<li class="list-inline-item clickable">
+					<a href="#" data-toggle="dropdown">
+						<i class="fa fa-user-circle-o nfa-2x"></i>
+						{{user.username}}
+					</a>
+					<!-- drop down for logged in user -->
+					<ul class="dropdown-menu dropdown-menu-login pull-right" >
+						<li><a href="{% url 'logout' %}">Logout</a></li>
+						<li> <a href="{% url 'password_change' %}">Change Password</a></li>   
+						<li class="dropdown-divider"></li>
+						<li><a href="{% url 'my_account' %}">My Account</a></li>
+						<li><a href="{% url 'my_orders' %}">My Orders</a></li>
+					</ul>
 
-					</li>
+				</li>
 
-					{% else %}
-						<li class="list-inline-item clickable"><a data-toggle="modal" data-target="#login-modal">Login</a></li>
-						<li class="list-inline-item"><a href="{% url 'register' %}">Sign Up</a></li>
-					{% endif %}
-				</ul>
-			</div>
+				{% else %}
+					<li class="list-inline-item clickable"><a data-toggle="modal" data-target="#login-modal">Login</a></li>
+					<li class="list-inline-item"><a href="{% url 'register' %}">Sign Up</a></li>
+				{% endif %}
+			</ul>
 		</div>
 	</div>
+</div>
 	
 	<!-- Login Modal -->
 	<div id="login-modal" tabindex="-1" role="dialog" aria-labelledby="Login" aria-hidden="true" class="modal fade">
@@ -95,9 +95,11 @@
 						<input hidden id="curr_pg" name="curr_pg" value="{{request.path}}" >						
 						<!-- To check if user is not authenticated and display an error message if not autheticated -->
 						<!-- The view returns a value "invalid" in invalid key if use if not authenticated. -->
+						<br />
+						<br />
 						<p>
 							<div class="text-center">
-								<button type = "submit" class="btn btn-primary"><i class="fa fa-sign-in"></i> Log in</button>
+								<button id="submit-btn" type = "submit" class="btn btn-primary"><i class="fa fa-sign-in"></i> Log in</button>
 							</div>
 
 							<div class="text-center">
@@ -139,11 +141,12 @@
 				
 					
 					<p class="text-center text-muted">Not registered yet?</p>
-					<p class="text-center text-muted"><a href=""><strong  class = "text-primary">Register now</strong></a>
-					! It is easy, done in a minute and gives you access to special offrers, discounts!</p>
+					<p class="text-center text-muted"><a href="{% url 'register' %}"><strong  class = "text-primary">Register now</strong></a>
+					! It is easy, done in a minute and gives you access to special offers, discounts!</p>
 				</div>
 			</div>
 		</div>
+		
 	</div>
 	<!-- END: Login modal -->
 	

@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from decimal import Decimal
 
-from PIL import Image
+from PIL import Image, ImageFilter
 
 import requests
 from io import BytesIO
@@ -76,6 +76,7 @@ def get_FramedImage(request):
 	#return framed_img
 	'''
 	
+	framed_img = dropShadow(framed_img)
 
 	buffered = BytesIO()
 	framed_img.save(buffered, format='JPEG')
@@ -136,11 +137,12 @@ def applyBorder(request, img_source, ref_url, border_top, border_right, border_b
 	box_leftedge = (0, slice_top, slice_left, img_ref.height - slice_bottom)
 	leftedge = img_ref.crop(box_leftedge)
 	leftedge = leftedge.resize((border_left, leftedge.height))
-
-
+	# drop shadow for left edge
+	#leftedge = dropInnerShadow(leftedge)
+	#leftedge = dropFrameShadowIn(leftedge)
+	
 	new_img = Image.new("RGB", (img_source.width + border_left + border_right, img_source.height + border_top + border_bottom), 0)
-	
-	
+
 	new_img.paste(img_source, (border_left,border_top)) 	# paste the image to apply the border to
 	
 	'''***************
@@ -181,9 +183,13 @@ def applyBorder(request, img_source, ref_url, border_top, border_right, border_b
 	'''
 	height_to_fill = int(new_img.height - (border_top + border_bottom))  # corners are already placed
 	num_of_imgs = height_to_fill // leftedge.height # number of images that will fit in the edge
+	
+	curr_coord = int(border_top)
+	if leftedge.height >= height_to_fill:
+		leftedge = leftedge.crop( (0, 0, leftedge.width, height_to_fill) )
+		
 	remainder = height_to_fill % leftedge.height # the remainder part
 
-	curr_coord = int(border_top)
 	for l in range( curr_coord, height_to_fill, leftedge.height):
 		new_img.paste(leftedge, (0, l))
 
@@ -320,7 +326,7 @@ def get_FramedUserImage(request):
 		border = int(m_width_inch * 450 / user_width)
 		
 		m_size = int(mount_size * 96 * ratio)
-		if m_size > 0 and mount_color != ''and mount_color != 'None':
+		if m_size > 0 and mount_color != '' and mount_color != '0' and mount_color != 'None':
 
 			img_with_mount = addMount(img_to_frame, mount_color, m_size, m_size, m_size, m_size)
 			
@@ -341,7 +347,7 @@ def get_FramedUserImage(request):
 	return response
 	#return framed_img
 	'''
-	
+	framed_img = dropShadow(framed_img)
 
 	buffered = BytesIO()
 	framed_img.save(buffered, format='JPEG')
@@ -407,7 +413,7 @@ def get_FramedUserImage_by_id(request):
 		border = int(m_width_inch * 450 / user_width)
 		
 		m_size = int(mount_size * 96 * ratio)
-		if m_size > 0 and mount_color != ''and mount_color != 'None':
+		if m_size > 0 and mount_color != '' and mount_color != '0' and mount_color != 'None':
 
 			img_with_mount = addMount(img_to_frame, mount_color, m_size, m_size, m_size, m_size)
 			
@@ -428,7 +434,7 @@ def get_FramedUserImage_by_id(request):
 	return response
 	#return framed_img
 	'''
-	
+	framed_img = dropShadow(framed_img)
 
 	buffered = BytesIO()
 	framed_img.save(buffered, format='JPEG')
@@ -437,3 +443,99 @@ def get_FramedUserImage_by_id(request):
 
 
 	return HttpResponse(img_str)
+
+
+	
+def dropShadow( image, offset=(8,8), background=0xffffff, shadow=0x444444, 
+                border=10, iterations=3):
+	"""
+	Add a gaussian blur drop shadow to an image.  
+
+	image       - The image to overlay on top of the shadow.
+	offset      - Offset of the shadow from the image as an (x,y) tuple.  Can be
+				positive or negative.
+	background  - Background colour behind the image.
+	shadow      - Shadow colour (darkness).
+	border      - Width of the border around the image.  This must be wide
+				enough to account for the blurring of the shadow.
+	iterations  - Number of times to apply the filter.  More iterations 
+				produce a more blurred shadow, but increase processing time.
+	"""
+
+	# Create the backdrop image -- a box in the background colour with a 
+	# shadow on it.
+	totalWidth = image.size[0] + abs(offset[0]) + 2*border
+	totalHeight = image.size[1] + abs(offset[1]) + 2*border
+	back = Image.new(image.mode, (totalWidth, totalHeight), background)
+
+	# Place the shadow, taking into account the offset from the image
+	shadowLeft = border + max(offset[0], 0)
+	shadowTop = border + max(offset[1], 0)
+	back.paste(shadow, [shadowLeft, shadowTop, shadowLeft + image.size[0], 
+	shadowTop + image.size[1]] )
+  
+	# Apply the filter to blur the edges of the shadow.  Since a small kernel
+	# is used, the filter must be applied repeatedly to get a decent blur.
+	n = 0
+	while n < iterations:
+		back = back.filter(ImageFilter.BLUR)
+		n += 1
+    
+	# Paste the input image onto the shadow backdrop  
+	imageLeft = border - min(offset[0], 0)
+	imageTop = border - min(offset[1], 0)
+	back.paste(image, (imageLeft, imageTop))
+
+	return back
+  
+  
+def dropInnerShadow(image, offset=(2,2), background=0x666666, shadow=0x444444, 
+                border=3, iterations=3):
+				
+	# Create the backdrop image -- a box in the background colour with a 
+	# shadow on it.
+	totalWidth = image.size[0] + abs(offset[0]) + border
+	totalHeight = image.size[1]
+	back = Image.new(image.mode, (totalWidth, totalHeight), background)
+
+	# Place the shadow, taking into account the offset from the image
+	shadowLeft = border + max(offset[0], 0)
+	shadowTop = 0   ##border + max(0, 0)
+	back.paste(shadow, [shadowLeft, shadowTop, shadowLeft + image.size[0], 
+	shadowTop + image.size[1]] )
+  
+	# Apply the filter to blur the edges of the shadow.  Since a small kernel
+	# is used, the filter must be applied repeatedly to get a decent blur.
+	n = 0
+	while n < iterations:
+		back = back.filter(ImageFilter.BLUR)
+		n += 1
+    
+	# Paste the input image onto the shadow backdrop  
+	imageLeft = border - offset[0]
+	imageTop = border - offset[1]
+	back.paste(image, (0, 0))
+
+	return back
+	
+def dropFrameShadowIn(image, shadowWidth=6, color=0x444444, shadow=0x999999):
+
+
+	totalWidth = image.size[0] + (shadowWidth)
+	totalHeight = image.size[1]
+	img = Image.new(image.mode, (totalWidth, totalHeight), '#999999')
+	shadow_black = Image.new(image.mode, (6, totalHeight), '#000000')
+	#shadow1 = Image.new(image.mode, (2, totalHeight), '#444444')
+	#shadow2 = Image.new(image.mode, (3, totalHeight), '#666666')
+	
+	img.paste(shadow_black, (image.size[0], 0))
+	#img.paste(shadow1, (image.size[0] + 1, 0))	
+	#img.paste(shadow2, (image.size[0] + 3, 0))	
+	n = 0
+	while n < 3:
+		img = img.filter(ImageFilter.BLUR)
+		n += 1
+	img.paste(image)
+	#img.paste(shadow_black, (image.size[0], 0))
+	return img
+	

@@ -1,0 +1,154 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+        <div class="container">
+			<div class="row">
+
+				<!-- breadcrumb-->
+				<div class="col-lg-12">
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+							<li aria-current="page" class="breadcrumb-item active">egift Card</li>
+						</ol>
+					</nav>
+				</div>
+
+				<div class="col-lg-3">
+
+					<button type="button" data-toggle="collapse" data-target="#cat_navigation" class="btn btn-outline-secondary navbar-toggler full-width-btn" style="width:100% !important;">
+						<span class="sr-only">Toggle navigation</span>
+						<i class="fa fa-align-justify"></i>eGift Card
+					</button>
+
+				
+					 <!--
+					 *** CATEGORIES AND FILTERS ***
+					_________________________________________________________
+					-->
+					<div id = "cat_navigation" class="collapse show navbar-collapse">
+						<div class="card sidebar-menu mb-4">
+							<div class="card-body">
+								<ul class="nav nav-pills flex-column">
+									<li><a href="#" class="nav-link">How it works</a></li>
+									<li><a href="#referform" class="nav-link">eGift Card</a></li>
+									<li><a href="#refer_tc" class="nav-link">T&Cs</a></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-9">
+					<div id="contact" class="box">
+						<h1>Referral Rewards</h1>
+						<div class = "row">
+							<div class = "col-sm-4">
+								<img id = "prod-img" src="{% static 'img/gifts.png' %}" data-action = "zoom" class="img-fluid"/>
+							</div>
+							<div class = "col-sm-8">
+								<p class="lead">Refer a friend and be rewarded</p>
+								<p>Refer us to your friends. Your friends get 10% off on their first order and 
+								your next order with us carries 10% discount.</p>
+								<ul>
+									<li>You refer a friend</li>
+									<li>Friend signs up</li>
+									<li>Friend places first order and gets 10% off</li>
+									<li>You get 10% off on your next order</li>
+								</ul>
+								Sounds good? Start by filling up the Referral Form below...
+							</div>
+						</div>
+						<hr>
+						<div class = "row">
+							<div id = "contactform">
+								<h2>Referral form</h2>
+							</div>
+						</div>
+						<div id = 'referform' class="row justify-content-center">
+							<div class="col-8">
+								{% if msg %}
+									<p style="font-size:1.2rem; color:red">{{msg}}</p>
+								{% endif %}
+								<form method="post">
+									{% csrf_token %}
+									<input hidden name="curr_pg" value="{{request.path}}" >						
+									<input hidden id = "g-recaptcha-response" name="g-recaptcha-response" value="" >						
+									<div class="panel panel-default cpanel cpanel-default">
+										<div class="w3-container">
+                                        {% for field in form %}
+                                            <div class="form-group cform-group row crow">
+                                                {{ field.label_tag }}
+                                                {% load widget_tweaks %}
+                                                {% if form.is_bound %}
+                                                    {% if field.errors %}
+                                                        {% render_field field class="form-control is-invalid" %}
+                                                        {% for error in field.errors %}
+                                                        <div class="invalid-feedback" style="color:#ff5821">
+                                                            {{ error }}
+                                                        </div>
+                                                        {% endfor %}
+                                                    {% else %}
+                                                        {% render_field field class="form-control is-valid" %}
+                                                    {% endif %}
+                                                {% else %}
+                                                    {% render_field field class="form-control" %}
+                                                {% endif %}
+                                            
+                                                {% if field.help_text %}
+                                                <small class="form-text text-muted">
+                                                    {{ field.help_text | safe }}
+                                                </small>
+                                                {% endif %}
+                                            </div>
+                                        {% endfor %}            
+
+										</div>
+										<!-- <button type="submit" class="btn btn-primary">Sign Me Up</button> -->
+									</div>
+
+									<div class="text-center" style="margin-top: 0px;margin-bottom: 3px;">
+										<button type="submit" class="btn btn-primary" style="border-radius: 0;width: 150px">Send Mail</button>
+									</div>
+									
+								</form>
+							</div>
+						</div>
+						<hr>
+						<div id = 'refer_tc' class="row justify-content-center mt-3">
+							<div class = "col-sm-12">
+								<p class="lead">How Referral Scheme works:</p>
+								<ul>
+									<li>You must be signed up customer to be able to refer</li>
+									<li>Providing name and valid email id of the person you want to refer to is mandatory</li>
+									<li>We will use the name and email provided only to send the email to your contact and to track the referral for applicable rewards</li>
+									<li>Your contact must sign up and login using the email id you provide</li>
+									<li>Your contact will get 10% off on their first order placed at ArteVenue.com</li>
+									<li>Immediately after your contact places their first order and makes payment, you will be eligible for 10% off on your next order</li>
+									<li>You can refer one contact only once</li>
+									<li>Referral scheme can be withdrawn by ArteVenue.com without prior notice</li>
+								</ul>
+							</div>
+						</div>	
+						
+					</div>
+				</div>
+				<!-- /.col-md-9-->
+
+			</div>
+		</div>
+	{% endblock sitecontent %}
+
+	
+	{% block jscripts %}
+	<script>
+	  grecaptcha.ready(function() {
+		  grecaptcha.execute('6Le2ZqAUAAAAAIAvZ7dRPJkj5zLI2IYAxfPktXqE', {action: 'referus'}).then(function(token) {
+			$("#g-recaptcha-response").val(token);
+		  });
+	  });
+	</script>	
+	{% endblock jscripts %}
+			
+	

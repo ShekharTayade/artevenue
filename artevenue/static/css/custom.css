@@ -64,6 +64,7 @@ top #phone-help .modal-header h5 {
 	text-align: center;
 	font-family: arial;
 	object-fit:contain;
+	/*box-shadow: 5px 6px 6px 0 #d3d3d3;*/
 
 }
 
@@ -127,6 +128,10 @@ top #phone-help .modal-header h5 {
 	position: absolute;
 	left: 0;
 	top: 0;
+}
+
+.img-magnifier-glass{
+	z-index: 99;
 }
 
 .text-white{
@@ -207,6 +212,10 @@ top #phone-help .modal-header h5 {
 	font: 0.85rem 'Roboto', sans-serif;
 	font-weight: 800;
 	margin-bottom:10px;
+}
+#title-sm {
+	font:1.15rem 'Roboto', sans-serif;
+	font-weight: 800;
 }
 
 .size-text {
@@ -496,6 +505,7 @@ top #phone-help .modal-header h5 {
 	width:17vw; 
 	height:13vw;
 	object-fit:scale-down;
+	
 }
 
 
@@ -576,15 +586,25 @@ top #phone-help .modal-header h5 {
 	font-size:0.75em;
 }
 
-.frame-image {
+@media only screen and (min-width: 600px) {
+	.frame-image {
+	  margin: 10px 20px !important; 
+	}
+}
+
+
+.frame-image {  
   width: 150px;
   height:auto;
-  margin: 10px 20px !important;
   text-align: center;
   font-family: arial;
   object-fit:contain;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;	
+  
 }
-
+	
 .frame-image:hover {
   background-color: #dfdfdf;
 }	
@@ -769,6 +789,88 @@ hr {
 	margin-right: auto;	
 }
 
-.product-slider {
-	margin-bottom: 40px;
+
+.img-responsive.mobile {
+  display: none;
+}
+
+@media only screen and (max-width: 480px) {
+  .img-responsive {
+    display: none;
+  }
+  .img-responsive.mobile {
+    display: block;
+  }
+}
+
+.dot {
+  height: 25px;
+  width: 25px;
+  border-radius: 50%;
+  display: inline-block;
+  border:1px solid lightgrey;
+}
+
+/*
+.f_images{
+	position: relative;
+	box-shadow: 3px 4px 4px 0 #d3d3d3, 3px 6px 4px 0#d3d3d3;
+}
+/*
+.f_images::before{
+	content: " ";
+	position: absolute;
+	z-index : -1;	
+	padding:0px; 
+	border:10px solid grey;
+} */
+
+.grecaptcha-badge { visibility: hidden; }
+
+.gift-image-container {
+  position: relative;
+  text-align: center;
+  color: white;
+  font-size:1.5rem;
+}
+
+.bottom-left {
+  position: absolute;
+  bottom: 8px;
+  left: 16px;
+}
+
+.top-left {
+  position: absolute;
+  top: 8px;
+  left: 16px;
+}
+
+.top-right {
+  position: absolute;
+  top: 8px;
+  right: 16px;
+}
+
+.bottom-right {
+  position: absolute;
+  bottom: 8px;
+  right: 16px;
+}
+
+.centered {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+div.sticky {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+}
+
+.px-bottom {
+	border-bottom: 4px solid #cfcfcf; 
 }

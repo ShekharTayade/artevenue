@@ -16,6 +16,7 @@ from artevenue.models import Order_stock_collage, Order_original_art, Order_item
 from artevenue.models import User_billing_address, User_shipping_address
 from artevenue.models import Order_billing, Order_shipping, Shipping_cost_slabs
 from artevenue.models import Country, State, City, Pin_code, Pin_city_state_country
+from artevenue.models import Generate_number_by_month
 
 today = datetime.datetime.today()
 
@@ -40,7 +41,7 @@ def checkout_step1_address(request):
 	usercart_items = Cart_item_view.objects.filter(cart_id = cart_id)
 
 	if not usercart_items:
-		return render(request, "artevenue/checkout_step1_address.html", {'order_total':0,
+		return render(request, "artevenue/checkout_step1_address_new.html", {'order_total':0,
 					'sub_total':sub_total, 'tax':tax})	
 	
 	# get shipping and billing addresses if it's a logged in user
@@ -52,7 +53,11 @@ def checkout_step1_address(request):
 	
 	# Check if order for cart_id is already created
 	order = Order.objects.filter(cart_id = cart_id).first()
+
 	if order :
+		sub_total = order.sub_total
+		tax = order.tax
+		order_total = order.order_total
 		# to retain these from the existing order. Other fields will be
 		# taken from the usercart
 		shipping_method = order.shipping_method
@@ -62,6 +67,7 @@ def checkout_step1_address(request):
 
 		order_items = Order_items_view.objects.filter(order = order)
 		order_id = order.order_id
+		order_number = order.order_number
 
 		#ord_total = order.order_total
 		#sub_total = order.sub_total
@@ -244,6 +250,7 @@ def checkout_step1_address(request):
 				# Update Order for the quantity
 				ord = Order(
 					order_id = order.order_id,
+					order_number = order.order_number,
 					order_date = order.order_date,
 					cart = usercart,
 					store_id = settings.STORE_ID,
@@ -251,6 +258,8 @@ def checkout_step1_address(request):
 					user = usercart.user,
 					voucher = usercart.voucher,
 					voucher_disc_amount = usercart.voucher_disc_amount,
+					referral = usercart.referral,
+					referral_disc_amount = usercart.referral_disc_amount,					
 					quantity = usercart.quantity,
 					sub_total = usercart.cart_sub_total,
 					order_discount_amt = usercart.cart_disc_amt,
@@ -265,15 +274,21 @@ def checkout_step1_address(request):
 				)
 				ord.save()
 				order_id = ord.order_id
+				order_number = ord.order_number				
 				shipping_cost = ord.shipping_cost
+				sub_total = ord.sub_total
+				tax = ord.tax
+				order_total = ord.order_total
+				
 		except Error as e:
 			msg = 'Apologies!! Could not save your cart. Please use the "Contact Us" link at the bottom of this page and let us know. We will be glad to help you.'
 		
 	
 	else :
-		
 		try:
+			order_number = get_order_next_order_number()
 			new_ord = Order(
+				order_number = order_number,
 				order_date = None,
 				cart = usercart,
 				store_id = settings.STORE_ID,
@@ -281,6 +296,8 @@ def checkout_step1_address(request):
 				user = usercart.user,
 				voucher = usercart.voucher,
 				voucher_disc_amount = usercart.voucher_disc_amount,
+				referral = usercart.referral,
+				referral_disc_amount = usercart.referral_disc_amount,					
 				quantity = usercart.quantity,
 				sub_total = usercart.cart_sub_total,
 				order_discount_amt = usercart.cart_disc_amt,
@@ -296,9 +313,11 @@ def checkout_step1_address(request):
 			
 			new_ord.save()
 			order_id = new_ord.order_id
+			order_number = new_ord.order_number
 			shipping_cost = 0 # as it's newly created order
-
-			ord_total = new_ord.order_total
+			sub_total = new_ord.sub_total
+			tax = new_ord.tax
+			order_total = new_ord.order_total
 
 			for c in usercart_items:
 				if c.product_type_id == 'STOCK-IMAGE':	
@@ -359,7 +378,7 @@ def checkout_step1_address(request):
 						updated_date = today,
 						user_image_id = c.product_id
 					)				
-				if c.product_type_id == 'STOCK-IMAGE':	
+				if c.product_type_id == 'STOCK-COLLAGE':	
 					new_ord_item = Order_stock_collage(	
 						order = new_ord,
 						cart_item_id = c.cart_item_id,
@@ -455,10 +474,11 @@ def checkout_step1_address(request):
 	for p in pin_code_list:
 		pin_code_arr.append(p.pin_code)
 	
-	return render(request, "artevenue/checkout_step1_address_new.html", {'order_total':usercart.cart_total,
+	return render(request, "artevenue/checkout_step1_address_new.html", {'order_total':order_total,
 					'sub_total':sub_total, 'tax':tax,'shipping_addr':shipping_addr, 'billing_addr':billing_addr,
 					'disc_amt':disc_amt, 'country_arr':country_arr, 'state_arr':state_arr,  'shipping_cost':shipping_cost,
-					'city_arr':city_arr, 'pin_code_arr':pin_code_arr, 'order_id':order_id})
+					'city_arr':city_arr, 'pin_code_arr':pin_code_arr, 'order_number':order_number,
+					'order_id':order_id})
 					
 @csrf_exempt					
 def get_addr_pin_city_state(request):
@@ -594,7 +614,8 @@ def checkout_saveAddr_shippingMethod(request):
 
 	# get the order
 	order = Order.objects.get(pk = order_id)
-
+	order_number = order.order_number
+	
 	try:
 		user = User.objects.get(username = request.user)
 	except User.DoesNotExist:
@@ -651,6 +672,30 @@ def checkout_saveAddr_shippingMethod(request):
 		
 		o.save()
 	
+		if user:		
+			user_addr = User_shipping_address.objects.filter(user = user, 
+				full_name = shipping_full_name, company = shipping_company,
+				city = shipping_city, state = s_state, pin_code_id = shipping_pin_code)
+			
+			if not user_addr :
+				u = User_shipping_address(
+					store_id = settings.STORE_ID,
+					user = user,
+					full_name = shipping_full_name,
+					company = shipping_company,
+					address_1 = shipping_address_1,
+					address_2 = shipping_address_2,
+					land_mark = '',
+					city = shipping_city,
+					state = s_state,
+					pin_code_id = shipping_pin_code,
+					country = s_country,
+					phone_number = shipping_phone_number,
+					email_id = shipping_email_id,
+					pref_addr = True,
+					updated_date =  today
+					)
+				u.save()
 
 		if ord_billing:
 			b = Order_billing(
@@ -741,7 +786,8 @@ def checkout_saveAddr_shippingMethod(request):
 				'order_total':order.order_total, 'order_id': order_id, 'order_shipping_cost':order.shipping_cost,
 				'sub_total':order.sub_total, 'tax':order.tax,'shipping_addr':o, 'billing_addr':b,
 				'disc_amt':order.order_discount_amt, 'country_arr':country_arr, 'state_arr':state_arr, 
-				'city_arr':city_arr, 'pin_code_arr':pin_code_arr, 'cart_id':order.cart_id, 'shipping_cost':shipping_cost})
+				'city_arr':city_arr, 'pin_code_arr':pin_code_arr, 'cart_id':order.cart_id, 'shipping_cost':shipping_cost,
+				'order_number':order_number})
 
 def checkout_step3_order_review(request):
 
@@ -794,6 +840,7 @@ def checkout_step3_order_review(request):
 			# So, at the moment only shipping cost and order total is updated
 			o = Order(
 				order_id = order_id,
+				order_number = order.order_number,
 				order_date = order.order_date,
 				cart = usercart,
 				store_id = settings.STORE_ID,
@@ -801,6 +848,8 @@ def checkout_step3_order_review(request):
 				user = usercart.user,
 				voucher = usercart.voucher,
 				voucher_disc_amount = usercart.voucher_disc_amount,
+				referral = usercart.referral,
+				referral_disc_amount = usercart.referral_disc_amount,					
 				quantity = usercart.quantity,
 				sub_total = usercart.cart_sub_total,
 				order_discount_amt = usercart.cart_disc_amt,
@@ -830,6 +879,8 @@ def checkout_step3_order_review(request):
 				cart_total = order_total ,
 				voucher_id = usercart.voucher_id,
 				voucher_disc_amount = usercart.voucher_disc_amount,
+				referral = usercart.referral,
+				referral_disc_amount = usercart.referral_disc_amount,					
 				created_date = usercart.created_date,
 				updated_date = today,
 				cart_status = usercart.cart_status
@@ -860,3 +911,39 @@ def get_shipping_cost_by_slab(order_total):
 			shipping_cost = s.flat_shipping_cost
 			
 	return (shipping_cost)	
+	
+
+
+def get_order_next_order_number():
+	bill_num = 0
+	#Get curentyear, month in format YYYYMM
+	dt = datetime.datetime.now()
+	mnth = dt.strftime("%Y%m")
+
+	# Get an suffix required 
+	suffix = '-'
+	
+	monthyear = Generate_number_by_month.objects.filter(type='ORDER-NUMBER', month_year = mnth).first()
+	if monthyear :
+		num = monthyear.current_number + 1
+	else :
+		num = 1
+		
+	# Update generated number in DB
+	gen_num = Generate_number_by_month(
+		type = 'ORDER-NUMBER',
+		description = "Billing number generation",
+		month_year = mnth,
+		current_number = num
+		)
+	
+	gen_num.save()
+		
+	generated_num = 0
+	if suffix:
+		generated_num = (mnth + suffix + str(num))
+	else:
+		generated_num = (mnth + str(num))
+	return generated_num 	
+	
+	
