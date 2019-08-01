@@ -473,7 +473,9 @@ top #phone-help .modal-header h5 {
 		text-align:center;
 	}
 	
-}
+}	
+	
+
 
 .prod-details{
 	color: #000 !important;
@@ -873,4 +875,118 @@ div.sticky {
 
 .px-bottom {
 	border-bottom: 4px solid #cfcfcf; 
+}
+
+#wrapper {
+  width: 100%;
+  position: relative;
+}
+
+#wrapper img {
+  max-width: 100%;
+}
+
+@media only screen and (min-width: 481px) {
+	#anchor-main-banner {
+	  height: 40%;
+	  width: 28%;
+	  left: 7.1%;
+	  top: 27.8%;
+	  /*border: 1px solid red;*/
+	  position:absolute;
+	}
+}
+@media only screen and (max-width: 480px) {
+	#anchor-main-banner-mobile {
+	  height: 30%;
+	  width: 22%;
+	  left: 0%;
+	  top: 35%;
+	  /*border: 1px solid red;*/
+	  position:absolute;
+	}
+}
+
+@media only screen and (min-width: 481px) {
+	#anchor-frame {
+	  /*height: 39.2%;
+	  width: 40%;
+	  left: 2.6%;
+	  top: 28.5%;*/
+	  height: 50%;
+	  width: 44%;
+	  left: 2.7%;
+	  top: 35%;
+	  /*border: 1px solid red;*/
+	  position:absolute;
+	}
+}
+@media only screen and (max-width: 480px) {
+	#anchor-frame-mobile {
+	  /*height: 35%;
+	  width: 42%;
+	  left: 0%;
+	  top: 32%;*/
+	  height: 50%;
+	  width: 44%;
+	  left: 2.7%;
+	  top: 35%;
+	  /*border: 1px solid red;*/
+	  position:absolute;
+	}
+}
+
+.btn-file {
+    position: relative;
+    overflow: hidden;
+}
+.btn-file input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 100px;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    outline: none;
+    background: white;
+    cursor: inherit;
+    display: block;
+}
+
+
+/* Tabs*/
+section {
+    padding: 10px 0;
+}
+
+section .section-title {
+    text-align: center;
+    color: #252525;
+    margin-bottom: 20px;
+}
+#tabs{
+	background: #fff;
+    color: #252525;
+}
+#tabs h6.section-title{
+    color: #252525;
+}
+
+#tabs .nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {
+    color: #f3f3f3;
+    background-color: transparent;
+    border-color: transparent transparent #f3f3f3;
+    border-bottom: 4px solid !important;
+    font-size: 16px;
+    font-weight: bold;
+}
+#tabs .nav-tabs .nav-link {
+    border: 1px solid transparent;
+    border-top-left-radius: .25rem;
+    border-top-right-radius: .25rem;
+    color: #252525;
+    font-size: 16px;
 }

@@ -1,31 +1,20 @@
-{% extends 'eStore/estore_base.html' %}
+{% extends 'artevenue/estore_base.html' %}
 {% load static %}
 	<!-- Only Override the site content block -->
 	{% block sitecontent %}
     <div class="block" style="padding-top: 5%; padding-bottom: 5%; ">
         <div class="container">
-
-            <h3 class="block-title">Wrong Way!!!</h3>
-
-            <div class="row" id="contact">
-    
+            <h2 class="block-title">Wrong Way!!!</h2>
+            <div class="row" id="contact">    
                 <div class="col-xs-12 col-sm-8 col-md-6">
-
-                    <div class="panel panel-info">
-                        <div class="panel-heading">
-                            <h5 class="panel-title">Page Not Found!</h5>
-                        </div>
-                        <div class="panel-body">
-                            <p>You seem to have landed at a non-existent page. Please go back to home page to navigate. If you think this is in error, please let us know.</p>
-                            <div  class="alert alert-success">
-                                <span style="float: right"><a href="{% url 'index' %} "><i class="fa fa-home">Home</i></a></span>
-                            </div>
-                        </div>           
+                    <div class="box">
+						<h3 class="panel-title">No Authorization!</h3>
+						<p>You are not authorized to access this page. Please go back to home page to navigate. If you think this is in error, please let us know.</p>
+						<span style="float: right"><a href="{% url 'index' %} "><i class="fa fa-home">Home</i></a></span>
                     </div>
                 </div>
             </div>
-
-        </div>
+        </div>		
     </div>
 				
 	{% endblock sitecontent %}

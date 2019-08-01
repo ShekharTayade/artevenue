@@ -6,7 +6,9 @@
 		<div class="container">
 			<div class="row">
 				<div class="col-md-12">
-					<h1 class="mb-0 text-center">{{ecom_site.featured_header}}</h1>
+					<div style = "color: #665d6f; font-family:Helvetica, sans-serif !important; font-size:1.3rem !important;"
+						class="mb-0 text-center">{{ecom_site.featured_header}}
+					</div>
 					<div class = "text-center">
 						<span class = "section-text">
 						</span>
@@ -18,7 +20,7 @@
 </div>
 
 <!-- Featured items slider -->
-<div class="product-slider owl-carousel owl-theme px-bottom">
+<div class="product-slider owl-carousel owl-theme">
 	{% for c in trending_categories %}
 		<div class="item">  
 				{% with 'img/'|add:c.url as image_static %}

@@ -41,10 +41,12 @@ def get_mouldings(request):
 		'moulding').filter((Q( moulding__applies_to="P") | Q( moulding__applies_to="B")), moulding__is_published = True ).values('image_id', 'url',
 			'border_slice', 'moulding_id', 'moulding__name', 'moulding__description')
 			
-			
-					
+	moulding_diagrams =  Moulding_image.objects.filter(image_type__iexact = "DIAGRAM").select_related(
+		'moulding')
+							
 	return ({'canvas_mouldings_apply':canvas_mouldings_apply, 'canvas_mouldings_show':canvas_mouldings_show,
-			 'paper_mouldings_apply':paper_mouldings_apply, 'paper_mouldings_show':paper_mouldings_show})
+			 'paper_mouldings_apply':paper_mouldings_apply, 'paper_mouldings_show':paper_mouldings_show,
+			 'moulding_diagrams':moulding_diagrams})
 
 
 def get_mounts(request):
@@ -138,7 +140,7 @@ def get_board_price_by_id(id) :
 	if boardObj :
 		return boardObj.price
 	else :
-		return 0
+		return Decimal(0)
 	
 def get_acrylic_price(request) :
 	acrylic = request.GET.get("id", "")

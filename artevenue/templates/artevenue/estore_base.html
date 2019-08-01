@@ -52,7 +52,7 @@
 		<link rel="stylesheet" href="{% static 'css/home-page-style.css' %}" id="theme-stylesheet">
 		
 		<!-- Favicon-->
-		<link rel="shortcut icon" href="{% static 'favicon.png' %}">
+		<link rel="shortcut icon" href="{% static 'img/favicon.png' %}">
 
 
 		<!-- Bootstrap-table -->
@@ -91,7 +91,9 @@
 		<!-- JQuery DataTables -->
 		<script type="text/javascript" src="{% static 'vendor/DataTables/datatables.min.js' %}"></script>
 		
+		{% block google-recaptcha-3 %}
 		<script src="https://www.google.com/recaptcha/api.js?render=6Le2ZqAUAAAAAIAvZ7dRPJkj5zLI2IYAxfPktXqE"></script>
+		{% endblock google-recaptcha-3 %}
 		
 	</head>
 	{% endblock html-head %}

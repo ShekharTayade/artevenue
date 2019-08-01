@@ -9,11 +9,15 @@
 			<div class="row">						
 				<div class="col-md-12 col-sm-12 col-12 align-self-center"  style = "padding:0px; !important;">
 					<div class="say_pic">
-						<img src = "{% static 'img/main_banner_shopnow.jpg' %}" class="img-responsive" usemap="#mainbannermap">
-						<img src="{% static 'img/main_banner_shopnow_mobile.jpg' %}" class="img-responsive mobile" usemap="#mainbannermap">
-						<map name="mainbannermap">
-						  <area shape="rect" coords="50,100,350,324" href="{% url 'all_stock_images' %}" alt="Start Shopping">
-						</map>
+						<div id = "wrapper">
+							<img src = "{% static 'img/main-image/entry_banner.jpg' %}" class="img-responsive">
+							<a id = "anchor-main-banner" href="{% url 'all_stock_images' %}"></a>
+							<img src="{% static 'img/main-image/entry_banner_mobile.jpg' %}" class="img-responsive mobile" usemap="#mainbannermap">
+							<a id = "anchor-main-banner-mobile" href="{% url 'all_stock_images' %}" class = "mobile"></a>
+							<!-- <map name="mainbannermap">
+							  <area shape="rect" coords="50,100,350,324" href="{% url 'all_stock_images' %}" alt="Start Shopping">
+							</map> -->
+						</div>
 					</div>
 				</div>
 			</div>

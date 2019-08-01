@@ -1,4 +1,5 @@
-{% load utils %}	
+{% load static %}	
+{% load utils %}
 	
 			<div class="row">
 
@@ -7,7 +8,7 @@
 				  <nav aria-label="breadcrumb">
 					<ol class="breadcrumb">
 						<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
-						<li aria-current="page" class="breadcrumb-item active">Wishlist</li>
+						<li aria-current="page" class="breadcrumb-item active">My Favourites</li>
 					</ol>
 				  </nav>
 				</div>
@@ -24,8 +25,8 @@
 							<input hidden id = "tax" name = "tax" value = "{{userwishlist.wishlist_tax|floatformat}}">
 							<input hidden id = "disc_amt_nv" name = "disc_amt_nv" value = "{{userwishlist.wishlist_disc_amt|floatformat}}">
 							<input hidden id = "wishlist_total_nv" name = "wishlist_total_nv" value = "{{userwishlist.wishlist_total|floatformat}}">
-							<h1>Your Wish List</h1>
-							<p class="text-muted">You currently have {% if userwishlist %} {{userwishlist.quantity}} {% else %} 0 {% endif %} item(s) in your wish list.</p>
+							<h1>Favourites</h1>
+							<p class="text-muted">You currently have {% if userwishlist %} {{userwishlist.quantity}} {% else %} 0 {% endif %} item(s) as Favourites.</p>
 							<div class="table table-responsive">
 								<table id = "wishlistTbl" class="table table-responsive">
 									<thead>
@@ -42,7 +43,15 @@
 									<tbody>
 										{% for i in userwishlistitems %}
 										<tr>
-											<td><img src = "{% if i.product_type == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product__image_to_frame}} {% else %} {{i.product__thumbnail_url}} {% endif %}" style = "width:75px; height:75px; object-fit:contain;">
+											<td>												
+												<img src = "{% if i.product_type == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product__image_to_frame}} {% else %} {% static i.product__thumbnail_url %} {% endif %}" style = "width:75px; height:75px; object-fit:contain;">
+												<!--
+												{% if i.product__publisher == '1001' %}
+													<img src = "{% if i.product_type == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product__image_to_frame}} {% else %} {% static i.product__thumbnail_url %} {% endif %}" style = "width:75px; height:75px; object-fit:contain;">
+												{% else %}
+													<img src = "{% if i.product_type == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product__image_to_frame}} {% else %} {{i.product__thumbnail_url}} {% endif %}" style = "width:75px; height:75px; object-fit:contain;">
+												{% endif %}
+												-->
 												<br />
 												<div class = "pull-left">
 													<button style="padding-left:0px;" type ="button" class = "btn btn-link pull-left" onclick = "getFramedImg('{{i.product_id}}', '{{i.image_width}}', '{{i.moulding_id | default_if_none:0}}', '{{i.mount__color | default_if_none:0}}','{{i.mount_size | default_if_none:0}}', '{{i.product__product_image__url | default_if_none:""}}');">
@@ -85,7 +94,11 @@
 											</td>
 											<td style = "text-align:right">{{i.item_total|floatformat}}</td>
 											<td>
-												<button class = "btn btn-link" data-toggle="tooltip" title="Move to Cart!" onclick ="moveitem({{i.wishlist_item_id}});" >
+												<a><i style = "cursor: pointer; color:red;" 
+													data-toggle="tooltip" title="Edit!" class="fa fa-edit"
+													onclick = "edit_item('{{i.wishlist_item_id}}', '{{i.product_id}}');">
+												</i></a>
+												<button class = "btn btn-link pull-left" data-toggle="tooltip" title="Move to Cart!" onclick ="moveitem({{i.wishlist_item_id}});" >
 													<i class= "fa fa-cart-plus"></i>
 												</button>
 												<a data-toggle="tooltip" title="Remove!" style = "cursor: pointer; color:red;"
@@ -121,10 +134,11 @@
 								<div class="right">
 									<button 
 										id = "checkout_btn"
-										type="submit" 
+										type="button" 
 										class="btn btn-primary" 
 										form = "checkoutform" 
-										value="submit">
+										value="submit"
+										onclick = "move_all_to_cart();">
 											Move All to Cart <i class="fa fa-cart-plus"></i>
 									</button>
 								</div>
@@ -140,7 +154,7 @@
 				<div class="col-lg-4">
 					<div id="order-summary" class="box">
 						<div class="box-header">
-							<h3 class="mb-0">Wish List summary</h3>
+							<h3 class="mb-0">Favorites summary</h3>
 						</div>
 						<div class="table-responsive">
 							<table class="table">
@@ -175,6 +189,10 @@
 
 				</div>
 				<!-- /.col-md-4-->
+				<form id = "edit_form" hidden action = "{% url 'stock_image_detail' %}" method = 'GET'>
+					<input hidden id="wishlist_item_id" name = "wishlist_item_id" value = ''>
+					<input hidden id="product_id" name = "product_id" value = ''>
+				</form>
 
 			</div>
 			<script>

@@ -79,22 +79,21 @@ def checkout_step1_address(request):
 			for c in usercart_items:
 				update_ord_itm = False
 			
-				ord_itm = order_items.filter( order = order,
+				ord_itm = order_items.filter(order_id = order.order_id,
 					product_id = c.product_id,
 					product_type_id = c.product_type_id,
-					promotion = c.promotion,
-					moulding = c.moulding,
+					promotion_id = c.promotion_id,
+					moulding_id = c.moulding_id,
 					moulding_size = c.moulding_size,
-					item_total = c.item_total,
-					print_medium = c.print_medium,
+					print_medium_id = c.print_medium_id,
 					print_medium_size = c.print_medium_size,
-					mount = c.mount,
+					mount_id = c.mount_id,
 					mount_size = c.mount_size,
-					board = c.board,
+					board_id = c.board_id,
 					board_size = c.board_size,
-					acrylic = c.acrylic,
+					acrylic_id = c.acrylic_id,
 					acrylic_size = c.acrylic_size,
-					stretch = c.stretch,
+					stretch_id = c.stretch_id,
 					stretch_size = c.stretch_size,
 					image_width = c.image_width,
 					image_height = c.image_height
@@ -105,18 +104,30 @@ def checkout_step1_address(request):
 					if ord_itm.quantity != c.quantity:
 						update_ord_itm = True
 						## Update existing order item
-						if c.prooduct_type_id == 'STOCK-IMAGE':
-							Order_stock_image.objects.get(
-								order_item_id = ord_itm.order_item_id).update(quantity = c.quantity)
-						if c.prooduct_type_id == 'USER-IMAGE':
-							Order_user_image.objects.get(
-								order_item_id = ord_itm.order_item_id).update(quantity = c.quantity)
-						if c.prooduct_type_id == 'STOCK-COLLAGE':
-							Order_stock_collage.objects.get(
-								order_item_id = ord_itm.order_item_id).update(quantity = c.quantity)
-						if c.prooduct_type_id == 'ORIGINAL-ART':
-							Order_original_art.objects.get(
-								order_item_id = ord_itm.order_item_id).update(quantity = c.quantity)
+						if c.product_type_id == 'STOCK-IMAGE':
+							Order_stock_image.objects.filter(
+								order_item_id = ord_itm.order_item_id).update(
+									quantity = c.quantity, item_sub_total=c.item_sub_total,
+									item_disc_amt = c.item_disc_amt, item_tax = c.item_tax,
+									item_total = c.item_total)
+						if c.product_type_id == 'USER-IMAGE':
+							Order_user_image.objects.filter(
+								order_item_id = ord_itm.order_item_id).update(
+									quantity = c.quantity, item_sub_total=c.item_sub_total,
+									item_disc_amt = c.item_disc_amt, item_tax = c.item_tax,
+									item_total = c.item_total)
+						if c.product_type_id == 'STOCK-COLLAGE':
+							Order_stock_collage.objects.filter(
+								order_item_id = ord_itm.order_item_id).update(
+									quantity = c.quantity, item_sub_total=c.item_sub_total,
+									item_disc_amt = c.item_disc_amt, item_tax = c.item_tax,
+									item_total = c.item_total)
+						if c.product_type_id == 'ORIGINAL-ART':
+							Order_original_art.objects.filter(
+								order_item_id = ord_itm.order_item_id).update(
+									quantity = c.quantity, item_sub_total=c.item_sub_total,
+									item_disc_amt = c.item_disc_amt, item_tax = c.item_tax,
+									item_total = c.item_total)
 
 				else:
 					update_ord_itm = True
@@ -242,8 +253,6 @@ def checkout_step1_address(request):
 							original_art_id = c.product_id
 						)
 						new_ord_item.save()
-
-
 						
 			# If there was an update to the order item, then update Order for the quantity
 			if update_ord_itm :
@@ -269,10 +278,12 @@ def checkout_step1_address(request):
 					shipping_method = order.shipping_method,
 					shipper = order.shipper,		
 					shipping_status = order.shipping_status,
+					created_date =  order.created_date,
 					updated_date =  today,
 					order_status = order.order_status				
 				)
 				ord.save()
+				
 				order_id = ord.order_id
 				order_number = ord.order_number				
 				shipping_cost = ord.shipping_cost
@@ -307,6 +318,7 @@ def checkout_step1_address(request):
 				shipping_method = None,
 				shipper = None,		
 				shipping_status = None,
+				created_date = today,
 				updated_date =  today,
 				order_status = 'PP'				
 			)
@@ -447,11 +459,16 @@ def checkout_step1_address(request):
 	# if it already exists, take it from Order Shipping, else get it from preferred addr, if it exists
 	shipping_addr = Order_shipping.objects.filter(order = order).select_related('pin_code', 'state', 'country').first()
 	billing_addr = Order_billing.objects.filter(order = order).select_related('pin_code', 'state', 'country').first()
+
 	if shipping_addr is None:
 		if request.user.is_authenticated:
 			userObj = User.objects.get(username = request.user)
-			shipping_addr = User_shipping_address.objects.filter(user = userObj).select_related('pin_code', 'state', 'country')
-			billing_addr = User_billing_address.objects.filter(user = userObj).select_related('pin_code', 'state', 'country')
+			shipping_addr = User_shipping_address.objects.filter(user = userObj).select_related('pin_code', 'state', 'country').last()
+	
+	if billing_addr is None:
+		if request.user.is_authenticated:
+			userObj = User.objects.get(username = request.user)
+			billing_addr = User_billing_address.objects.filter(user = userObj).select_related('pin_code', 'state', 'country').last()
 	
 	country_list = Country.objects.all()
 	country_arr = []
@@ -573,6 +590,7 @@ def checkout_saveAddr_shippingMethod(request):
 	billing_phone_number = request.POST.get('billing_phone_number', '')
 	billing_email_id = request.POST.get('billing_email_id', '')
 	billing_company = request.POST.get('billing_company', '')
+	billing_gst_number = request.POST.get('billing_gst_number', '')
 	billing_address_1 = request.POST.get('billing_address_1', '')
 	billing_address_2 = request.POST.get('billing_address_2', '')
 	billing_pin_code = request.POST.get('billing_pin_code', '')
@@ -706,6 +724,7 @@ def checkout_saveAddr_shippingMethod(request):
 				billing_address = ord_billing.billing_address,
 				full_name = billing_full_name,
 				Company = billing_company,
+				gst_number = billing_gst_number,
 				address_1 = billing_address_1,
 				address_2 = billing_address_2,
 				land_mark = '',
@@ -726,6 +745,7 @@ def checkout_saveAddr_shippingMethod(request):
 				billing_address = None,
 				full_name = billing_full_name,
 				Company = billing_company,
+				gst_number = billing_gst_number,
 				address_1 = billing_address_1,
 				address_2 = billing_address_2,
 				land_mark = '',
@@ -740,6 +760,32 @@ def checkout_saveAddr_shippingMethod(request):
 			)	
 		
 		b.save()
+		if user:		
+			user_addr = User_billing_address.objects.filter(user = user, 
+				full_name = billing_full_name, company = billing_company,
+				city = billing_city, state = b_state, pin_code_id = billing_pin_code)
+			
+			if not user_addr :
+				u = User_billing_address(
+					store_id = settings.STORE_ID,
+					user = user,
+					full_name = billing_full_name,
+					company = billing_company,
+					gst_number = billing_gst_number,
+					address_1 = billing_address_1,
+					address_2 = billing_address_2,
+					land_mark = '',
+					city = billing_city,
+					state = b_state,
+					pin_code_id = billing_pin_code,
+					country = b_country,
+					phone_number = billing_phone_number,
+					email_id = billing_email_id,
+					pref_addr = True,
+					updated_date =  today
+					)
+				u.save()
+
 		
 		# Get the shipping cost
 		shipping_cost = get_shipping_cost_by_slab(order.order_total)
@@ -824,7 +870,7 @@ def checkout_step3_order_review(request):
 	'''
 	usercartitems = Cart_item_view.objects.select_related('product', 'promotion').filter(
 			cart = usercart.cart_id, product__product_type_id = F('product_type_id')).values(
-		'cart_item_id', 'product_id', 'quantity', 'item_total', 'moulding_id',
+		'cart_item_id', 'product_id', 'product__publisher', 'quantity', 'item_total', 'moulding_id',
 		'moulding__name', 'moulding__width_inches', 'print_medium_id', 'mount_id', 'mount__name',
 		'acrylic_id', 'mount_size', 'product__name', 'image_width', 'image_height',
 		'product__thumbnail_url', 'cart_id', 'promotion__discount_value', 'promotion__discount_type', 'mount__color',
@@ -915,7 +961,7 @@ def get_shipping_cost_by_slab(order_total):
 
 
 def get_order_next_order_number():
-	bill_num = 0
+	num = 0
 	#Get curentyear, month in format YYYYMM
 	dt = datetime.datetime.now()
 	mnth = dt.strftime("%Y%m")

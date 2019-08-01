@@ -1,5 +1,6 @@
 from artevenue.models import Stock_image, Moulding_image, User_image
 from django.contrib.auth.models import User
+from django.conf import settings
 
 from django.http import HttpResponse
 from decimal import Decimal
@@ -32,8 +33,13 @@ def get_FramedImage(request):
 	
 	'''  OPEN FILE FROM A Internet URL '''
 	#response = requests.get("http://www.podexchange.com/dsi/lowres/11/11_PSMLT-166_lowres.jpg")
-	response = requests.get(prod_img.url)
-	img_source = Image.open(BytesIO(response.content))
+	#if prod_img.publisher == '1001':
+	#img_source = Image.open('artevenue/'+settings.STATIC_URL + prod_img.url)			
+	
+	img_source = Image.open(settings.PROJECT_DIR + '/' + settings.STATIC_URL + prod_img.url)			
+	#else :
+	#	response = requests.get(prod_img.url)
+	#	img_source = Image.open(BytesIO(response.content))
 
 	
 	# Get moulding
@@ -236,8 +242,11 @@ def get_ImagesWithAllFrames(request, prod_id, user_width):
 	
 	'''  OPEN FILE FROM A Internet URL '''
 	#response = requests.get("http://www.podexchange.com/dsi/lowres/11/11_PSMLT-166_lowres.jpg")
-	response = requests.get(prod_img.url)
-	img_source = Image.open(BytesIO(response.content))
+	#if prod_img.publisher == '1001':
+	img_source = Image.open(settings.PROJECT_DIR + '/' + settings.STATIC_URL + prod_img.url)			
+	#else:
+	#	response = requests.get(prod_img.url)
+	#	img_source = Image.open(BytesIO(response.content))
 	
 	# Get all mouldings
 	moulding = Moulding_image.objects.filter(image_type = "APPLY").values(

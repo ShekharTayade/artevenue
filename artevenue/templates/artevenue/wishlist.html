@@ -97,4 +97,43 @@
 			return false;
 		}
 		</script>
-	{% endblock jscripts %}
+		
+		<script>
+			function edit_item(wishlist_item_id, product_id){
+				$("#product_id").val(product_id);
+				$("#wishlist_item_id").val(wishlist_item_id);
+				$("#edit_form").submit();
+			}
+		</script>
+		
+		<script>
+			function move_all_to_cart(){
+				var wishlist_items = [];
+				
+				{% for i in userwishlistitems %}
+					wishlist_items.push("{{i.wishlist_item_id}}");
+				{% endfor %}
+				
+				if (wishlist_items.length > 0) {
+				
+					$.ajax({
+						url: '{% url "move_all_to_cart" %}', 
+						data: {'wishlist_items':wishlist_items},
+						dataType: 'text', 
+						type: 'POST',
+						success: function (data) {
+							result = JSON.parse(data);
+							// Update the display
+							show_wishlist();
+							$("#msg").html('Items moved to your cart!');
+							$("#msg-modal").modal('show');
+						},
+						error: function(xhr){
+							alert("An error occured: " + xhr.status + " " + xhr.statusText + " Apologies for the inconvenience!! Please let us know the details and we will be happy to help sort it out."); 
+							return;
+						}
+					});
+				}
+			}
+		</script>
+		{% endblock jscripts %}

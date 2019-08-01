@@ -5,6 +5,7 @@ from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.db.models import Count
 from django.forms import modelformset_factory
 from django.contrib.admin.views.decorators import staff_member_required
+from artevenue.decorators import is_chief
 
 from datetime import datetime
 import datetime
@@ -13,6 +14,7 @@ import json
 from django.contrib.auth.models import User
 
 from artevenue.models import Ecom_site, Business_profile, Profile_group, Profile_group
+from artevenue.views import email_sms_views
 
 today = datetime.date.today()
 
@@ -20,7 +22,7 @@ def profile_group(request):
 
 	return render(request, "artevenue/architect_registration.html", {})
 	
-@staff_member_required
+@is_chief
 def pending_business_accounts(request):
 
 	pending_accounts = Business_profile.objects.filter(profile_group__isnull = True,
@@ -84,6 +86,9 @@ def business_account_approval(request):
 			updated_date = today
 		)
 		accnt.save()
-	
+		
+		## send email
+		email_sms_views.send_business_account_approval_email(request, id)
+		
 	return render(request, "artevenue/business_account_approval.html", {'accnt':accnt})
 	

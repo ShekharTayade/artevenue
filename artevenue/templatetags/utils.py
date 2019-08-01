@@ -32,9 +32,12 @@ def multiply(a,b):
 	return a * b
 
 @register.simple_tag
-def get_price(width, aspect_ratio, sqin_price):
-	if width > 16:
-		width = 16
+def get_price(width, aspect_ratio, sqin_price, user_width):
+	if user_width > 0:
+		width = user_width
+	else:
+		if width > 16:
+			width = 16
 	height = round(width / aspect_ratio)
 	
 	return Decimal(round( float(width * height * sqin_price ) , -1))
@@ -51,6 +54,7 @@ def get_price(a, aspect_ratio):
 @register.filter	
 def get_mountcolor(cnt):
 
+	'''
 	remainder = cnt % 5
 	if remainder == 0:
 		color = 'none'
@@ -64,5 +68,7 @@ def get_mountcolor(cnt):
 		color = '#000000'
 	if remainder == 4:
 		color = '#800000'
-		
+	'''
+	color = '#fffff0'
+	
 	return color

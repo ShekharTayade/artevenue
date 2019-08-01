@@ -281,12 +281,22 @@
 											</div>
 										</div>
 									</div>
-									<div class="col-md-12">
-										<div class="form-group">
-											<label for="billing_company">Company</label>
-											<input id="billing_company" name = "billing_company" 
-											type="text" class="form-control"
-											value = "{{billing_addr.company}}">
+									<div class="row" style = "padding-left:15px;">
+										<div class="col-md-6">
+											<div class="form-group">
+												<label for="billing_company">Company</label>
+												<input id="billing_company" name = "billing_company" 
+												type="text" class="form-control"
+												value = "{{billing_addr.Company}}">
+											</div>
+										</div>
+										<div class="col-md-6">
+											<div class="form-group">
+												<label for="billing_gst_number">GST No.<small>(Pls enter if you have)</small></label>
+												<input id="billing_gst_number" name = "billing_gst_number" 
+												type="text" class="form-control"
+												value = "{{billing_addr.gst_number}}">
+											</div>
 										</div>
 									</div>
 									<div class="col-md-12">
@@ -363,9 +373,13 @@
 							</div>
 							
 							<!-- /.row-->
-							<div class="box-footer d-flex justify-content-between"><a href="{% url 'show_cart' %}" class="btn btn-outline-secondary"><i class="fa fa-chevron-left"></i>Back to Cart</a>
+							<div class="box-footer d-flex justify-content-between">
+								<a href="{% url 'show_cart' %}" class="btn btn-outline-secondary">
+									<i class="fa fa-chevron-left"></i>
+									Back to Cart
+								</a>
 								<button id = "btn-delMethod" type="submit" class="btn btn-primary">
-									Continue to Delivery Method<i class="fa fa-chevron-right"></i>
+									Delivery Method<i class="fa fa-chevron-right"></i>
 								</button>
 							</div>
 						</div>
@@ -713,7 +727,7 @@
 			$("#billing_email_id").val( $("#shipping_email_id").val() );
 			$("#billing_company").val( $("#shipping_company").val() );
 			$("#billing_address_1").val( $("#shipping_address_1").val() );
-			$("#billing_address_2").val( $("#shipping_ddress_2").val() );
+			$("#billing_address_2").val( $("#shipping_address_2").val() );
 			$("#billing_pin_code").val( $("#shipping_pin_code").val() );
 			$("#billing_city").val( $("#shipping_city").val() );
 			$("#billing_state").val( $("#shipping_state").val() );

@@ -30,12 +30,22 @@
 						<div class="col-md-6">
 							<div class="box">
 								<div class = "row">
+									<div class = "col-5">
+										<form id = "img-form" method = "post" enctype='multipart/form-data'>										
+											{% csrf_token %}
+										<!-- <span id = "artist"> Click browse button to select an image</span> -->
+										<div class = "btn btn-default btn-file" style = "border:2px solid gainsboro;">
+											<input name="image_to_frame" class="form-control" id="user_image" onchange = "$('#upld_btn').click()" type="file" accept="image/png, image/jpeg, image/gif, image/bmp" required>
+											<img src = "{% static 'img/upload_icon1.png' %}"><br /> Upload<input hidden name="user_id" syle = "display:none;" class="form-control" id="user_id" value = "{{request.user}}">
+										</div>
+										<button hidden id= "upld_btn" class="btn btn-primary" type = "submit" > <i class = "fa fa-upload"></i> Upload </button>
+										</form>
+									</div>
 									<div id = "title-sm" class = "col-4 pull-left">
-										<span>Upload Image</span>
-										<div class="price text-center">
-											
+										<!-- <span>Your Photo</span> -->
+										<div class="price">											
 											<div id = "promo-display" style = "display:none">
-												Price: <i class="fa fa-inr" aria-hidden="true">&nbsp;</i><small id = "item_unit_price" style = "color:red; text-decoration: line-through;">{{prod_detail.price|floatformat}}</small>
+												Price: <i class="fa fa-inr" aria-hidden="true"> </i><small id = "item_unit_price" style = "color:red; text-decoration: line-through;">{{prod_detail.price|floatformat}}</small>
 												<i class="fa fa-inr" aria-hidden="true">&nbsp;</i><span id = "item_total_price" style = "color:green; text-decoration: underline;">{{prod_detail.price|floatformat}}</span>
 												<span id = "disc" style = "font-size:0.75rem;" class = "text-muted"></span>
 											</div>	
@@ -46,23 +56,10 @@
 											<div id = "promotion_id_nv" style = "display:none;"></div>
 											<div id = "disc_amt_nv" style = "display:none;"></div>
 											<div id = "item_total_price_nv" style = "display:none;"></div>
-										</div>										
+										</div>	
 									</div>
-									<div class = "col-8 pull-right">
-										<!-- <span id = "artist"> Click browse button to select an image</span> -->
-										<form id = "img-form" method = "post" class="form-horizontal" enctype='multipart/form-data'>										
-											{% csrf_token %}
-											<p style="margin-bottom:0px !important">
-												<input name="image_to_frame" class="form-control" id="user_image" onchange = "$('#upld_btn').click()" type="file" accept="image/*" required>
-												<input hidden name="user_id" class="form-control" id="user_id" value = "{{request.user}}">
-												<button type = "button" class = "btn btn-link" onclick="removeUserImage();" style="text-decoration:underline;">Remove Image</button>
-											</p>
-											<p style="margin-bottom:0px !important">
-												<div class = "col-md-12 text-center">
-													<button hidden id= "upld_btn" class="btn btn-primary" type = "submit" > <i class = "fa fa-upload"></i> Upload </button>
-												</div>
-											</p>
-										</form>
+									<div class = "col-3">
+										<button type = "button" class = "btn btn-link pull-left" onclick="removeUserImage();" style="text-decoration:underline;">Remove</button>
 									</div>
 								</div>
 								<div class="price pull-right">
@@ -272,7 +269,6 @@
 	</script>
 	
 	<script>
-
 		// Global variables to store IDs of pricing components
 		var moulding_id = '0';
 		var mount_id = '0';
@@ -284,7 +280,7 @@
 		var acrylic_id = '0';
 		var stretch_id = '0'; 
 		var user_image_id = '0';
-		var ppi = 300;  // Print standard
+		var ppi = 150;  // Print standard
 		
 		function set_user_image_id(){
 
@@ -310,7 +306,13 @@
 				if (print_medium_id == 'PAPER') {
 					set_acrylic("YES");
 					set_board('{{boards.board_id}}');
+				} else {
+					// Set the stretch by default if moulding selected on Canvas
+					set_stretch("{{cart_item.stretch}}"); 
+					$("#in_stretched").prop("checked", true);
+					$("#in_stretched").prop("disabled", true);
 				}
+				
 				//Calculate the price
 				calc_total_price();
 			} else {
@@ -371,7 +373,12 @@
 				{% for m in mounts %}
 					$("#mnt_{{m.mount_id}}").hide();
 				{% endfor %}
-
+				if (moulding_id != '' && moulding_id !== '0'){
+					$("#in_stretched").prop("disabled", true);
+					$("#in_stretched").prop("checked", true);
+				} else {
+					$("#in_stretched").prop("disabled", false);
+				}
 				$("#stretched").show();
 				if (document.getElementById('in_stretched').checked) {				
 					set_stretch('{{stretches.stretch_id}}');
@@ -396,7 +403,9 @@
 				// Remove stretch
 				$("#stretched").hide();
 				set_stretch('0')
-				removeFrame();
+				set_moulding( moulding_id );
+				set_acrylic("{{acrylics.acrylic_id}}");
+				set_board("{{boards.board_id}}");
 			}		
 			//Calculate the price
 			calc_total_price();

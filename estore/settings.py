@@ -235,7 +235,10 @@ DEFAULT_FROM_EMAIL = ''
 EMAIL_SUBJECT_PREFIX = ''
 
 MEDIA_URL = ('/media/')
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+print("Project Dir: " + PROJECT_DIR)
+print("BASE Dir: " + BASE_DIR)
+print("MEdia Root: " + MEDIA_ROOT)
 
 
 MOULDING_ROOT = os.path.join(BASE_DIR, 'artevenue/static/img/')

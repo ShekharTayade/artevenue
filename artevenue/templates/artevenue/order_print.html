@@ -42,6 +42,10 @@
 		{% if o.order_billing.Company %}
 			, {{o.order_billing.Company}}
 		{% endif %}
+		{% if o.order_billing.gst_number %}
+			, {{o.order_billing.gst_number}}
+		{% endif %}
+		
 		<br />
 		{{o.order_billing.address_1}}
 		{% if o.order_billing.address_2 %}
@@ -67,7 +71,7 @@
 	<table id = "ordTbl" class="table table-responsive table-striped">
 		<thead>
 			<tr>
-				<th width="15%">Name</th>
+				<th width="15%">Product</th>
 				<th width="30%">Details</th>
 				<th width="15%" style="text-align:right">Unit Price</th>
 				<th width="10%" style="text-align:right">Quantity</th>
@@ -83,30 +87,40 @@
 				
 			{% else %}
 			<tr>
-				<td><img src = "{% if i.product_type == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product__image_to_frame }} {% else %}  {{i.product__thumbnail_url}} {% endif %}" style = "width:75px; height:75px; object-fit:contain;" alt="Uploaded Image">
+				<td>
+					USER: https://artevenue.com{{MEDIA_URL}}{{i.product.image_to_frame_thumbnail}};;; {{MEDIA_ROOT}}/{{i.product.image_to_frame_thumbnail}}
+					PROD:  https://artevenue.com{% static i.product.thumbnail_url%}
+					
+					<img src = "{% if i.product_type|cut:' ' == 'USER-IMAGE' %} https://artevenue.com/media/uploads/2019/07/24/20181102_105938_KR4mYvy_thumbnail.jpg{% else %}{% static i.product.thumbnail_url%}{% endif %}" style = "width:75px; height:75px;">
+					<!--																																											  
+					{% if i.product.publisher == '1001' %}
+						<img src = "{% if i.product_type == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product.image_to_frame}} {% else %} https://www.artevenue.com/{% static i.product.thumbnail_url %} {% endif %}" style = "width:75px; height:75px; object-fit:contain;">
+					{% else %}
+						<img src = "{% if i.product_type == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product.image_to_frame}} {% else %} {{i.product.thumbnail_url}} {% endif %}" style = "width:75px; height:75px; object-fit:contain;">
+					{% endif %}				
+					-->
 					<br />
 					<div class = "pull-left">
-						<button type ="button" class = "btn btn-link" style = "padding-left:0px;" onclick = "getFramedImg('{{i.product_id}}', '{{i.image_width}}', '{{i.moulding_id| default_if_none:0}}', '{{i.mount__color| default_if_none:0}}','{{i.mount_size| default_if_none:0}}', '{{i.product__url}}');">
-							{{i.product__name}}
+						<button type ="button" class = "btn btn-link" style = "padding-left:0px;" onclick = "getFramedImg('{{i.product_id}}', '{{i.image_width}}', '{{i.moulding_id| default_if_none:0}}', '{{i.mount.color| default_if_none:0}}','{{i.mount_size| default_if_none:0}}', '{{i.product.url}}');">
+							{{i.product.name}}
 						</button>
 					</div>
 				</td>
 				<td>
-					{% with width=i.moulding__width_inches|add_width_frame_mount:i.mount_size %}
+					{% with width=i.moulding.width_inches|add_width_frame_mount:i.mount_size %}
 
 					<small>Print on {{i.print_medium_id|title}}, 
+					Image Size : {{ i.image_width }}" X {{i.image_height }}";
 					{% if i.moulding_id %}
-						Frame {{i.moulding__name }} Total Size: 
-						{{ i.image_width|add_width:width }}" X {{i.image_height|add_width:width }}" 
-					{% else %}
-						Image Size : {{ i.image_width }}" X {{i.image_height }}" 
+						Frame {{i.moulding.name }} Total Size: 
+						{{ i.image_width|add_width:width }}" X {{i.image_height|add_width:width }}"; 
 					{% endif %}
 					
 					{% if i.mount_id %}
-						, {{i.mount_size }}" {{i.mount__name|title }} Mount  
+						{{i.mount_size }}" {{i.mount.name|title }} Mount;
 					{% endif %}
 					{% if i.acrylic_id %}
-						, Acrylic 
+						Acrylic;
 					{% endif %}
 					</small>
 					{% endwith %}
@@ -119,10 +133,10 @@
 				</td>
 				<td style = "text-align:right">
 				
-					{% if i.promotion__discount_type == "PERCENTAGE" %}
-						<small>{{i.promotion__discount_value|floatformat}}</small>
+					{% if i.promotion.discount_type == "PERCENTAGE" %}
+						<small>{{i.promotion.discount_value|floatformat}}</small>
 					{% else %}
-						<small>{{i.promotion__discount_value|floatformat}}</small>
+						<small>{{i.promotion.discount_value|floatformat}}</small>
 					{% endif %}
 				</td>
 				<td style = "text-align:right">

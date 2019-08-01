@@ -1,0 +1,102 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+        <div class="container">
+			<div class="row">
+				<!-- breadcrumb-->
+				<div class="col-lg-12">
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+							<li aria-current="page" class="breadcrumb-item active">eGift Payment Confirmation</li>
+						</ol>
+					</nav>
+				</div>
+
+				<div class="col-lg-12">
+				<div class = "row">
+					<div class="box">
+						<h1>eGift Payment Confirmation</h1>
+						<p>Thank you, {{firstname}}!</p>
+					</div>
+				</div>
+				<div class="row">
+					<div class="box">
+						{% if msg %}
+							<span style="color:red">{{msg}}</span>
+							<br/>
+							<br/>
+						{% endif %}					
+						<form id ="submit-form" method = "post" action = "{% url 'payment_submit' %}">
+							{% csrf_token %}
+							<p>Your payment of  <i class = "fa fa-inr"> {{amount|floatformat}}</i> is received. The receiver of this gift will shortly get an email/sms with your egift card and a coupan code to be used to claim the gift amount.</p>
+							<p>Please note your order number {{egift.gift_rec_id}}.</p>
+							<p>Please visit <a href="{% url 'contact_us' %}">Contact Us</a> page in case of any help required. Please quote the eGift Order No. and your email in all communication.</p>
+							<p>eGift Order Details: </p>
+							
+							<div class="col-lg-12">
+								<div id="order-summary" class="box">
+									<div class="box-header">
+										<h3 class="mb-0">eGift Order No. {{egift.gift_rec_id}}</h3>
+									</div>
+									<div class = "row">
+										<div class = "col-sm-3">
+											<div class = "col-sm-12">		
+												<strong>Gift Amount</strong>
+											</div>
+											<div class = "col-sm-12">		
+												<span class = "ord-row">{{amount|floatformat}}</span>
+											</div>
+										</div>
+										<div class = "col-sm-2">
+											<div class = "col-sm-12">		
+												<strong>Receiver Name</strong>
+											</div>
+											<div class = "col-sm-12">		
+												<span class = "ord-row">{{egift.receiver_name}}</span>
+											</div>
+										</div>
+										<div class = "col-sm-3">
+											<div class = "col-sm-12">		
+												<strong>Receiver Email</strong>
+											</div>
+											<div class = "col-sm-12">		
+												<span id ="s-h" class = "ord-row">{{egift.receiver_email}}</span>
+											</div>
+										</div>
+										<div class = "col-sm-2">
+											<div class = "col-sm-12">		
+												<strong>Receiver Phone</strong>
+											</div>
+											<div class = "col-sm-12">		
+												<span id ="ord-total" class = "ord-row"><strong>{{egift.receiver_phone}}</strong></span>
+											</div>
+										</div>
+										<div class = "col-sm-2">
+											<div class = "col-sm-12">		
+												<strong>Delivery Date</strong>
+											</div>
+											<div class = "col-sm-12">		
+												<span style = "color:green">{{egift.delivery_date}}</span>
+											</div>
+										</div>
+									</div>
+											
+								</div>					
+							</div>
+
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+				
+	{% endblock sitecontent %}
+
+	
+	{% block jscripts %}
+
+	{% endblock jscripts %}
+			
+	

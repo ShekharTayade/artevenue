@@ -10,10 +10,12 @@ from artevenue.models import Ecom_site, Cart
 from artevenue.forms import contactUsForm, referralForm, egiftForm
 
 from artevenue.models import Pin_code, City, State, Country, Pin_city_state_country
-from artevenue.models import Referral, Egift_card_design, Egift
+from artevenue.models import Referral, Egift_card_design, Egift, Voucher, Voucher_user
 from django.http import HttpResponse
 from django.conf import settings
 from django.core.mail import send_mail, EmailMultiAlternatives, EmailMessage
+from PIL import ImageFont, ImageDraw
+from django.core.files.uploadedfile import InMemoryUploadedFile
 
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
@@ -37,7 +39,7 @@ def contact_us(request):
 		form = contactUsForm(request.POST)
 		if form.is_valid():
 			contact = form.save()
-			return redirect('index')  
+			return redirect('contact_msg')  
 	else:
 		form = contactUsForm()
 		
@@ -49,12 +51,16 @@ def contact_msg(request):
 	
 def about_us(request):
 
-	return render(request, "artevenue/about_us.html")
+	return render(request, "artevenue/about_us.html", {})
 	
 def terms_conditions(request):
 
-	return render(request, "terms_conditions.html")
+	return render(request, "artevenue/tnc_26jun2019.html", {})
+	
+def privacy_policy(request):
 
+	return render(request, "artevenue/privacy_policy.html", {})
+	
 	
 def faq(request):
 
@@ -349,9 +355,10 @@ def egift_card(request):
 	return render(request, "artevenue/egift_card.html", {'form':form, 'msg':msg,
 			'designs':designs})
 
+@login_required
 def egift_card_review(request, gift_rec_id):
 	msg = ''
-	gift = Egift.objects.get(gift_rec_id=gift_rec_id)	
+	gift = Egift.objects.get(gift_rec_id=gift_rec_id)
 	form = egiftForm(instance = gift)
 
 	# Card Designs
@@ -360,7 +367,75 @@ def egift_card_review(request, gift_rec_id):
 	return render(request, "artevenue/egift_card_review.html", {'form':form, 'msg':msg,
 			'designs':designs, 'gift':gift})
 	
+def send_egift_mail(request, gift_rec_id):
 
+	egift = Egift.objects.get(gift_rec_id = gift_rec_id)
+	egift_card_design = Egift_card_design.objects.get(design_id = egift.egift_card_design_id)
+	voucher = Voucher.objects.get(voucher_id = egift.voucher_id)
+	voucher_user = Voucher_user.objects.filter(voucher = voucher, 
+		used_date__isnull = True).first()
+
+	#img_path = os.path.join(settings.EGIFT_DESIGNS, egift.egift_card_design.url)
+	img_path = settings.EGIFT_DESIGNS + egift.egift_card_design.url
+
+	card_img=Image.open(img_path)
+	img_save_location = settings.STATIC_ROOT + '/egift_cards/' + str(egift.gift_rec_id) + '.jpg'
+	img_url = 'http://artevenue.com/static/egift_cards/' + str(egift.gift_rec_id) + '.jpg'
+	print(img_save_location)
+	# use a truetype font
+	try:
+		font = ImageFont.truetype("arial.ttf", 18)
+	except IOError as i:
+		print(i)
+	
+	card_img = card_img.resize( (410, 256) )
+
+	voucher_loc =  (20,20)
+	amount_loc = (20,40)
+	if egift_card_design.text_location == 'bottom-right':
+		voucher_loc = (20,20)
+		amount_loc = (314, 226)
+	elif egift_card_design.text_location == 'top-left':
+		voucher_loc = (20,20)
+		amount_loc = (20, 40)
+	color = egift_card_design.text_color
+
+	# Print voucher code
+	ImageDraw.Draw(
+		card_img  # Image
+	).text(
+		voucher_loc,  # Coordinates
+		'Coupan Code: ' + voucher.voucher_code,  # Text
+		fill=color,  # Color
+		font=font
+	)
+
+	# Print gift amount
+	ImageDraw.Draw(
+		card_img  # Image
+	).text(
+		amount_loc,  # Coordinates
+		'Rs: ' + str(int(egift.gift_amount)),  # Text
+		fill=color,  # Color
+		font=font
+	)
+	card_img.save(img_save_location)
+
+	# Send email to receiver
+	subject = "A Gift for you from: " + egift.giver.first_name + " " + egift.giver.last_name + " (" + egift.giver.email + ")"
+	html_message = render_to_string('artevenue/voucher_email.html', 
+			{'voucher': voucher, 'voucher_user':voucher_user, 'egift':egift, 
+			'img_url':img_url})
+	plain_message = strip_tags(html_message)
+	from_email = 'support@artevenue.com'
+	to = egift.receiver_email
+	emsg = EmailMultiAlternatives(subject, plain_message, from_email, [to])
+	emsg.attach_alternative(html_message, "text/html")
+	emsg.send()
+	print("Email sent to: " + to)
+	
+	return render(request, "artevenue/voucher_email_display.html", {'egift':egift, 
+			'voucher_user':voucher_user, 'voucher':voucher, 'img_location':img_url})	
 
 def send_order_emails():
 

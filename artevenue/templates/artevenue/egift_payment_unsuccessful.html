@@ -1,0 +1,46 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+	<div class="container">
+		<div class="col-lg-12">
+			<div class = "row">
+				<div class="box">		
+					<h3 class="block-title">Payment Unsuccessful</h3>                
+					<div class = "col-sm-6">
+						<div class="panelbox" style = "height:270px">
+							<div class="panelbox-content">
+								<h4 class="tag-title">Hey {{firstname}}, the payment for your eGift order no. {{gift.gift_rec_id}} didn't not go through!</h4>
+								<div class = "alert alert-danger">
+								<P>Transaction status is: {{ status | upper}}</p>
+								<P>ID for this transaction is: {{ txnid }}</p>
+								</div>
+								<p>&nbsp;</p>
+								<p>&nbsp;</p>
+								<p>&nbsp;</p>
+								<div>
+									<span class="pull-left">
+										<p>Please try again</p>
+										<a class = "btn btn-primary" href="{% url 'egift_card_review' gift.gift_rec_id %}">eGift Order</a>
+									</span>
+
+									<span class="pull-right">
+										<p>Return to home page</p>
+										<a class = "btn btn-primary" href="{% url 'index' %}">Home</a>
+									</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+            </div>
+        </div>
+    </div>
+
+{% endblock features %}
+
+
+{% block registration %}
+{% endblock registration %}
+<!-- Footer-section remains as it is, no override -->
+

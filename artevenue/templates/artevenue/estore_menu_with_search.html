@@ -4,8 +4,8 @@
 
 	 
 	<a href="{% url 'index' %}" class="navbar-brand home">
-		<img src="{% static 'img/logo.png' %}" alt="logo" class="d-none d-md-inline-block">
-		<img src="{% static 'img/logo_mobile.png' %}" alt="{{ecom_site.store_name}}" class="d-inline-block d-md-none">
+		<img src="{% static 'img/new_logo1.png' %}" alt="logo" class="d-none d-md-inline-block">
+		<img src="{% static 'img/new_logo_mobile.png' %}" alt="{{ecom_site.store_name}}" class="d-inline-block d-md-none">
 		<span class="sr-only">{{ecom_site.store_name}} - go to homepage</span>
 	</a>
 	
@@ -31,7 +31,8 @@
 		  
 	<!--** Navigation to be picked up from DB -->
 	<div id="navigation" class="collapse navbar-collapse">
-		<ul class="navbar-nav mr-auto">
+
+		<ul class="navbar-nav mr-auto justified">
 			{% for main in level0_menuitems %}
 				{% if main.name|upper == 'ART' %}
 			
@@ -93,14 +94,15 @@
 			
 
 			<li><a href="{% url 'user_image' %}">Frame</a></li>
-			<li><a href="">Sale</a></li>
-			<li><a href="{% url 'show_wishlist' %}">Wish List</a></li>
+			<!-- <li><a href="">Sale</a></li> -->
+			<li><a href="{% url 'show_wishlist' %}">My Favourites</a></li>
 			<li><a href="{% url 'business_registration' %}">For Business</a></li>
 
 		</ul>	
 		
 		<div class="navbar-buttons d-flex justify-content-end">
-			<form role="search" class="form-inline search_form" action = "{% url 'products_by_keywords' %}">
+			<!-- <form role="search" class="form-inline search_form" action = "{% url 'products_by_keywords' %}"> -->
+			<form role="search" class="form-inline search_form" action = "{% url 'category_stock_images' %}">
 					<input type="text" placeholder="Ex. Blue Abstract" id ="keywords" name="keywords" class="form-control" required>
 					<button class="btn btn-outline-success" type="submit"><img src="{% static 'img/search_head.png' %}"></button>
 			</form>
@@ -117,7 +119,8 @@
 <!-- Search open up -->
 <div id="search" class="collapse">
 	<div class="container">
-		<form role="search" action = "{% url 'products_by_keywords' %}">
+		<!-- <form role="search" action = "{% url 'products_by_keywords' %}"> -->
+		<form role="search" action = "{% url 'category_stock_images' %}">
 			<div class="input-group">
 				<input type="text" placeholder="Ex. Blue Abstract" id ="keywords" name="keywords" class="form-control" required>
 				<div class="input-group-append">
@@ -127,3 +130,9 @@
 		</form>
 	</div>
 </div>
+
+<script>
+	// calculating margin-left to align it to center;
+	var width = $('.justified').width();
+	$('.justified').css('margin-left', (width / 2 /2)+'px');
+</script>

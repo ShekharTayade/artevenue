@@ -1,3 +1,4 @@
+{% load static %}	
 {% load utils %}	
 	
 			<div class="row">
@@ -42,7 +43,15 @@
 									<tbody>
 										{% for i in usercartitems %}
 										<tr>
-											<td><img src = "{% if i.product_type == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product__image_to_frame}} {% else %} {{i.product__thumbnail_url}} {% endif %}" style = "width:75px; height:75px; object-fit:contain;">
+											<td>
+												<img src = "{% if i.product_type == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product__image_to_frame}} {% else %} {% static i.product__thumbnail_url %} {% endif %}" style = "width:75px; height:75px; object-fit:contain;">
+												<!--
+												{% if i.product__publisher == '1001' %}
+													<img src = "{% if i.product_type == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product__image_to_frame}} {% else %} {% static i.product__thumbnail_url %} {% endif %}" style = "width:75px; height:75px; object-fit:contain;">
+												{% else %}
+													<img src = "{% if i.product_type == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product__image_to_frame}} {% else %} {{i.product__thumbnail_url}} {% endif %}" style = "width:75px; height:75px; object-fit:contain;">
+												{% endif %}
+												-->
 												<br />
 
 												<div class = "pull-left">
@@ -54,19 +63,18 @@
 											<td>												
 												{% with width=i.moulding__width_inches|add_width_frame_mount:i.mount_size %}
 
-												<small>Print on {{i.print_medium_id|title}}, 
+												<small>Print on {{i.print_medium_id|title}}; 
+												Image Size : {{ i.image_width }}" X {{i.image_height }}"; 
 												{% if i.moulding_id %}
 													Frame {{i.moulding__name }} Total Size: 
-													{{ i.image_width|add_width:width }}" X {{i.image_height|add_width:width }}" 
-												{% else %}
-													Image Size : {{ i.image_width }}" X {{i.image_height }}" 
+													{{ i.image_width|add_width:width }}" X {{i.image_height|add_width:width }}"; 
 												{% endif %}
 												
 												{% if i.mount_id %}
-													, {{i.mount_size }}" {{i.mount__name|title }} Mount  
+													{{i.mount_size }}" {{i.mount__name|title }} Mount;  
 												{% endif %}
 												{% if i.acrylic_id %}
-													, Acrylic 
+													Acrylic 
 												{% endif %}
 												</small>
 												{% endwith %}
@@ -76,8 +84,7 @@
 													onchange = 'updateItemQty("{{i.cart_item_id}}", $(this).val());'>
 											</td>
 											<td>{{i.item_unit_price}}</td>
-											<td style = "text-align:right">
-											
+											<td style = "text-align:right">											
 												{% if i.promotion__discount_type == "PERCENTAGE" %}
 													{{i.promotion__discount_value|floatformat}}%
 												{% else %}
@@ -89,6 +96,10 @@
 												<!-- <a data-toggle="tooltip" title="Change!" href="{% url 'stock_image_detail' i.product_id %}?cart_item_id={{i.cart_item_id}}" >
 													<i class= "fa fa-edit"></i>
 												</a> -->
+												<a><i style = "cursor: pointer; color:red;" 
+													data-toggle="tooltip" title="Edit!" class="fa fa-edit"
+													onclick = "edit_item('{{i.cart_item_id}}', '{{i.product_id}}');">
+												</i></a>
 												<a style = "cursor: pointer; color:red;" data-toggle="tooltip" title="Remove from Cart!" 
 													onclick="deleteItem('{{i.cart_item_id}}', '{{sub_total|floatformat}}', '{{total_tax|floatformat}}', '{{usercart.cart_total|floatformat}}', '{{i.item_total|floatformat}}');">
 													
@@ -212,6 +223,11 @@
 					</div>
 				</div>
 				<!-- /.col-md-4-->
+
+				<form id = "edit_form" hidden action = "{% url 'stock_image_detail' %}" method = 'GET'>
+					<input hidden id="cart_item_id" name = "cart_item_id" value = ''>
+					<input hidden id="product_id" name = "product_id" value = ''>
+				</form>
 
 			</div>
 

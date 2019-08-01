@@ -12,4 +12,9 @@ from .wishlist_views import *
 from .user_image_views import *
 from .profile_group_views import *
 from .promotion_views import *
+from .email_sms_views import *
 from. importImageDataFromCsv_NEW import *
+from .importImageData_PUBL_1001 import *
+from .updatePODImageData import *
+from .Frame import *
+from .get70_71k import *

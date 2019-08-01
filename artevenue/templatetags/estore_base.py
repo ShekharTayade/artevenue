@@ -18,15 +18,27 @@ register = template.Library()
 @register.inclusion_tag('artevenue/topbar.html')
 def topbar(request , auth_user):
 	ecom = get_object_or_404 (Ecom_site, store_id=settings.STORE_ID )
-
-	return {'ecom_site':ecom, 'request':request, 'user': request.user, 'auth_user' : auth_user}
+	if request:
+		if request.user:
+			return {'ecom_site':ecom, 'request':request, 'user': request.user, 'auth_user' : auth_user}
+		else:
+			return {'ecom_site':ecom, 'request':request, }
+		
+	else:
+		return {'ecom_site':ecom}
 
 
 @register.inclusion_tag('artevenue/artevenue_admin_menu.html')
 def admin_menu(request):
 	ecom = get_object_or_404 (Ecom_site, store_id=settings.STORE_ID )
-
-	return {'ecom_site':ecom, 'request':request, 'user': request.user}	
+	if request:
+		if request.user:
+			return {'ecom_site':ecom, 'request':request, 'user': request.user}	
+		else:
+			return {'ecom_site':ecom, 'request':request}
+	else:
+		return {'ecom_site':ecom, 'request':request}	
+	
 	
 	
 @register.inclusion_tag('artevenue/estore_menu_with_search.html')	
@@ -47,21 +59,23 @@ def menubar(request):
 	level2_menuitems = Stock_image_category.objects.filter(parent_id__in = level1_menuitems)
 
 	''' Get cart for total items in the cart '''
-	sessionid = request.session.session_key
-	if sessionid is None:
-		request.session.create()
-		sessionid = request.session.session_key
-
+	if request:
+		if request.session:
+			sessionid = request.session.session_key
+			if sessionid is None:
+				request.session.create()
+				sessionid = request.session.session_key		
 	usercart = {}
-
 	
 	try:
-		if request.user.is_authenticated:
-			
-			userid = User.objects.get(username = request.user)
-			usercart = Cart.objects.get(user_id = userid, cart_status = "AC")
-		else:
-			usercart = Cart.objects.get(session_id = sessionid, cart_status = "AC")
+		if request:
+			if request.user:
+				if request.user.is_authenticated:
+					userid = User.objects.get(username = request.user)
+					usercart = Cart.objects.get(user_id = userid, cart_status = "AC")
+				else:
+					if sessionid:
+						usercart = Cart.objects.get(session_id = sessionid, cart_status = "AC")
 	
 	except Cart.DoesNotExist:
 			usercart = {}
@@ -74,15 +88,26 @@ def menubar(request):
 @register.inclusion_tag('artevenue/footer.html')	
 def site_footer(request):
 	ecom = get_object_or_404 (Ecom_site, store_id=settings.STORE_ID )
-
-	return {'ecom_site':ecom, 'request':request, 'user': request.user}
+	if request:
+		if request.user:
+			return {'ecom_site':ecom, 'request':request, 'user': request.user}
+		else: 
+			return {'ecom_site':ecom, 'request':request}
+	else:
+		return {'ecom_site':ecom}
+		
 
 @register.inclusion_tag('artevenue/copy_right.html')	
 def copy_right(request):
 	ecom = get_object_or_404 (Ecom_site, store_id=settings.STORE_ID )
 
-	return {'ecom_site':ecom, 'request':request, 'user': request.user}
-
+	if request:
+		if request.user:
+			return {'ecom_site':ecom, 'request':request, 'user': request.user}
+		else:
+			return {'ecom_site':ecom, 'request':request}
+	else:
+		return {'ecom_site':ecom}
 
 @register.inclusion_tag('artevenue/cart_update_message.html')	
 def update_cart_message(result):

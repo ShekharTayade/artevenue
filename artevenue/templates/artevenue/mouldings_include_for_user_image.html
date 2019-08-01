@@ -7,8 +7,10 @@
 								<div class="frame-image" >
 									<a onclick = "set_moulding('{{f.moulding_id}}');"> 
 										<img src='{{user_instance.image_to_frame.url}}' alt="{{f.mouldings__name}}" class="img-fluid"
-										style = "border : 10px solid transparent; 
-										padding : 0px; 
+										style = "border : 10px solid initial; 
+										border-style :solid;
+										border-width:10px;
+										background-size: 100% 100%;
 										border-image : url({% static image_static %}) {{f.border_slice}} round; 
 										box-shadow: 3px 4px 4px 0 #d3d3d3, 3px 6px 4px 0#d3d3d3; 
 										{% if forloop.counter|get_mountcolor != 'none' %}

@@ -5,18 +5,54 @@
 						<div class="frame-image" >
 							<a onclick = "set_moulding('{{f.moulding_id}}');"> 
 								{% with 'img/'|add:f.url as image_static %}
-								<img src="{% if product.url %} {{product.url}} {% else %} {{main_img}} {% endif %}" alt="{{f.mouldings__name}}" class="f_images img-fluid"
+								<img src="{% if product.url %} {% static product.url %} {% else %} {{main_img}} {% endif %}" alt="{{f.mouldings__name}}" class="f_images img-fluid"
 									 style = "
 										border-image : url({% static image_static %}) {{f.border_slice}} round !important; 
-										border:10px solid transparent; 
+										border:10px solid initial; 
+										border-style :solid;
+										border-width:10px;
+										background-size: 100% 100%;
 										box-shadow: 3px 4px 4px 0 #d3d3d3, 3px 6px 4px 0#d3d3d3; 
 										{% if forloop.counter|get_mountcolor != 'none' %}
 											padding:10px; 
 											background-color:{{ forloop.counter|get_mountcolor}};
 										{% endif %}
-										">
+								">
 								{% endwith %}
-							
+								<!--
+								{% if product.publisher == '1001' %}
+									{% with 'img/'|add:f.url as image_static %}
+									<img src="{% if product.url %} {% static product.url %} {% else %} {{main_img}} {% endif %}" alt="{{f.mouldings__name}}" class="f_images img-fluid"
+										 style = "
+											border-image : url({% static image_static %}) {{f.border_slice}} round !important; 
+											border:10px solid initial; 
+											border-style :solid;
+											border-width:10px;
+											background-size: 100% 100%;
+											box-shadow: 3px 4px 4px 0 #d3d3d3, 3px 6px 4px 0#d3d3d3; 
+											{% if forloop.counter|get_mountcolor != 'none' %}
+												padding:10px; 
+												background-color:{{ forloop.counter|get_mountcolor}};
+											{% endif %}
+											">
+									{% endwith %}
+								{% else %}
+									{% with 'img/'|add:f.url as image_static %}
+									<img src="{% if product.url %} {{product.url}} {% else %} {{main_img}} {% endif %}" alt="{{f.mouldings__name}}" class="f_images img-fluid"
+										 style = "
+											border-image : url({% static image_static %}) {{f.border_slice}} round !important; 
+											border:10px solid initial; 
+											border-style :solid;
+											border-width:10px;
+											background-size: 100% 100%;
+											box-shadow: 3px 4px 4px 0 #d3d3d3, 3px 6px 4px 0#d3d3d3; 
+											{% if forloop.counter|get_mountcolor != 'none' %}
+												padding:10px; 
+												background-color:{{ forloop.counter|get_mountcolor}};
+											{% endif %}
+											">
+									{% endwith %}
+								{% endif %} -->
 								<span class="text text-center" onclick = "set_moulding('{{f.moulding_id}}')">
 									<h5>
 										{{ f.moulding__name }}

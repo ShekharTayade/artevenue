@@ -97,6 +97,10 @@ def upload_user_image(request):
 			)
 						
 			user_img.save()
+
+			
+			#also save a thumbnail
+			
 		else :
 			user_img = User_image(
 				product_type_id = 'USER-IMAGE',
@@ -155,8 +159,6 @@ def get_user_image_id(request):
 	if user_instance:
 		user_image_id = user_instance.product_id
 	
-	print("USER IMAGE ID============" + str(user_image_id) )
-	
 	return JsonResponse({'user_image_id':user_image_id})
 
 def validateUserImageSize(request):
@@ -176,7 +178,7 @@ def validateUserImageSize(request):
 	if user_instance is None:
 		return ({})
 	
-	ppi = 300
+	ppi = 150
 		
 	width = user_instance.image_to_frame.width
 	height = user_instance.image_to_frame.height

@@ -5,11 +5,15 @@
 	<div class="">	
 		<div class="row">			
 			<div class="say_pic px-bottom" style = "padding:0px !important;">
-				<img src="{% static 'img/frame_my_photos_button.jpg' %}" class="img-responsive" usemap="#frame-map">
-				<img src="{% static 'img/frame_my_photos_button.jpg' %}" class="img-responsive mobile" usemap="#frame-map">
-				<map name="frame-map">
-					<area shape="rect" coords="20,200,500,500" href="{% url 'user_image' %}" alt="Start Framing">
-				</map>
+				<div id = "wrapper">
+					<img src="{% static 'img/frame_my_photos_new.jpg' %}" class="img-responsive" usemap="#frame-map">
+					<a id = "anchor-frame" href="{% url 'user_image' %}"></a>				
+					<img src="{% static 'img/frame_my_photos_new.jpg' %}" class="img-responsive mobile" usemap="#frame-map">
+					<a id = "anchor-frame-mobile" href="{% url 'user_image' %}" class = "mobile"></a>
+				</div>
+				<!-- <map name="frame-map">
+					<area shape="rect" coords="30,200,475,435" href="{% url 'user_image' %}" alt="Start Framing">
+				</map> -->
 			</div>
 		</div>
 	</div>

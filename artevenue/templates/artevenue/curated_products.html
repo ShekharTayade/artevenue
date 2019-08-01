@@ -58,18 +58,22 @@
 								<h3 class="h4 card-title">Filter</h3>
 							</div>-->
 							{% for pf in prod_filters %}
+							{% if pf == 'ARTIST' or pf == 'SIZE' %}
+							<div class="card-body" style = "max-height:300px; width:auto; overflow:auto; margin-bottom:30px;">
+							{% else %}
 							<div class="card-body" style = "max-height:200px; width:auto; overflow:auto; margin-bottom:30px;">
-								<h3 class="card-title">{{ pf|title }}</h3>
+							{% endif  %}
+								<div class = "sticky"> <h3 class="card-title">{{ pf|title }}</h3></div>
 								<form id= "f_{{pf}}" role="form">
 									<div class="form-group" style="margin-bottom:0.25em !important;">
-										<div class="checkbox filter-class">
+										<div class="checkbox filter-class {{pf}}">
 											{% for key, value in prod_filter_values.items %}
 											
 												{% if key == pf %}
 													{% if pf == 'COLORS' %}
 														<div id = "colors-div" class = "row" style = "padding:10px;">
 														{% for val in value %}
-															<div class = "col-sm-1 text-center" 
+															<div class = "col-sm-1 text-center color-col" 
 																style = "background-color:{{val}}; 
 																	{% if val == 'White' %} border:1px solid gainsboro{% endif %}; 
 																	border-radius:50%; width:20px; height:30px; 
@@ -80,31 +84,43 @@
 															</div>
 														{% endfor %}
 														</div>
+														
 													{% else %}
-
-														{% for val in value %}												
-														<input class = "{{pf}}" type="checkbox" />
-															{% if pf == 'IMAGE-TYPE' %}
-																<label style="display:none">{{val}}</label>{% if val == '1' %} Fine Art {% elif val == '0' %} Photo {% endif %}<br />
-															{% else %}
-																<label {% if pf == 'COLORS' %} style = "background-color:{{val}}; border:1px solid gainsboro; border-radius:50%; width:25px; height:25px" {% endif %}>{% if pf == 'COLORS' %} &nbsp; {% else %} {{val}}{% endif %}</label><br />
-															{% endif %}
+														{% if pf == 'ARTIST' %}
+															<div class = "sticky mb-2">
+																<input id="artist_search" name="artist-search" class = "form-control" type="search" placeholder="Search...">
+															</div>
+														{% endif %}
+														<div id = "{{d_pf}}">
+														{% for val in value %}
+															<li>
+															<input class = "i_{{pf}}" type="checkbox" />
+																{% if pf == 'IMAGE-TYPE' %}
+																	<label id = "l_{{val}}" style="display:none">{{val}}</label>{% if val == '1' %} Photo {% elif val == '0' %} Fine Art {% endif %}
+																{% else %}
+																	<label {% if pf == 'COLORS' %} style = "background-color:{{val}}; border:1px solid gainsboro; border-radius:50%; width:25px; height:25px" {% endif %}>{% if pf == 'COLORS' %} &nbsp; {% else %} {{val}}{% endif %}</label>
+																{% endif %}
+															</li>
 														{% endfor %}
+														</div>
 													{% endif %}
 												{% endif %}
 											{% endfor prod_filter_values %}
 										</div>
 									</div>
-									<button type = "button" class="btn btn-secondary btn-sm pull-left" onclick = "getAllFilters()"><i class="fa fa-pencil"></i> Apply</button>
-									<button type = "button" class="btn btn-sm btn-outline-secondary pull-right" onclick = "clearFilter('{{pf}}')"><i class="fa fa-times-circle"></i> Clear</button>
 								</form>
 							</div>
+							<div class = "sticky">
+								<button type = "button" class="btn btn-secondary btn-sm pull-left" onclick = "getAllFilters('1', '{{sortOrder}}', '{{show}}', '{{ikeywords}}')"><i class="fa fa-pencil"></i> Apply</button>
+								<button type = "button" class="btn btn-sm btn-outline-secondary pull-right" onclick = "clearFilter('{{pf}}')"><i class="fa fa-times-circle"></i> Clear</button>
+							</div>
+							<hr>
 							{% endfor prod_filters %}
-							<div class="card-body" style = "max-height:200px; width:auto; overflow:auto; margin-bottom:30px;">
+							<div class="card-body" style = "max-height:300px; width:auto; overflow:auto; margin-bottom:30px;">
 								<h3 class="card-title">Size</h3>
 								<form id= "f_size" role="form">
 									<div class="form-group" style="margin-bottom:0.25em !important;">
-										<div class="checkbox filter-class">
+										<div class="checkbox filter-class mb-2">
 											<select id ="size_select" class = "form-control" name = "size" />
 												<option selected value = "any">Any</option>
 												<option disabled value= "-">PORTRAIT:</option>
@@ -153,9 +169,29 @@
 												<option value = "60_60"> 60" X 60"</option>
 											</select>	
 										</div>
+										<div class = "row">
+											<div class = "col-5">
+												<label for = "size_width">Width:</label>
+											</div>
+											<div class = "col-7">
+												<input id="size_width" type = "number" min="4" max="60" class = "form-control" onchange="setUserWidth(this);">
+											</div>
+										</div>
+										<!--<div style="display:flex; flex-direction: row; justify-content: center; align-items: center"> 
+											</div>-->
+										<div class = "row">
+											<div class = "col-5">
+												<label for = "size_height">Height:</label>
+											</div>
+											<div class = "col-7">
+												<input id="size_height" type = "number" min="4" max="60" class = "form-control" onchange="setUserHeight(this);">
+											</div>
+										</div>
 									</div>
-									<button type = "button" class="btn btn-secondary btn-sm pull-left" onclick = "getAllFilters()"><i class="fa fa-pencil"></i> Apply</button>
-									<button type = "button" class="btn btn-sm btn-outline-secondary pull-right" onclick = "clearFilter('{{pf}}')"><i class="fa fa-times-circle"></i> Clear</button>
+									<div class = "sticky">
+										<button type = "button" class="btn btn-secondary btn-sm pull-left" onclick = "getAllFilters('1', '{{sortOrder}}', '{{show}}', '{{keywords}}');"><i class="fa fa-pencil"></i> Apply</button>
+										<button type = "button" class="btn btn-sm btn-outline-secondary pull-right" onclick = "clearFilter('SIZE')"><i class="fa fa-times-circle"></i> Clear</button>
+									</div>
 								</form>
 							</div>									
 						</div>
@@ -171,29 +207,14 @@
 						<h1>{% if product_category %} {{ product_category.name }} {% else %} All Art {% endif %}</h1>
 						<p>{% if product_category.description %} {{product_category.description}} {% else %} Please use filters on left to narrow your search{% endif %}</p>
 					 </div>
-					 
-					<!-- Category header -->
-					<div class="box-cat info-bar">
-						<div class="row">
-
-							<div class="col-md-12 col-lg-12 products-number-sort">
-								<form class="form-inline d-block d-lg-flex justify-content-between flex-column flex-md-row">
-									<div class="products-number">
-										<strong>Show</strong><a href="?page={{prods.number}}&sort={{sortOrder}}&show=50" class="btn btn-sm {% if show == '50' or show == None %} btn-primary {% else %} btn-outline-secondary {% endif %}">50</a><a href="?page={{prods.number}}&sort={{sortOrder}}&show=100" class="btn btn-sm {% if show == '100' %} btn-primary {% else %} btn-outline-secondary {% endif %}">100</a><a href="?page={{prods.number}}&sort={{sortOrder}}&show=ALL" class="btn btn-sm {% if show == 'ALL' %} btn-primary {% else %} btn-outline-secondary {% endif %}">All</a><span>results/page</span>
-									</div>
-
-								</form>
-							</div>
-
-						</div>
-					</div>
 
 					<div id = "img-display">
 						{% include 'artevenue/prod_display_include.html' %}
 					</div> <!-- END:  img-display -->
 				</div>
 				<!-- /.col-lg-9-->
-				{% include 'artevenue/cart-add-message.html' %}
+				{% include 'artevenue/wishlist-add-message.html' %}
+				{% include 'artevenue/message-modal_ok.html' %}
 				
 			</div>
 		</div>
@@ -205,12 +226,38 @@
 	<script>
 		// Clear the filers
 		function clearFilter(ele_chx){
-			$("." + ele_chx ).each(function(){ 
+			/*$(":checkbox").each( function() {
 				$(this).prop('checked', false);
-			});
+			});*/
+			
+			switch (ele_chx) {
+			  case 'COLORS':
+				eles = document.getElementsByClassName("color-col");
+				for (i = 0; i < eles.length; ++i) {
+					eles[i].innerHTML = "";
+				}
+				break;
+			  case 'SIZE':
+				$('#size_select').val('any');
+				$('#size_width').val('');				
+				$('#size_height').val('');
+				break;
+			  default:
+				$("div." + ele_chx + " input[type=checkbox]").each( function() {
+					$(this).prop('checked', false);
+				});
+			}
+			
 		}
-		
-		function getAllFilters(){   
+	</script>
+	
+	<script>
+		function getAllFilters(page, sort, show, keywords){   
+			if (isNaN(page) == false) {
+				page_num = parseInt(page);
+			} else {
+				page_num = 1;  // default
+			}
 			var filter = '{';
 			var fcnt = 0;
 			{% for pf in prod_filters %}
@@ -222,7 +269,7 @@
 					}
 					valcnt = 0;
 					rec = ''
-					$(".{{pf}}").each(function () {
+					$(".i_{{pf}}").each(function () {
 						var val = $(this).next('label').text();
 						var sts = $(this).is(":checked");
 						if (sts) {
@@ -241,6 +288,19 @@
 			{% endfor prod_filters %}
 			
 			var size_val = $("#size_select").val();
+			var w = $("#size_width").val();
+			var h = $("#size_height").val();
+			var size_input = w + "_" + h;
+			if ( (w) && (h) ) {
+				if (w < 4 || h < 4) {
+					$("#msg").html ("We can print images with Width and Height between 4 and 60 inches");
+					$("#msg-modal").modal("show");
+					return
+				}
+			}
+			if ( ( parseInt(w) >= 4) && ( parseInt(h) >= 4) ){
+				size_val = size_input;
+			}
 
 			if (size_val != "any") {
 				rec = ', "SIZE": {"' + size_val + '" : ' + ' "true"';
@@ -266,20 +326,43 @@
 			if (len > 0){
 				filter = filter + rec + ' }';
 			}
+			
+			if (page_num >= 0 ){
+				rec = ', "PAGE": {"page": ' + page_num + '}';
+				filter = filter + rec;
+			}						
+			if (sort != '' && sort != 'None' ){
+				rec = ', "SORT": {"sort":"' + sort + '"}';
+				filter = filter + rec
+			}
+			if (keywords != '' && keywords !== 'None'){
+				rec = ', "KEY-WORDS": {"keywords":"{{ikeywords}}"}';
+				filter = filter + rec
+			}
+			
+			if (isNaN(show) == false) {
+				show_num = show;
+			} else {
+				if (show != 'ALL') {
+					show_num = '50' // default
+				} else {
+					show_num = show;  
+				}
+			}
+			if (show_num != '' ){
+				rec = ', "SHOW": {"show":"' + show_num + '"}';
+				filter = filter + rec
+			}			
+			
 			filter = filter + '}';
-			
-			
-			
-			{% if product_category.category_id %}				
-				
+						
+			{% if product_category.category_id %}								
 				$.ajax({url: '{% url "curated_collections" product_category.category_id %}', 
 					data: filter, 
 					dataType: 'text', 
 					type: 'POST',
 					success: function (data) {
-						//console.log(data);
 						$("#img-display").html(data);
-						//data = JSON.parse(data);
 					},
 					error: function(xhr){
 						alert("An error occured: " + xhr.status + " " + xhr.statusText + " Apologies for the inconvenience!! Please let us know the details and we will be happy to help sort it out."); 
@@ -293,9 +376,7 @@
 					dataType: 'text', 
 					type: 'POST',
 					success: function (data) {
-						//console.log(data);
 						$("#img-display").html(data);
-						//data = JSON.parse(data);
 					},
 					error: function(xhr){
 						alert("An error occured: " + xhr.status + " " + xhr.statusText + " Apologies for the inconvenience!! Please let us know the details and we will be happy to help sort it out."); 
@@ -338,6 +419,10 @@
 	</script>
 	
 	<script>
+		//document.addEventListener('contextmenu', event => event.preventDefault());
+	</script>	
+
+	<script>
 		function select_color(ele){
 			if (ele.innerHTML == "<i class=\"fa fa-check\"></i>"){
 				ele.innerHTML = "";
@@ -346,6 +431,145 @@
 			}
 		}
 	</script>
+	<script>
+	   $(document).on("input", "#artist_search", function(){
+			input = $("#artist_search");
+			filter = input.val().toUpperCase();				  
+			elem = document.getElementsByClassName("i_ARTIST");		
+			
+			$(".i_ARTIST").each(function () {
+				var label = $(this).next('label');
+				var val = $(this).next('label').text();
+				var sts = $(this).is(":checked");
+				if (val.toUpperCase().indexOf(filter) > -1) {
+				   $(this).show();
+				   label.show();
+				   $(this).prop("checked", sts);
+				   $(this).closest("li").show();
+				} else {
+				   $(this).hide();
+				   label.hide();;
+				   $(this).prop("checked", false);
+				   $(this).closest("li").hide();
+				}				
+			});
+
+		});
+	</script>
+	<script>
+		function addToFav(prod_id, currwidth, aspect_ratio, total_price,
+				discount, promotion_id, disc_amt, item_unit_price){
+			currheight = Math.round(currwidth / aspect_ratio);
+			qty = 1; moulding_id = 0; moulding_size = 0; 
+			print_medium_id = 'PAPER'; print_medium_size = currheight * currwidth;
+			mount_id = 0; mount_size = 0; mount_w_left =0; mount_w_right = 0;
+			mount_w_top =0; mount_w_bottom = 0;acrylic_id = 1;
+			acrylic_size = currheight * currwidth; board_id = 0; board_size = 0;
+			stretch_id = 0; stretch_size = 0; discount = 0;
+		
+			$.ajax({
+				url: "{% url 'add_to_wishlist' %}", 
+				data: { 'prod_id':prod_id,'qty':qty, 
+						'width':currwidth, 'height':currheight, 'moulding_id': moulding_id,
+						'moulding_size' : moulding_size,
+						'print_medium_id':print_medium_id, 'print_medium_size':print_medium_size, 
+						'mount_id':mount_id, 'mount_size':mount_size,
+						'mount_w_left' : mount_w_left, 'mount_w_right':mount_w_right, 
+						'mount_w_top':mount_w_top, 'mount_w_bottom' : mount_w_bottom, 
+						'acrylic_id':acrylic_id, 'acrylic_size':acrylic_size,
+						'board_id':board_id, 'board_size':board_size, 'stretch_id':stretch_id,
+						'stretch_size':stretch_size, 
+						'total_price':total_price, 'image_width':currwidth, 'image_height':currheight,
+						'discount':discount, 'promotion_id':promotion_id, 'disc_amt':disc_amt,
+						'item_unit_price':item_unit_price,  'prod_type':'STOCK-IMAGE'}, 
+				dataType: 'text', 
+					type: 'POST',
+				success: function (data) {
+					data = JSON.parse(data);
+					cart_qty = data.cart_qty;
+					$('#fav_'+prod_id).html('<i class = "fa fa-heart" onclick = "deleteItem(' + prod_id + ')"style="color:red; padding-right:5px;" data-toggle="tooltip" title="Added to Favorites!"></i>');
+					/* $('#msg-wishlist-modal').modal('show');
+					setTimeout(function() {
+						$('#msg-wishlist-modal').modal('hide');
+						}, 1000);
+					*/
+				},
+				error: function(xhr){
+					alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+				}
+			});	
+		}
+	</script>
+
+		<script>
+		
+		function deleteItem(prod_id){
+			wishlist_item_id = 0;
+			sub_total = 0;
+			tax = 0;
+			wishlist_total= 0;
+			item_total = 0;
+			{% for w in wishlistitems %}
+				if ({{w.product_id}} == prod_id){
+					wishlist_item_id = {{w.wishlist_item_id}};
+				}
+			{% endfor %}
+
+			sub_total = '';
+			tax='';
+			wishlist_total='';
+			item_total='';
+			
+			$.ajax({
+				url: "{% url 'delete_wishlist_item' %}", 
+				data: {'wishlist_item_id':wishlist_item_id, 'sub_total':sub_total, 'tax':tax, 
+				'wishlist_total':wishlist_total, 'item_total':item_total}, 
+				dataType: 'text', 
+				type: 'post',
+				success: function (data) {
+					data = JSON.parse(data);
+					wishlist_qty = data.msg;
+					$('#fav_'+prod_id).html('<i class = "fa fa-heart-o"  style="color:red; padding-right:5px;" data-toggle="tooltip" title="Add to Favorites!"></i>')
+					if (data = "SUCCESS") {
+						// Update the display
+						//show_wishlist();
+						$("#w_msg").html('Item removed from favorites');
+						/*$('#msg-wishlist-modal').modal('show');
+						setTimeout(function() {
+							$('#msg-wishlist-modal').modal('hide');
+							}, 1000);*/
+					} else {
+						alert(data);
+					}
+				},
+				error: function(xhr){
+					alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+				}
+			});			
+		}
+	</script>
+	
+	<script>
+	function setUserWidth(ele){
+		var value = ele.value;
+		if( value ) {
+			$(".iuser_width").val(value);
+		} else {
+			value = 0;
+			$(".iuser_width").val(value);
+		}		
+	}
+	function setUserHeight(ele){
+		var value = ele.value;
+		if( value ) {
+			$(".iuser_height").val(value);
+		} else {
+			value = 0;
+			$(".iuser_height").val(value);
+		}		
+	}
+	</script>
+	
 	{% endblock jscripts %}
 			
 	

@@ -5,8 +5,9 @@ from artevenue.models import Business_profile, Contact_us, User_image, Pin_code,
 from artevenue.models import User_shipping_address, User_billing_address, Profile_group, Egift
 from artevenue.validators import validate_artevenue_email, validate_contact_name
 from artevenue.validators import validate_image_size, validate_india_mobile_no
-
 from django.core.validators import validate_slug, MinLengthValidator
+
+from django.shortcuts import get_object_or_404
 
 from django.contrib.admin.widgets import AdminDateWidget
 from django.forms.fields import DateField
@@ -16,6 +17,8 @@ from django.core.exceptions import ValidationError
 from string import Template
 from django.forms import ImageField
 import datetime
+from django.conf import settings
+from artevenue.models import Ecom_site
 
 class registerForm(UserCreationForm):
 	email = forms.CharField(max_length=254, required=True, widget=forms.EmailInput())
@@ -23,7 +26,12 @@ class registerForm(UserCreationForm):
 		model = User
 		fields = ('username', 'first_name', 'last_name', 'email', 'password1', 
 				 'password2')
-
+	def clean_username(self):
+		username = self.cleaned_data['username']
+		if User.objects.filter(username__iexact=username).exists():
+			raise ValidationError("This username already taken")
+		return username
+		
 class businessuserForm(UserCreationForm):
 	email = forms.CharField(max_length=254, required=True, widget=forms.EmailInput())
 	class Meta:
@@ -154,31 +162,47 @@ class businessprof_Form(forms.ModelForm):
 		
 	class Meta:
 		model = Business_profile
-		fields = ('id', 'contact_name', 'phone_number', 'company', 'address_1', 'address_2',
-			'city', 'state', 'pin_code', 'country','gst_number')		
+		fields = ('id', 'contact_name', 'phone_number', 'company', 
+			'address_1', 'address_2',
+			'city', 'state', 'pin_code', 'country','gst_number',
+			'bank_acc_no', 'ifsc_code', 'bank_name', 'bank_branch')		
 		
 		
 class userForm(forms.ModelForm):
-	username = forms.CharField(
-		widget=forms.TextInput(),
+	id = forms.CharField(
+		widget=forms.HiddenInput(),
 		required=True,
-		disabled=True
+		#disabled=True
+	) 	
+	username = forms.CharField(
+		widget=forms.TextInput(attrs={'readonly':'readonly'}),
+		required=True,
+		#disabled=True
 	) 	
 	email = forms.CharField(max_length=254, 
 		required=True, 
-		widget=forms.EmailInput(),
-		disabled=True)	
+		widget=forms.EmailInput(attrs={'readonly':'readonly'}),
+		#disabled=True
+		)	
 	last_login = forms.DateTimeField( 
 		required=True, 
-		widget=forms.DateTimeInput(),
-		disabled=True)	
+		widget=forms.DateTimeInput(attrs={'readonly':'readonly'}),
+		#disabled=True
+		)	
 
 	class Meta:
 		model = User
-		fields = ('username', 'first_name', 'last_name',
+		fields = ('id', 'username', 'first_name', 'last_name',
 			'email', 'last_login')
 			
 class shipping_addressForm(forms.ModelForm):
+	store = forms.CharField(
+		widget=forms.HiddenInput(),
+		required=False
+	) 
+	user = forms.CharField(
+		widget=forms.HiddenInput(),
+	) 
 	address_1 = forms.CharField(
 		widget=forms.TextInput(attrs={'placeholder': 'Flat / House No./ Floor / Building'}),
 		required=False
@@ -193,7 +217,6 @@ class shipping_addressForm(forms.ModelForm):
 	)
 	def clean_pin_code(self):
 		pc = self.cleaned_data['pin_code']
-
 		try:
 			pincodeObj = Pin_code.objects.get(pk = pc)
 		except Pin_code.DoesNotExist:
@@ -201,14 +224,39 @@ class shipping_addressForm(forms.ModelForm):
 
 		return pincodeObj
 
+	def clean_store(self):
+
+		try:
+			storeObj = get_object_or_404 (Ecom_site, store_id=settings.STORE_ID )
+		except Ecom_site.DoesNotExist:
+			storeObj = None
+
+		return storeObj
+		
+	def clean_user(self):
+		u = self.cleaned_data['user']
+		try:
+			userObj = User.objects.get(pk = u)
+		except User.DoesNotExist:
+			userObj = None
+
+		return userObj
+
 	class Meta:
 		model = User_shipping_address
-		fields = ('full_name', 'company', 'address_1', 'address_2',
+		fields = ('store', 'full_name', 'company', 'address_1', 'address_2',
 		'land_mark', 'city', 'state', 'pin_code', 'country',
-		'phone_number', 'email_id', 'pref_addr')
+		'phone_number', 'email_id', 'pref_addr', 'user')
 
 		
-class billing_addressForm(forms.ModelForm):
+class billing_addressForm(forms.ModelForm): 
+	store = forms.CharField(
+		widget=forms.HiddenInput(),
+		required=False
+	) 
+	user = forms.CharField(
+		widget=forms.HiddenInput(),
+	) 
 	address_1 = forms.CharField(
 		widget=forms.TextInput(attrs={'placeholder': 'Flat / House No./ Floor / Building'}),
 		required=False
@@ -232,11 +280,28 @@ class billing_addressForm(forms.ModelForm):
 
 		return pincodeObj
 
+	def clean_store(self):
+		try:
+			storeObj = get_object_or_404 (Ecom_site, store_id=settings.STORE_ID )
+		except Ecom_site.DoesNotExist:
+			storeObj = None
+
+		return storeObj
+
+	def clean_user(self):
+		u = self.cleaned_data['user']
+		try:
+			userObj = User.objects.get(pk = u)
+		except User.DoesNotExist:
+			userObj = None
+
+		return userObj
+
 	class Meta:
 		model = User_billing_address
-		fields = ('full_name', 'company', 'address_1', 'address_2',
+		fields = ('store', 'full_name', 'company', 'address_1', 'address_2',
 		'land_mark', 'city', 'state', 'pin_code', 'country',
-		'phone_number', 'email_id', 'pref_addr')
+		'phone_number', 'email_id', 'gst_number', 'pref_addr', 'user')
 
 class referralForm(forms.ModelForm):
 	email_id = forms.CharField(max_length=254, required=True, widget=forms.EmailInput())
@@ -281,10 +346,11 @@ class egiftForm(forms.ModelForm):
 			widget=forms.DateInput(),
 			required=True
 		)
-	gift_amount = forms.DecimalField(min_value=500, max_value=50000, decimal_places=2,
+	gift_amount = forms.DecimalField(
+			min_value=500, max_value=100000, decimal_places=2,
 			label='Let us know the value of gift card you want to send:',
-			help_text="Min: Rs. 500, Max: Rs. 50,000",
-			widget=forms.NumberInput(),
+			help_text="Min: Rs. 500, Max: Rs. 1,00,000",
+			widget=forms.NumberInput({'step': '100'}),
 			required=True
 		)
 		
@@ -302,7 +368,8 @@ class egiftForm(forms.ModelForm):
 	)		
 	class Meta:
 		model = Egift
-		exclude = ('giver', 'receiver', 'voucher', 'payment_status')
+		exclude = ('giver', 'receiver', 'voucher', 'payment_status',
+					'giver_email_sent', 'receiver_email_sent', 'card_image' )
 			
 	def __init__(self, *args, **kwargs):
 		self.giver = kwargs.pop('giver', None)

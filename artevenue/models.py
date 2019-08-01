@@ -7,6 +7,9 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 import os
 from PIL import Image, ExifTags
+from io import StringIO, BytesIO
+from django.conf import settings
+
 
 class Ecom_site(models.Model):
 	store_id = models.AutoField(primary_key=True, null=False)
@@ -41,7 +44,7 @@ class Ecom_site(models.Model):
 	#support_email = models.EmailField(null=True)
 
 	def __str__(self):
-		return self.name
+		return str(self.store_id)
 
 	
 class Contact_us(models.Model):
@@ -57,7 +60,7 @@ class Contact_us(models.Model):
     reponded_by = models.CharField(max_length=30, blank=True, default='', editable=False)
     
     def __str__(self):
-        return self.name
+        return self.first_name + " " + self.last_name 
 		
 	
 # Model - voucher
@@ -71,12 +74,14 @@ class Voucher(models.Model):
 	discount_type = models.CharField(max_length = 10, null=False)  # PERCETNAGE or CASH
 	discount_value = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
 	all_applicability = models.BooleanField(null=False, default=False)
+	created_date = models.DateTimeField(auto_now_add=True, null=False)	
+	updated_date = models.DateTimeField(auto_now=True, null=False)	
 
 	class meta:
 		unique_together = (('store', 'voucher_id', 'effective_from', 'discount_type'),)
     
 	def __str__(self):
-		return self.voucher_id
+		return self.voucher_code
 
 class Voucher_user(models.Model):
 	voucher = models.ForeignKey(Voucher, on_delete=models.CASCADE, null=False)
@@ -84,12 +89,14 @@ class Voucher_user(models.Model):
 	effective_from = models.DateField(blank=True, null=True)
 	effective_to = models.DateField(blank=True, null=True)
 	used_date = models.DateField(blank=True, null=True)
+	created_date = models.DateTimeField(auto_now_add=True, null=False)	
+	updated_date = models.DateTimeField(auto_now=True, null=False)	
 
 	class meta:
 		unique_together = (('voucher', 'user'),)
 
 	def __str__(self):
-		return self.user
+		return str(self.user) + '-' + str(self.voucher)
 
 class Egift_card_design(models.Model):
 	design_id = models.AutoField(primary_key=True, null=False)
@@ -100,15 +107,18 @@ class Egift_card_design(models.Model):
 	amount_to =models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
 	text_location = models.CharField(max_length = 20, blank=True, default='') # 'top-left', 'top-right', 'bottom-left', 'bottom-right', 'center'; # Location to print the text on the card
 	text_color = models.CharField(max_length = 20, blank=True, default='')
-	
+	voucher_location = models.CharField(max_length = 20, blank=True, default='')
+
+	def __str__(self):
+		return self.name + '(' + str(self.design_id) + ')'	
 		
 class Egift(models.Model):
 	TRN_STATUS = (
 		('PP', 'Payment Pending'),
-		('PC', 'Payment Complete'),
-		('PR', 'pending redemption'),
-		('PC', 'Partial Redemption'),
-		('RC', 'Redemption Complete')
+		('PC', 'eGift Pending to be Redeemed'),
+		('PM', 'Partial Redemption Done'),
+		('RC', 'eGift Order Comleted - Redemption done'),
+		('EX', 'eGift Order Expired'),
 	)	
 	gift_rec_id = models.AutoField(primary_key=True, null=False)
 	giver = models.ForeignKey(User, on_delete=models.CASCADE, null=False,
@@ -129,8 +139,26 @@ class Egift(models.Model):
 	gift_date = models.DateField(blank=True, null=True)	
 	created_date = models.DateTimeField(auto_now_add=True, null=False)	
 	updated_date = models.DateTimeField(auto_now=True, null=False)	
+	giver_email_sent = models.DateTimeField(null=True)
+	receiver_email_sent = models.DateTimeField(null=True)
+	card_image = models.ImageField(upload_to='egift_cards/%Y/%m/%d/', blank=True, default="")
+
+	def __str__(self):
+		return str(self.giver) + ' To ->' + self.receiver_name	
+
+class eGift_sms_email(models.Model):
+	egift = models.OneToOneField(Egift, on_delete=models.CASCADE, null=False)
+	receiver_email_sent = models.BooleanField(null=False, default=False)
+	giver_email_sent = models.BooleanField(null=False, default=False)
+	receiver_sms_sent = models.BooleanField(null=False, default=False)
+	giver_sms_sent = models.BooleanField(null=False, default=False)
+	created_date = models.DateTimeField(auto_now_add=True, null=False)	
+	updated_date = models.DateTimeField(auto_now=True, null=False)		
+
+	def __str__(self):
+		return str(self.egift)
 	
-class  Egift_redemption(models.Model):
+class Egift_redemption(models.Model):
 	redemption_id = models.AutoField(primary_key=True, null=False)
 	egift = models.ForeignKey(Egift, on_delete=models.CASCADE, null=False)
 	redemption_date = models.DateField(blank=True, null=True)
@@ -294,6 +322,7 @@ class  User_billing_address (models.Model):
 	billing_address_id = models.AutoField(primary_key=True, null=False)
 	full_name = models.CharField(max_length=600, blank=False, null=False)
 	company = models.CharField(max_length=600, blank=True, default='')
+	gst_number = models.CharField(max_length=30, blank=True, default='')
 	address_1 = models.CharField(max_length=600, blank=False, null=False)
 	address_2 = models.CharField(max_length=600, blank=True, default='')
 	land_mark = models.CharField(max_length=600, blank=True, default='')
@@ -434,9 +463,76 @@ class User_image (models.Model):
 	status = models.CharField(max_length = 3, blank=True, null=False)
 	created_date = models.DateTimeField(auto_now_add=True, null=False)	
 	updated_date = models.DateTimeField(auto_now=True, null=False)	
-
+	image_to_frame_thumbnail = models.ImageField(upload_to='uploads/%Y/%m/%d/', blank=True, default="")
 	def __str__(self):
 		return str( self.product_id ) + " " + self.image_to_frame.name
+
+	def create_thumbnail(self):
+		# If there is no image associated with this.
+		# do not create thumbnail
+		if not self.image_to_frame:
+			return
+
+		# Set our max thumbnail size in a tuple (max width, max height)
+		THUMBNAIL_SIZE = (75, 75)
+
+		'''
+		DJANGO_TYPE = self.image_to_frame.file.content_type
+
+		if DJANGO_TYPE == 'image/jpeg':
+			PIL_TYPE = 'jpeg'
+			FILE_EXTENSION = 'jpg'
+		elif DJANGO_TYPE == 'image/png':
+			PIL_TYPE = 'png'
+			FILE_EXTENSION = 'png'
+		elif DJANGO_TYPE == 'image/gif':
+			PIL_TYPE = 'gif'
+			FILE_EXTENSION = 'gif'
+		'''
+		
+		PIL_TYPE = ''
+		if self.image_to_frame.name.lower().endswith(".jpg"):
+			PIL_TYPE = 'jpeg'
+			FILE_EXTENSION = 'jpg'
+			DJANGO_TYPE = 'image/jpeg'
+		if self.image_to_frame.name.lower().endswith(".png"):
+			PIL_TYPE = 'png'
+			FILE_EXTENSION = 'png'
+			DJANGO_TYPE = 'image/png'
+		if self.image_to_frame.name.lower().endswith(".gif"):
+			PIL_TYPE = 'gif'
+			FILE_EXTENSION = 'gif'
+			DJANGO_TYPE = 'image/gif'
+		if PIL_TYPE == '' :
+			extension = lower(os.path.splitext(self.image_to_frame.name)[1])
+			PIL_TYPE = extension
+			FILE_EXTENSION = extension
+			DJANGO_TYPE = 'image/' + extension
+
+		# Open original photo which we want to thumbnail using PIL's Image
+		image = Image.open(self.image_to_frame)
+
+		# use our PIL Image object to create the thumbnail, which already
+		image.thumbnail(THUMBNAIL_SIZE, Image.ANTIALIAS)
+
+		# Save the thumbnail
+		#temp_handle = StringIO()
+		temp_handle = BytesIO()
+		image.save(temp_handle, PIL_TYPE)
+		temp_handle.seek(0)
+		
+		# Save image to a SimpleUploadedFile which can be saved into ImageField
+		from django.core.files.uploadedfile import SimpleUploadedFile
+		suf = SimpleUploadedFile(os.path.split(self.image_to_frame.name)[-1],
+								 temp_handle.read(), content_type=DJANGO_TYPE)
+		# Save SimpleUploadedFile into image field
+		self.image_to_frame_thumbnail.save(
+			'%s_thumbnail.%s' % (os.path.splitext(suf.name)[0], FILE_EXTENSION),
+			suf, save=False)
+
+	def save(self, *args, **kwargs):
+		self.create_thumbnail()
+		super(User_image, self).save()	
 
 class Stock_collage(models.Model):
 	product_id = models.AutoField(primary_key=True, null=False)
@@ -525,6 +621,7 @@ class Product_view(models.Model):
 	session_id = models.CharField(max_length = 40, blank=True, default='')
 	user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
 	image_to_frame = models.ImageField(upload_to='uploads/%Y/%m/%d/', blank=True, default="")
+	image_to_frame_thumbnail = models.ImageField(upload_to='uploads/%Y/%m/%d/', blank=True, default="")
 	status = models.CharField(max_length = 3, blank=True, null=False)
 	created_date = models.DateTimeField(auto_now_add=True, null=False)	
 	updated_date = models.DateTimeField(auto_now=True, null=False)	
@@ -541,12 +638,17 @@ class Curated_category(models.Model):
 	description = models.CharField(max_length = 2000, blank=True, default = '')
 	effective_from = models.DateField(blank=True, null=True)
 	effective_to = models.DateField(blank=True, null=True)
+
+	def __str__(self):
+		return str(self.category_id) + '-' + self.name
 	
 class Curated_collection(models.Model):
 	curated_category = models.ForeignKey(Curated_category, models.DO_NOTHING)
 	product = models.ForeignKey(Stock_image, models.DO_NOTHING)
 	product_type = models.ForeignKey(Product_type, models.DO_NOTHING, null=False) 
 
+	def __str__(self):
+		return str(self.curated_category) + ' -> ' + str(self.product)
 	
 #################################################################################
 #     Promotions
@@ -567,7 +669,7 @@ class Promotion(models.Model):
 	class meta:
 		unique_together = (('store', 'promotion_id', 'effective_from', 'product_tag', 'discount_type'),)
 	def __str__(self):
-		return self.promotion_id
+		return str(self.promotion_id) + '-' + self.name
 
 class Promotion_images(models.Model):
 	image_id = models.AutoField(primary_key=True, null=False)
@@ -922,11 +1024,16 @@ class Business_profile(models.Model):
 	country = models.ForeignKey(Country, on_delete = models.PROTECT, null=False, default= "IND")
 	phone_number = models.CharField(max_length=30, blank=False, null=False)
 	# email_id  = models.EmailField(blank=True, default='')  -- Same as 'User' email
-	gst_number = models.CharField(max_length=600, blank=True, default='')
-	tax_id = models.CharField(max_length=600, blank=True, default='')
+	gst_number = models.CharField(max_length=30, blank=True, default='')
+	tax_id = models.CharField(max_length=30, blank=True, default='')
 	approval_date = models.DateField(blank=True, null=True)
 	created_date = models.DateTimeField(auto_now_add=True, null=False)	
 	updated_date = models.DateTimeField(auto_now=True, null=False)	
+	bank_acc_no = models.CharField(max_length = 20, default = '', blank = True)
+	ifsc_code = models.CharField(max_length = 11, default = '', blank = True)
+	bank_name = models.CharField(max_length = 500, default = '', blank = True)
+	bank_branch = models.CharField(max_length = 600, default = '', blank = True)
+
 
 	def __str__(self):
 		return self.company + " - " + self.contact_name
@@ -977,9 +1084,20 @@ class Order (models.Model):
 	updated_date = models.DateTimeField(auto_now=True, null=False)	
 
 	def __str__(self):
-		return str(self.order_id) + '' + str(self.user)
+		return str(self.order_id) + ' - ' + str(self.user)
+
+class Order_sms_email(models.Model):
+	order = models.OneToOneField(Order, on_delete=models.CASCADE, null=False)
+	customer_email_sent = models.BooleanField(null=False, default=False)
+	factory_email_sent = models.BooleanField(null=False, default=False)
+	customer_sms_sent = models.BooleanField(null=False, default=False)
+	factory_sms_sent = models.BooleanField(null=False, default=False)
+	created_date = models.DateTimeField(auto_now_add=True, null=False)	
+	updated_date = models.DateTimeField(auto_now=True, null=False)
 	
-	
+	def __str__(self):
+		return str(self.order)
+		
 class Order_items (models.Model):
 	order_item_id = models.AutoField(primary_key=True, null=False)
 	order = models.ForeignKey(Order,on_delete=models.PROTECT, null=False)
@@ -1123,6 +1241,7 @@ class Order_billing (models.Model):
 	email_id = models.EmailField(blank=True, default='')
 	created_date = models.DateTimeField(auto_now_add=True, null=False)	
 	updated_date = models.DateTimeField(auto_now=True, null=False)	
+	gst_number = models.CharField(max_length=30, blank=True, default='')
 
 	def __str__(self):
 		return str(self.order) + full_name
@@ -1139,7 +1258,10 @@ class Generate_number_by_month(models.Model):
 	month_year = models.CharField(max_length = 6, null=False)
 	current_number = models.IntegerField(null=False)	
 
-
+class Generate_number(models.Model):
+	type = models.CharField(max_length = 50, null=False, primary_key = True)
+	description = models.CharField(max_length = 1000, null=True)
+	current_number = models.IntegerField(null=False)	
 
 #############################################################################
 #  	WISH LIST
@@ -1250,6 +1372,15 @@ class Stock_image_error(models.Model):
 	created_date = models.DateTimeField(auto_now_add=True, null=False)	
 	updated_date = models.DateTimeField(auto_now=True, null=False)	
 
+class Image_url_error(models.Model):
+	row_id = models.IntegerField(null=True)
+	name = models.CharField(max_length = 128, null=True)
+	err_desc = models.CharField(max_length = 2000, null=True)
+	error = models.CharField(max_length = 2000, null=True)
+	created_date = models.DateTimeField(auto_now_add=True, null=False)	
+	updated_date = models.DateTimeField(auto_now=True, null=False)	
+
+
 class Stock_image_category_error(models.Model):
 	row_id = models.IntegerField(null=True)
 	category_name = models.CharField(max_length = 128, null=True)
@@ -1350,33 +1481,59 @@ class Payment_details (models.Model):
 	trn_type = models.CharField(max_length=3, blank=True, 
 		choices=TRN_TYPE, default='ORD')
 	
+
+class Employee(models.Model):
+	DEPT_CHOICES = (
+		(1, 'Business Support'),
+		(2, 'Production'),
+		(3, 'Sales'),
+		(4, 'Marketting'),
+		(5, 'Accounts'),
+		(6, 'IT'),
+	)
+	user = models.OneToOneField(User, on_delete=models.CASCADE)
+	department = models.PositiveSmallIntegerField(choices=DEPT_CHOICES, null=True)
+	is_manager = models.BooleanField('manager status', default=False)
+	is_chief = models.BooleanField('chief status', default=False)
+
+	def __str__(self):
+		return self.user.username + '(' + str(self.department) + ')'	
+
+class User_sms_email(models.Model):
+	user = models.OneToOneField(User, on_delete=models.CASCADE, null=False)
+	welcome_email_sent = models.BooleanField(null=False, default=False)
+	welcome_sms_sent = models.BooleanField(null=False, default=False)
+	created_date = models.DateTimeField(auto_now_add=True, null=False)	
+	updated_date = models.DateTimeField(auto_now=True, null=False)
+	
+	def __str__(self):
+		return str(self.order)
 		
 @receiver(post_save, sender=User_image, dispatch_uid="update_image_profile")
 def update_image(sender, instance, **kwargs):
-  if instance.image_to_frame:
-    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    fullpath = BASE_DIR + instance.image_to_frame.url
-    rotate_image(fullpath)
+	if instance.image_to_frame:
+	#BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+	#fullpath = BASE_DIR + instance.image_to_frame.url
+		fullpath = settings.PROJECT_DIR + instance.image_to_frame.url
+		rotate_image(fullpath)
 
 	
 def rotate_image(filepath):
-  try:
-    image = Image.open(filepath)
-    for orientation in ExifTags.TAGS.keys():
-      if ExifTags.TAGS[orientation] == 'Orientation':
-            break
-    exif = dict(image._getexif().items())
+	try:
+		image = Image.open(filepath)
+		for orientation in ExifTags.TAGS.keys():
+			if ExifTags.TAGS[orientation] == 'Orientation':
+				break
+		exif = dict(image._getexif().items())
 
-    if exif[orientation] == 3:
-        image = image.rotate(180, expand=True)
-    elif exif[orientation] == 6:
-        image = image.rotate(270, expand=True)
-    elif exif[orientation] == 8:
-        image = image.rotate(90, expand=True)
-    image.save(filepath)
-    image.close()
-  except (AttributeError, KeyError, IndexError):
-    # cases: image don't have getexif
-    pass		
-	
-	
+		if exif[orientation] == 3:
+			image = image.rotate(180, expand=True)
+		elif exif[orientation] == 6:
+			image = image.rotate(270, expand=True)
+		elif exif[orientation] == 8:
+			image = image.rotate(90, expand=True)
+		image.save(filepath)
+		image.close()
+	except (AttributeError, KeyError, IndexError):
+		# cases: image don't have getexif
+		pass

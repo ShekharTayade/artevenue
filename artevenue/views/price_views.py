@@ -8,8 +8,8 @@ from decimal import Decimal
 def get_prod_price(prod_id,**kwargs):
 
 	prod_type = kwargs['prod_type']
-	image_width = kwargs['image_width']
-	image_height = kwargs['image_height']
+	image_width = Decimal(kwargs['image_width'])
+	image_height = Decimal(kwargs['image_height'])
 	print_medium_id = kwargs['print_medium_id']
 	acrylic_id = kwargs['acrylic_id']
 	moulding_id = kwargs['moulding_id']
@@ -24,10 +24,11 @@ def get_prod_price(prod_id,**kwargs):
 	per_sqinch_canvas = per_sqinch_price['per_sqin_canvas']	
 	
 	# Image Price
-	if image_width > 0 and image_height > 0:
-		msg = ""
-	else :
-		msg = "ERROR-Image size missing"
+	if image_width:
+		if image_width > 0 and image_height > 0:
+			msg = ""
+		else :
+			msg = "ERROR-Image size missing"
 
 	# Get the Item Price
 	item_price = 0
@@ -58,13 +59,13 @@ def get_prod_price(prod_id,**kwargs):
 
 		# Mount price
 		if mount_size and mount_id:
-			mount_price = ((image_width + image_height) * 2 * mount_size)  * get_mount_price_by_id(mount_id)
+			mount_price = ((image_width + image_height) * 2 * Decimal(mount_size))  * get_mount_price_by_id(mount_id)
 			item_price = item_price + mount_price
 			print( "Mount Price: " + str(mount_price))
 		
 		# Board price
 		if board_id:
-			board_price = image_width * image_height * get_board_price_by_id(board_id)
+			board_price = image_width * image_height * Decimal(get_board_price_by_id(board_id))
 			item_price = item_price + board_price
 			print( "Board Price: " + str(board_price))
 

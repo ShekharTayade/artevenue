@@ -50,7 +50,8 @@
 				<div class="col-lg-9">
 					<div id="contact" class="box">
 						<h1>Contact</h1>
-						<p class="lead">Are you curious about something? Do you have some kind of problem with our site, products, orders etc.?</p>
+						<p class="lead">Are you curious about something? <br />
+										Do you have some kind of problem with our website, products, orders etc.?</p>
 						<p>Please feel free to contact us using any of the following means</p>
 						<hr>
 						<div class="row">
@@ -68,15 +69,15 @@
 							<div class="col-md-4">
 								<h3><i class="fa fa-phone"></i> Phone Support</h3>
 								<p class="text-muted">Please use this number to reach us between {{ecom_site.phone_support_start_time}} to {{ecom_site.phone_support_end_time}}. We will be happy to help you.</p>
-								<p><strong>{{ecom_site.support_phonenumber }}</strong></p>
+								<p><strong>+91 {{ecom_site.support_phonenumber }}</strong></p>
 							</div>
 							<!-- /.col-sm-4-->
 							<div class="col-md-4">
 								<h3><i class="fa fa-envelope"></i> Electronic support</h3>
 								<p class="text-muted">Please feel free to write an email to us at -</p>
-								<ul>
-								  <li><strong><a href="mailto:">info@arteavenue.com</a></strong></li>
-								</ul>
+								<p>
+								  <strong><a href="mailto:">support@artevenue.com</a></strong>
+								</p>
 							</div>
 							<!-- /.col-sm-4-->
 						</div>
@@ -89,11 +90,8 @@
 							<h2>Contact form</h2>
 						</div>
 						<div class="row justify-content-center">
-							<div class = "col-3">
-								<input type = "checkbox"> I am not a robot
-							</div>
 							<div class="col-8">
-								<form method="post" novalidate action = "{% url 'contact_msg' %}">
+								<form method="post" novalidate">
 									{% csrf_token %}
 									<input hidden name="curr_pg" value="{{request.path}}" >						
 									<div class="panel panel-default cpanel cpanel-default">
@@ -137,14 +135,14 @@
       function initialize() {
               var mapOptions = {
                   zoom: 15,
-                  center: new google.maps.LatLng(12.9708491, 77.59885489999999),
+                  center: new google.maps.LatLng(12.906680, 77.588320),
                   mapTypeId: google.maps.MapTypeId.ROAD,
                   scrollwheel: false
               }
               var map = new google.maps.Map(document.getElementById('map'),
                   mapOptions);
       
-              var myLatLng = new google.maps.LatLng(12.9708491, 77.59885489999999);
+              var myLatLng = new google.maps.LatLng(12.906680, 77.588320);
               var marker = new google.maps.Marker({
                   position: myLatLng,
                   map: map

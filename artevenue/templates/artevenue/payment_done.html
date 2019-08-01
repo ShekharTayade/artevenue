@@ -18,21 +18,22 @@
 				<div class = "row">
 					<div class="box">
 						<h1>Payment Confirmation</h1>
-						<p>Thank you, {{firstname}}!</p>
+						<p>Thank you {{firstname}}, for choosing Arte'Venue!</p>
 					</div>
 				</div>
 				<div class="row">
 					<div class="box">
 						<form id ="submit-form" method = "post" action = "{% url 'payment_submit' %}">
 							{% csrf_token %}
-							<p> Your payment of  <i class = "fa fa-inr"> {{amount|floatformat}}</i> is received. You will shortly receive an email.</p>
-							<p> Please visit <a href="{% url 'contact_us' %}">Contact Us</a> page in case of any help required. Please quote the order number and your email in all communication.</p>
-							<p> Your Order is: </p>
+							<p>Your payment of  <i class = "fa fa-inr"> {{amount|floatformat}}</i> is received. You will shortly receive an email with the order details.</p>
+							<p>Please note your order number {{order.order_number}}. You can find your order using 'Find My Order' link in the footer section, or 'My Orders' link, if you have logged in.</p>
+							<p>Please visit <a href="{% url 'contact_us' %}">Contact Us</a> page in case of any help required. Please quote the order number and your email in all communication.</p>
+							<p>Your Order is: </p>
 							
 							<div class="col-lg-12">
 								<div id="order-summary" class="box">
 									<div class="box-header">
-										<h3 class="mb-0">Order No. {{order.order_number}}</h3> <a href = ""> Track It Here</a>
+										<h3 class="mb-0">Order No. {{order.order_number}}</h3>
 									</div>
 									<div class = "row">
 										<div class = "col-sm-3">

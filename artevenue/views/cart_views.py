@@ -55,7 +55,7 @@ def show_cart(request):
 		
 		usercartitems = Cart_item_view.objects.select_related('product', 'promotion').filter(
 				cart = usercart.cart_id, product__product_type_id = F('product_type_id')).values(
-			'cart_item_id', 'product_id', 'quantity', 'item_total', 'moulding_id',
+			'cart_item_id', 'product_id', 'product__publisher','quantity', 'item_total', 'moulding_id',
 			'moulding__name', 'moulding__width_inches', 'print_medium_id', 'mount_id', 'mount__name',
 			'acrylic_id', 'mount_size', 'product__name', 'image_width', 'image_height',
 			'product__thumbnail_url', 'cart_id', 'promotion__discount_value', 'promotion__discount_type', 'mount__color',
@@ -65,12 +65,6 @@ def show_cart(request):
 
 	except Cart.DoesNotExist:
 			usercart = {}
-
-	## Get Tax rates
-	#taxes = get_taxes()
-	#image_tax_rate = taxes['image_tax_rate']
-	#oth_tax_rate = taxes ['oth_tax_rate']
-
 
 	if request.is_ajax():
 
@@ -83,41 +77,67 @@ def show_cart(request):
 	ref_status = '' 
 	ref_msg = ''
 	referral_disc_amount = 0
-	if usercart :
-		total_bare = usercart.cart_total - shipping_cost + usercart.cart_disc_amt
-		cart_total = usercart.cart_total
-		referral_disc_amount = usercart.referral_disc_amount			
-		## Check for an applicable referral
-		if request.user.is_authenticated:
-			ref = apply_referral(request, cart_total + usercart.cart_disc_amt)
-			if ref:
-				if ref['status'] == "SUCCESS":
-					ref_status = ref['status']
-					ref_msg = ref['msg']
-					referral_id = ref['referral_id']
-					referral_disc_amount = ref['disc_amt']
-					# Apply applicable referral, if not already alpplied.
-					if not usercart.referral_id :
-						cart_total = ref['cart_total']
-						cart_disc_amt = usercart.cart_disc_amt - usercart.referral_disc_amount + referral_disc_amount
+	try:
+		if usercart :
+			total_bare = usercart.cart_total - shipping_cost + usercart.cart_disc_amt
+			cart_total = usercart.cart_total
+			referral_disc_amount = usercart.referral_disc_amount			
+			## Check for an applicable referral
+			if request.user.is_authenticated:
+				ref = apply_referral(request, cart_total + usercart.cart_disc_amt)
+				if ref:
+					if ref['status'] == "SUCCESS":
+						ref_status = ref['status']
+						ref_msg = ref['msg']
+						referral_id = ref['referral_id']
+						referral_disc_amount = ref['disc_amt']
+						# Apply applicable referral, if not already applied.
+						if not usercart.referral_id :
+							cart_total = ref['cart_total']
+							cart_disc_amt = usercart.cart_disc_amt - usercart.referral_disc_amount + referral_disc_amount
 
-						row = Cart.objects.filter(cart_id=usercart.cart_id).update(
-							cart_total=cart_total, referral_id = referral_id,
-							referral_disc_amount = referral_disc_amount,
-							cart_disc_amt = cart_disc_amt)
+							# TAX Calculations
+							item_tax = 0
+							item_sub_total = 0
+							taxes = get_taxes()
+							####################################################
+							### How to apply tax if a cart contains different 
+							### product types such as STOCK IMAGE and USER IMAGE,
+							### both have different tax rates
+							####################################################						
+							tax_rate = taxes['stock_image_tax_rate']
 
-						# Update the changed values	of usercart for display
-						usercart.referral_id = referral_id
-						usercart.cart_total = cart_total
-						usercart.referral_disc_amount = referral_disc_amount
-						usercart.cart_disc_amt = cart_disc_amt
-						
-		cart_total = usercart.cart_total
-			
+							# Reclaculate tax & sub total after applying referral discount
+							cart_sub_total = round( cart_total / (1 + (tax_rate/100)), 2 )
+							cart_tax = cart_total - cart_sub_total
+							try:
+								row = Cart.objects.filter(cart_id=usercart.cart_id).update(
+									cart_total=cart_total, referral_id = referral_id,
+									cart_sub_total = cart_sub_total, cart_tax = cart_tax,
+									referral_disc_amount = referral_disc_amount,
+									cart_disc_amt = cart_disc_amt)
+							except Error as e:
+								print(e)
+								print(type(e))
+								
+							# Update the changed values	of usercart for display
+							usercart.referral_id = referral_id
+							usercart.cart_tax = cart_tax
+							usercart.cart_sub_total = cart_sub_total
+							usercart.cart_total = cart_total
+							usercart.referral_disc_amount = referral_disc_amount
+							usercart.cart_disc_amt = cart_disc_amt
+							
+			cart_total = usercart.cart_total
+	except Error as e:
+		print(e.message)
+		
+	print('MEDIA ROOT - ' + settings.MEDIA_ROOT)
 	return render(request, template, {'usercart':usercart, 
 		'usercartitems': usercartitems, 'shipping_cost':shipping_cost, 
 		'total_bare':total_bare, 'cart_total':cart_total, 
-		'ref_msg':ref_msg, 'ref_status':ref_status, 'referral_disc_amount':referral_disc_amount})
+		'ref_msg':ref_msg, 'ref_status':ref_status, 'referral_disc_amount':referral_disc_amount,
+		'MEDIA_ROOT':settings.MEDIA_ROOT, 'MEDIA_URL':settings.MEDIA_URL})
 	
 def show_wishlist(request):
 
@@ -138,7 +158,8 @@ def add_to_cart(request):
 	prod_id = request.POST.get('prod_id', '')
 	prod_type = request.POST.get('prod_type', '')
 	qty = int(request.POST.get('qty', '0'))
-
+	cart_item_flag = request.POST.get('cart_item_flag', 'FALSE')
+	
 	image_width = Decimal(request.POST.get('image_width', '0'))
 	image_height = Decimal(request.POST.get('image_height', '0'))
 	
@@ -358,19 +379,27 @@ def add_to_cart(request):
 
 		''' Check if product or user image exists in cart '''
 		cart_prods = {}
-		cart_user_images = {}
 		if prod:
-			cart_prods = Cart_item_view.objects.filter(cart_id = usercart.cart_id, 
-						product_id = prod_id, moulding_id = moulding_id,
-						print_medium_id = print_medium_id, mount_id = mount_id,
-						mount_size = mount_size, acrylic_id = acrylic_id,
-						board_id = board_id, stretch_id = stretch_id ).first()
+			## if this is from a cart then we only check if product id
+			## exists in the cart, as other factors can be changed by user
+			if cart_item_flag == 'TRUE':
+				cart_prods = Cart_item_view.objects.filter(cart_id = usercart.cart_id, 
+							product_id = prod_id).first()			
+			else:
+				cart_prods = Cart_item_view.objects.filter(cart_id = usercart.cart_id, 
+							product_id = prod_id, moulding_id = moulding_id,
+							print_medium_id = print_medium_id, mount_id = mount_id,
+							mount_size = mount_size, acrylic_id = acrylic_id,
+							board_id = board_id, stretch_id = stretch_id ).first()
 
 		if cart_prods:
 			prod_exits_in_cart = True
 	
 		try :
-			cart_total = Decimal(usercart.cart_total) + (total_price)
+			if cart_item_flag == 'TRUE' :
+				cart_total = Decimal(usercart.cart_total) - (cart_prods.item_total) + (total_price)
+			else:
+				cart_total = Decimal(usercart.cart_total) + (total_price)
 			voucher_disc_amount = usercart.voucher_disc_amount
 			# Calculate voucher discount
 			
@@ -416,27 +445,53 @@ def add_to_cart(request):
 			)
 			existingusercart.save()
 			'''
-			usercart.quantity =  usercart.quantity + qty
-			usercart.cart_sub_total = usercart.cart_sub_total + item_sub_total
-			usercart.cart_tax  = usercart.cart_tax + item_tax
+			# Reclaculate tax & sub total after applying voucher
+			cart_sub_total = round( cart_total / (1 + (tax_rate/100)), 2 )
+			cart_tax = cart_total - cart_sub_total
+			
+			# Update cart
+			if cart_item_flag == 'TRUE':
+				usercart.quantity =  usercart.quantity - (cart_prods.quantity) + qty
+			else:
+				usercart.quantity =  usercart.quantity + qty
+				
+			#usercart.cart_sub_total = usercart.cart_sub_total + item_sub_total
+			usercart.cart_sub_total = cart_sub_total
+			#usercart.cart_tax  = usercart.cart_tax + item_tax
+			usercart.cart_tax  = cart_tax
 			usercart.cart_total = cart_total
 			usercart.save()
-						
 			
 			''' If the product with same moulding, print_medium etc. already exists in the cart items, then update it, else insert new item '''
 			if prod_exits_in_cart:
-			
+				## If it has come from the cart then just update the current item for same qty
+				## Else update quantity and amount for current item
+				if cart_item_flag == 'FALSE':
+					iqty = cart_prods.quantity + qty
+					s_total = cart_prods.item_sub_total + item_sub_total
+					total = cart_prods.item_total + total_price
+					unit = cart_prods.item_unit_price
+					d_amt = cart_prods.item_disc_amt + disc_amt
+					tax_amt = cart_prods.item_tax + item_tax
+				else:
+					iqty = qty
+					s_total = item_sub_total
+					total = total_price
+					unit = item_unit_price
+					d_amt = disc_amt
+					tax_amt = item_tax
+				
 				if prod.product_type_id == 'STOCK-IMAGE':
 					usercartitems = Cart_stock_image(
 						cart_item_id = cart_prods.cart_item_id,
 						cart = usercart,
 						promotion = cart_prods.promotion,
-						quantity = cart_prods.quantity + qty,
-						item_unit_price = cart_prods.item_unit_price,
-						item_sub_total = cart_prods.item_sub_total + item_sub_total,
-						item_disc_amt = cart_prods.item_disc_amt + disc_amt,
-						item_tax  = cart_prods.item_tax + item_tax,
-						item_total = cart_prods.item_total + total_price,
+						quantity = iqty,
+						item_unit_price = unit,
+						item_sub_total = s_total,
+						item_disc_amt = d_amt,
+						item_tax  = tax_amt,
+						item_total = total,
 						moulding_id = moulding_id,
 						moulding_size =  mount_size,
 						print_medium_id = print_medium_id,
@@ -461,12 +516,12 @@ def add_to_cart(request):
 						cart_item_id = cart_prods.cart_item_id,
 						cart = usercart,
 						promotion = cart_prods.promotion,
-						quantity = cart_prods.quantity + qty,
-						item_unit_price = cart_prods.item_unit_price,
-						item_sub_total = cart_prods.item_sub_total + item_sub_total,
-						item_disc_amt = cart_prods.item_disc_amt + disc_amt,
-						item_tax  = cart_prods.item_tax + item_tax,
-						item_total = cart_prods.item_total + total_price,
+						quantity = iqty,
+						item_unit_price = unit,
+						item_sub_total = s_total,
+						item_disc_amt = d_amt,
+						item_tax  = tax_amt,
+						item_total = total,
 						moulding_id = moulding_id,
 						moulding_size =  mount_size,
 						print_medium_id = print_medium_id,
@@ -491,12 +546,12 @@ def add_to_cart(request):
 						cart_item_id = cart_prods.cart_item_id,
 						cart = usercart,
 						promotion = cart_prods.promotion,
-						quantity = cart_prods.quantity + qty,
-						item_unit_price = cart_prods.item_unit_price,
-						item_sub_total = cart_prods.item_sub_total + item_sub_total,
-						item_disc_amt = cart_prods.item_disc_amt + disc_amt,
-						item_tax  = cart_prods.item_tax + item_tax,
-						item_total = cart_prods.item_total + total_price,
+						quantity = iqty,
+						item_unit_price = unit,
+						item_sub_total = s_total,
+						item_disc_amt = d_amt,
+						item_tax  = tax_amt,
+						item_total = total,
 						moulding_id = moulding_id,
 						moulding_size =  mount_size,
 						print_medium_id = print_medium_id,
@@ -520,12 +575,12 @@ def add_to_cart(request):
 						cart_item_id = cart_prods.cart_item_id,
 						cart = usercart,
 						promotion = cart_prods.promotion,
-						quantity = cart_prods.quantity + qty,
-						item_unit_price = cart_prods.item_unit_price,
-						item_sub_total = cart_prods.item_sub_total + item_sub_total,
-						item_disc_amt = cart_prods.item_disc_amt + disc_amt,
-						item_tax  = cart_prods.item_tax + item_tax,
-						item_total = cart_prods.item_total + total_price,
+						quantity = iqty,
+						item_unit_price = unit,
+						item_sub_total = s_total,
+						item_disc_amt = d_amt,
+						item_tax  = tax_amt,
+						item_total = total,
 						moulding_id = moulding_id,
 						moulding_size =  mount_size,
 						print_medium_id = print_medium_id,
@@ -960,9 +1015,15 @@ def update_cart_item(request):
 		)
 		newusercart.save()
 		'''		
+		# Reclaculate tax after applying voucher
+		cart_sub_total = round( cart_total / (1 + (tax_rate/100)), 2 )
+		cart_tax = cart_total - cart_sub_total
+		
 		cart.quantity =  cart.quantity - cart_item.quantity + updated_qty
-		cart.cart_sub_total = cart.cart_sub_total - cart_item.item_sub_total + item_sub_total
-		cart.cart_tax  = cart.cart_tax - cart_item.item_tax + item_tax
+		#cart.cart_sub_total = cart.cart_sub_total - cart_item.item_sub_total + item_sub_total
+		cart.cart_sub_total = cart_sub_total
+		#cart.cart_tax  = cart.cart_tax - cart_item.item_tax + item_tax
+		cart.cart_tax  = cart_tax
 		cart.cart_total = cart_total
 		cart.save()		
 
@@ -1256,9 +1317,30 @@ def delete_cart_item(request):
 			)
 			c.save()
 			'''
+			# TAX Calculations
+			taxes = get_taxes()
+			#if product exists then it's an image tax
+			if cart_item.product_type_id == 'STOCK-IMAGE' :
+				tax_rate = taxes['stock_image_tax_rate']
+			elif cart_item.product_type_id == 'USER-IMAGE' :
+				tax_rate = taxes['user_image_tax_rate']
+			elif cart_item.product_type_id == 'STOCK-COLLAGE' :
+				tax_rate = taxes['stock_collage_tax_rate']
+			elif cart_item.product_type_id == 'ORIGINAL-ART' :
+				tax_rate = taxes['original_art_tax_rate']
+			elif cart_item.product_type_id == 'FRAME' :
+				tax_rate = taxes['frame_tax_rate']
+
+			# Reclaculate tax & sub total after applying voucher
+			cart_sub_total = round( cart_total / (1 + (tax_rate/100)), 2 )			
+			cart_tax = cart_total - cart_sub_total
+			
+			# Update cart
 			cart.quantity = cart.quantity - cart_item.quantity
-			cart.cart_sub_total = cart.cart_sub_total - cart_item.item_sub_total
-			cart.cart_tax  = cart.cart_tax - cart_item.item_tax
+			#cart.cart_sub_total = cart.cart_sub_total - cart_item.item_sub_total
+			cart.cart_sub_total = cart_sub_total
+			#cart.cart_tax  = cart.cart_tax - cart_item.item_tax
+			cart.cart_tax  = cart_tax
 			cart.cart_total = cart_total
 			cart.save()				
 				
@@ -1498,7 +1580,7 @@ def apply_referral(request, cart_total):
 					msg = "Congratulations! you get 10% off on order value for a sucessful referral for " + r.email_id + "."
 					return  ({'status':status, 'msg':msg, 
 						'disc_perc':disc_perc, 'cart_total':new_cart_total, 
-						'referral_id':referee.id, 'disc_amt':disc_amt})
+						'referral_id':r.id, 'disc_amt':disc_amt})
 					
 
 	## Check if it's the referee 
@@ -1508,7 +1590,7 @@ def apply_referral(request, cart_total):
 			disc_amt = ( cart_total * 10/100 )
 			new_cart_total = cart_total - disc_amt
 			status = "SUCCESS"
-			msg = "Congratulations! you get 10% off on order value as a gift through a referral (" + r.referred_by.email + ")."
+			msg = "Congratulations! you get 10% off on order value as a gift through a referral (" + referee.referred_by.email + ")."
 			return  ({'status':status, 'msg':msg, 
 				'disc_perc':disc_perc, 'cart_total':new_cart_total, 
 				'referral_id':referee.id, 'disc_amt':disc_amt})

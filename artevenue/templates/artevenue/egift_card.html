@@ -49,7 +49,7 @@
 									class="img-fluid" />
 							</div>
 							<div class = "col-sm-8">
-								<p class="lead">Feel like gifting someone the great artwork?</p>
+								<p class="lead">Feel like gifting an exclusive artwork?</p>
 								<ul>
 									<li>Let us know who you want to gift</li>
 									<li>Choose the gift card amount and the card design</li>
@@ -82,53 +82,65 @@
 											{% endfor %}												
 											{% for field in form.visible_fields %}
 												{% if field.html_name == 'egift_card_design' %}
-												<div class="form-group cform-group row crow">
-													<label>Choose the gift card design:</label>
-													<div class = "row">
-													{% for d in designs %}
-														{% with 'img/'|add:d.url as image_static %}
-														<div class = "col-4 text-center" style = "padding:0px 5px !important;">
-															<img src = "{% static image_static %}" class="f_images img-fluid"
-																onclick = "document.getElementById('{{d.design_id}}').checked = true;">
-															<input type = "radio" id = "{{d.design_id}}" name = "egift_card_design" 
-																value = "{{d.design_id}}" 
-																{% if field.value == d.design_id %} checked="checked" {% endif %}>
-														</div>
-														{% endwith %}
-													{% endfor %}													
-													{% if field.errors %}
-														<div class="invalid-feedback" style="color:#ff5821">
-															{{ error }}
-														</div>
-													{% endif %}
-													</div>													
-												</div>
-												{% else %}
-												
-												<div class="form-group cform-group row crow">
-													{{ field.label_tag }}
-													{% load widget_tweaks %}
-													{% if form.is_bound %}
+													<div class="form-group cform-group row crow">
+														<label>Choose the gift card design:</label>
+														<div class = "row">
+														{% for d in designs %}
+															{% with 'img/'|add:d.url as image_static %}
+															<div class = "col-4 text-center" style = "padding:0px 5px !important;">
+																<img src = "{% static image_static %}" class="f_images img-fluid"
+																	onclick = "document.getElementById('{{d.design_id}}').checked = true;">
+																<input type = "radio" id = "{{d.design_id}}" name = "egift_card_design" 
+																	value = "{{d.design_id}}" 
+																	{% if field.value == d.design_id %} checked="checked" {% endif %}>
+															</div>
+															{% endwith %}
+														{% endfor %}													
 														{% if field.errors %}
-															{% render_field field class="form-control is-invalid" %}
-															{% for error in field.errors %}
 															<div class="invalid-feedback" style="color:#ff5821">
 																{{ error }}
 															</div>
-															{% endfor %}
-														{% else %}
-															{% render_field field class="form-control is-valid" %}
 														{% endif %}
+														</div>													
+													</div>
+												{% else %}
+													{% if  field.html_name == 'delivery_date' %}
+														<div class = "form-group cform-group row crow">
+															{{ field.label_tag }}
+															<input class = "form-control" type = "date" id = "id_delivery_date" name = "delivery_date" 
+																value = "{{form.delivery_date.value|date:'Y-m-d'}}">
+															{% if field.errors %}
+																<div class="invalid-feedback" style="color:#ff5821">
+																	{{ error }}
+																</div>
+															{% endif %}
+														</div>
 													{% else %}
-														{% render_field field class="form-control" %}
+														<div class="form-group cform-group row crow">
+															{{ field.label_tag }}
+															{% load widget_tweaks %}
+															{% if form.is_bound %}
+																{% if field.errors %}
+																	{% render_field field class="form-control is-invalid" %}
+																	{% for error in field.errors %}
+																	<div class="invalid-feedback" style="color:#ff5821">
+																		{{ error }}
+																	</div>
+																	{% endfor %}
+																{% else %}
+																	{% render_field field class="form-control is-valid" %}
+																{% endif %}
+															{% else %}
+																{% render_field field class="form-control" %}
+															{% endif %}
+														
+															{% if field.help_text %}
+															<small class="form-text text-muted">
+																{{ field.help_text | safe }}
+															</small>
+															{% endif %}
+														</div>
 													{% endif %}
-												
-													{% if field.help_text %}
-													<small class="form-text text-muted">
-														{{ field.help_text | safe }}
-													</small>
-													{% endif %}
-												</div>
 												{% endif %}
 											{% endfor %}            
 
@@ -149,9 +161,9 @@
 							<div class = "col-sm-12">
 								<p class="lead">Terms and conditions:</p>
 								<ul>
-									<li>You must be signed up customer to be able to send an eGtft</li>
+									<li>You must be signed up customer to be able to send an eGift</li>
 									<li>Providing name and valid email id of the person you want to gift to is mandatory</li>
-									<li>We will use the email id to send the eGift voucher code</li>
+									<li>The eGift voucher code will be sent to the  receiver email id  shared by you  </li>
 									<li>IMPORTANT: Responsibility lies with the customer to ensure that valid and active email id of the receiver is provided to us</li>
 									<li>We use the name and email provided only to send the email to the receiver</li>
 									<li>Receiver gets an email with your gift card for value you choose, your message and a coupan code to claim the gift</li>

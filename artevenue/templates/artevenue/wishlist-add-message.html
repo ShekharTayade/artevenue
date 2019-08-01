@@ -9,13 +9,10 @@
 			<div class="modal-body">
 				<div class="text-center">
 					<div class = "mb-4">
-						<h4>Added to Your Wishlist!!</h4>
+						<h4 id="w_msg">Added to Your Favourites!!</h4>
 					</div>
-					<div class = "pull-left">
-						<a href="{% url 'show_wishlist' %}" class="btn btn-primary pull-left"><i class="fa fa-shopping-cart"></i> View Wishlist</a>
-					</div>
-					<div class = "pull-right">
-						<button class="btn btn-primary pull-right" onclick="$('#msg-modal').modal('hide');"><i class="fa fa-chevron-right"></i>Continue</button>
+					<div class = "text-center">
+						<button class="btn btn-primary pull-right" onclick="$('#msg-wishlist-modal').modal('hide');"><i class="fa fa-check-circle"></i>Ok</button>
 					</div>					
 				</div>
 
