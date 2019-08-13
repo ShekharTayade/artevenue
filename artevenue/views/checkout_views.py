@@ -872,7 +872,7 @@ def checkout_step3_order_review(request):
 			cart = usercart.cart_id, product__product_type_id = F('product_type_id')).values(
 		'cart_item_id', 'product_id', 'product__publisher', 'quantity', 'item_total', 'moulding_id',
 		'moulding__name', 'moulding__width_inches', 'print_medium_id', 'mount_id', 'mount__name',
-		'acrylic_id', 'mount_size', 'product__name', 'image_width', 'image_height',
+		'acrylic_id', 'mount_size', 'product__name', 'image_width', 'image_height', 'stretch_id', 
 		'product__thumbnail_url', 'cart_id', 'promotion__discount_value', 'promotion__discount_type', 'mount__color',
 		'item_unit_price', 'item_sub_total', 'item_disc_amt', 'item_tax', 'item_total', 'product_type',
 		'product__image_to_frame'

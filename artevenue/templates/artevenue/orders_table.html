@@ -106,7 +106,7 @@
 												<div class = "pull-left">
 													<button type ="button" class = "btn btn-link" style = "padding-left:0px;" onclick = "getFramedImg('{{i.product_id}}', '{{i.image_width}}', '{{i.moulding_id| default_if_none:0}}', '{{i.mount.color| default_if_none:0}}','{{i.mount_size| default_if_none:0}}', '{{i.product.url}}');">
 														{% if i.product_type|cut:' ' == 'USER-IMAGE' %}  
-															Uploaded Image
+															Customer Image
 														{% else %}
 															{{i.product.name}}
 														{% endif %}
@@ -117,21 +117,29 @@
 											<td>
 												{% with width=i.moulding.width_inches|add_width_frame_mount:i.mount_size %}
 
-												<small>Print on {{i.print_medium_id|title}}, 
-												Image Size : {{ i.image_width }}" X {{i.image_height }}";
+												<small>
+												<li>Print on {{i.print_medium_id|title}}</li>
 												{% if i.moulding_id %}
-													Frame {{i.moulding.name }} Total Size: 
-													{{ i.image_width|add_width:width }}" X {{i.image_height|add_width:width }}";
+												<li>Image Print Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+												<li>Frame {{i.moulding.name }} </li>
+												<li>Total Size: 
+													{{ i.image_width|add_width:width }}" X {{i.image_height|add_width:width }}"</li>
+												{% else %}
+													<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
 												{% endif %}
 												
 												{% if i.mount_id %}
-													{{i.mount_size }}" {{i.mount.name|title }} Mount;
+													<li>Mount: {{i.mount_size }}", Color: {{i.mount.name|title }} </li>
 												{% endif %}
 												{% if i.acrylic_id %}
-													Acrylic; 
+													<li>Acrylic covered</li>
+												{% endif %}
+												{% if i.stretch_id %}
+													<li>Canvas Stretched</li>
 												{% endif %}
 												</small>
 												{% endwith %}
+
 											</td>
 											<td style = "text-align:right">
 												{{i.item_unit_price}}

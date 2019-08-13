@@ -1,7 +1,8 @@
 from artevenue.models import Stock_image_category, Product_type, Tax
 from artevenue.models import Stock_image, Stock_image_stock_image_category
-from artevenue.models import Ecom_site, Publisher_price, Publisher
-from artevenue.models import Stock_image_error, Stock_image_category_error, Publisher_error, Stock_image_stock_image_category_error, Image_url_error
+from artevenue.models import Ecom_site, Publisher_price, Publisher, Curated_collection
+from artevenue.models import Stock_image_error, Stock_image_category_error
+from artevenue.models import Publisher_error, Stock_image_stock_image_category_error, Image_url_error
 
 from datetime import datetime
 from django.conf import settings
@@ -148,11 +149,11 @@ def importPODImageData():
 					continue
 					
 				if ft.code == 200:
-					pos = thumbnail_url.rfind('/')
-					loc = 0
-					if pos > 0:
-						loc = pos+1
-					thumbnail_img = thumbnail_url[loc:]
+					pos_t = thumbnail_url.rfind('/')
+					loc_t = 0
+					if pos_t > 0:
+						loc_t = pos_t+1
+					thumbnail_img = thumbnail_url[loc_t:]
 					file = Path("/home/artevenue/website/estore/static/image_data/POD/images/" + thumbnail_img)
 					# If file does not exists then copy the file
 					if not file.is_file():	
@@ -358,7 +359,8 @@ def deletePODImageData():
 	prods = Stock_image.objects.all()
 	
 	cnt = 0
-
+	d_cnt = 0
+	c_cnt = 0
 	prod_ids = []
 	for row in cr:	
 		# Skip the first row (header)
@@ -373,14 +375,22 @@ def deletePODImageData():
 		else:
 			# Set product is_published to false
 			if prod.product_id <= 1000000:
-				prod = Stock_image.objects.filter(product_id = prod.product_id).update(
+				prd = Stock_image.objects.filter(product_id = prod.product_id).update(
 						is_published = False)
-			print(cnt)
+				d_cnt = d_cnt+1
+				print(d_cnt)
+				# Delete from curated collections, if present
+				curated = Curated_collection.objects.filter(product_id = prod.product_id).first()
+				if curated:
+					curated.delete()
+					c_cnt = c_cnt+1
+					print(c_cnt)
 						
 		cnt = cnt + 1
 		if cnt >= 1000000:
 			break	
-	print("Total deleted: " + str(cnt) )
+	print("Total deleted: " + str(d_cnt) )
+	print("Total curated deleted: " + str(c_cnt) )
 	return cnt
 	
 def downloadPODFile():

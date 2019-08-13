@@ -335,10 +335,17 @@ def new_customer_emails():
 	users = User_sms_email.objects.filter( welcome_email_sent = False )
 	mail_cnt = 0
 	for u in users:
+		## Check if it's a busines user
+		business_user = Business_profile.objects.filter(user = u.user).first()
+		if business_user:
+			template = 'artevenue/new_business_customer_email.html'
+		else:
+			template = 'artevenue/new_customer_email.html'
+			
 		to = u.user.email
 		subject = "Welcome on board Arte'Venue!"
-		html_message = render_to_string('artevenue/new_customer_email.html', 
-			{'user': u.user})
+		html_message = render_to_string(template, 
+			{'user': u.user, 'business_user':business_user})
 		plain_message = strip_tags(html_message)
 		from_email = 'support@artevenue.com'
 	

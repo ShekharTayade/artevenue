@@ -43,11 +43,11 @@
 					<td>
 						{% if order.order_shipping %}
 						<div style = "left:10px;">
-							{{order.order_shipping.full_name}} 
+							{{order.order_shipping.full_name}}
 							{% if order.order_shipping.Company %}
 								, {{order.order_shipping.Company}}
-								<br />
-							{% endif %}
+								
+							{% endif %} <br />
 							{{order.order_shipping.address_1}}
 							{% if order.order_shipping.address_2 %}
 								{{order.order_shipping.address_2 }}
@@ -69,11 +69,11 @@
 					<td>
 						{% if order.order_billing %}
 						<div style = "left:600px; right:0px;">
-							{{order.order_billing.full_name}} 
+							{{order.order_billing.full_name}}
 							{% if order.order_billing.Company %}
 								, {{order.order_billing.Company}}
-								<br />
-							{% endif %}
+								
+							{% endif %} <br />
 							{{order.order_billing.address_1}}
 							{% if order.order_billing.address_2 %}
 								{{order.order_billing.address_2 }}
@@ -101,7 +101,7 @@
 		</table>
 		<hr>
 		<div class="table table-responsive">
-			<table id = "ordTbl" class="table table-responsive table-striped">
+			<table border=1 id = "ordTbl" class="table table-responsive table-striped">
 				<thead>
 					<tr>
 						<th width="15%" style="text-align:left">Product</th>
@@ -143,22 +143,29 @@
 						<td>
 							{% with width=i.moulding.width_inches|add_width_frame_mount:i.mount_size %}
 
-							<small>Print on {{i.print_medium_id|title}}, 
+							<small>
+							<li>Print on {{i.print_medium_id|title}}</li>
 							{% if i.moulding_id %}
-								Frame {{i.moulding.name }}, Total Size: 
-								{{ i.image_width|add_width:width }}" X {{i.image_height|add_width:width }}" 
+							<li>Image Print Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+							<li>Frame {{i.moulding.name}}, CODE:{{i.moulding.part_number}} </li>
+							<li>Total Size: 
+								{{ i.image_width|add_width:width }}" X {{i.image_height|add_width:width }}"</li>
 							{% else %}
-								Image Size : {{ i.image_width }}" X {{i.image_height }}" 
+								<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
 							{% endif %}
 							
 							{% if i.mount_id %}
-								, {{i.mount_size }}" {{i.mount.name|title }} Mount  
+								<li>Mount: {{i.mount_size }}", Color: {{i.mount.name|title }} </li>
 							{% endif %}
 							{% if i.acrylic_id %}
-								, Acrylic 
+								<li>Acrylic covered</li>
+							{% endif %}
+							{% if i.stretch_id %}
+								<li>Canvas Stretched</li>
 							{% endif %}
 							</small>
 							{% endwith %}
+
 						</td>
 						<td style = "text-align:right">
 							<small>{{i.quantity}}</small>
@@ -171,4 +178,11 @@
 				</tbody>
 			</table>
 		</div>
+
 		<hr>
+		<p>
+			With warm regards,<br />
+			Team Arte'Venue<br/>
+			<img src = "https://artevenue.com/static/img/logo.png" alt="Arte'venue Logo"  height="30" width="110"> <br />
+			<a href = "https://www.artevenue.com">www.artevenue.com</a>
+		</p>

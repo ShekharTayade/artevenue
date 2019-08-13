@@ -12,7 +12,7 @@ import json
 from artevenue.models import Ecom_site, Stock_image, Stock_image_category, Publisher_price
 from artevenue.models import Stock_image_stock_image_category, Cart_stock_image, Cart_item_view
 from artevenue.models import Print_medium, Publisher_price, Promotion_stock_image, Promotion_product_view
-from artevenue.models import Curated_collection, Curated_category
+from artevenue.models import Curated_collection, Curated_category, Promotion
 from artevenue.models import Wishlist, Wishlist_item_view
 
 from .frame_views import *
@@ -177,9 +177,9 @@ def category_stock_images(request, cat_id = ''):
 			perpage = 100
 			show = '100'
 		else:
-			if show == 'ALL':
-				perpage = 999999
-				show = 'ALL'
+			if show == '1000':
+				perpage = 1000
+				show = '1000'
 			else:
 				show = '50' # default
 				perpage = 50
@@ -188,7 +188,15 @@ def category_stock_images(request, cat_id = ''):
 	if not page:
 		page = request.GET.get('page')
 	
-	prods = paginator.get_page(page)		
+	prods = paginator.get_page(page)			
+	
+	#=====================
+	index = prods.number - 1 
+	max_index = len(paginator.page_range)
+	start_index = index - 5 if index >= 5 else 0
+	end_index = index + 5 if index <= max_index - 5 else max_index
+	page_range = list(paginator.page_range)[start_index:end_index]
+	#=====================
 	
 	if request.is_ajax():
 
@@ -201,7 +209,7 @@ def category_stock_images(request, cat_id = ''):
 		'products':products, 'prods':prods, 'sortOrder':sortOrder, 'show':show,'prod_filters':prod_filters,
 		'prod_filter_values':prod_filter_values, 'price':price, 'ikeywords':ikeywords,
 		'page':page, 'wishlistitems':wishlistitems, 'wishlist_prods':wishlist_prods,
-		'width':width, 'height':height} )
+		'width':width, 'height':height, 'page_range':page_range} )
 
 def show_categories(request):
 
@@ -212,8 +220,6 @@ def show_categories(request):
 	categories_list = Stock_image_category.objects.annotate(Count(
 		'stock_image_stock_image_category')).filter(
 		stock_image_stock_image_category__count__gt = 0).order_by('name')
-
-	print( categories_list )
 		
 	if show == None or show == '50':
 		perpage = 50 #default
@@ -222,15 +228,24 @@ def show_categories(request):
 		if show == '100':
 			perpage = 100
 		else:
-			if show == 'ALL':
-				perpage = 999999
+			if show == '1000':
+				perpage = 10000
 				
 	paginator = Paginator(categories_list, perpage) 
 	page = request.GET.get('page')
 	categories = paginator.get_page(page)
+
+	#=====================
+	index = categories.number - 1 
+	max_index = len(paginator.page_range)
+	start_index = index - 5 if index >= 5 else 0
+	end_index = index + 5 if index <= max_index - 5 else max_index
+	page_range = list(paginator.page_range)[start_index:end_index]
+	#=====================
+	
 	
 	return render(request, "artevenue/show_all_categories.html", {'categories':categories,
-	'sortOrder':sortOrder, 'show':show})
+	'sortOrder':sortOrder, 'show':show, 'page_range':page_range})
 		
 		
 
@@ -325,12 +340,20 @@ def search_products_by_keywords(request):
 		if show == '100':
 			perpage = 100
 		else:
-			if show == 'ALL':
-				perpage = 999999
+			if show == '1000':
+				perpage = 1000
 				
 	paginator = Paginator(products, perpage) 
 	page = request.GET.get('page')
 	prods = paginator.get_page(page)
+
+	#=====================
+	index = prods.number - 1 
+	max_index = len(paginator.page_range)
+	start_index = index - 5 if index >= 5 else 0
+	end_index = index + 5 if index <= max_index - 5 else max_index
+	page_range = list(paginator.page_range)[start_index:end_index]
+	#=====================
 
 	if request.is_ajax():
 
@@ -341,9 +364,9 @@ def search_products_by_keywords(request):
 	return render(request, template, {'prod_categories':prod_categories, 
 		'products':products, 'prods':prods, 'sortOrder':sortOrder, 'show':show, 'prod_filters':prod_filters,
 		'prod_filter_values':prod_filter_values, 'ikeywords':ikeywords,
-		'width':width, 'height':height} )
+		'width':width, 'height':height, 'page_range':page_range} )
 	
-def stock_image_detail(request, prod_id = ''):
+def stock_image_detail(request, prod_id = '', iuser_width='', iuser_height=''):
 	cart_item_id = request.GET.get("cart_item_id", "")
 	wishlist_item_id = request.GET.get("wishlist_item_id", "")
 	if not prod_id or prod_id == '' :
@@ -351,9 +374,11 @@ def stock_image_detail(request, prod_id = ''):
 	
 	if prod_id == None:
 		return
-
-	iuser_width = request.GET.get('iuser_width','0')
-	iuser_height = request.GET.get('iuser_height','0')
+	
+	if not iuser_width or iuser_width == '':
+		iuser_width = request.GET.get('iuser_width','0')
+	if not iuser_height or iuser_height == '' :
+		iuser_height = request.GET.get('iuser_height','0')
 
 	# get the product
 	#product = Stock_image.objects.get(product_id = prod_id, is_published = True)
@@ -410,7 +435,7 @@ def stock_image_detail(request, prod_id = ''):
 		'cart_item':cart_item_view, 'wishlist_item':wishlist_item_view, 'iuser_width':iuser_width, 
 		'iuser_height':iuser_height} )	
 	'''
-	return render(request, "artevenue/stock_image_detail_with_var.html", {'product':product,
+	return render(request, "artevenue/stock_image_detail.html", {'product':product,
 		'prod_categories':prod_categories, 'printmedium':printmedium, 'product_category':product_category,
 		'mouldings_apply':paper_mouldings_apply, 'mouldings_show':paper_mouldings_show, 'mounts':mounts,
 		'per_sqinch_paper':per_sqinch_paper, 'per_sqinch_canvas':per_sqinch_canvas, 'acrylics':acrylics,
@@ -714,23 +739,33 @@ def get_item_price_by_cart_item (cart_item_id):
 
 			
 def get_product_promotion(prod_id):
-
-	# Product promotions #	
-	promo_prod = Promotion_product_view.objects.filter(product_id = prod_id,
-			promotion__effective_from__lte = today, 
-			promotion__effective_to__gte = today).select_related('promotion').first()
-
 	cash_disc = 0
 	percent_disc = 0
 	promo_id = None
-		
+			
+	## Check for store wide promotion
+	promo = Promotion.objects.filter(effective_from__lte = today, 
+			effective_to__gte = today, promotion_type = 'A').first()
 	
-	if promo_prod:
-		if promo_prod.promotion.discount_type == "CASH":
-			cash_disc = promo_prod.promotion.discount_value
-		if promo_prod.promotion.discount_type == "PERCENTAGE":
-			percent_disc = promo_prod.promotion.discount_value
-		promo_id = promo_prod.promotion_id
+	if promo:
+		if promo.discount_type == "CASH":
+			cash_disc =promo.discount_value
+		if promo.discount_type == "PERCENTAGE":
+			percent_disc = promo.discount_value
+		promo_id = promo.promotion_id
+				
+	else:
+		# Product promotions #	
+		promo_prod = Promotion_product_view.objects.filter(product_id = prod_id,
+				promotion__effective_from__lte = today, 
+				promotion__effective_to__gte = today).select_related('promotion').first()
+
+		if promo_prod:
+			if promo_prod.promotion.discount_type == "CASH":
+				cash_disc = promo_prod.promotion.discount_value
+			if promo_prod.promotion.discount_type == "PERCENTAGE":
+				percent_disc = promo_prod.promotion.discount_value
+			promo_id = promo_prod.promotion_id
 		
 		
 	return ({'promotion_id':promo_id, 'cash_disc':cash_disc, 'percent_disc':percent_disc})
@@ -916,9 +951,9 @@ def all_stock_images(request):
 			perpage = 100
 			show = '100'
 		else:
-			if show == 'ALL':
-				perpage = 999999
-				show = 'ALL'
+			if show == '1000':
+				perpage = 1000
+				show = '1000'
 			else:
 				show = '50' # default
 				perpage = 50
@@ -927,7 +962,15 @@ def all_stock_images(request):
 	if not page:
 		page = request.GET.get('page')
 	prods = paginator.get_page(page)		
-	
+
+	#=====================
+	index = prods.number - 1 
+	max_index = len(paginator.page_range)
+	start_index = index - 5 if index >= 5 else 0
+	end_index = index + 5 if index <= max_index - 5 else max_index
+	page_range = list(paginator.page_range)[start_index:end_index]
+	#=====================
+		
 	if request.is_ajax():
 
 		template = "artevenue/prod_display_include.html"
@@ -938,7 +981,7 @@ def all_stock_images(request):
 		'category_prods': category_prods, 'product_category':product_cate, 
 		'products':products, 'prods':prods, 'sortOrder':sortOrder, 'show':show,'prod_filters':prod_filters,
 		'prod_filter_values':prod_filter_values, 'price':price,
-		'width':width, 'height':height} )
+		'width':width, 'height':height, 'page_range':page_range} )
 
 		
 		
@@ -1078,9 +1121,9 @@ def curated_collections(request, cat_id):
 			perpage = 100
 			show = '100'
 		else:
-			if show == 'ALL':
-				perpage = 999999
-				show = 'ALL'
+			if show == '1000':
+				perpage = 1000
+				show = '1000'
 			else:
 				show = '50' # default
 				perpage = 50
@@ -1090,7 +1133,15 @@ def curated_collections(request, cat_id):
 		page = request.GET.get('page')
 
 	prods = paginator.get_page(page)
-	
+
+	#=====================
+	index = prods.number - 1 
+	max_index = len(paginator.page_range)
+	start_index = index - 5 if index >= 5 else 0
+	end_index = index + 5 if index <= max_index - 5 else max_index
+	page_range = list(paginator.page_range)[start_index:end_index]
+	#=====================
+		
 	if request.is_ajax():
 
 		template = "artevenue/prod_display_include.html"
@@ -1101,7 +1152,7 @@ def curated_collections(request, cat_id):
 		'product_category':product_cate, 
 		'products':products, 'prods':prods, 'sortOrder':sortOrder, 'show':show,'prod_filters':prod_filters,
 		'prod_filter_values':prod_filter_values, 'price':price, 'show_artist':True,
-		'width':width, 'height':height} )		
+		'width':width, 'height':height, 'page_range':page_range} )		
 
 @staff_member_required
 @csrf_exempt
@@ -1145,9 +1196,9 @@ def image_by_image_code(request):
 			perpage = 100
 			show = '100'
 		else:
-			if show == 'ALL':
-				perpage = 999999
-				show = 'ALL'
+			if show == '1000':
+				perpage = 1000
+				show = '1000'
 			else:
 				show = '50' # default
 				perpage = 50
@@ -1159,10 +1210,19 @@ def image_by_image_code(request):
 			page = request.POST.get('page')
 
 		prods = paginator.get_page(page)
+		#=====================
+		index = prods.number - 1 
+		max_index = len(paginator.page_range)
+		start_index = index - 5 if index >= 5 else 0
+		end_index = index + 5 if index <= max_index - 5 else max_index
+		page_range = list(paginator.page_range)[start_index:end_index]
+		#=====================
 	else :
 		prods = {}
-
+		page_range = []
+	
 	return render(request, template,
-			{'prods':prods, 'show':show, 'perpage':perpage, 'width':16})
+			{'prods':prods, 'show':show, 'perpage':perpage, 'width':16,
+			'page_range':page_range})
 
 		

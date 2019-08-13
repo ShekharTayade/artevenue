@@ -473,7 +473,7 @@
 					type: 'POST',
 					success: function (data) {
 						data = JSON.parse(data);
-						if (data.msg == '') { 
+						if (data.msg.toUpperCase() != 'SUCCESS') { 
 							if (data.disc_applied) {
 								$("#no-disc").hide();
 								$("#promo-display").show("slow");

@@ -136,7 +136,17 @@ def business_registration(request):
 
 				user = form.save()
 				auth_login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-
+				# Update email, sms table
+				today = datetime.datetime.today()
+				u_email = User_sms_email(
+					user = user,
+					welcome_email_sent = False,
+					welcome_sms_sent = False,
+					created_date = today,	
+					updated_date = today
+				)
+				u_email.save()
+				
 				userprofile = businessprofile_form.save(commit=False)
 				userprofile.user = user
 				userprofile.save()

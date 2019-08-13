@@ -80,10 +80,11 @@ Customer ID: 186164730
 
 Support -
 	support@artevenue.com / $1arte_venue
-	factory@artevenue.com / $1csjd@kfdl
 	
+Factory:
+	factory@artevenue.com / $1csjd@kfdl 		
 
 Neeraj:
 	username: dugarneeraj@gamil.com
 	pwd: Nsj211001&
-	
+

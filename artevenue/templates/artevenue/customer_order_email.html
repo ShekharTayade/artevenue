@@ -34,13 +34,13 @@
 		<p>Thank you for choosing Arte’Venue!</p>
 			
 		<p>	Your order number <span  style = "color:blue">
-				Order Number : {{order.order_number}}</span> 
-				has been received Your order and is under process right now. 
-				You will receive an intimation via email once your order is 
-				dispatched along with the AWB number. 
+				Your order number : {{order.order_number}}</span> 
+				has been received and is under process right now. 
+				You will receive an intimation along with the AWB number 
+				via email once your order is dispatched. 
 				You can track your order using the AWB number.
 		</p>
-		<h4>  <span  style = "color:blue">{{order.order_number}}</span> </h4>
+		<h4>  <span  style = "color:blue">Order Number: {{order.order_number}}</span> </h4>
 		Date : {{order.order_date}}
 		<hr>
 
@@ -161,19 +161,25 @@
 						<td>
 							{% with width=i.moulding.width_inches|add_width_frame_mount:i.mount_size %}
 
-							<small>Print on {{i.print_medium_id|title}}, 
+							<small>
+							<li>Print on {{i.print_medium_id|title}}</li>
 							{% if i.moulding_id %}
-								Frame {{i.moulding.name }} Total Size: 
-								{{ i.image_width|add_width:width }}" X {{i.image_height|add_width:width }}" 
+							<li>Image Print Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+							<li>Frame {{i.moulding.name }} </li>
+							<li>Total Size: 
+								{{ i.image_width|add_width:width }}" X {{i.image_height|add_width:width }}"</li>
 							{% else %}
-								Image Size : {{ i.image_width }}" X {{i.image_height }}" 
+								<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
 							{% endif %}
 							
 							{% if i.mount_id %}
-								, {{i.mount_size }}" {{i.mount.name|title }} Mount  
+								<li>Mount: {{i.mount_size }}", Color: {{i.mount.name|title }} </li>
 							{% endif %}
 							{% if i.acrylic_id %}
-								, Acrylic 
+								<li>Acrylic covered</li>
+							{% endif %}
+							{% if i.stretch_id %}
+								<li>Canvas Stretched</li>
 							{% endif %}
 							</small>
 							{% endwith %}
@@ -250,3 +256,9 @@
 			</table>
 		</div>
 		<hr>
+		<p>
+			With warm regards,<br />
+			Team Arte'Venue<br/>
+			<img src = "https://artevenue.com/static/img/logo.png" alt="Arte'venue Logo"  height="30" width="110"> <br />
+			<a href = "https://www.artevenue.com">www.artevenue.com</a>
+		</p>

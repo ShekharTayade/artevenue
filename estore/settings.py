@@ -21,7 +21,7 @@ import dj_database_url
 SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=False, cast=bool)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
-
+EXEC_ENV = config('EXEC_ENV', default='DEV')
 
 DATABASES = {
     'default': dj_database_url.config(
@@ -38,7 +38,7 @@ SECRET_KEY = 'fgn-iuumkx7nu-yymz(n_kecklq9+v!gmu%xt!j08h$0o*1crb'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-SITE_ID = 1
+SITE_ID = 2
 TEMPLATE_DEBUG = True
 
 # Store ID
@@ -64,7 +64,9 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.facebook',
     'allauth.socialaccount.providers.google',
     'allauth.socialaccount.providers.instagram',	
-    'allauth.socialaccount.providers.twitter',]
+    'allauth.socialaccount.providers.twitter',
+	'rest_framework',
+	]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -98,6 +100,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'estore.wsgi.application'
 
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
@@ -231,8 +238,8 @@ EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
 
-DEFAULT_FROM_EMAIL = ''
-EMAIL_SUBJECT_PREFIX = ''
+DEFAULT_FROM_EMAIL = 'support@artevenue.com'
+EMAIL_SUBJECT_PREFIX = 'ArteVenue.com: '
 
 MEDIA_URL = ('/media/')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')

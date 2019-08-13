@@ -76,6 +76,7 @@ class Voucher(models.Model):
 	all_applicability = models.BooleanField(null=False, default=False)
 	created_date = models.DateTimeField(auto_now_add=True, null=False)	
 	updated_date = models.DateTimeField(auto_now=True, null=False)	
+	expiry_date = models.DateField(blank=True, null=True)
 
 	class meta:
 		unique_together = (('store', 'voucher_id', 'effective_from', 'discount_type'),)
@@ -97,6 +98,17 @@ class Voucher_user(models.Model):
 
 	def __str__(self):
 		return str(self.user) + '-' + str(self.voucher)
+
+
+class Voucher_used(models.Model):
+	voucher = models.ForeignKey(Voucher, on_delete=models.CASCADE, null=False)
+	user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
+	created_date = models.DateTimeField(auto_now_add=True, null=False)	
+	updated_date = models.DateTimeField(auto_now=True, null=False)	
+
+	def __str__(self):
+		return str(self.user) + '-' + str(self.voucher)
+
 
 class Egift_card_design(models.Model):
 	design_id = models.AutoField(primary_key=True, null=False)
@@ -504,10 +516,10 @@ class User_image (models.Model):
 			FILE_EXTENSION = 'gif'
 			DJANGO_TYPE = 'image/gif'
 		if PIL_TYPE == '' :
-			extension = lower(os.path.splitext(self.image_to_frame.name)[1])
-			PIL_TYPE = extension
-			FILE_EXTENSION = extension
-			DJANGO_TYPE = 'image/' + extension
+			extension = os.path.splitext(self.image_to_frame.name)[1]
+			PIL_TYPE = extension.lower()[1:]
+			FILE_EXTENSION = PIL_TYPE
+			DJANGO_TYPE = 'image/' + PIL_TYPE[1:]
 
 		# Open original photo which we want to thumbnail using PIL's Image
 		image = Image.open(self.image_to_frame)
@@ -657,10 +669,20 @@ class Curated_collection(models.Model):
 # This model stores promotions that the Store runs.	
 # New Arrival, Sale, Promotion etc...
 class Promotion(models.Model):
+	STORE_WIDE = 'A'
+	CATEGORY_WIDE = 'C'
+	SELECT_PRODS = 'P'
+	PROMO_TYPE = (
+		(STORE_WIDE, 'Store-wide Promotion, applies to all products'),
+		(CATEGORY_WIDE, 'Applies to a particular category'),
+		(SELECT_PRODS, 'Applies to select products only'),
+	)
+
 	promotion_id = models.AutoField(primary_key=True, null=False)
 	product_type = models.ForeignKey(Product_type, models.CASCADE, null=False) 
 	name = models.CharField(max_length = 600, blank = True, default = '')
 	store = models.ForeignKey(Ecom_site, models.CASCADE)
+	promotion_type = models.CharField(max_length = 1, choices = PROMO_TYPE, blank = True, default = '')
 	effective_from = models.DateField(blank=True, null=True)
 	effective_to = models.DateField(blank=True, null=True)
 	discount_type = models.CharField(max_length = 10, null=False)  # PERCETNAGE or CASH
@@ -1038,6 +1060,22 @@ class Business_profile(models.Model):
 	def __str__(self):
 		return self.company + " - " + self.contact_name
 	
+
+class Business_commission(models.Model):
+	month_year = models.CharField(max_length = 7, blank = False, 
+		null = False, help_text='Commission month (YYYY-MM)')
+	business_profile = models.ForeignKey(Business_profile, 
+		on_delete=models.CASCADE, null=False)
+	commission_amount = models.DecimalField(max_digits=12, 
+		decimal_places=2, blank=False, null=False)
+	sale_in_current_year = models.DecimalField(max_digits=12, 
+		decimal_places=2, blank=False, null=False)
+	commission_paid_date = models.DateTimeField(null=True)
+	commission_paid_reference =models.CharField(max_length = 600, 
+		default = '', blank = True)
+	created_date = models.DateTimeField(auto_now_add=True, null=False)	
+	updated_date = models.DateTimeField(auto_now=True, null=False)	
+
 	
 ############################
 #  END:  Business User
@@ -1507,7 +1545,64 @@ class User_sms_email(models.Model):
 	updated_date = models.DateTimeField(auto_now=True, null=False)
 	
 	def __str__(self):
-		return str(self.order)
+		return str(self.user)
+
+class Homelane_data(models.Model):
+	product = models.OneToOneField(Stock_image, on_delete=models.CASCADE, primary_key=True)
+	product_name = models.CharField(max_length = 128, null=True, default = '')
+	description = models.CharField(max_length = 2000, blank=True, default = '')
+	part_number = models.CharField(max_length = 30, null=True)
+	product_type = models.ForeignKey(Product_type, models.CASCADE, null=True)
+	category = models.ForeignKey(Stock_image_category, models.CASCADE, null=True)
+	category_name = models.CharField(max_length = 128, null=True, default = '')
+	is_published = models.BooleanField(null=False, default=False)
+	aspect_ratio = models.DecimalField(max_digits = 21, decimal_places=18, null=True)
+	image_type =  models.CharField(max_length = 1, null=True)
+	orientation = models.CharField(max_length = 20, null=True)
+	max_width = models.DecimalField(max_digits = 6, decimal_places=2, null=True)
+	max_height = models.DecimalField(max_digits = 6, decimal_places=2, null=True)
+	min_width = models.DecimalField(max_digits = 6, decimal_places=2, null=True)
+	publisher = models.CharField(max_length = 600, null=True)
+	artist = models.CharField(max_length = 600, null=True)
+	colors = models.CharField(max_length = 600, null=True)
+	key_words = models.CharField(max_length = 2000, null=True)
+	url = models.CharField(max_length = 1000, blank=True, default='')
+	thumbnail_url = models.CharField(max_length = 1000, blank=True, default='')
+	framed_url = models.CharField(max_length = 1000, blank=True, default='')
+	framed_thumbnail_url = models.CharField(max_length = 1000, blank=True, default='')
+	promotion = models.ForeignKey(Promotion, models.PROTECT, null=True)
+	promotion_name = models.CharField(max_length = 128, null=True, default = '')
+	quantity = models.IntegerField(null=False)
+	item_unit_price = models.DecimalField(max_digits=12, decimal_places=2, null=False, default=0)
+	item_sub_total = models.DecimalField(max_digits=12, decimal_places=2,  null=False, default=0)
+	item_disc_amt  = models.DecimalField(max_digits=12, decimal_places=2,  null=False, default=0)
+	item_tax  = models.DecimalField(max_digits=12, decimal_places=2,  null=False, default=0)
+	item_total = models.DecimalField(max_digits=12, decimal_places=2,  null=False, default=0)
+	moulding = models.ForeignKey(Moulding,on_delete=models.PROTECT, null=True)
+	moulding_name = models.CharField(max_length = 30, null=True, default = '')
+	moulding_size = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	print_medium = models.ForeignKey(Print_medium, models.PROTECT, null=False, default='PAPER')
+	print_medium_name = models.CharField(max_length = 30, null=True, default = '')
+	print_medium_size = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	mount = models.ForeignKey(Mount, models.PROTECT, null=True)
+	mount_name = models.CharField(max_length = 30, null=True, default = '')
+	mount_size = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	board = models.ForeignKey(Board, models.PROTECT, null=True)
+	board_name = models.CharField(max_length = 30, null=True, default = '')
+	board_size = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	acrylic = models.ForeignKey(Acrylic, models.PROTECT, null=True)
+	acrylic_name = models.CharField(max_length = 30, null=True, default = '')
+	acrylic_size = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	stretch = models.ForeignKey(Stretch, models.PROTECT, null=True)
+	stretch_name = models.CharField(max_length = 30, null=True, default = '')
+	stretch_size = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	image_width = models.DecimalField(max_digits=3, decimal_places=0, blank=False, null=False)
+	image_height = models.DecimalField(max_digits=3, decimal_places=0, blank=False, null=False)	
+	created_date = models.DateTimeField(auto_now_add=True, null=False)	
+	updated_date = models.DateTimeField(auto_now=True, null=False)	
+	
+	def __str__(self):
+		return str( self.product_id ) + " " + self.product_name
 		
 @receiver(post_save, sender=User_image, dispatch_uid="update_image_profile")
 def update_image(sender, instance, **kwargs):

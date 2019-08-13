@@ -22,29 +22,41 @@ import urllib
 
 from artevenue.models import Order, Order_billing, PrePaymentGateway
 from artevenue.models import Payment_details, Cart, Egift, Voucher
-from artevenue.models import Voucher_user, Egift_card_design
-from artevenue.models import Order_sms_email, eGift_sms_email
+from artevenue.models import Voucher_user, Egift_card_design, Voucher_used
+from artevenue.models import Order_sms_email, eGift_sms_email, Referral
 
 MERCHANT_KEY = "ckibPj1d"
 key=""
 SALT = "hSWhatiYaO"
-PAYU_BASE_URL = "https://sandboxsecure.payu.in/_payment"  # Testing
-###PAYU_BASE_URL = "https://secure.payu.in/_payment "  # LIVE 
 
-SURL = 'https://www.artevenue.com/payment_done/'
-FURL = 'https://www.artevenue.com/payment_unsuccessful/'
-CURL = 'https://www.artevenue.com/payment_unsuccessful/'
-E_SURL = 'https://www.artevenue.com/egift_payment_done/'
-E_FURL = 'https://www.artevenue.com/egift_payment_unsuccessful/'
-E_CURL = 'https://www.artevenue.com/egift_payment_unsuccessful/'
-'''
-SURL = 'http://localhost:7000/payment_done/'
-FURL = 'http://localhost:7000/payment_unsuccessful/'
-CURL = 'http://localhost:7000/payment_unsuccessful/'
-E_SURL = 'http://localhost:7000/egift_payment_done/'
-E_FURL = 'http://localhost:7000/egift_payment_unsuccessful/'
-E_CURL = 'http://localhost:7000/egift_payment_unsuccessful/'
-'''
+env = settings.EXEC_ENV
+
+if env == 'DEV' or env == 'TESTING':
+	PAYU_BASE_URL = "https://sandboxsecure.payu.in/_payment"  # Testing
+	SURL = 'http://localhost:7000/payment_done/'
+	FURL = 'http://localhost:7000/payment_unsuccessful/'
+	CURL = 'http://localhost:7000/payment_unsuccessful/'
+	E_SURL = 'http://localhost:7000/egift_payment_done/'
+	E_FURL = 'http://localhost:7000/egift_payment_unsuccessful/'
+	E_CURL = 'http://localhost:7000/egift_payment_unsuccessful/'
+elif env == 'PROD':
+	PAYU_BASE_URL = "https://secure.payu.in/_payment "  # LIVE 
+	SURL = 'https://www.artevenue.com/payment_done/'
+	FURL = 'https://www.artevenue.com/payment_unsuccessful/'
+	CURL = 'https://www.artevenue.com/payment_unsuccessful/'
+	E_SURL = 'https://www.artevenue.com/egift_payment_done/'
+	E_FURL = 'https://www.artevenue.com/egift_payment_unsuccessful/'
+	E_CURL = 'https://www.artevenue.com/egift_payment_unsuccessful/'
+else:
+	PAYU_BASE_URL = "https://sandboxsecure.payu.in/_payment"  # Testing
+	SURL = 'http://localhost:7000/payment_done/'
+	FURL = 'http://localhost:7000/payment_unsuccessful/'
+	CURL = 'http://localhost:7000/payment_unsuccessful/'
+	E_SURL = 'http://localhost:7000/egift_payment_done/'
+	E_FURL = 'http://localhost:7000/egift_payment_unsuccessful/'
+	E_CURL = 'http://localhost:7000/egift_payment_unsuccessful/'
+		
+
 
 SERVICE_PROVIDER = 'Montage Art Private Limited'
 
@@ -170,7 +182,6 @@ def payment_done(request):
 	email=request.POST["email"]
 	salt="GQs7yium"
 
-	
 	try:
 		additionalCharges=request.POST["additionalCharges"]
 		retHashSeq=additionalCharges+'|'+salt+'|'+status+'|||||||||||'+email+'|'+firstname+'|'+productinfo+'|'+amount+'|'+txnid+'|'+key
@@ -215,6 +226,32 @@ def payment_done(request):
 		cart = Cart.objects.filter(cart_id = order.cart_id).update(cart_status = 'CO',
 			updated_date = today)
 		
+		## Update referral records, if any
+		if order.referral_disc_amount:
+			if order.referral_disc_amount > 0:
+				## Get referral record
+				ref = Referral.objects.filter(id = order.referral_id)
+				
+				## Check if user is a referrer or referee and update accordingly 
+				for r in ref:
+					if r.referred_by == order.user:
+						ref_upd = Referral.objects.filter(id = order.referral_id).update(
+							referred_by_claimed_date = today)
+					elif r.email_id == order.user.email:
+						ref_upd = Referral.objects.filter(id = order.referral_id).update(
+							referee_claimed_date = today)			
+		
+		## Update the voucher used table, if a voucher was used
+		if order.voucher_id and order.user:
+			vu = Voucher_used( 
+				voucher_id = order.voucher_id,
+				user = order.user,
+				created_date = today,
+				updated_date = today
+			)
+			vu.save()
+		
+
 		# Update email, sms table
 		o_email = Order_sms_email(
 			order = order,

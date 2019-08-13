@@ -61,29 +61,36 @@
 												</div>
 											</td>
 											<td>												
-												{% with width=i.moulding__width_inches|add_width_frame_mount:i.mount_size %}
+													{% with width=i.moulding__width_inches|add_width_frame_mount:i.mount_size %}
 
-												<small>Print on {{i.print_medium_id|title}}; 
-												Image Size : {{ i.image_width }}" X {{i.image_height }}"; 
-												{% if i.moulding_id %}
-													Frame {{i.moulding__name }} Total Size: 
-													{{ i.image_width|add_width:width }}" X {{i.image_height|add_width:width }}"; 
-												{% endif %}
-												
-												{% if i.mount_id %}
-													{{i.mount_size }}" {{i.mount__name|title }} Mount;  
-												{% endif %}
-												{% if i.acrylic_id %}
-													Acrylic 
-												{% endif %}
-												</small>
-												{% endwith %}
+													<small>
+													<li>Print on {{i.print_medium_id|title}}</li>
+													{% if i.moulding_id %}
+													<li>Image Print Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+													<li>Frame {{i.moulding__name }} </li>
+													<li>Total Size: 
+														{{ i.image_width|add_width:width }}" X {{i.image_height|add_width:width }}"</li>
+													{% else %}
+														<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+													{% endif %}
+													
+													{% if i.mount_id %}
+														<li>Mount: {{i.mount_size }}", Color: {{i.mount__name|title }} </li>
+													{% endif %}
+													{% if i.acrylic_id %}
+														<li>Acrylic covered</li>
+													{% endif %}
+													{% if i.stretch_id %}
+														<li>Canvas Stretched</li>
+													{% endif %}
+													</small>
+													{% endwith %}
 											</td>
 											<td style = "text-align:right">
 												<input type="number" value="{{i.quantity}}" class="form-control"
 													onchange = 'updateItemQty("{{i.cart_item_id}}", $(this).val());'>
 											</td>
-											<td>{{i.item_unit_price}}</td>
+											<td>{{i.item_unit_price|floatformat}}</td>
 											<td style = "text-align:right">											
 												{% if i.promotion__discount_type == "PERCENTAGE" %}
 													{{i.promotion__discount_value|floatformat}}%
@@ -112,8 +119,10 @@
 									</tbody>
 									<tfoot>
 										<tr>
-											<th colspan="4">Total</th>
-											<th colspan="2" style = "text-align:right">{{total_bare|floatformat}}</th>
+											<th colspan="3">Total</th>
+											<th colspan="1" style = "text-align:right">{{total_bare|floatformat}}</th>
+											<!--<th colspan="1" style = "text-align:right">{{usercart.cart_disc_amt|floatformat}}</th>
+											<th colspan="1" style = "text-align:right">{{cart_total|floatformat}}</th> -->
 											<th></th>
 										</tr>
 									</tfoot>
@@ -173,7 +182,7 @@
 										<th><span class="pull-right">{{shipping_cost}}</span></th>
 									</tr>
 									<tr class="total">
-										<td>Total</td>
+										<td>Cart Total</td>
 										<th class="pull-right"><i class = "fa fa-inr"> </i> <span id ="cart_total" >{{usercart.cart_total|floatformat:"0"|default:"0"}}</span></th>
 									</tr>
 

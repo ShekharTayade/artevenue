@@ -41,7 +41,7 @@ urlpatterns = [
 	url(r'^store_order_pdf/$', views.get_store_orders, name='get_store_orders'),
 	url(r'^find_orders/$', views.find_orders, name='find_orders'),	
 
-	url(r'^import_image_data/$', views.importImageData_NEW, name='import_image_data'),
+	#url(r'^import_image_data/$', views.importImageData_NEW, name='import_image_data'),
 
 	
 	url(r'^register/$', views.register, name='register'),	
@@ -97,9 +97,9 @@ urlpatterns = [
 
 	url(r'^ajax/sync_cart_session_user/$', views.sync_cart_session_user, name='sync_cart_session_user'),
 	url(r'^show_cart/$', views.show_cart, name='show_cart'),
-	url(r'^ajax/add_to_cart/$', views.add_to_cart, name='add_to_cart'),
+	url(r'^ajax/add_to_cart/$', views.add_to_cart_new, name='add_to_cart'),
 	url(r'^ajax/delete_cart_item/$', views.delete_cart_item, name='delete_cart_item'),
-	url(r'^ajax/update_cart_item/$', views.update_cart_item, name='update_cart_item'),
+	url(r'^ajax/update_cart_item/$', views.add_to_cart_new, name='update_cart_item'),
 	url(r'^ajax/apply_voucher/$', views.apply_voucher, name='apply_voucher'),
 
 

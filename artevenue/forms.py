@@ -81,7 +81,8 @@ class businessprofile_Form(forms.ModelForm):
 	class Meta:
 		model = Business_profile
 		fields = ('contact_name', 'phone_number', 'company', 'address_1', 'address_2',
-			'city', 'state', 'pin_code', 'country','gst_number')
+			'city', 'state', 'pin_code', 'country','gst_number',
+			'bank_name', 'bank_branch', 'bank_acc_no', 'ifsc_code')
 
 class pendingbusinessprofile_Form(forms.ModelForm):
 	class Meta:

@@ -26,7 +26,7 @@ def get_prod_price(prod_id,**kwargs):
 	# Image Price
 	if image_width:
 		if image_width > 0 and image_height > 0:
-			msg = ""
+			msg = "SUCCESS"
 		else :
 			msg = "ERROR-Image size missing"
 
@@ -37,7 +37,7 @@ def get_prod_price(prod_id,**kwargs):
 		# Image price
 		if image_width > 0 and image_height > 0:
 			image_price = image_width * image_height * per_sqinch_paper
-			item_price = item_price + image_price
+			item_price = Decimal(item_price + image_price)
 
 
 		print( "Width: " + str(image_width) )
@@ -47,26 +47,25 @@ def get_prod_price(prod_id,**kwargs):
 		# Acrylic Price	
 		if acrylic_id:
 			acrylic_price = image_width * image_height * get_acrylic_price_by_id(acrylic_id)
-			item_price = item_price + acrylic_price
-			item_price = item_price + acrylic_price
+			item_price = Decimal(item_price + acrylic_price)
 			print( "Acrylic Price: " + str(acrylic_price))
 		
 		# Moulding price
 		if moulding_id:
 			moulding_price = (image_width + image_height) * 2 * get_moulding_price_by_id(moulding_id)
-			item_price = item_price + moulding_price
+			item_price = Decimal(item_price + moulding_price)
 			print( "Moulding Price: " + str(moulding_price))
 
 		# Mount price
 		if mount_size and mount_id:
 			mount_price = ((image_width + image_height) * 2 * Decimal(mount_size))  * get_mount_price_by_id(mount_id)
-			item_price = item_price + mount_price
+			item_price = Decimal(item_price + mount_price)
 			print( "Mount Price: " + str(mount_price))
 		
 		# Board price
 		if board_id:
 			board_price = image_width * image_height * Decimal(get_board_price_by_id(board_id))
-			item_price = item_price + board_price
+			item_price = Decimal(item_price + board_price)
 			print( "Board Price: " + str(board_price))
 
 		print( "======================")
@@ -78,34 +77,38 @@ def get_prod_price(prod_id,**kwargs):
 		# Image price
 		if image_width > 0 and image_height > 0:
 			image_price = image_width * image_height * per_sqinch_canvas
-			item_price = item_price + image_price
+			item_price = Decimal(item_price + image_price)
 			print( "Image Price: " + str(image_price))
 
 		# Moulding price
 		if moulding_id:
 			moulding_price = (image_width + image_height) * 2 * get_moulding_price_by_id(moulding_id)
-			item_price = item_price + moulding_price
+			item_price = Decimal(item_price + moulding_price)
 			print( "Moulding Price: " + str(moulding_price))
 		
 		# Stretch price
 		if stretch_id:			
 			stretch_price = image_width * image_height * get_stretch_price_by_id(stretch_id)
-			item_price = item_price + stretch_price
+			item_price = Decimal(item_price + stretch_price)
 			print( "Stretch Price: " + str(stretch_price))
 
 		print( "======================")
 		print( "Total Item Price: " + str(item_price))
 
-	item_price_withoutdisc = round(item_price,-1)
+	item_price = Decimal(round(float(item_price),-1))
+
+	#item_price_withoutdisc = Decimal( "{:.0f}".format( round(item_price, -1) ) )
+	item_price_withoutdisc = Decimal( round(float(item_price), -1) )
 	
 	disc_applied = False
 	promo = product_views.get_product_promotion(prod_id)
 	print(promo)
-		
+	
+	
 	disc_amt = 0
 	cash_disc = 0
 	if promo:
-		cash_disc = round(promo['cash_disc'],-1)
+		cash_disc = round(promo['cash_disc'])
 		percent_disc = promo['percent_disc']	
 		promotion_id = promo['promotion_id']
 	else:
@@ -118,16 +121,14 @@ def get_prod_price(prod_id,**kwargs):
 		disc_applied = True
 		disc_amt = round(cash_disc)
 	elif percent_disc > 0:
-		disc_amt = round(item_price * percent_disc / 100,-1)
+		disc_amt = round(item_price * percent_disc / 100)
 		item_price = item_price - disc_amt
 		disc_applied = True
 		
-	#item_price = round(item_price, -1)
-	item_price = Decimal(round(float(item_price),-1))
-	
 	print( "======================")
 	print( "Disc Amt: " + str(disc_amt))
 	print( "Item Price: " + str(item_price))
+	print( "Item Price w/o Disc: " + str(item_price_withoutdisc))
 
 	return ({"msg":msg, "item_price" : item_price, 'cash_disc':cash_disc,
 				'percent_disc':percent_disc, 'item_unit_price':item_price_withoutdisc,

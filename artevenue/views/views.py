@@ -64,7 +64,7 @@ def privacy_policy(request):
 	
 def faq(request):
 
-	return render(request, "faq.html")
+	return render(request, "artevenue/faq.html")
 	
 def show_prod_details(request):
 
@@ -281,7 +281,7 @@ def refer_confirm(request, ref_id):
 	# Send mail
 	subject = 'Your friend has a referred us, Artevenue.com. Log on and get rewarded!'
 	html_message = render_to_string('artevenue/referral_email.html', 
-			{'referral': referral, 'host':request.get_host()})
+			{'referral': referral})
 	plain_message = strip_tags(html_message)
 	from_email = 'support@artevenue.com'
 	to = referral.email_id

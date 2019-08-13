@@ -12,7 +12,8 @@
 		{% include 'artevenue/cart-removed-message.html' %}
 
 		{% include 'artevenue/show-product.html' %}
-		
+
+		{% include 'artevenue/message-modal_ok.html' %}		
 	{% endblock sitecontent %}
 
 	
@@ -26,13 +27,55 @@
 			var obj = JSON.parse(document.getElementById(cart_item_id).textContent);
 			
 			// add uupdated qty to the json obj
-			obj['updated_qty'] = val;
-			
+			//obj['updated_qty'] = val;
+			obj['quantity'] = val;
+			obj['cart_item_flag'] = 'FALSE';
 			var value = JSON.stringify(obj);
+
+			var prod_id = obj['product_id'];
+			var qty = obj['quantity'];
+			var moulding_id = obj['moulding_id']
+			var currwidth = obj['image_width']
+			var currheight = obj['image_height']
+			var moulding_size = '0'
+			var print_medium_id = obj['print_medium_id']
+			var print_medium_size = '0'
+			var mount_id = obj['mount_id']
+			var mount_size = obj['mount_size']
+			var mount_w_left = '0'
+			var mount_w_right = '0'
+			var mount_w_bottom  = '0'
+			var mount_w_top = '0'
+			var acrylic_id = obj['acrylic_id']
+			var acrylic_size = '0'
+			var board_id = obj['board_id']
+			var board_size = '0'
+			var stretch_id = obj['stretch_id']
+			var stretch_size = '0'
+			var total_price = obj['item_total']
+			var discount = obj['item_disc_amt']
+			var promotion_id = obj['promotion_id']
+			var disc_amt = obj['item_disc_amt']
+			var item_unit_price = obj['item_unit_price']
+			var cart_item_flag = obj['cart_item_flag']			
 			
 			$.ajax({
 				url: "{% url 'update_cart_item' %}", 
-				data: value, 
+				//data: value, 
+				data:{'prod_id':prod_id, 'qty':qty, 'moulding_id': moulding_id,
+					'width':currwidth, 'height':currheight,
+					'moulding_size' : moulding_size,
+					'print_medium_id':print_medium_id, 'print_medium_size':print_medium_size, 
+					'mount_id':mount_id, 'mount_size':mount_size,
+					'mount_w_left' : mount_w_left, 'mount_w_right':mount_w_right, 
+					'mount_w_top':mount_w_top, 'mount_w_bottom' : mount_w_bottom, 
+					'acrylic_id':acrylic_id, 'acrylic_size':acrylic_size,
+					'board_id':board_id, 'board_size':board_size, 'stretch_id':stretch_id,
+					'stretch_size':stretch_size, 
+					'total_price':total_price, 'image_width':currwidth, 'image_height':currheight,
+					'discount':discount, 'promotion_id':promotion_id, 'disc_amt':disc_amt,
+					'item_unit_price':item_unit_price, 'prod_type':'STOCK-IMAGE',
+					'cart_item_flag':cart_item_flag },
 				dataType: 'text', 
 				type: 'post',
 				success: function (data) {
@@ -116,7 +159,6 @@
 			} else {
 				return true;
 			}
-		
 		}
 		
 		function applyVoucher(cart_id, v_code, cart_total) {
@@ -128,78 +170,133 @@
 				type: 'POST',
 				success: function (data) {
 					response = JSON.parse(data); 
-					console.log(response.status);
-					
+					show_cart();
 					switch(response.status) {
 					  case "SUCCESS":
 							$("#voucher-msg").html("Congratulations! " + response.disc_amount + " discount applied.");
+							cart_total = parseFloat($("#cart_total").html());
 							
-							//Existing disc from the product promotions
-							disc_amt = parseFloat($("#disc_amt").html());
+							$('#msg').html("Congratulations! " + response.disc_amount + " discount applied.");
+							$('#msg-modal').modal('show');
+							setTimeout(function() {
+								$('#msg-modal').modal('hide');
+							}, 2500);
+							
+							// Get total discount
+							/*disc_amt = parseFloat( response.cart_disc_amount );
 							if ( isNaN(disc_amt) ) {
 								disc_amt = 0;
 							}
-							cart_total = parseFloat($("#cart_total").html());
-							
-							// Add the disc through voucher
-							disc_amt = parseFloat( response.disc_amount );
 							cart_total = ( response.cart_total );
 							
 							$("#disc_amt").html(disc_amt);
 							$("#cart_total").html(cart_total);
 							$("#disc_amt_nv").val(disc_amt);
-							$("#cart_total_nv").val(cart_total);
+							$("#cart_total_nv").val(cart_total); */
 							$("#vouch_text").html( "(You have used coupan " + v_code + ". Discount of <i class = 'fa fa-inr'></i> " +  response.disc_amount + " is applied).");
 							break;
 					  case "INVALID-CODE":
 							$("#voucher-msg").html("Entered Code is invalid (You need to be logged in and using correct code)");
 							break;
+					  case "NO-USER":
+							$("#voucher-msg").html("You need to be logged in to use coupan/voucher.");
+							$('#msg').html("You need to be logged in to use coupan/voucher.");
+							$('#msg-modal').modal('show');
+							setTimeout(function() {
+								$('#msg-modal').modal('hide');
+							}, 2500);
+							break;
 					  case "USER-MISMATCH":
 							$("#voucher-msg").html("Entered Code is not valid for you.");
+							$('#msg').html("Entered Code is not valid for you.");
+							$('#msg-modal').modal('show');
+							setTimeout(function() {
+								$('#msg-modal').modal('hide');
+							}, 2500);
 							break;
 					  case "USED":
 							$("#voucher-msg").html("You have already used this code.");
+							$('#msg').html("You have already used this code.");
+							$('#msg-modal').modal('show');
+							setTimeout(function() {
+								$('#msg-modal').modal('hide');
+							}, 2500);
 							break;
 					  case "ONLY-ONE":
 							$("#voucher-msg").html("You can use only one coupan per order.");
+							$('#msg').html("You can use only one coupan per order.");
+							$('#msg-modal').modal('show');
+							setTimeout(function() {
+								$('#msg-modal').modal('hide');
+							}, 2500);
 							break;
 					  case "SUCCESS-":
 							if (response.voucher_bal_amount > 0 ) {
 								$("#voucher-msg").html("Congratulations! " + response.disc_amount + " discount applied. You have Rs. " + response.voucher_bal_amount + " balance left." );
+								ms = "Congratulations! " + response.disc_amount + " discount applied. You have Rs. " + response.voucher_bal_amount + " balance left." 
 							} else {
 								$("#voucher-msg").html("Congratulations! " + response.disc_amount + " discount is applied." );
+								ms = "Congratulations! " + response.disc_amount + " discount is applied."
 							}
+							$('#msg').html(ms);
+							$('#msg-modal').modal('show');
+							setTimeout(function() {
+								$('#msg-modal').modal('hide');
+							}, 2500);
 							//Existing disc from the product promotions
-							disc_amt = parseFloat($("#disc_amt").html());
+							//disc_amt = parseFloat($("#disc_amt").html());
+							//if ( isNaN(disc_amt) ) {
+							//	disc_amt = 0;
+							//}
+							cart_total = parseFloat($("#cart_total").html());
+							
+							// Get total discount amount
+							/*disc_amt = parseFloat( response.cart_disc_amount );
 							if ( isNaN(disc_amt) ) {
 								disc_amt = 0;
 							}
-							cart_total = parseFloat($("#cart_total").html());
-							
-							// Add the disc through voucher
-							disc_amt = parseFloat( response.disc_amount );
 							//cart_total = cart_total - parseFloat( response.disc_amount );
 							cart_total = parseFloat( response.cart_total );
 							
 							$("#disc_amt").html(disc_amt);
 							$("#cart_total").html(cart_total);
 							$("#disc_amt_nv").val(disc_amt);
-							$("#cart_total_nv").val(cart_total);
+							$("#cart_total_nv").val(cart_total); */
 							$("#vouch_text").html( "(You have used coupan " + v_code + ". Discount of <i class = 'fa fa-inr'></i> " +  response.disc_amount + " is applied).");
 							break;
 							
 					   case	'NO-MORE':
 							$("#voucher-msg").html("No more discount is applicable.");
+							$('#msg').html("No more discount is applicable.");
+							$('#msg-modal').modal('show');
+							setTimeout(function() {
+								$('#msg-modal').modal('hide');
+							}, 2500);
 							break;
 					   
 					   case 'DOESNOT-APPLY':
 							$("#voucher-msg").html("This coupan doesn't apply to you. Please ensure you have logged as the eligible user or check the code you have entered.");
+							$('#msg').html("This coupan doesn't apply to you. Please ensure you have logged as the eligible user or check the code you have entered.");
+							$('#msg-modal').modal('show');
+							setTimeout(function() {
+								$('#msg-modal').modal('hide');
+							}, 2500);
 							break;
 					   case 'NO-BALANCE':
 							$("#voucher-msg").html("Sorry, you have no balance left in this coupan.");
+							$('#msg').html("Sorry, you have no balance left in this coupan.");
+							$('#msg-modal').modal('show');
+							setTimeout(function() {
+								$('#msg-modal').modal('hide');
+							}, 2500);
 							break;
 					  default:
 							$("#voucher-msg").html("Sorry! We have encounter an error in applying this code.");
+							$('#msg').html("Sorry! We have encounter an error in applying this code.");
+							$('#msg-modal').modal('show');
+							setTimeout(function() {
+								$('#msg-modal').modal('hide');
+							}, 2500);
 					}					
 					
 				},

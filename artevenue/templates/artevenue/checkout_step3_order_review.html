@@ -96,7 +96,8 @@
 						<h1>Checkout - Order Confirm</h1>
 
 						<div class="nav flex-column flex-md-row nav-pills text-center">
-							<a href="javascript:;" class="nav-link flex-sm-fill text-sm-center" onclick="document.getElementById('addr_btn').click();"> 
+							<!--<a href="javascript:;" class="nav-link flex-sm-fill text-sm-center" onclick="document.getElementById('addr_btn').click();"> -->
+							<a href="javascript:;" class="nav-link flex-sm-fill text-sm-center"> 
 								<i class="fa fa-map-marker">                  
 								</i>Address
 							</a>
@@ -167,19 +168,25 @@
 												<td>
 													{% with width=i.moulding__width_inches|add_width_frame_mount:i.mount_size %}
 
-													<small>Print on {{i.print_medium_id|title}}, 
+													<small>
+													<li>Print on {{i.print_medium_id|title}}</li>
 													{% if i.moulding_id %}
-														Frame {{i.moulding__name }} Total Size: 
-														{{ i.image_width|add_width:width }}" X {{i.image_height|add_width:width }}" 
+													<li>Image Print Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+													<li>Frame {{i.moulding__name }} </li>
+													<li>Total Size: 
+														{{ i.image_width|add_width:width }}" X {{i.image_height|add_width:width }}"</li>
 													{% else %}
-														Image Size : {{ i.image_width }}" X {{i.image_height }}" 
+														<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
 													{% endif %}
 													
 													{% if i.mount_id %}
-														, {{i.mount_size }}" {{i.mount__name|title }} Mount  
+														<li>Mount: {{i.mount_size }}", Color: {{i.mount__name|title }} </li>
 													{% endif %}
 													{% if i.acrylic_id %}
-														, Acrylic 
+														<li>Acrylic covered</li>
+													{% endif %}
+													{% if i.stretch_id %}
+														<li>Canvas Stretched</li>
 													{% endif %}
 													</small>
 													{% endwith %}

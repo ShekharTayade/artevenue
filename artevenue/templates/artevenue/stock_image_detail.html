@@ -639,7 +639,7 @@
 			set_acrylic("0");
 			set_board('0');
 			$("#diagram-div").hide();
-			document.getElementById("prod-img").src = "{{product.url}}";
+			document.getElementById("prod-img").src = "{% static product.url %}";
 			if (print_medium_id == 'CANVAS') {
 				$("#stretched").show();
 				$("#in_stretched").prop("disabled", false);
@@ -773,7 +773,8 @@
 				type: 'POST',
 				success: function (data) {
 					data = JSON.parse(data);
-					if (data.msg == '') { 
+					msg = data.msg.toUpperCase();
+					if (data.msg.toUpperCase() == 'SUCCESS') { 
 						if (data.disc_applied) {
 							$("#no-disc").hide();
 							$("#promo-display").show("slow");

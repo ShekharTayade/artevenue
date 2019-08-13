@@ -9,6 +9,7 @@ from artevenue.decorators import is_chief
 
 from datetime import datetime
 import datetime
+from dateutil.relativedelta import relativedelta
 import json
 
 from django.contrib.auth.models import User
@@ -91,4 +92,33 @@ def business_account_approval(request):
 		email_sms_views.send_business_account_approval_email(request, id)
 		
 	return render(request, "artevenue/business_account_approval.html", {'accnt':accnt})
+	
+
+def process_commission():
+
+	bus_user = Business_profile.objects.all()
+	
+	for b in bus_user:
+		# Get joining date, month		
+		dt_time = b.created_date
+		dt = dt_time.day
+		mth = b.created_date.month
+		now = datetime.datetime.now()
+		year = now.year - 1
+		
+		## Get calendar date for last one year since joining
+		since_date = datetime.datetime.strptime(str(dt) + str(mth) + str(year),
+				"%d%m%Y").date()
+	
+	
+		year_from = now.year - 1
+		joining_year = b.created_date.year
+		year = year_from
+		for i in range (joining_year, year_from, 1):
+			year = i
+			
+		
+	
+	
+		# Get last one year orders for this user
 	

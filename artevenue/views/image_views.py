@@ -35,8 +35,14 @@ def get_FramedImage(request):
 	#response = requests.get("http://www.podexchange.com/dsi/lowres/11/11_PSMLT-166_lowres.jpg")
 	#if prod_img.publisher == '1001':
 	#img_source = Image.open('artevenue/'+settings.STATIC_URL + prod_img.url)			
+	env = settings.EXEC_ENV
+	if env == 'DEV' or env == 'TESTING':
+		response = requests.get(prod_img.url)
+		img_source = Image.open(BytesIO(response.content))
+	else:
+		img_source = Image.open(settings.PROJECT_DIR + '/' + settings.STATIC_URL + prod_img.url)			
 	
-	img_source = Image.open(settings.PROJECT_DIR + '/' + settings.STATIC_URL + prod_img.url)			
+	
 	#else :
 	#	response = requests.get(prod_img.url)
 	#	img_source = Image.open(BytesIO(response.content))
