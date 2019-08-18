@@ -28,18 +28,18 @@ def get_mouldings(request):
 	# get frames to be applied and shown
 	canvas_mouldings_apply =  Moulding_image.objects.filter(image_type__iexact = "APPLY").select_related(
 		'moulding').filter((Q( moulding__applies_to="C") | Q( moulding__applies_to="B")), moulding__is_published = True ).values('image_id', 'url',
-			'border_slice', 'moulding_id', 'moulding__name', 'moulding__description')
+			'border_slice', 'moulding_id', 'moulding__name', 'moulding__description', 'moulding__width_inches')
 
 	canvas_mouldings_show =  Moulding_image.objects.filter(image_type__iexact = "APPLY").select_related(
 		'moulding').filter((Q( moulding__applies_to="C") | Q( moulding__applies_to="B")), moulding__is_published = True ).values('image_id', 'url',
-			'border_slice', 'moulding_id', 'moulding__name', 'moulding__description')
+			'border_slice', 'moulding_id', 'moulding__name', 'moulding__description', 'moulding__width_inches')
 	paper_mouldings_apply =  Moulding_image.objects.filter(image_type__iexact = "APPLY").select_related(
 		'moulding').filter((Q( moulding__applies_to="P") | Q( moulding__applies_to="B")), moulding__is_published = True ).values('image_id', 'url',
-			'border_slice', 'moulding_id', 'moulding__name', 'moulding__description')
+			'border_slice', 'moulding_id', 'moulding__name', 'moulding__description', 'moulding__width_inches')
 
 	paper_mouldings_show =  Moulding_image.objects.filter(image_type__iexact = "APPLY").select_related(
 		'moulding').filter((Q( moulding__applies_to="P") | Q( moulding__applies_to="B")), moulding__is_published = True ).values('image_id', 'url',
-			'border_slice', 'moulding_id', 'moulding__name', 'moulding__description')
+			'border_slice', 'moulding_id', 'moulding__name', 'moulding__description', 'moulding__width_inches')
 			
 	moulding_diagrams =  Moulding_image.objects.filter(image_type__iexact = "DIAGRAM").select_related(
 		'moulding')

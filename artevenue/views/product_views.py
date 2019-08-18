@@ -123,7 +123,10 @@ def category_stock_images(request, cat_id = ''):
 
 	# Apply keyword filter (through ajax or search)
 	for word in keywords:
-		products = products.filter( key_words__icontains = word )
+		products = products.filter( 
+			Q(key_words__icontains = word) |
+			Q(artist__icontains = word)
+			)
 		
 	dt =  today.day
 	if dt >= 1 and dt <= 5:
@@ -260,7 +263,10 @@ def search_products_by_keywords(request):
 	prod_categories = Stock_image_category.objects.filter(store_id=settings.STORE_ID, trending = True )
 	
 	for word in keywords:
-		products = Stock_image.objects.filter(is_published = True, key_words__icontains = word )
+		products = Stock_image.objects.filter(
+			Q(is_published = True) &
+			(Q(key_words__icontains = word) | Q(artist__icontains = word))
+		)
 
 	# In AJAX, the keywords are pased back in a JSON, which is processed below. So in AJAX case,
 	# Let's strat with all the products and then it will get filtered below
@@ -384,11 +390,78 @@ def stock_image_detail(request, prod_id = '', iuser_width='', iuser_height=''):
 	#product = Stock_image.objects.get(product_id = prod_id, is_published = True)
 	product = get_object_or_404(Stock_image, is_published = True, pk=prod_id)
 		
-	product_category = Stock_image_stock_image_category.objects.get(stock_image = product) 
+	product_category = Stock_image_stock_image_category.objects.get(stock_image = product)
 	
 	prod_categories = Stock_image_category.objects.filter(store_id=settings.STORE_ID)
 	
 	printmedium = Print_medium.objects.all()
+
+	##############################################
+	## Get the similar products
+	##############################################
+	similar_products = None
+	## First get rpoducts by same artist
+	similar_products_artist = Stock_image.objects.filter(  
+			artist = product.artist)
+	## If same artist has more than 8 products, then filter further
+	if similar_products_artist:
+		if similar_products_artist.count() > 8 :
+			## Filter for the same artist and same category
+			prods_in_cat = Stock_image_stock_image_category.objects.filter(
+				stock_image_category_id = product_category.stock_image_category).values('stock_image_id')
+			similar_products_cat = similar_products_artist.filter(
+				product_id__in = prods_in_cat)
+			## Same artist has more than 8 products in same category, filter further
+			if similar_products_cat: 
+				if similar_products_cat.count() > 8 :
+					## Filter for having same key words
+					similar_products_kw = similar_products_cat.filter( key_words__in = product.key_words )
+					if similar_products_kw :
+						if similar_products_kw.count() > 8:
+							similar_products = similar_products_kw[:8]
+						elif similar_products_kw.count() == 0:
+							similar_products = similar_products_cat.filter(
+								product_id__in = prods_in_cat)
+					else:
+						similar_products = similar_products_cat.filter(
+							product_id__in = prods_in_cat)
+						
+				## if the filter causes the result to be empty, revert to earlier filter
+				else:
+					similar_products = Stock_image.objects.filter(  
+							artist = product.artist)
+			elif similar_products.count() == 0:
+				similar_products = Stock_image.objects.filter(  
+						artist = product.artist)
+		else:
+			similar_products = Stock_image.objects.filter(  
+					artist = product.artist)
+
+	## Restrict the result to 10 products
+	if similar_products:
+		if similar_products.count() > 8:
+			similar_products = similar_products[:8]
+
+	price = Publisher_price.objects.filter(print_medium_id = 'PAPER') 
+
+
+	if request.user.is_authenticated:
+		user = User.objects.get(username = request.user)
+		wishlist = Wishlist.objects.filter(
+			user = user).values('wishlist_id')
+		wishlistitems = Wishlist_item_view.objects.filter(
+			wishlist_id__in = wishlist)
+	else:
+		session_id = request.session.session_key
+		wishlist = Wishlist.objects.filter(
+			session_id = session_id).values('wishlist_id')
+		wishlistitems = Wishlist_item_view.objects.filter(
+			wishlist_id__in = wishlist)
+
+	wishlist_prods = []
+	if wishlistitems:
+		for w in wishlistitems:
+			wishlist_prods.append(w.product_id)
 
 	
 	# Get image price on paper and canvas
@@ -442,7 +515,8 @@ def stock_image_detail(request, prod_id = '', iuser_width='', iuser_height=''):
 		'boards':boards, 
 		#######'img_with_all_mouldings':img_with_all_mouldings, 
 		'stretches':stretches,
-		'cart_item':cart_item_view, 'iuser_width':iuser_width, 'iuser_height':iuser_height} )	
+		'cart_item':cart_item_view, 'iuser_width':iuser_width, 'iuser_height':iuser_height,
+		'prods':similar_products, 'price':price, 'wishlist_prods':wishlist_prods} )
 
 
 
@@ -892,7 +966,10 @@ def all_stock_images(request):
 						
 	# Apply keyword filter (through ajax or search)
 	for word in keywords:
-		products = products.filter( key_words__icontains = word )
+		products = products.filter( 
+			Q(key_words__icontains = word) |
+			Q(artist__icontains = word)
+		)
 
 	dt =  today.day
 	if dt >= 1 and dt <= 5:
@@ -1077,7 +1154,10 @@ def curated_collections(request, cat_id):
 
 	# Apply keyword filter (through ajax or search)
 	for word in keywords:
-		products = products.filter( key_words__icontains = word )						
+		products = products.filter( 
+			Q(key_words__icontains = word) |
+			Q(artist__icontains = word)
+		)
 
 	prod_filters = ['ORIENTATION', 'ARTIST', 'IMAGE-TYPE', 'COLORS']	
 	prod_filter_values ={}

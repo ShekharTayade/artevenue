@@ -82,7 +82,7 @@ Support -
 	support@artevenue.com / $1arte_venue
 	
 Factory:
-	factory@artevenue.com / $1csjd@kfdl 		
+	factory@artevenue.com / factory@jpn78 		
 
 Neeraj:
 	username: dugarneeraj@gamil.com

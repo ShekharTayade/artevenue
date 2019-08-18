@@ -611,6 +611,33 @@ top #phone-help .modal-header h5 {
   background-color: #dfdfdf;
 }	
 
+
+@media only screen and (min-width: 600px) {
+	.similar-image {
+	  margin: 10px 20px !important; 
+	}
+}
+
+
+.similar-image {  
+  /*width: 120px;*/
+  height:auto;
+  text-align: center;
+  font-family: arial;
+  object-fit:contain;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;	
+  
+}
+	
+.similar-image:hover {
+  background-color: #dfdfdf;
+}	
+
+
+
+
 .filter-class {
 	font-size: 0.75rem;
 }

@@ -317,4 +317,17 @@
 				$("#edit_form").submit();
 			}
 		</script>
+		
+		
+		<script>
+		$(document).ready(function(){
+			if ('{{promo_removed}}' == 'Y') {
+				$('#msg').html("Promotions applied to one or more items in your cart have expired. Prices have been changed accordingly.");
+				$('#msg-modal').modal('show');
+				setTimeout(function() {
+					$('#msg-modal').modal('hide');
+				}, 6000);			
+			}
+		});
+		</script>
 	{% endblock jscripts %}

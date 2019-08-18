@@ -56,6 +56,7 @@
 								<span class="text text-center" onclick = "set_moulding('{{f.moulding_id}}')">
 									<h5>
 										{{ f.moulding__name }}
+										{% if f.moulding__width_inches %} ({{f.moulding__width_inches}} inch) {% endif %}
 									</h5>
 								</span>
 							</a>

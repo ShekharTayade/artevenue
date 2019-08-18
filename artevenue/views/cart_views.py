@@ -19,6 +19,7 @@ from artevenue.models import Product_view, Promotion, Order, Voucher, Voucher_us
 from artevenue.models import Cart_user_image, Cart_stock_image, Cart_stock_collage, Cart_original_art
 from artevenue.models import Order_stock_image, Order_stock_collage, Order_original_art, Order_user_image
 from artevenue.models import Referral, Egift_redemption, Egift, Order_items_view, Voucher_used
+from artevenue.models import Order_shipping, Order_billing
 from .product_views import *
 from .user_image_views import *
 from .tax_views import *
@@ -30,6 +31,15 @@ ecom = get_object_or_404 (Ecom_site, store_id=settings.STORE_ID )
 
 @csrf_exempt
 def show_cart(request):
+
+	## First of all validate the promotions. Revert promotion discounts
+	## if the promotion has expired while item is in the cart.
+	result = validatePromotions(request)
+	if result:
+		promo_removed = 'Y'
+	else :
+		promo_removed = 'N'
+	
 	usercart = {}
 	usercartitems = {}
 	shipping_cost = 0 
@@ -60,14 +70,13 @@ def show_cart(request):
 			'acrylic_id', 'mount_size', 'product__name', 'image_width', 'image_height', 'stretch_id', 'board_id',
 			'product__thumbnail_url', 'cart_id', 'promotion__discount_value', 'promotion__discount_type', 'mount__color',
 			'item_unit_price', 'item_sub_total', 'item_disc_amt', 'item_tax', 'item_total', 'product_type',
-			'product__image_to_frame'
+			'product__image_to_frame', 'promotion_id'
 			).order_by('product_type')
 
 	except Cart.DoesNotExist:
 			usercart = {}
 
 	if request.is_ajax():
-
 		template = "artevenue/cart_include.html"
 	else :
 		template = "artevenue/cart.html"
@@ -131,13 +140,25 @@ def show_cart(request):
 			cart_total = usercart.cart_total
 	except Error as e:
 		print(e.message)
-		
-	print('MEDIA ROOT - ' + settings.MEDIA_ROOT)
+
+
+	## To disply the total after applying promotion discounts, but before 
+	## voucher and referral discount
+	cart_without_disc = 0
+	if usercart:
+		if cart_total:
+			cart_without_disc = cart_total		
+		if usercart.referral_disc_amount:
+			cart_without_disc = cart_total + usercart.referral_disc_amount 
+		if usercart.voucher_disc_amount:
+			cart_without_disc = cart_without_disc + usercart.voucher_disc_amount
+
 	return render(request, template, {'usercart':usercart, 
 		'usercartitems': usercartitems, 'shipping_cost':shipping_cost, 
 		'total_bare':total_bare, 'cart_total':cart_total, 
 		'ref_msg':ref_msg, 'ref_status':ref_status, 'referral_disc_amount':referral_disc_amount,
-		'MEDIA_ROOT':settings.MEDIA_ROOT, 'MEDIA_URL':settings.MEDIA_URL})
+		'MEDIA_ROOT':settings.MEDIA_ROOT, 'MEDIA_URL':settings.MEDIA_URL, 
+		'cart_without_disc':cart_without_disc, 'promo_removed':promo_removed})
 	
 def show_wishlist(request):
 
@@ -1137,7 +1158,7 @@ def update_cart_item(request):
 
 	
 @csrf_exempt	
-def delete_cart_item(request):
+def delete_cart_item(request):	
 	cart_item_id = request.POST.get('cart_item_id','')
 	sub_total = request.POST.get('sub_total','')
 	cart_total = request.POST.get('cart_total','')
@@ -1211,6 +1232,14 @@ def delete_cart_item(request):
 		# if there are more items in the cart, then update cart quantity and remove the item
 		if num_cart_item == 1:
 			if order:
+				## Delete order shipping and billing address
+				os = Order_shipping.objects.filter(order_id = order.order_id).first()
+				if os:
+					os.delete()
+				ob = Order_billing.objects.filter(order_id = order.order_id).first()
+				if os:
+					ob.delete()
+					
 				order.delete()
 
 			if cart:
@@ -1302,9 +1331,7 @@ def delete_cart_item(request):
 		msg = "Cart item does not exist"
 	
 	except Error as e:
-		msg = 'Apologies!! Could not save your cart. Please use the "Contact Us" link at the bottom of this page and let us know. We will be glad to help you.'
-
-	
+		msg = 'Apologies!! Could not save your cart. Please use the "Contact Us" link at the bottom of this page and let us know. We will be glad to help you.'	
 	
 	return JsonResponse({'msg':msg}, safe=False)
 
@@ -2246,3 +2273,173 @@ def apply_voucher_py_new(request, cart_id, voucher_code, cart_total):
 				'cart_disc_amt':cart.cart_disc_amt, 'disc_type':disc_type})
 		
 		
+## Check and remove discounts is any promotion has expired and 
+## update the cart.		
+def validatePromotions(request):
+	usercart = {}
+	usercartitems = {}
+	change_flag = False
+	try:
+		if request.user.is_authenticated:
+			usr = User.objects.get(username = request.user)
+			usercart = Cart.objects.get(user = usr, cart_status = "AC")
+		else:
+			sessionid = request.session.session_key		
+			if sessionid is None:
+				request.session.create()
+				sessionid = request.session.session_key
+				
+			usercart = Cart.objects.get(session_id = sessionid, cart_status = "AC")
+
+		usercartitems = Cart_item_view.objects.select_related('product', 
+			'promotion').filter( cart = usercart.cart_id, 
+				product__product_type_id = F('product_type_id')).order_by(
+					'product_type')
+
+		# If any order exists against this cart
+		order = Order.objects.filter(cart_id = usercart.cart_id).first()
+		
+		## Order items, if any
+		if order:
+			orderitems = Order_items_view.objects.filter(order_id = order.order_id)
+		else :
+			orderitems = {}
+		
+	except Cart.DoesNotExist:
+			usercart = {}
+			## Cart items
+
+	except Error as e:
+		print(e.message)
+
+	## If cart contains, promotion items, validate those
+	for u in usercartitems:
+		if u.promotion_id:
+			promo = Promotion.objects.filter(promotion_id = u.promotion_id).first()
+			if promo:
+				if promo.effective_to < today:	## Promotion is no longer running
+					change_flag = True
+					## Revert promo discounts
+					price = get_prod_price(u.product_id, 
+							prod_type=u.product_type_id,
+							image_width=u.image_width, image_height=u.image_height,
+							print_medium_id = u.print_medium_id,
+							acrylic_id = u.acrylic_id,
+							moulding_id = u.moulding_id,
+							mount_size = u.mount_size,
+							mount_id = u.mount_id,
+							board_id = u.board_id,
+							stretch_id = u.stretch_id)
+					total_price = price['item_price']
+					msg = price['msg']
+					cash_disc = price['cash_disc']
+					percent_disc = price['percent_disc']
+					item_unit_price = price['item_unit_price']
+					disc_amt = price['disc_amt']
+					disc_applied = price['disc_applied']
+					promotion_id = price['promotion_id']					
+					
+					# TAX Calculations
+					item_tax = 0
+					item_sub_total = 0
+					taxes = get_taxes()
+
+					if u.product_type_id == 'STOCK-IMAGE':
+						tax_rate = taxes['stock_image_tax_rate']
+					if u.product_type_id == 'ORIGINAL-ART':
+						tax_rate = taxes['original_art_tax_rate']
+					if u.product_type_id == 'USER-IMAGE':
+						tax_rate = taxes['user_image_tax_rate']
+					if u.product_type_id == 'STOCK-COLLAGE':
+						tax_rate = taxes['stock_image_tax_rate']
+					if u.product_type_id == 'FRAME':
+						tax_rate = taxes['frame_tax_rate']					
+						
+					# Calculate tax and sub_total
+					item_sub_total = round( total_price / (1 + (tax_rate/100)), 2 )
+					item_tax = total_price - item_sub_total
+					
+					#############################################################
+					## update cart item and cart
+					#############################################################
+					ci = Cart_item.objects.filter(cart_item_id = u.cart_item_id).update(
+							promotion_id = promotion_id,
+							quantity = u.quantity,
+							item_unit_price = item_unit_price,
+							item_sub_total = item_sub_total,
+							item_disc_amt = disc_amt,
+							item_tax  = item_tax,
+							item_total = total_price,
+							updated_date = today
+						)
+					if orderitems:
+						## Update order item, if any
+						if u.product_type == 'STOCK-IMAGE':
+							oi = Order_stock_image.objects.filter(cart_item_id = u.cart_item_id).update(
+									promotion_id = promotion_id,
+									quantity = u.quantity,
+									item_unit_price = item_unit_price,
+									item_sub_total = item_sub_total,
+									item_disc_amt = disc_amt,
+									item_tax  = item_tax,
+									item_total = total_price,
+									updated_date = today
+								)
+						elif u.product_type == 'USER-IMAGE':
+							oi = Order_user_image.objects.filter(cart_item_id = u.cart_item_id).update(
+									promotion_id = promotion_id,
+									quantity = u.quantity,
+									item_unit_price = item_unit_price,
+									item_sub_total = item_sub_total,
+									item_disc_amt = disc_amt,
+									item_tax  = item_tax,
+									item_total = total_price,
+									updated_date = today
+								)
+						elif u.product_type == 'STOCK-COLLAGE':
+							oi = Order_stock_collage.objects.filter(cart_item_id = u.cart_item_id).update(
+									promotion_id = promotion_id,
+									quantity = u.quantity,
+									item_unit_price = item_unit_price,
+									item_sub_total = item_sub_total,
+									item_disc_amt = disc_amt,
+									item_tax  = item_tax,
+									item_total = total_price,
+									updated_date = today
+								)
+						elif u.product_type == 'ORIGINAL-ART':
+							oi = Order_original_art.objects.filter(cart_item_id = u.cart_item_id).update(
+									promotion_id = promotion_id,
+									quantity = u.quantity,
+									item_unit_price = item_unit_price,
+									item_sub_total = item_sub_total,
+									item_disc_amt = disc_amt,
+									item_tax  = item_tax,
+									item_total = total_price,
+									updated_date = today
+								)
+					cart_sub_total = usercart.cart_sub_total - u.item_sub_total + item_sub_total
+					cart_disc_amt = usercart.cart_disc_amt - u.item_disc_amt + disc_amt
+					cart_tax  = usercart.cart_tax - u.item_tax + item_tax
+					cart_total = usercart.cart_total - u.item_total + total_price
+					c = Cart.objects.filter(cart_id = usercart.cart_id).update(
+							cart_sub_total = cart_sub_total,
+							cart_disc_amt = cart_disc_amt,
+							cart_tax  = cart_tax,
+							cart_total = cart_total,
+							updated_date = today
+						)
+						
+					if order:
+						order_sub_total = order.order_sub_total - u.item_sub_total + item_sub_total,
+						order_disc_amt = order.order_disc_amt - u.item_disc_amt + disc_amt,
+						order_tax  = order.order_tax - u.item_tax + item_tax,
+						order_total = order.order_total - u.item_total + total_price,
+						o = Order.objects.filter(order_id = order.order_id).update(
+								order_sub_total = order_sub_total,
+								order_disc_amt = order_disc_amt,
+								order_tax  = order_tax,
+								order_total = order_total,
+								updated_date = today
+							) 
+	return change_flag

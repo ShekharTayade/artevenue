@@ -277,6 +277,15 @@
 				</div>
 
 			</div>
+			<!-- Similar products -->
+			{% if prods %}
+			<div id = "similar-show" class = "size-box mt-5">
+				<div id = "similar_include" style = "background-color:#fafafa">
+					{% include 'artevenue/similar_products.html' %}
+				</div>
+
+			</div>
+			{% endif %}
 
 			{% if recent_view_prods %}
 			<div class="row same-height-row">
@@ -962,6 +971,52 @@
 		}				
 	
 	</script>
+	
+	<script>
+		function addToFav(prod_id, currwidth, aspect_ratio, total_price,
+				discount, promotion_id, disc_amt, item_unit_price){
+			currheight = Math.round(currwidth / aspect_ratio);
+			qty = 1; moulding_id = 0; moulding_size = 0; 
+			print_medium_id = 'PAPER'; print_medium_size = currheight * currwidth;
+			mount_id = 0; mount_size = 0; mount_w_left =0; mount_w_right = 0;
+			mount_w_top =0; mount_w_bottom = 0;acrylic_id = 1;
+			acrylic_size = currheight * currwidth; board_id = 0; board_size = 0;
+			stretch_id = 0; stretch_size = 0; discount = 0;
+		
+			$.ajax({
+				url: "{% url 'add_to_wishlist' %}", 
+				data: { 'prod_id':prod_id,'qty':qty, 
+						'width':currwidth, 'height':currheight, 'moulding_id': moulding_id,
+						'moulding_size' : moulding_size,
+						'print_medium_id':print_medium_id, 'print_medium_size':print_medium_size, 
+						'mount_id':mount_id, 'mount_size':mount_size,
+						'mount_w_left' : mount_w_left, 'mount_w_right':mount_w_right, 
+						'mount_w_top':mount_w_top, 'mount_w_bottom' : mount_w_bottom, 
+						'acrylic_id':acrylic_id, 'acrylic_size':acrylic_size,
+						'board_id':board_id, 'board_size':board_size, 'stretch_id':stretch_id,
+						'stretch_size':stretch_size, 
+						'total_price':total_price, 'image_width':currwidth, 'image_height':currheight,
+						'discount':discount, 'promotion_id':promotion_id, 'disc_amt':disc_amt,
+						'item_unit_price':item_unit_price,  'prod_type':'STOCK-IMAGE'}, 
+				dataType: 'text', 
+					type: 'POST',
+				success: function (data) {
+					data = JSON.parse(data);
+					cart_qty = data.cart_qty;
+					$('#fav_'+prod_id).html('<i class = "fa fa-heart" onclick = "deleteItem(' + prod_id + ')"style="color:red; padding-right:5px;" data-toggle="tooltip" title="Added to Favorites!"></i>');
+					/* $('#msg-wishlist-modal').modal('show');
+					setTimeout(function() {
+						$('#msg-wishlist-modal').modal('hide');
+						}, 1000);
+					*/
+				},
+				error: function(xhr){
+					alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+				}
+			});	
+		}
+	</script>
+	
 	{% endblock jscripts %}	
 		
 

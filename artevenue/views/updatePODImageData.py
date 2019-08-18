@@ -371,7 +371,13 @@ def deletePODImageData():
 
 	for prod in prods:
 		if str(prod.product_id) in prod_ids:
-			None
+			## Check if price is available,if no group is assigned then don't
+			## publish the image
+			p = Publisher.objects.filter(publisher_id = prod.publisher, publisher_group = 'XXX')
+			if p:
+				prd = Stock_image.objects.filter(product_id = prod.product_id).update(
+						is_published = False)				
+						
 		else:
 			# Set product is_published to false
 			if prod.product_id <= 1000000:
