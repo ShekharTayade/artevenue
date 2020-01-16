@@ -4,7 +4,7 @@ from artevenue.models import Homelane_data, Stock_image_stock_image_category
 from django.conf import settings
 from decimal import Decimal
 
-from PIL import Image, ImageFilter
+from PIL import Image, ImageFilter, ImageFile
 import requests
 from .product_views import *
 from .tax_views import *
@@ -14,10 +14,51 @@ from artevenue.views import *
 import requests
 from io import BytesIO
 
-def createHomelaneData():
+ImageFile.LOAD_TRUNCATED_IMAGES = True
+
+def homelane_data():
+
+	## Abstract 150
+	curated = Curated_collection.objects.filter(curated_category_id = 3)[:150]
+	print("Absract: " + str(curated.count()) )
+	createHomelaneData(curated)
+
+	## Landscape 50
+	curated = Curated_collection.objects.filter(curated_category_id = 7)[:75]
+	print("Landscape: " + str(curated.count()) )
+	createHomelaneData(curated)
+	
+	## Coastal 50
+	curated = Curated_collection.objects.filter(curated_category_id = 8)[:75]
+	print("Coastal: " + str(curated.count()) )
+	createHomelaneData(curated)
+
+	## Floral 50
+	curated = Curated_collection.objects.filter(curated_category_id = 5)[:50]
+	print("Foral: " + str(curated.count()) )
+	createHomelaneData(curated)
+
+
+	## Kids 50
+	curated = Curated_collection.objects.filter(curated_category_id = 4)[:50]
+	print("Kids: " + str(curated.count()) )
+	createHomelaneData(curated)
+
+	## Master 50
+	curated = Curated_collection.objects.filter(curated_category_id = 1)[:50]
+	print("Masters: " + str(curated.count()) )
+	createHomelaneData(curated)
+
+	## Women 50
+	curated = Curated_collection.objects.filter(curated_category_id = 10)[:50]
+	print("Femme: " + str(curated.count()) )
+	createHomelaneData(curated)
+
+
+def createHomelaneData(curated):
 	
 	## Get data from curated collections
-	curated = Curated_collection.objects.all()
+	#curated = Curated_collection.objects.all()
 	cnt = 0
 	for c in curated:
 		cnt = cnt + 1
@@ -32,16 +73,22 @@ def createHomelaneData():
 		if (cnt % 2) == 0:
 			moulding_id = 18
 			img_width = 12
-			mount_size = 2
+			mount_size = 1
 		else:
 			moulding_id = 1   ## To be replaced with correct id
 			img_width = 24
-			mount_size = 1
+			mount_size = 2
 
 		img_height = round(img_width / prod.aspect_ratio)
 		moulding = Moulding.objects.get( moulding_id = moulding_id )
+		moulding_name = ''
+		if moulding:
+			moulding_name = moulding.name
 
 		mount = Mount.objects.get(pk=3)   ## Offwhite
+		mount_color = ''
+		if mount :
+			mount_color = mount.color
 		category = Stock_image_stock_image_category.objects.get(
 			stock_image_id = c.product_id)
 		category_id = category.stock_image_category_id
@@ -117,7 +164,7 @@ def createHomelaneData():
 		promo = {}
 		if prod:
 			promo = get_product_promotion(prod.product_id)	
-		promotion = {}
+		promotion = None
 		if promo :
 			if promo['promotion_id']:
 				promotion = Promotion.objects.filter(promotion_id = promo['promotion_id']).first()
@@ -131,6 +178,9 @@ def createHomelaneData():
 		# Create HomeLane DATA
 		#####################################################
 		## Insert or Update
+		promo_name = ''
+		if promotion:
+			promo_name = promotion.name
 		hl = Homelane_data(
 			product_id = prod.product_id,
 			product_name = prod.name,
@@ -155,7 +205,7 @@ def createHomelaneData():
 			framed_url = '',
 			framed_thumbnail_url = '',
 			promotion = promotion,
-			promotion_name = promotion.name,
+			promotion_name = promo_name,
 			quantity = quantity,
 			item_unit_price = item_unit_price,
 			item_sub_total = item_sub_total,
@@ -169,7 +219,7 @@ def createHomelaneData():
 			print_medium_name = 'PAPER',
 			print_medium_size = 0,
 			mount = mount,
-			mount_name = mount.color,
+			mount_name = mount_color,
 			mount_size = mount_size,
 			board_id = 1,
 			board_name = '1',
@@ -192,14 +242,17 @@ def createHomelaneData():
 def createHomelaneImages():	
 	homelane_data = Homelane_data.objects.all()
 	for h in homelane_data:
-		framed_img = get_FramedImage(h.product_id, h.moulding_id, 
+		framed_img = get_FramedImage_api(h.product_id, h.moulding_id, 
 			h.mount.color, h.mount_size, h.image_width)
 
 		env = settings.EXEC_ENV
+		img_url = ''
 		if env == 'DEV' or env == 'TESTING':
-			img_loc = settings.BASE_DIR + '/artevenue/' + settings.STATIC_URL + "homelane_data/images" 
+			img_loc = settings.BASE_DIR + '/artevenue/' + settings.STATIC_URL + "homelane_data/images/" 
+			img_url = img_loc
 		else:
-			img_loc = settings.PROJECT_DIR + '/' + settings.STATIC_URL + "homelane_data/images" 
+			img_loc = settings.PROJECT_DIR + '/' + settings.STATIC_URL + "homelane_data/images/"
+			img_url = 'https://www.artevenue.com' + settings.STATIC_URL + "homelane_data/images/"
 		
 		pos = h.url.rfind('/')
 		loc = 0
@@ -221,13 +274,13 @@ def createHomelaneImages():
 
 		
 		## Save in urls table
-		hf = Homelane_data.objects.filter(product_id = h.product_id).update(	
-				framed_url = img_loc + lowres_img_name, 
-				framed_thumbnail_url = img_loc + thumb_img_name)
+		hf = Homelane_data.objects.filter(homelane_key = h.homelane_key).update(	
+				framed_url = img_url + lowres_img_name, 
+				framed_thumbnail_url = img_url + thumb_img_name)
 		
 		print("Saved: " + lowres_img_name)
 
-def get_FramedImage(prod_id, frame_id, mount_color, mount_size, user_width):
+def get_FramedImage_api(prod_id, frame_id, mount_color, mount_size, user_width):
 
 	# Get image
 	prod_img = Stock_image.objects.filter( product_id = prod_id ).first()		
@@ -290,3 +343,209 @@ def Homelane_endpoint_test():
 	data = json.loads(json_url.read())	
 	
 	print(data)
+
+	
+def createHomelaneFile():
+	hl = Homelane_data.objects.filter(is_published_ = True)	
+	with open('Artevenue_data.csv', 'w', newline='') as myfile:
+		wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
+		row =['SKU', 'Name', 'ArteVenue Category',
+				'Price(Excluding tax)', 'Tax(in amt)', 'Height(inches)', 
+				'Width(inches)', 'Quantity', 'Description', 'Image URL', 
+				'Additional Information', 'Image Thumbnail URL']
+		wr.writerow(row)
+		for h in hl:
+			length = h.image_height 
+			if h.moulding:
+				if h.moulding.width_inner_inches:
+					length = length + (h.moulding.width_inner_inches * 2)
+				if h.mount:
+					if h.mount_size:
+						length = length + (h.mount_size * 2)
+			
+			breadth = h.image_width 
+			if h.moulding:
+				if h.moulding.width_inner_inches:
+					breadth = breadth + (h.moulding.width_inner_inches * 2)
+				if h.mount:
+					if h.mount_size:
+						breadth = breadth + (h.mount_size * 2)
+
+			prod_details = "Print on " + h.print_medium_id + "; "
+			if h.moulding_id:
+				prod_details = prod_details + "Image Print Size : " + str(h.image_width) + " X " + str(h.image_height) + "; " + "Frame: " + h.moulding.name + " (" + str(h.moulding.width_inches) + "inch); "
+			if h.mount_id:
+				prod_details = prod_details + "Mount: " + str(h.mount_size) + ", Color: " + h.mount.name + "; "
+				if h.moulding.width_inner_inches:
+					prod_details = prod_details + "Total Size: " + str(h.image_width + (h.moulding.width_inner_inches *2) + (h.mount_size *2) ) + " X " + str(h.image_height + (h.moulding.width_inner_inches * 2) + ( h.mount_size * 2) ) + "; "
+				else:
+					prod_details = prod_details + "Total Size: " + str(h.image_width) + " X " + str(h.image_height) + "; "
+				
+			else:
+				prod_details = prod_details + "Image Size : " + str(h.image_width) + " X " + str(h.image_height) + "; "
+			
+			if h.acrylic_id:
+				prod_details = prod_details + "Acrylic covered; "
+				
+			#if i.stretch_id:
+			#	prod_details = prod_details +  + "Canvas Stretched; "
+
+			row =[h.homelane_key, h.product_name, h.category_name,
+					round(h.item_sub_total), h.item_tax, str(length), 
+					str(breadth), h.quantity, '', h.framed_url, 
+					prod_details, h.framed_thumbnail_url]
+			
+			wr.writerow(row)
+			
+			
+			
+@csrf_exempt		
+def homelane_products(request):
+	ikeywords = request.GET.get('keywords', '')
+	keywords = ikeywords.split()
+	keyword_filter = False # Turned on only if a keyword filter is present (through the AJAX call)
+	page = 1 # default
+
+	sortOrder = request.GET.get("sort")
+	show = request.GET.get("show")
+	
+	prod_categories = Stock_image_category.objects.filter(store_id=settings.STORE_ID, trending = True )
+	
+	dt =  today.day
+	products = Homelane_data.objects.all()
+		
+	width = 0
+	height = 0
+	if request.is_ajax():
+		#Apply the user selected filters -
+
+		# Get data from the request.
+		json_data = json.loads(request.body.decode("utf-8"))
+
+		major_array = []
+		sub_array = []
+		size_key = None
+		size_val = None
+		
+		t_f = Q()
+		for majorkey, subdict in json_data.items():
+			#######################################
+			s_keys = json_data[majorkey]
+			f = Q()
+			for s in s_keys:
+				if majorkey == 'SIZE':
+					# Get the size
+					idx = s.find("_")
+					width = int(s[:idx])
+					height = int(s[(idx+1):])
+					ratio = round(Decimal(width)/Decimal(height), 18)
+					f = f | ( Q( aspect_ratio = ratio) & Q(max_width__gte = width) & Q(max_height__gte = height))				
+			
+				if majorkey == 'IMAGE-TYPE':
+					f = f | Q(image_type = s)
+				if majorkey == 'ORIENTATION':
+					f = f | Q(orientation = s)
+				if majorkey == 'ARTIST':
+					f = f | Q(artist = s)
+				if majorkey == 'COLORS':
+					#f = f | Q(colors__icontains = s)
+					f = f | Q(key_words__icontains = s)
+				if majorkey == 'KEY-WORDS':
+					ikeywords = s_keys[s] 
+					print("Keywords: " + ikeywords)
+					keywords = ikeywords.split()
+					#f = f | Q(key_words__icontains = keywords)
+					keyword_filter = True
+				if majorkey == 'PAGE':									
+					page = s_keys[s]
+				if majorkey == 'SORT':
+					sortOrder =  s_keys[s]
+				if majorkey == 'SHOW':
+					show =  str(s_keys[s])
+			
+			
+			t_f = t_f & f
+		print (t_f)
+		products = products.filter( t_f )	
+
+	# Apply keyword filter (through ajax or search)
+	for word in keywords:
+		products = products.filter( 
+			Q(key_words__icontains = word) |
+			Q(artist__icontains = word)
+		)
+
+	prod_filters = ['ORIENTATION', 'ARTIST', 'IMAGE-TYPE', 'COLORS']	
+	prod_filter_values ={}
+	orientation_values = products.values('orientation').distinct()
+	
+	or_arr = []
+	for v in orientation_values:
+		if v['orientation'] not in or_arr:
+			or_arr.append ( v['orientation'] )
+	prod_filter_values['ORIENTATION'] = or_arr 
+	
+	artist_values = products.values('artist').distinct().order_by('artist')
+	ar_arr = []
+	for a in artist_values:
+		if a['artist'] not in ar_arr:
+			ar_arr.append(a['artist'] )
+	prod_filter_values['ARTIST'] = ar_arr 
+	
+	image_type_values = products.values('image_type').distinct()
+	im_arr = []
+	for i in image_type_values:
+		if i['image_type'] not in im_arr:
+			im_arr.append(i['image_type'] )
+	prod_filter_values['IMAGE-TYPE'] = im_arr
+
+
+	#image_type_values = products.values('colors').distinct()
+	im_arr = ['Red', 'Orange',  'Yellow', 'Green', 'Blue', 'Purple', 'Pink', 'Brown', 'black', 'White']
+	prod_filter_values['COLORS'] = im_arr
+	
+	price = Publisher_price.objects.filter(print_medium_id = 'PAPER') 
+
+	if show == None :
+		show = 50
+	
+	if show == '50':
+		perpage = 50 #default
+		show = '50'
+	else:
+		if show == '100':
+			perpage = 100
+			show = '100'
+		else:
+			if show == '1000':
+				perpage = 1000
+				show = '1000'
+			else:
+				show = '50' # default
+				perpage = 50
+				
+	paginator = Paginator(products, perpage) 
+	if not page:
+		page = request.GET.get('page')
+
+	prods = paginator.get_page(page)
+
+	#=====================
+	index = prods.number - 1 
+	max_index = len(paginator.page_range)
+	start_index = index - 5 if index >= 5 else 0
+	end_index = index + 5 if index <= max_index - 5 else max_index
+	page_range = list(paginator.page_range)[start_index:end_index]
+	#=====================
+		
+	if request.is_ajax():
+
+		template = "artevenue/homelane_prod_display_include.html"
+	else :
+		template = "artevenue/homelane_products.html"
+
+	return render(request, template, {'prod_categories':prod_categories, 
+		'products':products, 'prods':prods, 'sortOrder':sortOrder, 'show':show,'prod_filters':prod_filters,
+		'prod_filter_values':prod_filter_values, 'price':price, 'show_artist':True,
+		'width':width, 'height':height, 'page_range':page_range} )		
+		

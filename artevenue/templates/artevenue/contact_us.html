@@ -1,5 +1,23 @@
 {% extends 'artevenue/estore_base.html' %}
 {% load static %}
+
+{% block page-title %} 
+<title>Contact Us For Sales, Support & Enquiries | Arte'venue</title>
+{% endblock page-title %} 
+  
+{% block page-description %}
+<meta name="description" content="Need help with orders, payments or delivery? Get in touch with us and get swift resolution for your enquiries.">
+{% endblock page-description %}
+  
+{% block page-keywords %}
+<meta name="keywords" content="contact artevenue">
+{% endblock page-keywords %}
+  
+{% block page-author %}
+<meta name="author" content="Arte'Venue">
+{% endblock page-author %}
+
+
 {% load widget_tweaks %}
 	<!-- Only Override the site content block -->
 	{% block sitecontent %}
@@ -131,7 +149,7 @@
 
 	
 	{% block jscripts %}
-    <script>
+	<script>
       function initialize() {
               var mapOptions = {
                   zoom: 15,

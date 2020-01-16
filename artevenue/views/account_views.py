@@ -3,9 +3,9 @@ from django.contrib.auth import login as auth_login
 from django.shortcuts import get_object_or_404, render, redirect
 from django.conf import settings
 
-from django.contrib.auth import login as auth_login
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 from django.db import IntegrityError, DatabaseError, Error
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
@@ -15,10 +15,11 @@ from django.contrib import messages
 import datetime 
 
 from artevenue.forms import registerForm, businessprofile_Form, businessuserForm
-from artevenue.forms import businessprof_Form
+from artevenue.forms import businessprof_Form, userProfileForm
 from artevenue.forms import userForm, shipping_addressForm, billing_addressForm
-
-from artevenue.models import Pin_code, Business_profile, User_shipping_address
+from artevenue.forms import OrderStatusUpdate
+from artevenue.models import Pin_code, Business_profile, User_shipping_address, Promotion_voucher
+from artevenue.models import Promotion_voucher, Voucher_user, UserProfile
 from artevenue.models import User_billing_address, Order, Order_items_view, Cart_item_view
 
 from artevenue.models import Egift, Egift_redemption, User_sms_email
@@ -33,8 +34,9 @@ from weasyprint import HTML, CSS
 from .views import *
 
 ecom = get_object_or_404 (Ecom_site, store_id=settings.STORE_ID )
-def artevenuelogin(request):
+today = datetime.datetime.today()
 
+def artevenuelogin(request):
 	if request.method == 'POST':
     
 		# Get current session details
@@ -74,13 +76,27 @@ def artevenuelogin(request):
 		return render(request, 'artevenue/estore_base.html')
 
 	
-def register(request):
+def register(request, email=None):
 
+	## Get any sign up promotion
+	try:
+		promo_voucher = Promotion_voucher.objects.get(promotion__name = 'SIGN-UP',
+			promotion__effective_from__lte = today,
+			promotion__effective_to__gte = today)
+	except Promotion_voucher.DoesNotExist:
+			promo_voucher = None
+	if promo_voucher:
+		promotion_id = promo_voucher.promotion.promotion_id
+	else:
+		promotion_id = None
 	msg =''
+	business_code = ''
 	if request.method == 'POST':	
 		next = request.POST['curr_pg']
 		form = registerForm(request.POST)
+		business_code = request.POST.get('business_code', None)
 
+		'''
 		# get the token submitted in the form
 		recaptcha_response = request.POST.get('signup-recaptcha')
 		url = 'https://www.google.com/recaptcha/api/siteverify'
@@ -100,27 +116,59 @@ def register(request):
 		if (not result['success']) or (not result['action'] == 'signup'):
 			msg = 'Invalid reCAPTCHA. Please try again.'
 			return render(request, "artevenue/register.html", {'form':form,
-					'msg':msg} )
+					'msg':msg, 'promo_voucher':promo_voucher} )
 		else :	
-			if form.is_valid():
-				user = form.save()
-				auth_login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+		'''
+		bus_profile = None
+		if form.is_valid():
+			## validate the business code
+			if business_code:
+				try:
+					bus_profile = Business_profile.objects.get(business_code = business_code)
+				except Business_profile.DoesNotExist:
+					msg = "The business referral code you entered does not exist. Please check the code and try again."
+					bus_profile = None
+					return render(request, "artevenue/register.html", {'form':form, 
+							'promo_voucher':promo_voucher, 'msg':msg, 'business_code':business_code} )
 
-				# Update email, sms table
-				today = datetime.datetime.today()
-				u_email = User_sms_email(
+			user = form.save()
+			auth_login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+
+			# Update email, sms table
+			tday = datetime.datetime.today()
+			u_email = User_sms_email(
+				user = user,
+				welcome_email_sent = False,
+				welcome_sms_sent = False,
+				created_date = tday,	
+				updated_date = tday
+			)
+			u_email.save()
+			
+			## Create voucher for current user, in case of any running promotion 
+			if promotion_id:
+				ret = create_user_voucher_for_promo(request, promotion_id)
+			
+			if bus_profile:
+				u_profile = UserProfile(
 					user = user,
-					welcome_email_sent = False,
-					welcome_sms_sent = False,
-					created_date = today,	
-					updated_date = today
-				)
-				u_email.save()
-				# After successful sign up redirect to cuurent page
-				return redirect('index')
+					phone_number = '',
+					date_of_birth = None,
+					gender = '',
+					business_profile = bus_profile )
+					
+				u_profile.save()
+			# After successful sign up redirect to cuurent page
+			return redirect('index')
 	else:
-		form = registerForm()
-	return render(request, "artevenue/register.html", {'form':form} )
+		email = request.GET.get('email', '')
+		if email:
+			form = registerForm({'email':email})
+		else:
+			form = registerForm()
+		
+	return render(request, "artevenue/register.html", {'form':form, 
+			'promo_voucher':promo_voucher, 'msg':msg, 'business_code':business_code} )
 	
 	
 def business_registration(request):
@@ -137,7 +185,6 @@ def business_registration(request):
 				user = form.save()
 				auth_login(request, user, backend='django.contrib.auth.backends.ModelBackend')
 				# Update email, sms table
-				today = datetime.datetime.today()
 				u_email = User_sms_email(
 					user = user,
 					welcome_email_sent = False,
@@ -166,7 +213,14 @@ def my_account(request):
 	profile={}
 	shipping_form ={}
 	billing_form ={}
+	user_ProfileForm = {}
+	business_code = ''
 	curruser = get_object_or_404(User, username = request.user)	
+	try:
+		curruser_profile = UserProfile.objects.get(user = curruser)
+		business_code = curruser_profile.business_profile.business_code
+	except UserProfile.DoesNotExist:
+		curruser_profile = None
 
 	if request.method == 'POST':
 		if request.POST.get('u_form', 'NONE') != 'NONE':
@@ -174,7 +228,30 @@ def my_account(request):
 			if user_form.is_valid():
 				u = user_form.save()
 				msg = "Changes to your Arte'Venue account saved."
-		
+
+		if request.POST.get('prof_form', 'NONE') != 'NONE':			
+			user_ProfileForm = userProfileForm( request.POST, prefix = 'prof' )
+			if user_ProfileForm.is_valid():
+				u = user_ProfileForm.save(commit=False)
+				id = user_ProfileForm['id'].data
+				if id:
+					u.id = id
+				bus_code = user_ProfileForm['business_referral_code'].data
+				if bus_code:
+					try:
+						profile = Business_profile.objects.get( business_code = bus_code )
+						business_code = profile.business_code
+						u.business_profile = profile
+						msg = "Changes to your profile saved."
+						u.user = curruser
+						u.save()
+					except Business_profile.DoesNotExist:
+						msg = 'The entered business referral code is not valid. Please check and try again.'
+				else:
+					msg = "Changes to your profile saved."
+					u.user = curruser
+					u.save()
+
 		if request.POST.get('b_form', 'NONE') != 'NONE':
 			businessprofile_form = businessprof_Form( request.POST )
 			if businessprofile_form.is_valid():
@@ -204,6 +281,15 @@ def my_account(request):
 				
 	# Get user id
 	user_form = userForm( instance = curruser )
+
+	if not user_ProfileForm:
+		if curruser_profile:
+			user_ProfileForm = userProfileForm( instance = curruser_profile, prefix = 'prof',
+			initial={'user_id':curruser.id, 'business_profile': curruser_profile.business_profile_id,
+				'business_referral_code':curruser_profile.business_profile.business_code})
+		else:
+			user_ProfileForm = userProfileForm(prefix = 'prof', initial={'user_id':curruser.id})
+		
 	if not businessprofile_form:
 		try:
 			profile = Business_profile.objects.get( user = curruser )
@@ -264,7 +350,8 @@ def my_account(request):
 			
 	
 	return render(request, 'artevenue/my_account.html', {'msg':msg,
-		'user_form':user_form, 'businessprofile_form':businessprofile_form,
+		'user_form':user_form, 'user_ProfileForm':user_ProfileForm,
+		'businessprofile_form':businessprofile_form, 'business_code':business_code,
 		'shipping_form':shipping_form, 'billing_form':billing_form,
 		'egift_giver':egift_giver, 'egift_receiver':egift_receiver,
 		'egift_redemption':egift_redemption, 'redemptions':redemptions,
@@ -280,10 +367,22 @@ def my_orders(request):
 @login_required
 @csrf_exempt
 def get_orders(request):
+
+
+	#import logging
+	#logger = logging.getLogger('weasyprint')
+	#if settings.EXEC_ENV == 'DEV' or settings.EXEC_ENV == 'TESTING':
+	#	logger.addHandler(logging.FileHandler('/weasyprint/log/weasyprint.log'))
+	#	
+	#if settings.EXEC_ENV == 'PROD':
+	#	logger.addHandler(logging.FileHandler(settings.PROJECT_DIR + '/weasyprint/log/weasyprint.log'))
+
+	
 	startDt = ''
 	endDt = ''	
 	page = request.POST.get('page', 1)
 	printpdf = request.POST.get('printpdf', 'NO')
+	ordtype = request.POST.get('ordtype', 'U')
 	
 	from_date = request.POST.get("fromdate", '')
 	if from_date != '' :
@@ -293,8 +392,12 @@ def get_orders(request):
 	if to_date != '' :
 		endDt = datetime.datetime.strptime(to_date, "%Y-%m-%d")
 
-	user = User.objects.get(username = request.user)
-	order_list = Order.objects.filter(user = request.user).order_by('order_number')
+	if ordtype == 'U':
+		user = User.objects.get(username = request.user)
+		order_list = Order.objects.filter(user = request.user).order_by('order_number')
+	else:
+		order_list = Order.objects.all().order_by('-updated_date')
+	
 	order_items_list = {}
 	if startDt:
 		order_list = order_list.filter(order_date__gte = startDt)
@@ -335,12 +438,15 @@ def get_orders(request):
 			'startDt':startDt, 'endDt':endDt, 'MEDIA_URL':settings.MEDIA_URL,
 			'MEDIA_ROOT':settings.MEDIA_ROOT})
 
-		html = HTML(string=html_string, base_url=request.build_absolute_uri())
-		print(html_string)
+		html = HTML(string=html_string, base_url=request.build_absolute_uri('/'))
+		
 		html.write_pdf(target= settings.TMP_FILES + str(request.user) + '_ord_pdf.pdf',
-			stylesheets=[CSS(settings.CSS_FILES +  'style.default.css'), 
+			stylesheets=[
+						CSS(settings.CSS_FILES +  'style.default.css'), 
 						CSS(settings.CSS_FILES +  'custom.css'),
-						CSS(settings.VENDOR_FILES + 'bootstrap/css/bootstrap.min.css') ]);
+						CSS(settings.VENDOR_FILES + 'bootstrap/css/bootstrap.min.css') 
+						],
+						presentational_hints=True);
 		
 		fs = FileSystemStorage(settings.TMP_FILES)
 		with fs.open(str(request.user) + '_ord_pdf.pdf') as pdf:
@@ -381,7 +487,7 @@ def get_store_orders(request):
 		endDt = datetime.datetime.strptime(to_date, "%Y-%m-%d")
 		
 	order_list = Order.objects.filter().select_related('order_billing', 
-		'order_shipping').order_by('order_number')
+		'order_shipping').order_by('-updated_date')
 		
 	order_items_list = {}
 	if startDt:
@@ -447,38 +553,29 @@ def get_store_orders(request):
 			'orders': orders, 'order_items_list':order_items_list, 
 			'startDt':startDt, 'endDt':endDt, 'MEDIA_URL':settings.MEDIA_URL})		
 
-'''
-@csrf_exempt			
-def find_orders(request):
+@staff_member_required
+def orders_for_status_update(request):
+	return render(request, 'artevenue/orders_for_status.html', {})
+
+@csrf_exempt	
+def get_orders_for_status_update(request):
 	page = request.POST.get('page', 1)
 	printpdf = request.POST.get('printpdf', 'NO')
 	order_number = request.POST.get("order_number", '')
-	email_id = request.POST.get("email_id", '')
-
-	order_list = Order.objects.filter().select_related('order_billing', 
-		'order_shipping').order_by('order_number')
+		
+	order_list = Order.objects.exclude(
+		Q(order_status = 'PP') | Q(order_status = 'CO')
+		).select_related('order_billing', 
+		'order_shipping').order_by('-updated_date')
 		
 	order_items_list = {}
-	if email_id:
-		pay = Payment_details.objects.filter(email_id = email_id).first().values('order_id')				
-		order_list = order_list.filter(order__in = pay)
-
 	if order_number:
-		order_list = order_list.filter(order_number = order_number)			
-
-		
-	order_items_list = Order_items_view.objects.filter(
-		order__in = order_list).select_related('product', 'promotion').values(
-		'order_item_id', 'product_id', 'quantity', 'item_total', 'item_sub_total', 'item_tax', 'item_disc_amt',
-		'moulding_id', 'item_unit_price', 'product__image_to_frame',
-		'moulding__name', 'moulding__width_inches', 'print_medium_id', 'mount_id', 'mount__name',
-		'acrylic_id', 'mount_size', 'product__name', 'image_width', 'image_height',
-		'product__thumbnail_url', 'promotion__discount_value', 
-		'promotion__discount_type', 'mount__color', 'order_id'
-		).order_by('order_id')
+		order_list = order_list.filter(order_number = order_number)	
+	
+	order_items_list = Order_items_view.objects.select_related('product', 'promotion').filter(
+		order__in = order_list, product__product_type_id = F('product_type_id'))
 	
 	count = order_list.count()
-
 	
 	paginator = Paginator(order_list, 5)
 	orders = paginator.get_page(page)
@@ -490,26 +587,186 @@ def find_orders(request):
 		orders = paginator.page(paginator.num_pages)
 
 		
-	if printpdf == "YES":
-		#html_string = render_to_string('artevenue/store_orders_table.html', {'count':count, 
-		html_string = render_to_string('artevenue/order_print.html', {'count':count, 
-			'orders': order_list, 'order_items_list':order_items_list, 
-			'startDt':startDt, 'endDt':endDt})
+	return render(request, 'artevenue/orders_for_status_update.html', {'count':count, 
+		'orders': orders, 'order_items_list':order_items_list})		
 
-		html = HTML(string=html_string)
-		html.write_pdf(target= settings.TMP_FILES + str(request.user) + '_ord_pdf.pdf',
+	
+@staff_member_required
+@csrf_exempt
+def update_order_status(request, order_id = None, order_status =  None):
+	if order_id and order_status:
+		order = Order.objects.filter(order_id = order_id).update(
+			order_status = order_status, updated_date = today )
+		msg = "Order Status Updated"
+		return JsonResponse({'msg':'Order Status Updated.'}, safe=False)
+	if request.method == 'POST':
+		order_id = int(request.POST.get('order_id', '0'))
+		order_status = request.POST.get('order_status', '')
+		order = Order.objects.get(order_id = order_id)
+		if order_status == 'SH' and order.invoice_number == '':		# If ready for shipping, generate the invoice number
+			from artevenue.views.invoice_views import get_next_invoice_number
+			inv_num = get_next_invoice_number()
+			ord = Order.objects.filter(order_id = order_id).update(
+				order_status = order_status, updated_date = today,
+				invoice_number = inv_num, invoice_date = today)
+		else:	
+			ord = Order.objects.filter(order_id = order_id).update(
+				order_status = order_status, updated_date = today )
+		msg = "Order Status Updated"
+			
+		
+		return JsonResponse({'msg':'Order Status Updated.'}, safe=False)
+	else:
+		order_id = int(request.GET.get('order_id', '0'))
+		order = Order.objects.get(order_id = order_id)
+		form = OrderStatusUpdate(instance = order)
+		return  render(request, 'artevenue/order_status_update_modal.html', {'form':form})
+		
+
+
+@login_required
+def create_user_voucher_for_promo(request, promotion_id):
+
+	msg = ''
+
+	## Get current user
+	user = User.objects.get(username = request.user)
+	if not user:
+		return ({'msg':'NO-USER'})		
+
+	## Get the voucher record
+	try:
+		promo_voucher = Promotion_voucher.objects.get(promotion__promotion_id = promotion_id,
+				promotion__effective_from__lte = today,
+				promotion__effective_to__gte = today)
+	except Promotion_voucher.DoesNotExist:
+			promo_voucher = None
+	
+	if not promo_voucher:
+		return ({'msg':'NO-PROMO'})
+
+	voucher_user = Voucher_user(
+		voucher_id = promo_voucher.voucher.voucher_id,
+		user = user,
+		effective_from = today,
+		effective_to = promo_voucher.promotion.effective_to,
+		used_date = None,
+		created_date = today,
+		updated_date = today
+		)
+	voucher_user.save()
+	msg = "SUCCESS"
+
+	return ({'msg':msg})
+
+
+@staff_member_required
+def store_carts(request):
+	return render(request, 'artevenue/store_carts.html')	
+
+@staff_member_required		
+@csrf_exempt
+def get_carts(request, printpdf=''):
+	startDt = ''
+	endDt = ''	
+	page = request.POST.get('page', 1)
+	
+	no_checkout_carts = request.POST.get('no_checkout_carts', '')
+	all_carts = request.POST.get('all_carts', '')
+	no_payment_carts = request.POST.get('no_payment_carts', '')
+	payment_done_carts = request.POST.get('payment_done_carts', '')
+	user_email =  request.POST.get('user_email', '')
+	carts_opt =  request.POST.get('carts_opt', '')
+	
+	if printpdf == '':
+		printpdf = request.POST.get('printpdf', 'NO')
+
+	from_date = request.POST.get("fromdate", '')
+	if from_date != '' :
+		startDt = datetime.datetime.strptime(from_date, "%Y-%m-%d")
+		
+	to_date = request.POST.get("todate", '')
+	if to_date != '' :
+		endDt = datetime.datetime.strptime(to_date, "%Y-%m-%d")
+		
+	cart_list = Cart.objects.order_by('-created_date')
+	if startDt:
+		cart_list = cart_list.filter(created_date__date__gte = startDt)
+	if endDt:
+		cart_list = cart_list.filter(created_date__date__lte = endDt)
+
+	if user_email:
+		cart_list = cart_list.filter(user__email = user_email)
+
+	if	carts_opt == 'NO-CHK':
+		## Remove the carts that already have an order created against
+		for c in cart_list:
+			ord = Order.objects.filter( cart_id = c.cart_id).first()
+			if ord:
+				cart_list = cart_list.exclude(cart_id = c.cart_id)
+			
+	if	carts_opt == 'CHK':
+		## Remove the carts that have an order created against but no payment done
+		for c in cart_list:
+			ord = Order.objects.filter( cart_id = c.cart_id).first()
+			if ord:
+				if ord.order_status != 'PP':
+					cart_list = cart_list.exclude(cart_id = c.cart_id)
+			else:
+				cart_list = cart_list.exclude(cart_id = c.cart_id)
+	
+	if	carts_opt == 'PAY-DONE':
+		## Remove the carts that have an order created and payment is done
+		for c in cart_list:
+			ord = Order.objects.filter( cart_id = c.cart_id).first()
+			if ord:
+				if ord.order_status == 'PP':
+					cart_list = cart_list.exclude(cart_id = c.cart_id)
+			else:
+				cart_list = cart_list.exclude(cart_id = c.cart_id)
+	
+	if	not startDt and not endDt:
+		return render(request, 'artevenue/carts_table.html', {'count':0, 
+			'startDt':startDt, 'endDt':endDt})
+	cart_items_list = Cart_item_view.objects.select_related('product').filter(
+		cart__in = cart_list, product__product_type_id = F('product_type_id'))
+			
+	count = cart_list.count()
+
+	cart_list_ids = cart_list.values('cart_id')
+	orders = Order.objects.filter( cart__in = cart_list_ids)
+	
+	paginator = Paginator(cart_list, 10)
+	carts = paginator.get_page(page)
+	
+	try:
+		carts = paginator.page(page)
+	except PageNotAnInteger:
+		carts = paginator.page(1)
+	except EmptyPage:
+		carts = paginator.page(paginator.num_pages)
+	
+	if printpdf == "YES":
+		html_string = render_to_string('artevenue/carts_print.html', {'count':count, 
+			'carts': carts, 'cart_items':cart_items_list, 'orders':orders,
+			'startDt':startDt, 'endDt':endDt, 'ecom_site':ecom})
+
+		html = HTML(string=html_string, base_url=request.build_absolute_uri())
+		html.write_pdf(target= settings.TMP_FILES + str(request.user) + '_cart_pdf.pdf',
 			stylesheets=[CSS(settings.CSS_FILES +  'style.default.css'), 
 						CSS(settings.CSS_FILES +  'custom.css'),
-						CSS(settings.VENDOR_FILES + 'bootstrap/css/bootstrap.min.css') ]);
+						CSS(settings.VENDOR_FILES + 'bootstrap/css/bootstrap.min.css') ],
+						presentational_hints=True);
 		
 		fs = FileSystemStorage(settings.TMP_FILES)
-		with fs.open(str(request.user) + '_ord_pdf.pdf') as pdf:
+		with fs.open(str(request.user) + '_cart_pdf.pdf') as pdf:
 			response = HttpResponse(pdf, content_type='application/pdf')
-			response['Content-Disposition'] = 'attachment; filename="' + str(request.user) + '_ord_pdf.pdf"'
+			response['Content-Disposition'] = 'attachment; filename="' + str(request.user) + '_cart_pdf.pdf"'
 			return response
 
 		return response		
 	else:
-		return render(request, 'artevenue/orders_table.html', {'count':count, 
-			'orders': orders, 'order_items_list':order_items_list})							
-	'''
+		
+		return render(request, 'artevenue/carts_table.html', {'count':count, 
+			'carts': carts, 'cart_items':cart_items_list,  'orders':orders, 
+			'startDt':startDt, 'endDt':endDt, 'ecom_site':ecom})		

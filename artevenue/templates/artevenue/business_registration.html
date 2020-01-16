@@ -2,27 +2,126 @@
 {% load static %}
 {% load widget_tweaks %}
 
+{% block page-title %}
+<title>Bulk Art Supplies & Art Prints For Sale | Arte'venue Business</title>
+{% endblock page-title %}
+
+{% block page-description %}
+<meta name="description" content="Bulk art supplies & art prints for home, office and retail space. Sign up on Arte'venue business and access 2,50,000 art, 70+ categories & 300+ artists.">
+{% endblock page-description %}
+
+{% block page-keywords %}  
+<meta name="keywords" content="bulk art supplies, art prints for sale, buy art in bulk, unique art for sale">
+{% endblock page-keywords %}  
+
+{% block page-author %}  
+<meta name="author" content="Arte'venue">
+{% endblock page-author %}  
+
 	<!-- Only Override the site content block -->
 	{% block sitecontent %}
 
 	
     <div id="highlighted-slider" class="container ccontainer">
-            <div class="row">
-                <div class="col-md-12">
-					Already have a business account? 	
-						<li class="list-inline-item clickable"><a data-toggle="modal" data-target="#login-modal"><span style = "color:blue"> Login here</span></a></li>
-				</div>
+		<div class="row">
+			<div class="col-12">
+				Already have a business account? 	
+					<li class="list-inline-item clickable"><a data-toggle="modal" data-target="#login-modal"><span style = "color:blue"> Login here</span></a></li>
 			</div>
-        <div class="box box-default">
-            <div class="box-header with-border row">
-                <div class="col-md-3" ><h3>Business-Sign Up</i></h3></div>
-				<div class="col-md-9" >
-					<div class="quote-leftbar" >
-						Do you have large requirements, are you a business or supplying to a business?
-						Create a business account with us and get exciting benefits. Sign up below...
+		</div>
+		<div class="row">
+			<div class="col-12">
+				<img src="{% static 'img/business_page/business_registration_image.png' %}" alt="Business Page Image" style="width:100%">
+			</div>
+		</div>
+		<div class = "mt-3" style = "background-color:#fff; color:#665d6f; padding:30px;">
+			<div class="row">
+				<div class="col-12">
+					<div class = "text-center small_text_on_mobiles">
+						<strong>GET ONE STOP SOLUTION FOR ALL YOUR ART PRINTS,<br />FRAMES & INTERIOR NEEDS</strong>
 					</div>
 				</div>
-            </div>
+				<div class="col-12 mt-3">
+					<div class = "text-center small_text_on_mobiles">
+						Arte'Venue brings together 2,50,00 designs, custom framing options, and bulk order fulfilment under a <br />
+						single roof. Buy custom art prints from famous international artists and frame them as per your <br />
+						need with just a few clicks on Arte'Venue.
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class = "mt-2" style = "background-color:#fafafa; color:#665d6f; padding:30px;">
+			<div class="row">
+				<div class="col-12">
+					<div class = "text-center small_text_on_mobiles">
+						<strong>PERKS OF SIGNING UP FOR ARTE'VENUE BUSINESS</strong>
+					</div>
+				</div>
+			</div>
+			<div class="row mt-3" style = "background-color:#fff;" >
+				<div class="col-4 mt-3" style = "padding-left:0px !important; padding-right:0px !important;">
+					<div class = "small_text_on_mobiles text-center">
+						<img src="{% static 'img/business_page/art-pieces.png' %}" alt='' style = "float: left;">
+						<strong>ACCESS TO 2,50,000+ DESIGNS</strong>
+						<br />
+						Use actual art prices in your mockup that can be ordered later
+					</div>
+				</div>
+				<div class="col-4  mt-3" style = "padding-left:0px !important; padding-right:0px !important;">
+					<div class = "small_text_on_mobiles text-center">
+						<img src="{% static 'img/business_page/referral-fee.png' %}" alt='' style = "float: left;">
+						<strong>GET REFERRAL FEE ON ALL ORDERS</strong>
+						<br />
+						Get a referral fee on every sale that happens through you
+					</div>
+				</div>
+				<div class="col-4  mt-3" style = "padding-left:0px !important; padding-right:0px !important;">
+					<div class = "small_text_on_mobiles text-center">
+						<img src="{% static 'img/business_page/free-shipping.png' %}" alt='' style = "float: left;">
+						<strong>GET FREE SHIPPING ANYWHERE IN INDIA</strong>
+						<br />
+						Get fast and free shipping anywhere in India on all orders
+					</div>
+				</div>
+				<div class="col-4  mt-3" style = "padding-left:0px !important; padding-right:0px !important;">
+					<div class = "small_text_on_mobiles text-center">
+						<img src="{% static 'img/business_page/bulk-orders.png' %}" alt='' style = "float: left;">
+						<strong>BULK ORDERS FOR ANY SCALE</strong>
+						<br />
+						Order in any numbers and we will deliver on time
+					</div>
+				</div>
+				<div class="col-4  mt-3" style = "padding-left:0px !important; padding-right:0px !important;">
+					<div class = "small_text_on_mobiles text-center">
+						<img src="{% static 'img/business_page/customise.png' %}" alt='' style = "float: left;">
+						<strong>CUSTOMIZE ORDERS AS PER NEED</strong>
+						<br />
+						Choose size, frame, mount color to match your interiors
+					</div>
+				</div>
+				<div class="col-4  mt-3" style = "padding-left:0px !important; padding-right:0px !important;">
+					<div class = "small_text_on_mobiles text-center">
+						<img src="{% static 'img/business_page/customise.png' %}" alt='' style = "float: left;">
+						<strong>BE 100% ASSURED ABOUT QUALITY</strong>
+						<br />
+						Our orders contain 100% satisfaction guarantee and return options
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row mt-3">
+			<div class="col-12">
+				<div class = "text-center small_text_on_mobiles">
+					<strong>SIGN UP FOR BUSINESS ACCOUNT</strong>
+				</div>
+			</div>
+		</div>
+				
+				
+				
+				
+        <div class="box box-default">
+
             <div class="row">
                 <div class="col-md-12">
                     <form method="post" novalidate>
@@ -39,7 +138,6 @@
                                     <div class="w3-container">
                                         {% include 'includes/form.html' %}
                                     </div>
-                                    <!-- <button type="submit" class="btn btn-primary">Sign Me Up</button> -->
                                 </div>
                             </div>
                             

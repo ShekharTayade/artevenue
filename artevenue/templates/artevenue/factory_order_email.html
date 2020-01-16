@@ -141,22 +141,22 @@
 							Image Code: {{i.product.part_number}}
 						</td>
 						<td>
-							{% with width=i.moulding.width_inches|add_width_frame_mount:i.mount_size %}
+							{% with width=i.moulding.width_inner_inches|add_width_frame_mount:i.mount_size %}
 
 							<small>
 							<li>Print on {{i.print_medium_id|title}}</li>
 							{% if i.moulding_id %}
 							<li>Image Print Size : {{ i.image_width }}" X {{i.image_height }}"</li>
-							<li>Frame {{i.moulding.name}}, CODE:{{i.moulding.part_number}} </li>
+							<li>Frame {{i.moulding.name}}, CODE:{{i.moulding.part_number}} SIZE: {{i.moulding.width_inches}} inch</li>
+							{% if i.mount_id %}
+								<li>Mount: {{i.mount_size }}", Color: {{i.mount.name|title }} </li>
+							{% endif %}
 							<li>Total Size: 
-								{{ i.image_width|add_width:width }}" X {{i.image_height|add_width:width }}"</li>
+								{{ i.image_width|add_width:width|add_width:width }}" X {{i.image_height|add_width:width|add_width:width }}"</li>
 							{% else %}
 								<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
 							{% endif %}
 							
-							{% if i.mount_id %}
-								<li>Mount: {{i.mount_size }}", Color: {{i.mount.name|title }} </li>
-							{% endif %}
 							{% if i.acrylic_id %}
 								<li>Acrylic covered</li>
 							{% endif %}
@@ -186,3 +186,5 @@
 			<img src = "https://artevenue.com/static/img/logo.png" alt="Arte'venue Logo"  height="30" width="110"> <br />
 			<a href = "https://www.artevenue.com">www.artevenue.com</a>
 		</p>
+	</body>
+</html>

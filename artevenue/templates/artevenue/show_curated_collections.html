@@ -1,203 +1,50 @@
 {% load static %}
-<section class="curated_section">
-	<!--<div class="hgroup_2 text-center">
-		<h2 class = "mt-4 text-center">Curated</h2>
-	</div> -->
+{% load show_frame_my_art from prod_template_tags %}
 
-		
-	<div class="text-center">
+	<div class="col-md-12 mt-5 py-3">
+		<h2 class="text-center">CURATED COLLECTIONS
+		</h2>
 	
-		<div class="row mt-5" style="margin:5px;">
-			<div class = "col-lg-12 mb-5" style="padding:0px !important;">
-				<div class="curted_pic" style = "background-color:#f0f0f0 !important;">
-					<a href = "{% url 'curated_collections' 10 %}">
-						<div class="text-center mb-2" style = "color: #5d5566; font-family:Helvetica, sans-serif !important; font-size:1.4rem !important;">
-							
-						</div>
-						<div class="text-center mb-2" style = "color: #5d5566; font-family:Helvetica, sans-serif !important; font-size:0.9rem !important;">
-							
-						</div>
-						<img src="{% static 'img/curated/woman.jpg' %}" class="img-fluid">
-					</a>
+		<div class="row" style="margin:5px;">
+			<div class = "col-lg-6 mt-5" >			
+				<div class="curated-container">
+					<img class = "d-none d-sm-block" src="{% static 'img/curated/history.jpg' %}" alt="Art" style="width:100%">
+					<img class = "d-block d-sm-none" src="{% static 'img/curated/history_mobile.jpg' %}" alt="Art" style="width:100%">
+					<a class="btn" href = "{% url 'curated_collections' 1 %}">
+					ART OVER CENTURIES</a>
 				</div>
 			</div>
-		</div>	
-	
-		<div class="row mt-5" style="margin:5px !important;">
-			<div class = "col-lg-6 mb-5" >
-				<div class="curted_pic" style = "background-color:#f0f0f0 !important;">
-					<a style="background-color:gainsboro;" href = "{% url 'curated_collections' 1 %}">
-						<!--<div class="mb-2 text-center" style = "color: #665d6f; font-family:Helvetica, sans-serif !important; font-size:1.3rem !important;">-->
-						<!--<div class="mb-2 text-center" style = "color: #5d5566; font-family:Helvetica, sans-serif !important; font-size:1.4rem !important;">
-							Art Over Centuries
-						</div>
-						<div class="mb-2 text-center" style = "color: #5d5566; font-family:Helvetica, sans-serif !important; font-size:0.9rem !important;">
-							Timeless collections of the grand masters
-						</div> -->
-						<div class="say_pic">						
-							<img style="margin-bottom:0px !important;" src="{% static 'img/curated/art_over_centuries_text.jpg' %}" class="img-responsive mb-2">
-							<img src="{% static 'img/curated/art_over_centuries_text_mobile.jpg' %}" class="img-responsive mobile">
-							<img src="{% static 'img/curated/monalisa_updated.jpg' %}" class="img-fluid">
-						</div>
-					</a>
+			<div class = "col-lg-6 mt-5" >			
+				<div class="curated-container">
+					<img class = "d-none d-sm-block" src="{% static 'img/curated/black_white.jpg' %}" alt="Abstract" style="width:100%">
+					<img class = "d-block d-sm-none" src="{% static 'img/curated/black_white_mobile.jpg' %}" alt="Abstract" style="width:100%">
+					<a class="btn" href="{% url 'curated_collections' 6 %}">
+					BLACK & WHITE</a>
 				</div>
 			</div>
-			<div class = "col-lg-6 mb-5">
-				<div class="curted_pic" style = "background-color:#f0f0f0 !important;">
-					<a href = "{% url 'curated_collections' 2 %}">
-						<!--<div class="text-center mb-2" style = "color: #5d5566; font-family:Helvetica, sans-serif; font-size:1.4rem;">
-							Photography
-						</div>
-						<div class="text-center mb-2 " style = "color: #5d5566; font-family:Helvetica, sans-serif; font-size:0.9rem;">
-							Moments captured through lens
-						</div>-->
-						<div class="say_pic">						
-							<img style="margin-bottom:0px !important;" src="{% static 'img/curated/photography_text.jpg' %}" class="img-responsive mb-2">
-							<img src="{% static 'img/curated/photography_text_mobile.jpg' %}" class="img-responsive mobile">						
-							<img src="{% static 'img/curated/tiger_updated.jpg' %}" class="img-fluid">
-						</div>
-					</a>
+			<div class = "col-lg-3 mt-4" >			
+				<div class="curated-container">
+					<img class = "d-none d-sm-block" src="{% static 'img/curated/femme.jpg' %}" alt="Art" style="width:100%">
+					<img class = "d-block d-sm-none" src="{% static 'img/curated/femme_mobile.jpg' %}" alt="Art" style="width:100%">
+					<a class="btn" href = "{% url 'curated_collections' 10 %}">
+					FEMME</a>
 				</div>
-			</div>	
-		</div>
-		
-		
-		<div class="row px-bottom" style="margin:5px;">
-			<div class = "col-lg-12" style="padding:0px !important;">
-				<div class="curted_pic" style = "background-color:#f0f0f0 !important;">
-					<a href = "{% url 'curated_collections' 6 %}">
-						<!--<div class="text-center mb-2" style = "color: #5d5566; font-family:Helvetica, sans-serif !important; font-size:1.4rem !important;  letter-spacing: 3px;">
-							Black & White
-						</div>
-						<div class="text-center mb-2" style = "color: #5d5566; font-family:Helvetica, sans-serif !important; font-size:0.9rem !important;  letter-spacing: 3px;">
-							Stark, Bold & Beautiful
-						</div>-->
-						<div class="say_pic">						
-							<img style="margin-bottom:0px !important;" src="{% static 'img/curated/black_white_text.jpg' %}" class="img-responsive mb-2">
-							<img src="{% static 'img/curated/black_white_text_mobile.jpg' %}" class="img-responsive mobile">
-							<img src="{% static 'img/curated/black_white.jpg' %}" class="img-fluid">
-						</div>
-					</a>
+			</div>
+			<div class = "col-lg-3 mt-4" >			
+				<div class="curated-container">
+					<img class = "d-none d-sm-block" src="{% static 'img/curated/photo.jpg' %}" alt="Art" style="width:100%">
+					<img class = "d-block d-sm-none" src="{% static 'img/curated/photo_mobile.jpg' %}" alt="Art" style="width:100%">
+					<a class="btn" href = "{% url 'curated_collections' 2 %}">
+					PHOTOGRAPHY</a>
+				</div>
+			</div>
+			<div class = "col-lg-6 mt-4" >			
+				<div class="curated-container">
+					<img class = "d-none d-sm-block" src="{% static 'img/curated/abstract.jpg' %}" alt="Art">
+					<img class = "d-block d-sm-none" src="{% static 'img/curated/abstract_mobile.jpg' %}" alt="Art">
+					<a class="btn" href = "{% url 'curated_collections' 3 %}">
+					ABSTRACT</a>
 				</div>
 			</div>
 		</div>
-		<div class="row mt-5" style="margin:5px;">
-			<div class = "col-lg-12" style="padding:0px !important; ">
-				<a href = "{% url 'egift_card' %}">
-					<img src="{% static 'img/egift_banner.jpg' %}" class="img-fluid">
-				</a>
-			</div>
-		</div>
-		<div class="row mt-5" style="margin:5px;">
-			<div class = "col-lg-12" style="padding:0px !important;">
-				<div class="curted_pic" style = "background-color:#f0f0f0 !important;">
-					<a href = "{% url 'curated_collections' 3 %}">
-						<!--<div class="text-center mb-2" style = "color: #5d5566; font-family:Helvetica, sans-serif !important; font-size:1.4rem !important;">
-							Abstract
-						</div>
-						<div class="text-center mb-2" style = "color: #5d5566; font-family:Helvetica, sans-serif !important; font-size:0.9rem !important;">
-							Nurtured Imperfections
-						</div>-->
-						<div class="say_pic">						
-							<img style="margin-bottom:0px !important;" src="{% static 'img/curated/abstract_text.jpg' %}" class="img-responsive mb-2">
-							<img src="{% static 'img/curated/abstract_text_mobile.jpg' %}" class="img-responsive mobile">
-							<img src="{% static 'img/curated/abstract.jpg' %}" class="img-fluid">
-						</div>
-					</a>
-				</div>
-			</div>
-		</div>			
-		
-		<div class="row mt-5"  style = "margin:5px;">
-			<div class = "col-lg-4 mb-5">
-				<div class="curted_pic" style = "background-color:#f0f0f0 !important;">
-					<a href = "{% url 'curated_collections' 5 %}">
-						<!--<div class="mb-2 text-center" style = "color: #5d5566; font-family:Helvetica, sans-serif !important; font-size:1.4rem !important;">
-							Floral
-						</div>
-						<div class="mb-2 text-center" style = "color: #5d5566; font-family:Helvetica, sans-serif !important; font-size:0.9rem !important;">
-							Buds and Blooms
-						</div>-->
-						<div class="say_pic">						
-							<img style="margin-bottom:0px !important;" src="{% static 'img/curated/floral_text.jpg' %}" class="img-responsive mb-2">
-							<img src="{% static 'img/curated/floral_text.jpg' %}" class="img-responsive mobile">
-							<img src="{% static 'img/curated/floral.jpg' %}" class="img-fluid">
-						</div>
-					</a>
-				</div>
-			</div>
-			<div class = "col-lg-4 mb-5">
-				<div class="curted_pic" style = "background-color:#f0f0f0 !important;">
-					<a href = "{% url 'curated_collections' 4 %}">
-						<!--<div class="text-center mb-2" style = "color: #5d5566; font-family:Helvetica, sans-serif; font-size:1.4rem;">
-							Kids
-						</div>
-						<div class="text-center mb-2 " style = "color: #5d5566; font-family:Helvetica, sans-serif; font-size:0.9rem;">
-							Playful and More
-						</div>-->
-						<div class="say_pic">						
-							<img style="margin-bottom:0px !important;" src="{% static 'img/curated/kids_text.jpg' %}" class="img-responsive mb-2">
-							<img src="{% static 'img/curated/kids_text.jpg' %}" class="img-responsive mobile">
-							<img src="{% static 'img/curated/kids.jpg' %}" class="img-fluid">
-						</div>
-					</a>
-				</div>
-			</div>	
-			<div class = "col-lg-4 mb-5">
-				<div class="curted_pic" style = "background-color:#f0f0f0 !important;">
-					<a href = "{% url 'curated_collections' 9 %}">
-						<!--<div class="text-center mb-2" style = "color: #5d5566; font-family:Helvetica, sans-serif; font-size:1.4rem;">
-							Vintage
-						</div>
-						<div class="text-center mb-2 " style = "color: #5d5566; font-family:Helvetica, sans-serif; font-size:0.9rem;">
-							The Tales Of Time
-						</div>-->
-						<div class="say_pic">						
-							<img style="margin-bottom:0px !important;" src="{% static 'img/curated/vintage_text.jpg' %}" class="img-responsive mb-2">
-							<img src="{% static 'img/curated/vintage_text.jpg' %}" class="img-responsive mobile">
-							<img src="{% static 'img/curated/vintage.jpg' %}" class="img-fluid">
-						</div>
-					</a>
-				</div>
-			</div>	
-		</div>
-		<div class="row"  style = "margin:5px;">
-			<div class = "col-lg-6 mb-5">
-				<div class="curted_pic" style = "background-color:#f0f0f0 !important;">
-					<a style="background-color:gainsboro;" href = "{% url 'curated_collections' 8 %}">
-						<!--<div class="mb-2 text-center" style = "color: #5d5566; font-family:Helvetica, sans-serif !important; font-size:1.4rem !important;">
-							Coastal
-						</div>
-						<div class="mb-2 text-center" style = "color: #5d5566; font-family:Helvetica, sans-serif !important; font-size:0.9rem !important;">
-							The Horizon, Yonder
-						</div>-->
-						<div class="say_pic">						
-							<img style="margin-bottom:0px !important;" src="{% static 'img/curated/coastal_text.jpg' %}" class="img-responsive mb-2">
-							<img src="{% static 'img/curated/coastal_text_mobile.jpg' %}" class="img-responsive mobile">
-							<img src="{% static 'img/curated/coastal.jpg' %}" class="img-fluid">
-						</div>
-					</a>
-				</div>
-			</div>
-			<div class = "col-lg-6 mb-5">
-				<div class="curted_pic" style = "background-color:#f0f0f0 !important;">
-					<a href = "{% url 'curated_collections' 7 %}">
-						<!--<div class="text-center mb-2" style = "color: #5d5566; font-family:Helvetica, sans-serif; font-size:1.4rem;">
-							Landscape
-						</div>
-						<div class="text-center mb-2 " style = "color: #5d5566; font-family:Helvetica, sans-serif; font-size:0.9rem;">
-							The Ways of Nature
-						</div>-->
-						<div class="say_pic">						
-							<img style="margin-bottom:0px !important;" src="{% static 'img/curated/landscape_text.jpg' %}" class="img-responsive mb-2">
-							<img src="{% static 'img/curated/landscape_text_mobile.jpg' %}" class="img-responsive mobile">
-							<img src="{% static 'img/curated/landscape.jpg' %}" class="img-fluid">
-						</div>
-					</a>
-				</div>
-			</div>	
-		</div>
-		
-	</div>
-
-</section>
+	</div>	

@@ -6,13 +6,11 @@
 		<div class="container">
 			<div class="row">
 				<div class="col-md-12">
-					<div style = "color: #665d6f; font-family:Helvetica, sans-serif !important; font-size:1.3rem !important;"
-						class="mb-0 text-center">{{ecom_site.featured_header}}
-					</div>
-					<div class = "text-center">
-						<span class = "section-text">
-						</span>
-					</div>
+					<h2 class="mb-2 text-center">{{ecom_site.featured_header|upper}}
+				</div>
+				<div class = "text-center">
+					<span class = "section-text">
+					</span>
 				</div>
 			</div>
 		</div>
@@ -25,15 +23,15 @@
 		<div class="item">  
 				{% with 'img/'|add:c.url as image_static %}
 				<div class="front"  style="margin:0px 2px 0px 2px !important;">
-					<a href="{% url 'category_stock_images' c.category_id %}"> 
+					<a href="{% url 'art_by_category' c.category_id %}"> 
 						<img src="{% static image_static %}" alt="{{c.name}}" class="img-fluid img-container-cat">
 					</a>
 				</div>
 				{% endwith %}
 				<div class="mt-2 trending-cat text text-center">
-					<h5>
-						<a href="{% url 'category_stock_images' c.category_id %}">{{ c.name|title }}</a>
-					</h5>
+					<p>
+						<a href="{% url 'art_by_category' c.category_id %}">{{ c.name|title }}</a>
+					</p>
 				</div>
 				
 		</div>

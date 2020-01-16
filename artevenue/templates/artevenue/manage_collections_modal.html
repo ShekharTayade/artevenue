@@ -1,0 +1,70 @@
+<!-- Message Modal -->
+<div id="collection-modal" tabindex="-1" role="dialog" aria-labelledby="Manage Collections" aria-hidden="true" class="modal fade">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h2 class="modal-title">My Collections</h2>
+				<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
+			</div>
+			<div class="modal-body">
+				<div class="text-center">
+					{% if not user_collection %}
+					<div class = "row">
+						<div class = "col-12">
+							<button type = "button" class = "btn btn-link">
+								<i class = "fa fa-plus-square-o fa-3x">
+								</i>
+								Create New Collection
+							</button>
+						</div>
+					</div>
+					{% endif %}
+				</div>
+				<div class = "row">
+					<div class="col-xs-12 col-md-12">
+						<a type = "button" class = "btn btn-link pull-right"
+							style = "color:blue; text-decoration:underline;">
+							<i class = "fa fa-plus-square-o">
+							</i>New Collection
+						</a>
+					</div>
+				</div>
+				<div class = "row">
+					<div class="col-xs-12 col-md-12">
+						<nav>
+							<div class="col-xs-12 col-md-12">
+								<div class="nav nav-tabs nav-fill" id="nav-tab" role="tablist">
+									{% for c in user_collection %}
+									<a class="nav-item nav-link active" 
+										id="nav-{{c.name}}" 
+											data-toggle="tab" href="#nav-{{c.user_collection_id}}" role="tab" aria-controls="nav-home" 
+											aria-selected="true">
+										{{c.name}}
+										<button type = "button" class = "btn btn-link pull-right">
+											<i class = "fa fa-trash" style = "color:grey;" ></i>
+										</button>
+									</a>
+									{% endfor %}
+								</div>
+							</div>
+						</nav>
+						<div id = "spaces">
+							{% for u in user_space  %}
+							<div class="tab-pane fade show active" id="nav-{{u.user_collection_id}}" role="tabpanel" aria-labelledby="nav-profile-tab">
+								<div class = "col-sm-12">
+									{{u.name}}
+								</div>
+							</div>
+							{% endfor %}	
+						</div>
+					</div>
+				</div>
+				<div class = "text-center">
+					<button class="btn btn-secondary pull-left" onclick="$('#collection-modal').modal('hide');"><i class="fa fa-check-circle"></i>Cancel</button>
+					<button class="btn btn-primary pull-right" onclick="$('#collection-modal').modal('hide');"><i class="fa fa-check-circle"></i>Save</button>
+				</div>					
+			</div>
+		</div>
+	</div>
+</div>
+ge modal -->		

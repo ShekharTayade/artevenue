@@ -3,7 +3,7 @@
 
 	<!-- Only Override the site content block -->
 	{% block sitecontent %}
-	<div class="container">
+	<div class="container-fluid">
         <div class="row">
 			<div class="col-lg-12">
 				<!-- breadcrumb-->
@@ -16,113 +16,49 @@
 				</nav>
             </div>
 			
-		
-			<div class="col-lg-12">
-				<div id="order-summary" class="box">
-					<div class="box-header">
-						<h3 class="mb-0">Order No. {{order_number}}</h3>
-						<span class="text-muted"><small>(Shipping and handling costs will be added based on the shipping method.)</small></span>
-					</div>
-					<div class = "row">
-						<div class = "col-xs-12 col-md-3">
-							<div class = "col-xs-7 col-md-12">		
-								<strong>Order subtotal</strong>
-							</div>
-							<div class = "col-xs-5 col-md-12">		
-								<span class = "ord-row">{{sub_total|floatformat}}</span>
-							</div>
-						</div>
-						<div class = "col-xs-12 col-md-2">
-							<div class = "col-xs-7 col-md-12">		
-								<strong>Tax</strong>
-							</div>
-							<div class = "col-xs-5 col-md-12">		
-								<span class = "ord-row">{{tax|floatformat}}</span>
-							</div>
-						</div>
-						<div class = "col-xs-12 col-md-3">
-							<div class = "col-xs-7 col-md-12">		
-								<strong>Shipping & handling</strong>
-							</div>
-							<div class = "col-sx-5 col-md-12">		
-								<span class = "ord-row">{{shipping_cost|floatformat}}</span>
-							</div>
-						</div>
-						<div class = "col-xs-12 col-md-2">
-							<div class = "col-xs-7 col-md-12">		
-								<strong>Order Total</strong>
-							</div>
-							<div class = "col-xs-5 col-md-12">		
-								<span class = "ord-row"><strong>{{order_total|floatformat}}</strong></span>
-							</div>
-						</div>
-						{% if disc_amt %}
-						<div class = "col-xs-12 col-md-2">
-							<div class = "col-xs-7 col-md-12">		
-								<strong>Your Saving</strong>
-							</div>
-							<div class = "col-xs-5 col-md-12">		
-								<span style = "color:green">{{disc_amt|floatformat}}</span>
-							</div>
-						</div>
-						{% endif %}
-					</div>
-							
-				</div>					
-			</div>
-			
-
-			
-            <div id="checkout" class="col-lg-12">
-				<div class="box">
-					<form id = "addr_form" method="post" action="{% url 'checkout_saveAddr_shippingMethod' %}">
-						{% csrf_token %}
-						<input hidden name = "order_id" value = "{{order_id}}">
-					
-						<h1>Checkout - Address</h1>
-						<div class="nav flex-column flex-md-row nav-pills text-center">
-							<a href="#" class="nav-link flex-sm-fill text-sm-center active"> 
-								<i class="fa fa-map-marker">                  
-								</i>Address
-							</a>
-							<a href="#" class="nav-link flex-sm-fill text-sm-center disabled"> 
-								<i class="fa fa-truck"></i>
-								Shipping
-							</a>
-							<!-- <a href="#" class="nav-link flex-sm-fill text-sm-center disabled"> 
-								<i class="fa fa-money"></i>
-								Payment Method
-							</a>-->
-							<a href="#" class="nav-link flex-sm-fill text-sm-center disabled"> 
-								<i class="fa fa-eye"></i>
-								Order Review
-							</a>
-						</div>
-				  
+				{% if order_number %}			
+				<div id="checkout" class="col-12 col-md-9">
+					<div class="box">
+						<form id = "addr_form" method="post" action="{% url 'checkout_step3_order_review' %}">
+							{% csrf_token %}
+							<input hidden name = "order_id" value = "{{order_id}}">
 						
-						<div class="content py-3">
-							{% if msg %}
-								<div id = "ship_err_div" class="col-md-12"">
-									<div style =" margin: 10px; color:#dc3545; padding:5px; border: 1px solid #dc3545">
-									<ul>
-										{% for m in msg %}
-											<li> {{m}}<li>
-										{% endfor %}
-										</div>
-									</ul>
-								</div>
-							{% endif %}
-							<div class="row">
-								<div class="col-md-6 box-addr">
-									<div class="form-group box-addr-header">
-										<strong> Ship To</strong>
+							<h1>Checkout - Address</h1>
+							<div class="py-3">
+								{% if msg %}
+									<div id = "ship_err_div" class="col-12">
+										<div style =" margin: 10px; color:#dc3545; padding:5px; border: 1px solid #dc3545">
+										<ul>
+											{% for m in msg %}
+												<li> {{m}}<li>
+											{% endfor %}
+											</div>
+										</ul>
 									</div>
-
-									<div id = "ship_err_div" class="col-md-12" style ="display:none;">
+								{% endif %}
+								<div class="row">
+									<div class="col-6">
+										<div class="form-group">
+											<strong> Shipping Address</strong>
+										</div>
+									</div>
+									<div class="col-6">
+										<div class="form-group">
+											<label class = "pull-right">
+												<input type="checkbox" onclick= "sameAddr();" id = "sameaddr" name = "sameaddr"> 
+												<span style = "color: #11b6bd; font-size:0.8rem;">My Billing Address is same as Shipping Address</span>
+											</label>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div id = "ship_err_div" class="col-12" style ="display:none;">
 										<div id = "shipping_addr_error" style =" margin: 10px; color:#dc3545; padding:5px; border: 1px solid #dc3545">
 										</div>
 									</div>
-									<div class="col-md-12">
+								</div>
+								<div class="row">
+									<div class = "col-12 col-md-3">
 										<div class="form-group">
 											<label for="shipping_full_name">Full Name</label>
 											<input id="shipping_full_name" name = "shipping_full_name" 
@@ -131,8 +67,8 @@
 												value = "{{shipping_addr.full_name}}">
 										</div>
 									</div>
-									<div class="row" style = "padding:15px;">
-										<div class="col-md-6">
+									<div class = "col-12 col-md-3">
+										<div class="form-group">											
 											<label for="shipping_phone_number">Mobile</label>
 											<input id="shipping_phone_number" name="shipping_phone_number" 
 												type="text" class="form-control"  
@@ -142,25 +78,27 @@
 												required
 												value = "{{shipping_addr.phone_number}}">
 										</div>
-										<div class="col-md-6">
-											<div class="form-group">
-												<label for="shipping_email_id">Email</label>
-												<input id="shipping_email_id" name="shipping_email_id" type="email" 
-												class="form-control"
-												required
-												value = "{{shipping_addr.email_id}}">
-											</div>
+									</div>
+									<div class = "col-12 col-md-3">
+										<div class="form-group">
+											<label for="shipping_email_id">Email</label>
+											<input id="shipping_email_id" name="shipping_email_id" type="email" 
+											class="form-control"
+											required
+											value = "{{shipping_addr.email_id}}">
 										</div>
 									</div>
-									<div class="col-md-12">
+									<div class = "col-12 col-md-3">
 										<div class="form-group">
-											<label for="shipping_company">Company</label>
+											<label for="shipping_company">Company(Optional)</label>
 											<input id="shipping_company" name = "shipping_company" 
 											type="text" class="form-control"
-											value = "{{shipping_addr.company}}">
+											value = "{{shipping_addr.Company}}">
 										</div>
 									</div>
-									<div class="col-md-12">
+								</div>
+								<div class="row">
+									<div class = "col-12 col-md-6">
 										<div class="form-group">
 											<label for="shipping_address_1">Street Address</label>
 											<input id="shipping_address_1" name="shipping_address_1" 
@@ -170,87 +108,89 @@
 											value = "{{shipping_addr.address_1}}">
 										</div>
 									</div>
-									<div class="col-md-12">
+									<div class = "col-12 col-md-6">										
 										<div class="form-group">
+											<label for="shipping_address_2">Locality</label>
 											<input id="shipping_address_2" name="shipping_address_2" 
 											type="text" class="form-control"  
 											placeholder = "Colony / Street / Locality"
 											value = "{{shipping_addr.address_2}}">
 										</div>
 									</div>
-									<div class="row" style = "padding:15px;">
-										<div class="col-md-6">
-											<div class="form-group">
-												<label for="shipping_pin_code">Pin Code</label>
-												<input id="shipping_pin_code" name="shipping_pin_code" 
-													maxlength= "6" type="text" class="form-control" 
-													pattern = "[1-9][0-9]{5}" placeholder = "6 digit pin-code"
-													onchange = "getCities(this.value, 'SHIPPING');"
-													value = "{{shipping_addr.pin_code.pin_code}}">
-											</div>
-										</div>
-										<div class="col-md-6">
-											<div class="form-group">
-												<label for="shipping_city">City</label>
-												<input id="shipping_city" name="shipping_city" 
-												type="text" class="form-control"
-												required
-												value = "{{shipping_addr.city}}">
-											</div>
+								</div>
+								<div class="row">
+									<div class="col-6 col-md-3">
+										<div class="form-group">
+											<label for="shipping_pin_code">Pin Code</label>
+											<input id="shipping_pin_code" name="shipping_pin_code" 
+												maxlength= "6" type="text" class="form-control" 
+												pattern = "[1-9][0-9]{5}" placeholder = "6 digit pin-code"
+												onchange = "getCities(this.value, 'SHIPPING');"
+												value = "{{shipping_addr.pin_code.pin_code}}">
 										</div>
 									</div>
-									<div class="row" style = "padding:15px;">
-										<div class="col-md-6">
-											<div class="form-group">
-												<label for="shipping_state">State</label>
-												
-												<!-- <input id="shipping_state" name="shipping_state" 
-												class="form-control"
-												value = "{{s.state_name}}" > -->
-
-												<select id="shipping_state" name="shipping_state"
-														class="form-control">
-													{% for st in state_arr %}
-														{% if st == shipping_addr.state.state_name %}
-															<option value = "{{st}}" selected>{{st}}</option>
-														{% else %}
-															<option value = "{{st}}">{{st}}</option>
-														{% endif %}
-													{% endfor %}
-												</select>
-
-
-											</div>
+									<div class="col-6 col-md-3">
+										<div class="form-group">
+											<label for="shipping_city">City</label>
+											<input id="shipping_city" name="shipping_city" 
+											type="text" class="form-control"
+											required
+											value = "{{shipping_addr.city}}">
 										</div>
-										<div class="col-md-6">
-											<div class="form-group">
-												<label for="shipping_country">Country</label>
-												<select id="shipping_country" name="shipping_country"
-														class="form-control">
-													{% for cnt in country_arr %}
-														{% if cnt == shipping_addr.country.country_name %}
-															<option value = "{{cnt}}" selected>{{cnt}}</option>
-														{% else %}
-															<option value = "{{cnt}}">{{cnt}}</option>
-														{% endif %}
-													{% endfor %}
-												</select>
-											</div>
+									</div>
+									<div class="col-6 col-md-3">
+										<div class="form-group">
+											<label for="shipping_state">State</label>
+											<select id="shipping_state" name="shipping_state"
+													class="form-control">
+												{% for st in state_arr %}
+													{% if st == shipping_addr.state.state_name %}
+														<option value = "{{st}}" selected>{{st}}</option>
+													{% else %}
+														<option value = "{{st}}">{{st}}</option>
+													{% endif %}
+												{% endfor %}
+											</select>
+										</div>
+									</div>
+									<div class="col-6 col-md-3">
+										<div class="form-group">
+											<label for="shipping_country">Country</label>
+											<select id="shipping_country" name="shipping_country"
+													class="form-control">
+												{% for cnt in country_arr %}
+													{% if cnt == shipping_addr.country.country_name %}
+														<option value = "{{cnt}}" selected>{{cnt}}</option>
+													{% else %}
+														<option value = "{{cnt}}">{{cnt}}</option>
+													{% endif %}
+												{% endfor %}
+											</select>
 										</div>
 									</div>
 								</div>
-									
-								<div class="col-md-6 box-addr">
-									<div class="form-group box-addr-header">
-											<strong> Bill To</strong> &nbsp;&nbsp;&nbsp;<input type="checkbox" onclick= "copyAddr();" id = "sameaddr" name = "sameaddr"> Copy from Ship to Address
+							</div>
+										
+							<div class="py-3" id = "bill-addr" style = "display:none">
+								<hr>
+								<div class = "row mb-3">
+									<div class="col-3">
+										<strong> Billing Address</strong>
 									</div>
-
-									<div id = "bill_err_div" class="col-md-12" style ="display:none;">
+									<div class="col-9">
+										<span class = "" style = "border-bottom:1px solid Gainsboro;cursor:pointer;color:#11b6bd;">
+											<i class = "fa fa-copy" onclick= "copyAddr();" > Copy from Shipping</i>
+										</span>
+									</div>
+								</div>
+								<div class = "row">
+									<div id = "bill_err_div" class="col-12" style ="display:none;">
 										<div id = "billing_addr_error" style =" margin: 10px; color:#dc3545; padding:5px; border: 1px solid #dc3545">
 										</div>
 									</div>
-
-									<div class="col-md-12">
+								</div>
+								<div class = "row">
+									<div class="col-6 col-md-3">
 										<div class="form-group">
 											<label for="billing_full_name">Full Name</label>
 											<input id="billing_full_name" name = "billing_full_name" 
@@ -259,47 +199,47 @@
 											value = "{{billing_addr.full_name}}">
 										</div>
 									</div>
-									<div class="row" style = "padding:15px;">
-										<div class="col-md-6">
-											<div class="form-group">
-												<label for="billing_phone_number">Mobile</label>
-												<input id="billing_phone_number" 
-												name="billing_phone_number" type="text" 
-												class="form-control"  placeholder = "10-digit mobile number without prefix"
-												pattern="[6-9]\d{9}"
-												required
-												value = "{{billing_addr.phone_number}}">
-											</div>
-										</div>
-										<div class="col-md-6">
-											<div class="form-group">
-												<label for="billing_email_id">Email</label>
-												<input id="billing_email_id" name="billing_email_id" 
-												type="email" class="form-control"
-												required
-												value = "{{billing_addr.email_id}}">
-											</div>
+									<div class="col-6 col-md-3">
+										<div class="form-group">
+											<label for="billing_phone_number">Mobile</label>
+											<input id="billing_phone_number" 
+											name="billing_phone_number" type="text" 
+											class="form-control"  placeholder = "10-digit mobile number without prefix"
+											pattern="[6-9]\d{9}"
+											required
+											value = "{{billing_addr.phone_number}}">
 										</div>
 									</div>
-									<div class="row" style = "padding-left:15px;">
-										<div class="col-md-6">
-											<div class="form-group">
-												<label for="billing_company">Company</label>
-												<input id="billing_company" name = "billing_company" 
-												type="text" class="form-control"
-												value = "{{billing_addr.Company}}">
-											</div>
-										</div>
-										<div class="col-md-6">
-											<div class="form-group">
-												<label for="billing_gst_number">GST No.<small>(Pls enter if you have)</small></label>
-												<input id="billing_gst_number" name = "billing_gst_number" 
-												type="text" class="form-control"
-												value = "{{billing_addr.gst_number}}">
-											</div>
+									<div class="col-6 col-md-3">
+										<div class="form-group">
+											<label for="billing_email_id">Email</label>
+											<input id="billing_email_id" name="billing_email_id" 
+											type="email" class="form-control"
+											required
+											value = "{{billing_addr.email_id}}">
 										</div>
 									</div>
-									<div class="col-md-12">
+									<div class="col-6 col-md-3">
+										<div class="form-group">
+											<label for="billing_company">Company</label>
+											<input id="billing_company" name = "billing_company" 
+											type="text" class="form-control"
+											value = "{{billing_addr.Company}}">
+										</div>
+									</div>
+								</div>
+								<div class = "row">
+									<div class="col-6">
+										<div class="form-group">
+											<label for="billing_gst_number">GST No.<small>(Pls enter if you have)</small></label>
+											<input id="billing_gst_number" name = "billing_gst_number" 
+											type="text" class="form-control"
+											value = "{{billing_addr.gst_number}}">
+										</div>
+									</div>
+								</div>
+								<div class = "row">
+									<div class="col-6 col-md-6">
 										<div class="form-group">
 											<label for="billing_address_1">Street Address</label>
 											<input id="billing_address_1" name="billing_address_1" 
@@ -308,89 +248,198 @@
 											value = "{{billing_addr.address_1}}">
 										</div>
 									</div>
-									<div class="col-md-12">
+									<div class="col-6 col-md-6">
 										<div class="form-group">
+											<label for="shipping_address_2">Locality</label>
 											<input id="billing_address_2" name="billing_address_2" 
 											type="text" class="form-control"  placeholder = "Colony / Street / Locality"
 											value = "{{billing_addr.address_2}}">
 										</div>
 									</div>
-									<div class="row" style = "padding:15px;">
-										<div class="col-md-6">
-											<div class="form-group">
-												<label for="billing_pin_code">Pin Code</label>
-												<input id="billing_pin_code" name="billing_pin_code" 
-												type="text" class="form-control" pattern = "[1-9][0-9]{5}" 
-												placeholder = "6 digit pin-code"
-												onchange = "getCities(this.value, 'BILLING');"
-												value = "{{billing_addr.pin_code_id}}">
-											</div>
-										</div>
-										<div class="col-md-6">
-											<div class="form-group">
-												<label for="billing_city">City</label>
-												<input id="billing_city" name="billing_city" 
-												type="text" class="form-control"
-												required
-												value = "{{billing_addr.city}}">
-											</div>
+								</div>
+								<div class="row">
+									<div class="col-6 col-md-3">
+										<div class="form-group">
+											<label for="billing_pin_code">Pin Code</label>
+											<input id="billing_pin_code" name="billing_pin_code" 
+											type="text" class="form-control" pattern = "[1-9][0-9]{5}" 
+											placeholder = "6 digit pin-code"
+											onchange = "getCities(this.value, 'BILLING');"
+											value = "{{billing_addr.pin_code_id}}">
 										</div>
 									</div>
-									<div class="row" style = "padding:15px;">
-										<div class="col-md-6">
-											<div class="form-group">
-												<label for="billing_state">State</label>
-												<select id="billing_state" name="billing_state" 
-													class="form-control">
-													{% for st in state_arr %}
-														{% if st == billing_addr.state.state_name %}
-															<option value = "{{st}}" selected>{{st}}</option>
-														{% else %}
-															<option value = "{{st}}">{{st}}</option>
-														{% endif %}
-													{% endfor %}
-												</select>
-											</div>
+									<div class="col-6 col-md-3">
+										<div class="form-group">
+											<label for="billing_city">City</label>
+											<input id="billing_city" name="billing_city" 
+											type="text" class="form-control"
+											required
+											value = "{{billing_addr.city}}">
 										</div>
-										<div class="col-md-6">
-											<div class="form-group">
-												<label for="billing_country">Country</label>
-												<select id="billing_country" name="billing_country" 
-													class="form-control" value = "{{billing_addr.country.country_name}}">
-													{% for cnt in country_arr %}
-														{% if cnt == billing_addr.country.country_name %}
-															<option value = "{{cnt}}" selected>{{cnt}}</option>
-														{% else %}
-															<option value = "{{cnt}}">{{cnt}}</option>
-														{% endif %}
-													{% endfor %}										
-												</select>
-											</div>
+									</div>
+									<div class="col-6 col-md-3">
+										<div class="form-group">
+											<label for="billing_state">State</label>
+											<select id="billing_state" name="billing_state" 
+												class="form-control">
+												{% for st in state_arr %}
+													{% if st == billing_addr.state.state_name %}
+														<option value = "{{st}}" selected>{{st}}</option>
+													{% else %}
+														<option value = "{{st}}">{{st}}</option>
+													{% endif %}
+												{% endfor %}
+											</select>
 										</div>
+									</div>
+									<div class="col-6 col-md-3">
+										<div class="form-group">
+											<label for="billing_country">Country</label>
+											<select id="billing_country" name="billing_country" 
+												class="form-control" value = "{{billing_addr.country.country_name}}">
+												{% for cnt in country_arr %}
+													{% if cnt == billing_addr.country.country_name %}
+														<option value = "{{cnt}}" selected>{{cnt}}</option>
+													{% else %}
+														<option value = "{{cnt}}">{{cnt}}</option>
+													{% endif %}
+												{% endfor %}										
+											</select>
+										</div>
+									</div>									
+								</div>
+								
+							</div>
+							<div class = "row">
+								<div class = "col-12">
+									<div class="box-footer d-flex justify-content-between">
+										<a href="{% url 'show_cart' %}" class="btn btn-outline-secondary">
+											<i class="fa fa-chevron-left"></i>
+											Back to Cart
+										</a>
+										<button id = "btn-delMethod" type="button" class="btn btn-primary" onclick="submit_form();">
+											Order Review<i class="fa fa-chevron-right"></i>
+										</button>
 									</div>
 								</div>
-									
 							</div>
-							
-							<!-- /.row-->
-							<div class="box-footer d-flex justify-content-between">
-								<a href="{% url 'show_cart' %}" class="btn btn-outline-secondary">
-									<i class="fa fa-chevron-left"></i>
-									Back to Cart
-								</a>
-								<button id = "btn-delMethod" type="submit" class="btn btn-primary">
-									Delivery Method<i class="fa fa-chevron-right"></i>
-								</button>
-							</div>
+						</form>
+					</div>
+				</div>
+				
+				<div class="col-12 col-md-3">
+					<div id="order-summary" class="box">
+						<div class="box-header">
+							<h3 class="mb-0">Order No. {{order_number}}</h3>
 						</div>
-					</form>
-				<!-- /.box-->
-            </div>
-			<!-- /.col-lg-9-->
-		</div>
-		<!-- /.row-->
-    </div>
+						<div class="table-responsive">
+							<table class="table">
+								<tbody>
+									<tr>
+										<td>Subtotal</td>
+										<th class="pull-right">{{sub_total|floatformat}}</th>
+									</tr>
+									<tr>
+										<td>Tax</td>
+										<th class="pull-right">{{tax|floatformat}}</th>
+									</tr>
 
+								
+									<tr>
+										<td>Shipping & handling</td>
+										<th><span class="pull-right">{{shipping_cost|floatformat}}</span></th>
+									</tr>
+									<tr class="total">
+										<td>Cart Total</td>
+										<th class="pull-right"><span id ="cart_total" >{{order_total|floatformat}}</span></th>
+									</tr>
+
+									<tr>
+										<td>Discount</td>
+										<th id = "disc_amt" style = "color:green" class="pull-right">
+											{{disc_amt|floatformat}}
+										</th>
+										 
+									</tr>									
+								</tbody>
+							</table>
+						</div>
+					</div>
+
+
+
+
+				
+				<!-- <div class="col-3">
+					<div id="order-summary" class="box">
+						<div class="box-header">
+							<h3 class="mb-0">Order No. {{order_number}}</h3>
+						</div>
+						<div class = "row">
+							<div class = "col-xs-12 col-md-3">
+								<div class = "col-xs-7 col-md-12">		
+									<strong>Order subtotal</strong>
+								</div>
+								<div class = "col-xs-5 col-md-12">		
+									<span class = "ord-row">{{sub_total|floatformat}}</span>
+								</div>
+							</div>
+							<div class = "col-xs-12 col-md-2">
+								<div class = "col-xs-7 col-md-12">		
+									<strong>Tax</strong>
+								</div>
+								<div class = "col-xs-5 col-md-12">		
+									<span class = "ord-row">{{tax|floatformat}}</span>
+								</div>
+							</div>
+							<div class = "col-xs-12 col-md-3">
+								<div class = "col-xs-7 col-md-12">		
+									<strong>Shipping & handling</strong>
+								</div>
+								<div class = "col-sx-5 col-md-12">		
+									<span class = "ord-row">{{shipping_cost|floatformat}}</span>
+								</div>
+							</div>
+							<div class = "col-xs-12 col-md-2">
+								<div class = "col-xs-7 col-md-12">		
+									<strong>Order Total</strong>
+								</div>
+								<div class = "col-xs-5 col-md-12">		
+									<span class = "ord-row"><strong>{{order_total|floatformat}}</strong></span>
+								</div>
+							</div>
+							{% if disc_amt %}
+							<div class = "col-xs-12 col-md-2">
+								<div class = "col-xs-7 col-md-12">		
+									<strong>Your Saving</strong>
+								</div>
+								<div class = "col-xs-5 col-md-12">		
+									<span style = "color:green">{{disc_amt|floatformat}}</span>
+								</div>
+							</div>
+							{% endif %}
+						</div>
+								
+					</div>					
+				</div> -->
+				
+				
+				</div>
+			
+			
+			
+			{% else %}
+				<div class="col-12 mb-5">
+					<span style = "font-size:1rem;">Please start the checkout process from Your Shopping Cart</span>
+					<a style = "border:1px solid Gainsboro;"
+						class = "btn" id = "goto-cart" 
+						href="{% url 'show_cart' %}">
+					<img src="/static/img/cart_icon.png">
+					</a>
+				</div>				
+			{% endif %}
+		</div>
+	</div>
 	{% include "artevenue/fix-error-message.html" %}
  
  	{% endblock sitecontent %}
@@ -404,6 +453,8 @@
 		{% else %}
 			$("#btn-delMethod").prop('disabled', true);
 		{% endif %}
+		
+		document.getElementById("sameaddr").checked = true;
 	});
 	
 	</script>
@@ -719,21 +770,37 @@
 	</script>
 	
 	<script>
-	function copyAddr(){
-		checkBox = document.getElementById("sameaddr");
+	function sameAddr(){
+		checkBox = document.getElementById("sameaddr").checked;
 		if (checkBox) {
-			$("#billing_full_name").val( $("#shipping_full_name").val() );
-			$("#billing_phone_number").val( $("#shipping_phone_number").val() );
-			$("#billing_email_id").val( $("#shipping_email_id").val() );
-			$("#billing_company").val( $("#shipping_company").val() );
-			$("#billing_address_1").val( $("#shipping_address_1").val() );
-			$("#billing_address_2").val( $("#shipping_address_2").val() );
-			$("#billing_pin_code").val( $("#shipping_pin_code").val() );
-			$("#billing_city").val( $("#shipping_city").val() );
-			$("#billing_state").val( $("#shipping_state").val() );
-			$("#billing_country").val( $("#shipping_country").val() );
+			copyAddr();
+			$("#bill-addr").hide();				
+		} else {
+			$("#bill-addr").show();
 		}
 	}
+	
+	function copyAddr(){
+		$("#billing_full_name").val( $("#shipping_full_name").val() );
+		$("#billing_phone_number").val( $("#shipping_phone_number").val() );
+		$("#billing_email_id").val( $("#shipping_email_id").val() );
+		$("#billing_company").val( $("#shipping_company").val() );
+		$("#billing_address_1").val( $("#shipping_address_1").val() );
+		$("#billing_address_2").val( $("#shipping_address_2").val() );
+		$("#billing_pin_code").val( $("#shipping_pin_code").val() );
+		$("#billing_city").val( $("#shipping_city").val() );
+		$("#billing_state").val( $("#shipping_state").val() );
+		$("#billing_country").val( $("#shipping_country").val() );	
+	}
+
+		
+	function submit_form(){
+		checkBox = document.getElementById("sameaddr").checked;
+		if (checkBox) {
+			copyAddr();
+		}
+		$('#addr_form').submit();
+	}	
 	
 	</script>
 	

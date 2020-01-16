@@ -1,0 +1,156 @@
+{% load static %}					
+{% load utils %}					
+					<!-- Category header -->
+					<div class="box-cat info-bar">
+						<div class="row">
+
+							<div class="col-md-12 col-lg-12 products-number-sort">
+								<!-- <form class="form-inline d-block d-lg-flex justify-content-between flex-column flex-md-row"> -->
+									<div class="products-number">
+										<strong>Show</strong>
+										<!--<a href="?page={{prods.number}}&sort={{sortOrder}}&show=50" class="btn btn-sm {% if show == '50' or show == None %} btn-primary {% else %} btn-outline-secondary {% endif %}">50</a><a href="?page={{prods.number}}&sort={{sortOrder}}&show=100" class="btn btn-sm {% if show == '100' %} btn-primary {% else %} btn-outline-secondary {% endif %}">100</a><a href="?page={{prods.number}}&sort={{sortOrder}}&show=ALL" class="btn btn-sm {% if show == 'ALL' %} btn-primary {% else %} btn-outline-secondary {% endif %}">All</a><span>results/page</span>-->
+										<button type = 'button' onclick="getAllFilters(page='{{prods.number}}', sort='{{sortOrder}}',show='50', keywords='{{ikeywords}}');" class="btn btn-sm {% if show == '50' or show == 'None' %} btn-primary {% else %} btn-outline-secondary {% endif %}">50</button><button onclick="getAllFilters(page='{{prods.number}}', sort='{{sortOrder}}', show='100', keywords='{{ikeywords}}');" class="btn btn-sm {% if show == '100' %} btn-primary {% else %} btn-outline-secondary {% endif %}">100</button><button onclick="getAllFilters(page='{{prods.number}}', sort='{{sortOrder}}', show='1000', keywords='{{ikeywords}}');" class="btn btn-sm {% if show == '1000' %} btn-primary {% else %} btn-outline-secondary {% endif %}">1000</button><span>results/page</span>
+									</div>
+
+								<!-- </form>-->
+							</div>
+
+						</div>
+					</div>
+
+					<h5>{{prods.paginator.count}} results found</h5>
+
+					
+					<div class="row">
+						{% for prod in prods %}
+						{% if prod.publisher %}
+						<div class="col-lg-3 col-md-6">
+							<div class = "prod-details">
+								<div class="img-container">
+									<a id = "alink_{{prod.product_id}}" href="{% url 'stock_image_detail' prod.product_id %}">
+									<!-- <form id = "img-form_{{prod.product_id}}" action = "{% url 'stock_image_detail' prod.product_id %}" method = 'GET' >
+										<input hidden class ='iuser_width' id="iuser_width_{{prod.product_id}}" name = "iuser_width" type = "number" value = '{{width}}' min="4" max="60" >
+										<input hidden class ='iuser_height' id="iuser_height_{{prod.product_id}}" name = "iuser_height" type = "number"  value = '{{height}}' min="4" max="60" > -->
+										
+										<img src="{% static prod.url %}" alt="" class="img-fluid image-display" 
+												style = "filter: drop-shadow(0.25rem 0.25rem 0.25rem grey);" onclick="$('#img-form_{{prod.product_id}}').submit();">
+										<!-- {% if prod.publisher == '1001' %}
+											<img src="{% static prod.url %}" alt="" class="img-fluid image-display" 
+												style = "filter: drop-shadow(0.25rem 0.25rem 0.25rem grey);">
+										{% else %}
+											<img src="{{prod.url}}" alt="" class="img-fluid image-display" 
+												style = "filter: drop-shadow(0.25rem 0.25rem 0.25rem grey);" onclick="$('#img-form_{{prod.product_id}}').submit();">
+										{% endif %} -->
+									<!--</form>-->
+									</a>
+								</div>
+
+								<div class="text text-center" style = "margin-top: 5px;">
+									<h4><a href="">{{prod.name}}</a></h4>
+									{% if show_artist %}
+									<h5 style = "color:blue;">By {{prod.artist}}</h5>
+									{% endif %}
+									<p class="price">
+										{% for p in price %}
+											{% if p.publisher_id == prod.publisher %}
+												
+												{% if width %}
+													{% if prod.aspect_ratio > 0 %}
+														<i class = "fa fa-inr"></i> {% get_price prod.max_width prod.aspect_ratio p.price width %}
+													{% else %}
+														<i class = "fa fa-inr"></i> {{p.price|multiply:256|floatformat:"0"}}												
+													{% endif %}
+												{% else %}													
+													{% if prod.aspect_ratio > 0 %}
+														<i class = "fa fa-inr"></i> {% get_price prod.max_width prod.aspect_ratio p.price 0 %}
+													{% else %}
+														<i class = "fa fa-inr"></i> {{p.price|multiply:256|floatformat:"0"}}												
+													{% endif %}
+												{% endif %}
+												
+											{% endif %}
+										{% endfor %}
+										<del></del>
+										{% if prod.product_id in wishlist_prods %}
+											<span id = "fav_{{prod.product_id}}" class = "pull-right">
+												<i class = "fa fa-heart"  
+													onclick = "deleteItem('{{prod.product_id}}')" 
+													style="color:red; padding-right:5px;cursor:alias;" data-toggle="tooltip" title="Added to Favorites!"></i>
+											</span>
+										{% else %}
+											<span  id = "fav_{{prod.product_id}}" class = "pull-right">
+												<i class = "fa fa-heart-o"  
+													onclick = "addToFav({{prod.product_id}}, {% if prod.max_width > 16 %} 16 {%else%} {{prod.max_width}} {%endif%}, {{prod.aspect_ratio}}, 0, '', 0, 0, 0);"
+													style="color:red; padding-right:5px;cursor:alias;" data-toggle="tooltip" title="Add to Favourites!"></i>
+											</span>
+										{% endif %}
+									</p>
+								</div>
+							</div>
+						</div>
+						<!-- END of Products -->
+						{% endif %}
+						{% endfor prods %}
+
+					</div>
+					<!--
+					<div class="box info-bar">
+						<div class="row">
+							<div class="col-md-12 col-lg-12 products-showing">
+								<div class = "text-center">
+									{% if prods.has_previous %}
+										<button class="btn btn-sm btn-primary" onclick="getAllFilters(page='1', sort='{{sortOrder}}', show='{{show}}', keywords='{{ikeywords}}');">&laquo; First</button>
+										<button class="btn btn-sm btn-primary"  onclick="page='getAllFilters(page={{ prods.previous_page_number }}' ,sort='{{sortOrder}}', keywords='{{ikeywords}}');">Prev</button>
+									{% else %}
+										<a class="btn btn-sm btn btn-secondary disabled" href="#">&laquo; First</a>
+										<a class="btn btn-sm btn btn-secondary disabled"  href="#">Prev</a>
+									{% endif %}
+									Showing Page {{ prods.number }} of {{ prods.paginator.num_pages }}
+									{% if prods.has_next %}
+										<button class="btn btn-sm btn-primary" onclick=" getAllFilters(page='{{ prods.next_page_number }}', sort='{{sortOrder}}', show='{{show}}', keywords='{{ikeywords}}');">Next</button>
+										<button class="btn btn-sm btn-primary" onclick="getAllFilters(page='{{ prods.paginator.num_pages }}', sort='{{sortOrder}}', show='{{show}}', keywords='{{ikeywords}}');">Last &raquo;</button>
+									{% else %}
+										<a class="btn btn-sm btn-secondary disabled" href="#">Next</a>
+										<a class="btn btn-sm btn-secondary disabled" href="#">Last &raquo;</a>
+									{% endif %}				
+								</div>
+							</div>
+						</div>
+					</div>
+					-->
+					
+					<div class="box-cat info-bar">
+						<div class="row">
+							<div class="col-md-12 col-lg-12">
+								<ul class = "pagination justify-content-center"style="margin-bottom:0px !important">
+									{% if prods.has_previous %}
+									<li class="page-item">
+									  <button class="page-link" onclick="getAllFilters(page='1', sort='{{sortOrder}}', show='{{show}}', keywords='{{ikeywords}}');" aria-label="Previous">
+										<span aria-hidden="true">&laquo; First</span>
+										<span class="sr-only">begin</span>
+									  </button>
+									</li>   {% endif %}
+
+									{% for n in prods.paginator.page_range %}
+									  {% if prods.number == n %}
+										<li class="page-item active">
+										  <span class="page-link">{{ n }}<span class="sr-only">(current)</span></span>
+										</li>
+									  {% elif n > prods.number|add:'-5' and n < prods.number|add:'5' %}
+										<li class="page-item">
+										<button class="page-link" onclick="getAllFilters(page='{{n}}', sort='{{sortOrder}}', show='{{show}}', keywords='{{ikeywords}}');">{{ n }}</a></li>
+									  {% endif %}
+									{% endfor %}
+
+									{% if prods.has_next %}
+									  <li class="page-item">
+										<button class="page-link" onclick="getAllFilters(page='{{prods.paginator.num_pages}}', sort='{{sortOrder}}', show='{{show}}', keywords='{{ikeywords}}');" aria-label="Next">
+										  <span aria-hidden="true">Last &raquo;</span>
+										  <span class="sr-only">end</span>
+										</button>
+									  </li>
+									  {% endif %}   
+								</ul> 
+							</div>
+						</div>
+					</div>

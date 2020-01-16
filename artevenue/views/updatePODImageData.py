@@ -28,11 +28,13 @@ def importPODImageData():
 	file = urllib.request.urlopen(url)
 	if file.code != 200:
 		print ("File not found on POD!")
-		return
-		
+		return		
 	cr = csv.reader(codecs.iterdecode(file, 'utf-8'))	
 	
-	#cr = csv.reader(csvfile, delimiter=',')
+	'''
+	file = open('/home/artevenue/website/estore/POD_file_06.Nov.2019.csv')
+	cr = csv.reader(file, delimiter=',')
+	'''
 
 	cnt = 0
 	'''Get Product type (IMAGE) '''
@@ -42,20 +44,36 @@ def importPODImageData():
 	tax_rate = prod_tax.tax_rate
 
 	import wget
+	
 	img_dir = "/home/artevenue/website/estore/static/image_data/POD/images/"
 	
 	for row in cr:
-		print(cnt)
-		# Skip the first row (header)
-		if cnt == 0:
+		if cnt == 0:	## Skipping first header row
 			cnt = cnt + 1
+			continue
+		cnt = cnt + 1
+		
+		print(cnt)
+		try:
+			row[0]
+			row[14]
+		except IndexError:
+			err_flag = True
+			err = Stock_image_error (
+				row_id = int(row[0]),
+				name = row[4],
+				error = 'LIST INDEX ERROR:- '.join(row),
+				created_date = datetime.datetime.now(),
+				updated_date = datetime.datetime.now()		
+			)
+			err.save()
 			continue
 
 		if row[0]:
 			prod = Stock_image.objects.filter(product_id = int(row[0])).first()
 			if not prod:
 				## Low Resolution Image
-				lowres_url = row[11]
+				lowres_url = row[11].replace(' ', '%20')
 				print("NEW:- " + lowres_url)
 				try:
 					fl =  urllib.request.urlopen(lowres_url)
@@ -69,7 +87,7 @@ def importPODImageData():
 						created_date = datetime.datetime.now(),
 						updated_date = datetime.datetime.now()		
 					)
-					err.save()
+					err.save()					
 					continue
 				except URLError as e:
 					print('Reason: ', e)
@@ -108,7 +126,7 @@ def importPODImageData():
 						print(lowres_url)
 						wget.download(lowres_url, out=img_dir)
 					
-				thumbnail_url = row[12]
+				thumbnail_url = row[12].replace(' ', '%20')
 				try :
 					ft =  urllib.request.urlopen(thumbnail_url)
 				except HTTPError as e:
@@ -192,20 +210,23 @@ def importPODImageData():
 				else:
 					published = False
 									
-				## Get image file names
-				pos = row[11].rfind('/')
+				## Get image file urls
+				lowres_url = row[11].replace(' ', '%20')
+				pos = lowres_url.rfind('/')
 				loc = 0
 				if pos > 0:
 					loc = pos+1
-				url = row[11][loc:]
-				####
-				pos = row[12].rfind('/')
+				url = lowres_url[loc:]
+								
+				##
+				thumbnail_url = row[12].replace(' ', '%20')
+				pos = thumbnail_url.rfind('/')
 				loc = 0
 				if pos > 0:
 					loc = pos+1
-				thumbnail_url = row[12][loc:]
-
+				thumb_url = thumbnail_url[loc:]
 				
+				## Update Product
 				newprod = Stock_image(
 					store = ecom,
 					product_id = int(row[0]),
@@ -233,7 +254,7 @@ def importPODImageData():
 					colors = '',
 					key_words = row[13],
 					url = 'image_data/POD/images/' + url,
-					thumbnail_url = 'image_data/POD/images/' + thumbnail_url			
+					thumbnail_url = 'image_data/POD/images/' + thumb_url			
 				)
 
 				newprod.save()
@@ -253,13 +274,20 @@ def importPODImageData():
 			''' Categories 		'''
 			'''					'''
 			#get the category id
-			prod_category = Stock_image_category.objects.filter(name__iexact = row[14]).first()
+			category_nm = row[14]
+			if row[14] == "Children''s Art":
+				category_nm = "Kids"
+			
+			if row[14] == "":
+				category_nm = "Miscellanuous"
+				
+			prod_category = Stock_image_category.objects.filter(name__iexact = category_nm).order_by('category_id').first()
 			if prod_category is None:
 				# Insert
 				try:
 					prod_cat = Stock_image_category(
 							store = ecom,
-							name = row[14],
+							name = category_nm,
 							description = '',
 							background_image = '',
 							parent = None,
@@ -275,7 +303,7 @@ def importPODImageData():
 					print (error)
 					err = Stock_image_category_error (
 						row_id = int(row[0]),
-						category_name = row[14],
+						category_name = category_nm,
 						error = error,
 						created_date = datetime.datetime.now(),
 						updated_date = datetime.datetime.now()		
@@ -337,12 +365,7 @@ def importPODImageData():
 
 				pub_price.save()	
 			'''
-				
-		cnt = cnt + 1
-		
-		#if cnt > 5000:
-		#	break
-				
+								
 	return 
 	
 	
@@ -354,9 +377,6 @@ def deletePODImageData():
 		print ("File not found on POD!")
 		return
 	cr = csv.reader(codecs.iterdecode(csvfile, 'utf-8'))
-
-	# Get all products
-	prods = Stock_image.objects.all()
 	
 	cnt = 0
 	d_cnt = 0
@@ -368,7 +388,18 @@ def deletePODImageData():
 			cnt = cnt + 1
 			continue	
 		prod_ids.append(row[0])
+	
+	if len(prod_ids) == 0:
+		print ("No rows in POD file!")
+		return
 
+	if len(prod_ids) < 240000 :
+		print ("POD File contains less than 2.4 lakh rows, skipping deletion of data.")
+		return
+
+	# Get all products
+	prods = Stock_image.objects.filter(is_published=True)
+	
 	for prod in prods:
 		if str(prod.product_id) in prod_ids:
 			## Check if price is available,if no group is assigned then don't
@@ -385,12 +416,14 @@ def deletePODImageData():
 						is_published = False)
 				d_cnt = d_cnt+1
 				print(d_cnt)
+				'''
 				# Delete from curated collections, if present
 				curated = Curated_collection.objects.filter(product_id = prod.product_id).first()
 				if curated:
 					curated.delete()
 					c_cnt = c_cnt+1
 					print(c_cnt)
+				'''
 						
 		cnt = cnt + 1
 		if cnt >= 1000000:

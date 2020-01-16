@@ -1,0 +1,123 @@
+{% load static %}
+<nav class="navbar navbar-expand-lg">
+	<a href="{% url 'index' %}" class="navbar-brand home text-left">
+		<!--<img src="{% static 'img/logo.png' %}" alt="logo" class="d-none d-md-inline-block" style="width:160px; height:35px;">-->
+		<img src="{% static 'img/logo.png' %}" alt="logo" class="d-none d-md-inline-block" style="width:200px; height:45px;">
+		<img src="{% static 'img/logo.png' %}" alt="{{ecom_site.store_name}}" class="d-inline-block d-md-none"  style="width:90px; height:22px;">
+		<span class="sr-only">{{ecom_site.store_name}} - go to homepage</span>
+	</a>
+	<div class="navbar-buttons">
+	
+		<button type="button" data-toggle="collapse" data-target="#search" class="btn btn-outline-secondary navbar-toggler">
+			<span class="sr-only">Toggle search</span>
+			<i class="fa fa-search"></i>
+		</button>
+		<a href="{% url 'show_cart' %}" class="btn btn-outline-secondary navbar-toggler">
+			<i class="fa fa-shopping-cart"></i>
+		</a>
+	</div>
+	
+	<!-- Menu -->
+	<button type="button" data-toggle="collapse" data-target="#navigation" class="btn btn-outline-secondary navbar-toggler">
+		<span class="sr-only">Toggle navigation</span>
+		<i class="fa fa-align-justify"></i>
+	</button>
+
+	<!--<div class="collapse navbar-collapse flex-column ml-lg-0 ml-3" id="navbarCollapse">
+		<ul class="navbar-nav mr-auto justify-content-left ml-4"> -->
+	<div id="navigation" class="collapse navbar-collapse">
+		<ul class="navbar-nav mr-auto justify-content-left ml-4 ">
+			{% for main in level0_menuitems %}
+				{% if main.name|upper == 'ART PRINTS' %}
+			
+				<li class="nav-item dropdown menu-large" style="color:grey; margin:2px;">
+					<a href="#" data-toggle="dropdown" data-hover="dropdown" 
+						id = "art_id"
+						class="dropdown-toggle nav-link"
+						onmouseover="$('#art_id').click();">
+						{{main.name}}<b class="caret"></b>
+					</a>
+					{% if level1_menuitems %}
+					<ul class="dropdown-menu megamenu">
+						<li class = "dropdown">
+							<div class="row">
+								{% for level1 in level1_menuitems %}
+								{% if level1.name != '' %} 
+								{% if forloop.counter == 7 %}
+									<div class="col-md-12 col-lg-12" 
+										style = "border-bottom : 1px dotted #555; padding-bottom:5px; margin-bottom:10px;">
+										<h4>More Categories</h4>
+									</div>
+								{% endif %}
+								<div class="col-md-4 col-lg-2">
+									<a style = "color:#696868 !important;" href="{% url 'category_stock_images' level1.category_id %}" class="nav-link">
+										{% if forloop.counter < 7 %}
+											{% if level1.url %}
+												{% with 'img/'|add:level1.url as image_static %}
+												<img class = "img-in-menu " src = "{% static image_static %}" >
+												{% endwith %}
+											{% endif %}
+										{% endif %}
+										<div class = "text-center">
+											<h5>{{level1.name|title}}</h5>
+										</div>
+									</a>
+									<ul class="list-unstyled mb-3">
+									{% for level2 in level2_menuitems %}
+									{% if level2.parent_id == level1.category_id %}
+										<li class="nav-item"><a style = "color:#696868 !important;"  href="{% url 'category_stock_images' level2.category_id %}" class="nav-link">{{level2.name|title}}</a></li>
+									{% endif %}
+									{% endfor level2_menu %}
+									</ul>
+								</div>
+
+								{% endif %}
+								{% endfor level1_menu %}
+
+								<div class="col-md-6 col-lg-3">
+									<h5><a style = "color:#696868 !important; text-decoration:underline;" href="{% url 'show_all_categories' %}" class="nav-link"><i class = ""></i>Show All<i class = ""></i></a></h5>
+								</div>
+
+							</div>
+						</li>
+					</ul>
+					{% endif %}
+				</li>				
+				{% endif %}
+				{% if main.name|upper == 'ORIGINAL ART' %}
+					<li><a href=""><i style="color:grey; margin:2px;" class = ""></i>Original Art</a></li>
+				{% endif %}
+				
+				{% if main.name|upper == 'OFFERS' %}
+					<li><a href=""><i style="color:grey; margin:2px;" class = ""></i>Sale</a></li>
+				{% endif %}
+			{% endfor %}
+		</ul>
+		<ul class="navbar-nav flex-row mb-2 mb-auto" style=" font-size:0.7rem;">
+			<li><a href=""><i style="color:grey; margin:2px;" class = ""></i>Abstract</a></li>
+			<li><a href=""><i style="color:grey; margin:2px;" class = ""></i>Lanscape</a></li>
+			<li><a href=""><i style="color:grey; margin:2px;" class = ""></i>Grand Masters</a></li>
+			<li><a href=""><i style="color:grey; margin:2px;" class = ""></i>Coastal</a></li>
+			<li><a href=""><i style="color:grey; margin:2px;" class = ""></i>Floral</a></li>
+		</ul>
+		
+	</div>
+	
+	<button class = "btn mr-2" style = "background-color:#11b6bd; border:0px;">
+		<a style = "color:#fff; font-size:0.7rem;" href="{% url 'user_image' %}">
+			<i class = "fa fa-picture-o"></i>Custom Framing
+		</a>
+	</button>
+	<div class="navbar-buttons d-flex justify-content-end">
+		<!-- <form role="search" class="form-inline search_form" action = "{% url 'products_by_keywords' %}"> -->
+		<form role="search" class="form-inline search_form" action = "{% url 'category_stock_images' %}">
+				<input type="text" placeholder="Ex. Van Gogh, Blue, Abstract etc." id ="keywords" name="keywords" class="form-control" required>
+				<button class="btn btn-outline-success" type="submit"><img src="{% static 'img/search_head.png' %}"></button>
+		</form>
+	
+		<div id="basket-overview" class="navbar-collapse collapse d-none d-lg-block">
+			<a href="{% url 'show_cart' %}" class="cart_top d-xl-block d-lg-block d-none"><img src="{% static 'img/cart_icon.png' %}"><span id="itemsincart">{% if usercart %} {{usercart.quantity}} {%else%} 0 {%endif %}</span></a>
+			
+		</div>
+	</div>
+</nav>

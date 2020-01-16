@@ -1,6 +1,8 @@
 from django import template
 from decimal import Decimal
 
+from artevenue.models import Moulding
+
 register = template.Library()
 
 @register.filter
@@ -12,7 +14,7 @@ def add_width_frame_mount(a, b):
 	if not a:
 		return 0
 	if b:
-		return (a*2)+(b*2)
+		return a+b
 	else:
 		return a
 		
@@ -31,16 +33,25 @@ def add_width(a, b):
 def multiply(a,b):
 	return a * b
 
+@register.filter
+def divide(a,b):
+	return a / b
+
+
 @register.simple_tag
 def get_price(width, aspect_ratio, sqin_price, user_width):
 	if user_width > 0:
 		width = user_width
 	else:
-		if width > 16:
-			width = 16
+		if width > 12:
+			width = 12
 	height = round(width / aspect_ratio)
 	
 	return Decimal(round( float(width * height * sqin_price ) , -1))
+
+@register.filter
+def filter_by_cart_id(qs, cart_id):
+    return qs.filter(cart_id=cart_id)
 
 '''	
 @register.filter	
@@ -72,3 +83,44 @@ def get_mountcolor(cnt):
 	color = '#fffff0'
 	
 	return color
+
+@register.filter	
+def indian_number_format(input):
+	'''
+	import locale
+	locale.setlocale(locale.LC_MONETARY, 'en_IN')
+	return locale.currency(input, grouping=True)
+	'''
+
+	from babel.numbers import format_currency
+	return format_currency(input, 'INR', locale='en_IN')
+	
+	
+@register.filter
+def get_height(width, aspect_ratio):
+	height = round(width / aspect_ratio)
+	
+	return height
+
+
+@register.filter
+def get_dict_item(dictionary, key):
+    return dictionary.get(key)
+	
+	
+@register.filter
+def get_frame_name_innerwidth(frame_id, nameorwidth):
+	if frame_id == '':
+		return ''
+	try:
+		m = Moulding.objects.get(pk=frame_id)
+		name = m.name
+		inner_width = m.width_inner_inches
+	except Moulding.DoesNotExist:
+		name = ''
+		inner_width = 0
+	if nameorwidth == 'NAME':
+		return name
+	else:
+		return inner_width
+		

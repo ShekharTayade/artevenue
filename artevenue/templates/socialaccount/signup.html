@@ -1,0 +1,47 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% load i18n %}
+
+{% block page-title %}
+<title>Social Sign Up</title>
+{% endblock page-title %}
+
+{% block page-description %}
+<meta name="description" content="Social Media Sign Up">
+{% endblock page-description %}
+
+{% block page-keywords %}  
+<meta name="keywords" content="">
+{% endblock page-keywords %}  
+
+{% block page-author %}  
+<meta name="author" content="Arte'venue">
+{% endblock page-author %}  
+{% block sitecontent %}
+	{% block content %}
+	<div class="container mt-5 mb-5">
+		<div class = "row box">
+			<div class="col-12">
+				<h1>{% trans "Social Media Sign Up" %}</h1>
+
+				<p>{% blocktrans with provider_name=account.get_provider.name site_name=site.name %}You are about to use your {{provider_name}} account to login to
+				{{site_name}}. As a final step, please complete the following form:{% endblocktrans %}</p>
+
+				<form class="signup" id="signup_form" method="post" action="{% url 'socialaccount_signup' %}">
+				  {% csrf_token %}
+				  {{ form.as_p }}
+				  {% if redirect_field_value %}
+				  <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+				  {% endif %}
+				  <button type="submit">{% trans "Sign Up" %} &raquo;</button>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	{% endblock %}
+{% endblock sitecontent %}
+
+{% block jscripts %}
+{% endblock jscripts %}

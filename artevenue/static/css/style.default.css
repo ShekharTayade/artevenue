@@ -67,6 +67,12 @@ h1 {
   margin-top: -1px;
 }
 
+@media screen and (min-width: 0px) and (max-width: 768px) {
+	.menu-large .megamenu{ width: 100%; }
+}
+
+
+
 .menu-large a.nav-link {
  /*  padding: 7px !important; */
   padding: 0px !important;
@@ -202,6 +208,7 @@ h1 {
   padding: 30px !important;
   -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+  background-color:#f7f7f7;
 }
 
 @media (max-width: 991.98px) {
@@ -274,8 +281,8 @@ h1 {
 }
 
 #search form {
-  max-width: 500px;
-  padding: 20px 0;
+  max-width: 700px;
+  padding: 5px 0;
 }
 
 #search .navbar-form {
@@ -378,12 +385,12 @@ h1 {
 *
 */
 #main-slider {
-  margin-bottom: 15px;
+  /*margin-bottom: 15px;
   margin-top: 15px;
   border: solid 1px #fff;
   -webkit-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  
+  */
 }
 
 .box.slideshow ul li div, #main-slider ul li div {
@@ -405,8 +412,8 @@ h1 {
 */
 #footer {
   background: #e0e0e0;
-  padding: 30px 0 5px;
-  margin-top: 30px;
+  padding: 25px 25px 5px;
+  /*margin-top: 30px;*/
 }
 
 #footer ul {
@@ -415,7 +422,8 @@ h1 {
 }
 
 #footer ul a {
-  color: #999;
+  /*color: #999;*/
+  color: #fff;*
 }
 
 #footer .social {
@@ -473,7 +481,7 @@ h1 {
 #copyright {
   background: #333;
   color: #ccc;
-  padding: 20px 0;
+  padding: 5px 0;
   font-size: 0.738rem;
 }
 
@@ -2045,10 +2053,11 @@ h6,
 .h5,
 .h6 {
   margin-bottom: 0.5rem;
-  font-family: inherit;
+  font-family: 'Cormorant Garamond', serif;
   font-weight: 400;
   line-height: 1.2;
   color: inherit;
+  letter-spacing: 1px;
 }
 
 h1,
@@ -2058,7 +2067,17 @@ h1,
 
 h2,
 .h2 {
-  font-size: 1.3rem;
+    font-size: 1.6rem !important;
+    line-height: 1.5em !important;
+    font-weight: 600 !important;
+}
+
+@media(max-width:767px){
+h2,.h2 {
+    font-size: 1.3rem !important;
+    line-height: 1.5em !important;
+    font-weight: 600 !important;
+}
 }
 
 h3,
@@ -2919,6 +2938,8 @@ code {
   border-radius: 0.25rem;
   -webkit-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
   box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+  font-size:12px;
+  padding:10px;
 }
 
 .card > .list-group:first-child .list-group-item:first-child {
@@ -2931,12 +2952,14 @@ code {
   border-bottom-left-radius: 0.25rem;
 }
 
+
 .card-body {
-  padding: 1.25rem;
+  padding: 0.5rem;
 }
 
 .card-title {
   margin-bottom: 0.75rem;
+  font-weight:600;
 }
 
 .card-subtitle {

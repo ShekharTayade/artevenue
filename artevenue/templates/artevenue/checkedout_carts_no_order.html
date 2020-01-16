@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+{% load utils %}
+{% load static %}
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="robots" content="all,follow">
+		<!-- Bootstrap CSS-->
+		<link rel="stylesheet" href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}">
+				
+		<!-- Font Awesome CSS-->
+		<link rel="stylesheet" href="{% static 'vendor/font-awesome/css/font-awesome.min.css' %}">
+		<!-- Google fonts - Roboto -->
+		<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:400,500,700,300,100">
+		<!-- Custom stylesheet -->
+		<link rel="stylesheet" href="{% static  'css/custom.css' %}">
+		<!-- theme stylesheet-->
+		<link rel="stylesheet" href="{% static 'css/style.default.css' %}" id="theme-stylesheet">
+		<!-- theme stylesheet-->
+		<link rel="stylesheet" href="{% static 'css/home-page-style.css' %}" id="theme-stylesheet">
+
+	</head>
+
+	<body>
+		<h2 style="text-decoration:underline; color:blue;">
+			<strong>{{hd}}</strong>
+		</h2>
+		<h3>As of {{today|date:'d-M-Y'}}</h3>
+		<hr>
+
+		{% regroup order_billing by updated_date|date:"Y-m-d" as ordlist %}
+		{% for ord in ordlist %}
+		<h3 style="padding:5px; font-weight:700; color:white; background-color:black;">{{ ord.grouper }}</h3>
+		{% for c in ord.list %}
+		<div class = "row">
+			<div class = "col-sm-12 col-md-6">
+				<h3 style = "color:blue;">Name: {{c.full_name}}</h3> 
+				<h4>Login Username: {{c.userc.user.username}}</h4> 
+				<h4> Email: {{c.email_id}} Phone: {{c.phone_number}}
+					{% if c.address_1 %}
+						{{c.address_1}} {{c.address_2}}
+					{% endif %}
+					{% if c.city %}
+						 {{c.city}} {{c.state_id}} {{c.pin_code_id}}
+					{% endif %}
+					</h4>
+				<h4>Cart Number : {{c.order.cart_id}}; 
+				Created on: {{c.order.cart.created_date|date:"d M Y P"}}  | Status: {{ c.order.cart.get_cart_status_display }}
+				{% if c.order.cart.ip_address %} from IP: {{c.order.cart.ip_address}} {% endif %} </h4>
+			</div>
+		</div>
+		<table class = "table">
+			<thead>
+				<tr>
+					<th width="25%" style = "text-align:right;">Discount</th>
+					<th width="25%" style = "text-align:right;" width="20%">Sub Total</th>
+					<th width="25%" style = "text-align:right;" width="35%">Tax</th>
+					<th width="25%" style = "text-align:right;" width="10%" style = "text-align:right;">Total</th>
+				</tr>
+			</thead>
+			<tbody>	
+				<tr>
+					<td style = "text-align:right;">
+						{{c.order.cart.cart_disc_amt|floatformat}}
+					</td>
+					<td style = "text-align:right;">
+						{{c.order.cart.cart_sub_total|floatformat}}
+					</td>
+					<td style = "text-align:right;">
+						{{c.order.cart.cart_tax|floatformat}}
+					</td>
+					<td style = "text-align:right;">		
+						<strong>{{c.order.cart.cart_total|floatformat}}</strong>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		
+		<div class = "row">
+			<div class="table table-responsive">
+				<table id = "cartTbl" class="table table-responsive">
+					<thead>
+						<tr>
+							<th width="10%">Item</th>
+							<th width="35%">Details</th>
+							<th width="10%" style = "text-align:right;">Qty</th>
+							<th width="10%" style = "text-align:right;">Unit Price</th>
+							<th width="10%" style = "text-align:right;">Disc</th>
+							<th width="10%" style = "text-align:right;"> Tax</th>
+							<th width="10%" style = "text-align:right;">Total</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for i in cart_items %}
+						{% if c.order.cart.cart_id == i.cart_id %}
+						<tr>
+							<td>
+								<img src = "{% if i.product_type_id == 'USER-IMAGE' %} https://www.artevenue.com/{{MEDIA_URL}}{{i.product.image_to_frame}} {% else %} https://www.artevenue.com/{% static i.product.thumbnail_url %} {% endif %}" style = "width:50px; height:50px; object-fit:contain;">
+								<br />
+
+								<div class = "pull-left">
+									<button style="padding-left:0px;" type ="button" class = "btn btn-link pull-left" onclick = "getFramedImg('{{i.product_id}}', '{{i.image_width}}', '{{i.moulding_id | default_if_none:0}}', '{{i.mount.color | default_if_none:0}}','{{i.mount_size | default_if_none:0}}', '{{i.product.url | default_if_none:""}}'f;">
+										<small>{{i.product.name|truncatechars:10 }}<br />
+										({{i.product.part_number}})
+										</small>
+									</button>
+								</div>
+							</td>
+							<td>
+									{% with width=i.moulding.width_inner_inches|add_width_frame_mount:i.mount_size %}
+									<small>
+									<li>Print on {{i.print_medium_id|title}}</li>
+									{% if i.moulding_id %}
+										<li>Image Print Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+										<li>Frame: {{i.moulding.name }} ({{i.moulding.width_inches}} inch, Polystyrene)</li>
+										{% if i.mount_id %}
+											<li>Mount: {{i.mount_size }}", Color: {{i.mount.name|title }} </li>
+										{% endif %}
+										<li>Total Size: 
+											{{ i.image_width|add_width:width|add_width:width }}" X {{i.image_height|add_width:width|add_width:width }}"</li>
+									{% else %}
+										<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+									{% endif %}
+									
+									{% if i.acrylic_id %}
+										<li>Acrylic covered</li>
+									{% endif %}
+									{% if i.stretch_id %}
+										<li>Canvas Stretched</li>
+									{% endif %}
+									</small>
+									{% endwith %}
+							</td>
+							<td style = "text-align:right;">
+								{{i.quantity|floatformat}}
+							</td>
+							<td style = "text-align:right;">{{i.item_unit_price|floatformat}}</td>
+							<td style = "text-align:right;">											
+								{{i.item_disc_amt|floatformat}}
+							</td>
+							<td style = "text-align:right;">
+								{{i.item_tax|floatformat}}
+							</td>
+							<td style = "text-align:right">{{i.item_total|floatformat}}</td>
+						</tr>
+						{% endif %}
+						{% endfor cart_items %}
+						
+					</tbody>
+				</table>
+			</div>		
+		</div>
+		<hr>
+		{% endfor carts %}		
+		{% endfor %}
+		
+		<hr>
+		<p>
+			With warm regards,<br />
+			Team Arte'Venue<br/>
+			<img src = "https://artevenue.com/static/img/artevenue_logo_new.png" alt="Arte'venue Logo"  height="25" width="110"> <br />
+			<a href = "https://www.artevenue.com">www.artevenue.com</a>
+		</p>
+	</body>
+</html>

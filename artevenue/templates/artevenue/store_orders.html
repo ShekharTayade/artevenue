@@ -47,7 +47,7 @@
 										<label>&nbsp; </label><br />
 										<button type="button" id = "date-submit" 
 										class = "btn btn-primary"
-										onclick = "get_store_orders('1', 'NO');">Submit</button>
+										onclick = "get_orders('1', 'NO');">Submit</button>
 									</div>
 								</div>
 							</div>
@@ -58,10 +58,11 @@
 							</div>
 							
 							<div class="row">
-								<form method = "POST" action = "{% url 'get_store_orders'%}" id = "getpdf">
+								<form method = "POST" action = "{% url 'get_orders'%}" id = "getpdf">
 									<input hidden name = "printpdf" value = "YES">
 									<input hidden name = "fromdate" id = "fromdate_pdf" value = "$('#fromdate').val();">
 									<input hidden name = "todate" id = "todate_pdf" value = "$('#todate').val();">
+									<input hidden name = "ordtype" id = "ordtype" value = "A">
 									<div class="form-group">
 										<button type="submit" id = "submit_pdf" 
 										class = "btn btn-primary" form = "getpdf">
@@ -125,7 +126,7 @@
 
 		});
 	
-		function get_store_orders(page, printpdf){
+		function get_orders(page, printpdf='NO'){
 		
 			var execute_ajax = false;
 			var query_data = {};
@@ -154,10 +155,10 @@
 				$("#msg-modal").modal("show");
 				return;
 			}
-			query_data = {'fromdate':from_date, 'todate':to_date, 'page':page, 'printpdf':printpdf}
+			query_data = {'fromdate':from_date, 'todate':to_date, 'page':page, 'printpdf':printpdf, 'ordtype':'A'}
 
 			$.ajax({
-				url: "{% url 'get_store_orders' %}", 
+				url: "{% url 'get_orders' %}", 
 				dataType: 'text',
 				data: query_data,
 				type: 'POST',

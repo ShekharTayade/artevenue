@@ -8,7 +8,9 @@ SELECT "store_id" as store_id, "product_id" as product_id, "name" as name, "desc
 	"max_height" as max_height, "min_width" as min_width, "publisher" as publisher, "artist" as artist,
 	"colors" as colors, "key_words" as key_words, "url" as url, "thumbnail_url" as thumbnail_url,
 	'' as session_id, 0 as user_id, '' as image_to_frame, '' as status, CURRENT_DATE as created_date, 
-	CURRENT_DATE as updated_date, 0 as collage_layout_id, ''  as image_to_frame_thumbnail
+	CURRENT_DATE as updated_date, 0 as collage_layout_id, ''  as image_to_frame_thumbnail,
+	0 as art_width , 0 as art_height, '' as art_medium, '' as art_surface, '' as art_surface_desc,
+	'' as high_resolution_url, "category_disp_priority" as category_disp_priority	
 FROM "artevenue_stock_image"
 
 UNION
@@ -21,7 +23,9 @@ SELECT 0 as store_id, "product_id" as product_id, '' as name, '' as description,
 	'' as url, '' as thumbnail_url, "session_id" as session_id, "user_id" as user, 
 	"image_to_frame" as image_to_frame, "status" as status, "created_date" as created_date, 
 	"updated_date" as updated_date, 0 as collage_layout_id,
-	"image_to_frame_thumbnail" as image_to_frame_thumbnail
+	"image_to_frame_thumbnail" as image_to_frame_thumbnail,
+	0 as art_width , 0 as art_height, '' as art_medium, '' as art_surface, '' as art_surface_desc,
+	'' as high_resolution_url, "category_disp_priority" as category_disp_priority
 FROM "artevenue_user_image"
 
 UNION
@@ -33,7 +37,9 @@ SELECT 0 as store_id, "product_id" as product_id, "name" as name, '' as descript
 	'' as url, '' as thumbnail_url, '' as session_id, 0 as user, 
 	'' as image_to_frame, '' as status, CURRENT_DATE as created_date, 
 	CURRENT_DATE as updated_date, "collage_layout_id" as collage_layout_id,
-	''  as image_to_frame_thumbnail
+	''  as image_to_frame_thumbnail,
+	0 as art_width , 0 as art_height, '' as art_medium, '' as art_surface, '' as art_surface_desc,
+	'' as high_resolution_url, "category_disp_priority" as category_disp_priority
 FROM "artevenue_stock_collage"
 
 UNION
@@ -46,5 +52,8 @@ SELECT 0 as store_id, "product_id" as product_id, "name" as name, "description" 
 	"max_height" as max_height, "min_width" as min_width, "publisher" as publisher, "artist" as artist,
 	"colors" as colors, "key_words" as key_words, "url" as url, "thumbnail_url" as thumbnail_url,
 	'' as session_id, 0 as user_id, '' as image_to_frame, '' as status, CURRENT_DATE as created_date, 
-	CURRENT_DATE as updated_date, 0 as collage_layout_id, ''  as image_to_frame_thumbnail
+	CURRENT_DATE as updated_date, 0 as collage_layout_id, ''  as image_to_frame_thumbnail,
+	"art_width" as art_width , "art_height" as art_height, "art_medium" as art_medium, 
+	"art_surface" as art_surface, "art_surface_desc" as art_surface_desc,
+	"high_resolution_url" as high_resolution_url, "category_disp_priority" as category_disp_priority
 FROM "artevenue_original_art"

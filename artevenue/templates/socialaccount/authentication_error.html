@@ -1,0 +1,39 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% load i18n %}
+
+{% block page-title %}
+<title>Social Loging Failure</title>
+{% endblock page-title %}
+
+{% block page-description %}
+<meta name="description" content="Social Media login has failed">
+{% endblock page-description %}
+
+{% block page-keywords %}  
+<meta name="keywords" content="">
+{% endblock page-keywords %}  
+
+{% block page-author %}  
+<meta name="author" content="Arte'venue">
+{% endblock page-author %}
+{% block sitecontent %}
+	{% block content %}
+	<div class="container mt-5 mb-5">
+		<div class = "row box">
+			<div class="col-12">
+				<h1>{% trans "Login Cancelled" %}</h1>
+				<h1>{% trans "Social Network Login Failure" %}</h1>
+
+				<p>{% trans "An error occurred while attempting to login via your social network account." %}</p>
+
+				<p><a href="{% url 'login' %}" class="btn btn-secondary btn-block">Return to log in</a></p>
+			</div>
+		</div>
+	</div>
+	{% endblock %}
+{% endblock %}
+
+{% block jscripts %}
+{% endblock jscripts %}

@@ -18,3 +18,4 @@ class Homelane_dataViewSet(viewsets.ReadOnlyModelViewSet):
 	pagination_class = None
 	queryset = Homelane_data.objects.all()
 	serializer_class = Homelane_dataSerializer
+	

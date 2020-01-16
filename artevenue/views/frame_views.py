@@ -28,25 +28,35 @@ def get_mouldings(request):
 	# get frames to be applied and shown
 	canvas_mouldings_apply =  Moulding_image.objects.filter(image_type__iexact = "APPLY").select_related(
 		'moulding').filter((Q( moulding__applies_to="C") | Q( moulding__applies_to="B")), moulding__is_published = True ).values('image_id', 'url',
-			'border_slice', 'moulding_id', 'moulding__name', 'moulding__description', 'moulding__width_inches')
+			'border_slice', 'moulding_id', 'moulding__name', 'moulding__description', 'moulding__width_inches', 'moulding__width_inner_inches')
 
 	canvas_mouldings_show =  Moulding_image.objects.filter(image_type__iexact = "APPLY").select_related(
 		'moulding').filter((Q( moulding__applies_to="C") | Q( moulding__applies_to="B")), moulding__is_published = True ).values('image_id', 'url',
-			'border_slice', 'moulding_id', 'moulding__name', 'moulding__description', 'moulding__width_inches')
+			'border_slice', 'moulding_id', 'moulding__name', 'moulding__description', 'moulding__width_inches', 'moulding__width_inner_inches')
 	paper_mouldings_apply =  Moulding_image.objects.filter(image_type__iexact = "APPLY").select_related(
 		'moulding').filter((Q( moulding__applies_to="P") | Q( moulding__applies_to="B")), moulding__is_published = True ).values('image_id', 'url',
-			'border_slice', 'moulding_id', 'moulding__name', 'moulding__description', 'moulding__width_inches')
+			'border_slice', 'moulding_id', 'moulding__name', 'moulding__description', 'moulding__width_inches', 'moulding__width_inner_inches')
 
 	paper_mouldings_show =  Moulding_image.objects.filter(image_type__iexact = "APPLY").select_related(
 		'moulding').filter((Q( moulding__applies_to="P") | Q( moulding__applies_to="B")), moulding__is_published = True ).values('image_id', 'url',
-			'border_slice', 'moulding_id', 'moulding__name', 'moulding__description', 'moulding__width_inches')
-			
+			'border_slice', 'moulding_id', 'moulding__name', 'moulding__description', 'moulding__width_inches', 'moulding__width_inner_inches')
+																												 
 	moulding_diagrams =  Moulding_image.objects.filter(image_type__iexact = "DIAGRAM").select_related(
 		'moulding')
+
+
+	canvas_mouldings_corner =  Moulding_image.objects.filter(image_type__iexact = "CORNER").select_related(
+		'moulding').filter((Q( moulding__applies_to="C") | Q( moulding__applies_to="B")), moulding__is_published = True ).values('image_id', 'url',
+			'border_slice', 'moulding_id', 'moulding__name', 'moulding__description', 'moulding__width_inches', 'moulding__width_inner_inches')
+	paper_mouldings_corner =  Moulding_image.objects.filter(image_type__iexact = "CORNER").select_related(
+		'moulding').filter((Q( moulding__applies_to="P") | Q( moulding__applies_to="B")), moulding__is_published = True ).values('image_id', 'url',
+			'border_slice', 'moulding_id', 'moulding__name', 'moulding__description', 'moulding__width_inches', 'moulding__width_inner_inches')
+
 							
 	return ({'canvas_mouldings_apply':canvas_mouldings_apply, 'canvas_mouldings_show':canvas_mouldings_show,
 			 'paper_mouldings_apply':paper_mouldings_apply, 'paper_mouldings_show':paper_mouldings_show,
-			 'moulding_diagrams':moulding_diagrams})
+			 'moulding_diagrams':moulding_diagrams, 'canvas_mouldings_corner':canvas_mouldings_corner,
+			 'paper_mouldings_corner':paper_mouldings_corner})
 
 
 def get_mounts(request):
@@ -121,7 +131,6 @@ def get_mount_price_by_id(id):
 		
 def get_board_price(request) :
 	board = request.GET.get("id", "")
-	print("board = " + board)
 	if board == "":
 		return JsonResponse({"sqin_price" : "0"})
 	boardObj = Board.objects.filter(board_id = board).first()
@@ -144,7 +153,6 @@ def get_board_price_by_id(id) :
 	
 def get_acrylic_price(request) :
 	acrylic = request.GET.get("id", "")
-	print("acrylic = " + acrylic)
 	if acrylic == "":
 		return JsonResponse({"sqin_price" : "0"})
 	acrylicObj = Acrylic.objects.filter(acrylic_id = acrylic).first()
@@ -166,7 +174,6 @@ def get_acrylic_price_by_id(acr_id) :
 	
 def get_stretch_price(request) :
 	stretch = request.GET.get("id", "")
-	print("Stretch = " + stretch)
 	if stretch == "":
 		return JsonResponse({"sqin_price" : "0"})
 	stretchObj = Stretch.objects.filter(stretch_id = stretch).first()
@@ -177,7 +184,6 @@ def get_stretch_price(request) :
 		return JsonResponse({"sqin_price" : "0"})
 	
 def get_stretch_price_by_id(strt_id) :
-	print("stretch = " + str(strt_id))
 	if strt_id == "":
 		return JsonResponse({"sqin_price" : "0"})
 	stretchObj = Stretch.objects.filter(stretch_id = strt_id).first()

@@ -13,7 +13,7 @@
 							{% for o in orders %}
 							<h3 style = "color:blue"}>Order Number : {{o.order_number}}
 							</h3>
-							<h4>Dated : {{o.order_date}}  | Status: {{ o.get_order_status_display }}							
+							<h4>Dated : {{o.order_date|date:"d m Y"}}  | Status: {{ o.get_order_status_display }}
 							</h4>
 						
 							<div class = "row">
@@ -51,7 +51,7 @@
 										, {{o.order_billing.Company}}
 									{% endif %}
 									{% if o.order_billing.gst_number %}
-										, {{o.order_billing.gst_number}}
+										, GST No.:{{o.order_billing.gst_number}}
 									{% endif %}
 									
 									<br />
@@ -80,10 +80,11 @@
 										<tr>
 											<th width="15%">Name</th>
 											<th width="30%">Details</th>
-											<th width="15%" style="text-align:right">Unit Price</th>
-											<th width="10%" style="text-align:right">Quantity</th>
-											<th width="15%" style="text-align:right">Discount</th>
-											<th width="15%" style="text-align:right">Total</th>
+											<th width="12%" style="text-align:right">Unit Price</th>
+											<th width="12%" style="text-align:right">Quantity</th>
+											<th width="12%" style="text-align:right">Discount</th>
+											<th width="12%" style="text-align:right">Tax</th>
+											<th width="12%" style="text-align:right">Total</th>
 										</tr>
 									</thead>
 									<tbody>
@@ -95,50 +96,47 @@
 										<tr>
 											<td>
 												<img src = "{% if i.product_type|cut:' ' == 'USER-IMAGE' %} https://artevenue.com{{MEDIA_URL}}{{i.product.image_to_frame_thumbnail}} {% else %} {% static i.product.thumbnail_url %} {% endif %}" style = "width:75px; height:75px; object-fit:contain;">
-												<!--
-												{% if i.product.publisher == '1001' %}
-													<img src = "{% if i.product_type == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product.image_to_frame}} {% else %} {% static i.product.thumbnail_url %} {% endif %}" style = "width:75px; height:75px; object-fit:contain;">
-												{% else %}
-													<img src = "{% if i.product_type == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product.image_to_frame}} {% else %} {{i.product.thumbnail_url}} {% endif %}" style = "width:75px; height:75px; object-fit:contain;">
-												{% endif %}				
-												-->
 												<br />
 												<div class = "pull-left">
-													<button type ="button" class = "btn btn-link" style = "padding-left:0px;" onclick = "getFramedImg('{{i.product_id}}', '{{i.image_width}}', '{{i.moulding_id| default_if_none:0}}', '{{i.mount.color| default_if_none:0}}','{{i.mount_size| default_if_none:0}}', '{{i.product.url}}');">
+													<small style = "padding-left:0px;" >
 														{% if i.product_type|cut:' ' == 'USER-IMAGE' %}  
 															Customer Image
 														{% else %}
 															{{i.product.name}}
 														{% endif %}
 															
-													</button>
+													</small>
 												</div>
 											</td>
 											<td>
-												{% with width=i.moulding.width_inches|add_width_frame_mount:i.mount_size %}
-
 												<small>
-												<li>Print on {{i.print_medium_id|title}}</li>
+												{% with width=i.moulding.width_inner_inches|add_width_frame_mount:i.mount_size %}
+												{% if i.product_type_id == 'ORIGINAL-ART' %}
+													<li>{{i.product.description}}</li>
+												{% else %}													
+													<li>Print on {{i.print_medium_id|title}}</li>
+												{% endif %}
+												
 												{% if i.moulding_id %}
-												<li>Image Print Size : {{ i.image_width }}" X {{i.image_height }}"</li>
-												<li>Frame {{i.moulding.name }} </li>
-												<li>Total Size: 
-													{{ i.image_width|add_width:width }}" X {{i.image_height|add_width:width }}"</li>
+													<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+													<li>Frame: {{i.moulding.name }} ({{i.moulding.width_inches}} inch, Polystyrene)</li>
+													{% if i.mount_id %}
+														<li>Mount: {{i.mount_size }}", Color: {{i.mount.name|title }} </li>
+													{% endif %}
+													<li>Total Size: 
+														{{ i.image_width|add_width:width|add_width:width }}" X {{i.image_height|add_width:width|add_width:width }}"</li>
 												{% else %}
 													<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
 												{% endif %}
 												
-												{% if i.mount_id %}
-													<li>Mount: {{i.mount_size }}", Color: {{i.mount.name|title }} </li>
-												{% endif %}
 												{% if i.acrylic_id %}
 													<li>Acrylic covered</li>
 												{% endif %}
 												{% if i.stretch_id %}
 													<li>Canvas Stretched</li>
 												{% endif %}
-												</small>
 												{% endwith %}
+												</small>
 
 											</td>
 											<td style = "text-align:right">
@@ -148,13 +146,16 @@
 												{{i.quantity}}
 											</td>
 											<td style = "text-align:right">
-											
+												{{i.item_disc_amt|floatformat}}
+												<!--
 												{% if i.promotion.discount_type == "PERCENTAGE" %}
 													{{i.promotion.discount_value|floatformat}}%
 												{% else %}
 													{{i.promotion.discount_value|floatformat}}
 												{% endif %}
+												-->
 											</td>
+											<td style = "text-align:right">{{i.item_tax|floatformat}}</td>
 											<td style = "text-align:right">{{i.item_total|floatformat}}</td>
 
 										</tr>
@@ -164,12 +165,13 @@
 									</tbody>
 									<tfoot>
 										<tr>
-											<th colspan="4"><small>Shipping & Handing</small></th>
+											<th colspan="5"><small>Shipping & Handing</small></th>
 											<th colspan="2" style = "text-align:right">
 												<small>{{o.shipping_cost|floatformat}}</small>
 											</th>
 											<th></th>
 										</tr>
+										<!--
 										<tr>
 											<th colspan="4"><small>Discount</small></th>
 											<th colspan="1" style = "text-align:right">
@@ -177,8 +179,9 @@
 											</th>
 											<th></th>
 										</tr>
+										-->
 										<tr>
-											<th colspan="4">Order Total</th>
+											<th colspan="5">Order Total</th>
 											<th colspan="2" style = "text-align:right">
 												<i class = "fa fa-inr"> </i> {{o.order_total|floatformat}}
 											</th>
@@ -187,7 +190,7 @@
 									</tfoot>
 								</table>
 							</div>
-							<div class = "mb-5" style="padding-bottom:2px; background-color:gainsboro;" >
+							<div class = "mb-5" style="padding-bottom:2px; background-color:blue;" >
 							</div>
 							{% endfor orders %}
 							
@@ -198,16 +201,16 @@
 									<div class="col-md-12 col-lg-12 products-showing">
 										<div class = "text-center">
 											{% if orders.has_previous %}
-												<button type = "button" class="btn btn-sm btn-primary" onclick="get_store_orders('1');"><i class="fa fa-chevron-left"></i> First</button>  
-												<button type = "button" class="btn btn-sm btn-primary"  onclick="get_store_orders('{{ orders.previous_page_number }}');">Prev</button>
+												<button type = "button" class="btn btn-sm btn-primary" onclick="get_orders('1');"><i class="fa fa-chevron-left"></i> First</button>  
+												<button type = "button" class="btn btn-sm btn-primary"  onclick="get_orders('{{ orders.previous_page_number }}');">Prev</button>
 											{% else %}
 												<button type = "button" class="btn btn-sm btn btn-secondary disabled" href="#"><i class = "fa fa-chevron-left"></i> First</button>
 												<button type = "button" class="btn btn-sm btn btn-secondary disabled"  href="#">Prev</button>
 											{% endif %}
 											Showing Page {{ orders.number }} of {{ orders.paginator.num_pages }}
 											{% if orders.has_next %}
-												<button type = "button" class="btn btn-sm btn-primary" onclick="get_store_orders('{{ orders.next_page_number }}');">Next</button>
-												<button type = "button" class="btn btn-sm btn-primary" onclick="get_store_orders('{{ orders.paginator.num_pages }}');">Last <i class = "fa fa-chevron-right"></i></button>
+												<button type = "button" class="btn btn-sm btn-primary" onclick="get_orders('{{ orders.next_page_number }}');">Next</button>
+												<button type = "button" class="btn btn-sm btn-primary" onclick="get_orders('{{ orders.paginator.num_pages }}');">Last <i class = "fa fa-chevron-right"></i></button>
 											{% else %}
 												<button type = "button" class="btn btn-sm btn-secondary disabled" href="#">Next</button>
 												<button type = "button" class="btn btn-sm btn-secondary disabled" href="#">Last <i class = "fa fa-chevron-right"></i></button>

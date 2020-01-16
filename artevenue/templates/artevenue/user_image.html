@@ -1,5 +1,24 @@
 {% extends 'artevenue/estore_base.html' %}
 {% load static %}
+
+{% block page-title %} 
+<title>Picture Framing, Frame Your Pictures Online | Arte'venue</title>
+{% endblock page-title %} 
+
+  
+{% block page-description %}
+<meta name="description" content="Frame your pictures online on Arte'venue. Upload your pictures, get it framed and delivered at doorstep. Sign up now to get started.">
+{% endblock page-description %}
+  
+{% block page-keywords %}
+<meta name="keywords" content="custom picture frames, custom picture framing, frame my pictures, frame custom pictures, online photo framing, online framing">
+{% endblock page-keywords %}
+  
+{% block page-author %}
+<meta name="author" content="Arte'venue">
+{% endblock page-author %}
+
+
 {% load moulding_url %}
 {% load update_cart_message from estore_base %}
 	<!-- Only Override the site content block -->
@@ -22,8 +41,41 @@
 									onmouseenter="startMagnify()" 
 									onmouseleave="stopMagnify()"
 									ontouchstart="startMagnify()" 
-									ontouchend="stopMagnify()"> 
-								<img id = "prod-img" src="{% if user_instance.image_to_frame %} {{user_instance.image_to_frame.url}} {% endif %}" data-action = "zoom" class="img-fluid"/>
+									ontouchend="stopMagnify()"
+									style = "box-shadow: 3px 4px 4px 0 #444444, 3px 6px 4px 0#444444;"> 
+								<img id = "prod-img" src="{% if user_instance.image_to_frame %} {{user_instance.image_to_frame.url}} {% endif %}" data-action = "zoom" class="img-fluid"/
+										style = "padding:0px; margin:0px;">
+							</div>
+							<div class = "row mt-3">
+								<div class = "col-sm-12 text-center">								
+									<div class="btn-group">
+										  <!--<button type="button" class="btn btn-primary" data-method="setDragMode" data-option="move" title="Move">
+											<span class="docs-tooltip" data-toggle="tooltip" title="cropper.setDragMode(&quot;move&quot;)">
+											  <span class="fa fa-crop-alt" onclick = "startCrop();"></span>
+											</span>
+										  </button>
+										  <button type="button" class="btn btn-primary" data-method="reset" title="Reset">
+											<span class="docs-tooltip" data-toggle="tooltip" title="cropper.reset()">
+											  <span class="fa fa-sync-alt" onclick = "cropReset();"></span>
+											</span>
+										  </button>
+										</div> -->
+										<button id = "cropstart" class = "btn btn-secondary" title="Edit Image" onclick = "startCrop();"><i class = "fa fa-crop"></i></button>
+										<button id = "cropreset" disabled class = "btn btn-secondary" title="Reset"><i class = "fa fa-refresh" onclick = "cropReset();"></i></button>
+										<button id = "cropzoomin" disabled class = "btn btn-secondary" title="Zoom In"><i class = "fa fa-search-plus" onclick = "cropZoomin()"></i></button>
+										<button id = "cropzoomout" disabled class = "btn btn-secondary" title="Zoom Out"><i class = "fa fa-search-minus" onclick = "cropZoomout()"></i></button>
+										<button id = "croprotateleft" disabled class = "btn btn-secondary" title="Rotate Left"><i class = "fa fa-rotate-left" onclick = "rotateLeft();"></i></button>
+										<button id = "croprotateright" disabled class = "btn btn-secondary" title="Rotate Right"><i class = "fa fa-rotate-right" onclick = "rotateRight();"></i></button>
+										<button id = "cropremove" disabled class = "btn btn-secondary" title="Remove Cropping"><i class = "fa fa-power-off" onclick = "cropDestroy(this);"></i></button>
+									</div>
+									<div class="btn-group">
+										<button id = "cropdone" disabled class = "btn btn-secondary" title="Done"><i class = "fa fa-check-square" onclick = "cropDone(this);"></i></button>
+									</div>
+									<div class ="col-sm-12" style = "color:#4d4d4d;">
+										<small>Use this tool bar to edit your image</small>
+									</div>
+									
+								</div>
 							</div>
 						</div>
 
@@ -106,12 +158,25 @@
 												</option>
 												{% endfor printmedium %}
 											</select>
-											<div style = "margin-top:5px; font: 0.85rem 'Roboto', sans-serif;" id="stretched" class = "checkbox pull-right" style = "display:none;">
-												<label class="checkbox-inline">
-													<input id="in_stretched" name="in_stretched"
-														onchange = "set_stretch()"
-														type = "checkbox"> Stretched? <i class = "fa fa-question-circle-o" rel="tooltip" title="Check this box if would like the Canvas to be stretched" id="strt"></i>
-												</label>
+											<div style = "margin-top:5px; font: 0.85rem 'Roboto', sans-serif;" id="stretched" class = "checkbox row" style = "display:none;">
+												<div class = "col-12">
+													<label class="checkbox-inline">
+														<input id="in_stretched" name="in_stretched"
+															onchange = "set_stretch()"
+															type = "checkbox"><strong>Stretched?</strong>
+													</label>
+													<span class = "pull-right">
+														<i class = "fa fa-question-circle" 
+															data-toggle="tooltip" title="Click to know more!"
+															id="strt" 
+															onclick="$('#stretched-modal').modal('show');">
+															<span style = "color:#11b6bd; font-size:0.7rem; text-decoration:underline;">What is stretched</span>															
+														</i>
+													</span>
+												</div>
+												<div class = "col-12">
+													<small>Check the checkbox to get the canvas streched on a wooden frame</small>
+												</div>
 											</div>
 										</div>
 									</div>
@@ -163,18 +228,16 @@
 							<div class = "box">
 								<div class = "row mb-3">
 									<div class="col-sm-12">
-										<a class = "pull-left"  style = "font-size:1rem; color:#4d4d4d; text-decoration:underline;" href = "#moulding-show"> Choose Frame</a>
-										<button class = "btn btn-link pull-right" style = "font-size:1rem; color:#4d4d4d; text-decoration:underline;" onclick="removeFrame();"> Remove Frame</button>
+										<a class = "btn btn-link pull-left"  style = "font-size:1rem; color:#4d4d4d; text-decoration:underline; padding-left:0px;" href = "#moulding-show"> Choose Frame</a>
+										<button class = "btn btn-link pull-right" style = "font-size:1rem; color:#4d4d4d;" onclick="removeFrame();"><i class="fa fa-times-circle"></i>Remove Frame</button>
 									</div>
 								</div>
 								<hr>
 								<div id = "mount-show">
 									<div class = "row">
 										<div class="col-sm-12">
-											<span style = "font-size:1rem; color:#4d4d4d;" class = "pull-left" id = "frame-name">Choose Mount</span>
-											<div class = "pull-right">
-												<button onclick = "set_mount_id('0'); set_mount_color('0');" class = "btn btn-link"><i class="fa fa-remove"></i>Remove Mount</button>
-											</div>
+											<a class = "btn btn-link pull-left" style = "font-size:1rem; color:#4d4d4d; text-decoration:underline; padding-left:0px;" class = "pull-left" id = "frame-name">Choose Mount</a>
+											<button class = "btn btn-link pull-right" onclick = "set_mount_id('0'); set_mount_color('0');" class = "btn btn-link" style="padding-left:0px;"><i class="fa fa-times-circle"></i>Remove Mount</button>
 										</div>
 									</div>
 									<div class = "row ml-1 mb-3">
@@ -197,8 +260,8 @@
 												Colors
 											</div>
 											{% for m in mounts %}
-											<div class = "col-sm-1">
-												<div class = "btn mount" 
+											<div class = "col-1 mr-3">
+												<button class = "btn mount" 
 													id = "mnt_{{m.mount_id}}"
 													style = "border:1px solid grey; background-color:{{m.color}};" 
 													data-toggle="tooltip" 
@@ -206,7 +269,7 @@
 													onclick = "set_mount_id('{{m.mount_id}}');
 															   set_mount_color('{{m.color}}');
 															   ">
-												</div>
+												</button>
 											</div>
 											{% endfor %}
 										</div>
@@ -226,8 +289,8 @@
 			<div id = "moulding-show" class = "size-box">
 				<div class = "row">
 					<div class="col-lg-12">
-						<span class = "pull-left" id = "frame-name">Select Frame</span>
-						<button class = "btn btn-outline-secondary pull-right" id = "frame-btn" onclick="removeFrame();"><i class="fa fa-remove"></i>Remove</button>
+						<a class = "btn btn-link pull-left" style = "font-size:1rem; color:#4d4d4d; padding-left:0px;" class = "pull-left">Click to Select Frame</a>
+						<button class = "btn btn-link pull-right" id = "frame-btn" onclick="removeFrame();"><i class="fa fa-times-circle"></i>Remove</button>
 						<br />
 					</div>
 				</div>
@@ -243,6 +306,28 @@
 			{% include 'artevenue/cart-add-message.html' %}
 			{% include 'artevenue/wishlist-add-message.html' %}
 			{% include 'artevenue/loader-message.html' %}
+			<div id="stretched-modal" tabindex="-1" role="dialog" aria-labelledby="Strecher" aria-hidden="true" class="modal fade">
+				<div class="modal-dialog modal-sm">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h3 class="modal-title">Stretched Canvas Print</h3>
+							<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
+						</div>
+						<div class="modal-body">
+							<div class="">
+								<img src = "{% static 'img/canvas_stretched.jpg' %}" style = "display:block; margin-left:auto; margin-right:auto; width:200px;">
+								<ul class = "mt-3" style = "font-size:0.75rem;">
+									<li>Please check the "Streched" checkbox to get the art 
+										printed on canvas and streched on a wooden frame as 
+									shown above. </li>
+									<li>If not checked, we print art on canvas, roll it and 
+									deliver it in a tube.</li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 
 		</div>
 		
@@ -503,6 +588,7 @@
 						} else {
 								$("#promo-display").hide();
 								$("#no-disc").show();
+								$("#prod-price").html(data.item_price);
 								
 								$("#item_unit_price_nv").html(data.item_unit_price);
 								$("#item_total_price_nv").html(data.item_price);
@@ -970,7 +1056,7 @@
 					}, 500);
 				},
 				error: function(xhr){
-					alert("An error occured: " + xhr.status + " " + xhr.statusText + " Apologies for the inconvenience!! Please let us know the details and we will be happy to help sort it out."); 
+					alert("An error occured: " + xhr.status + " " + xhr.statusText + " Please make sure that you are uploading a proper ,jpg, .gif or .png image."); 
 					return;
 				}
 			});	
@@ -1012,6 +1098,106 @@
 				});	
 			{% endif %}			
 		}
+	</script>
+	
+	<script>
+	var cropper 
+	// import 'cropperjs/dist/cropper.css';
+	//import Cropper from 'cropperjs';
+	function startCrop(){
+	  image = document.getElementById('prod-img');
+	  cropper = new Cropper(image, {
+		});
+	  $('#cropstart').prop("disabled", true);
+	  $('#cropreset').prop("disabled", false);
+	  $('#cropzoomin').prop("disabled", false);
+	  $('#cropzoomout').prop("disabled", false);
+	  $('#croprotateleft').prop("disabled", false);
+	  $('#croprotateright').prop("disabled", false);
+	  $('#cropremove').prop("disabled", false);
+	  $('#cropdone').prop("disabled", false);
+	}
+	function clearcrop(){	
+		cropper.clear();
+	}
+	function cropReset(){
+		cropper.reset();
+	}	
+	function cropZoomin(){
+		cropper.zoom(0.1);
+	}
+	function cropZoomout(){		
+		cropper.zoom(-0.1);
+	}
+	function cropDestroy(){		
+		cropper.destroy();
+		$('#cropstart').prop("disabled", false);
+		$('#cropreset').prop("disabled", true);
+		$('#cropzoomin').prop("disabled", true);
+		$('#cropzoomout').prop("disabled", true);
+		$('#croprotateleft').prop("disabled", true);
+		$('#croprotateright').prop("disabled", true);
+		$('#cropremove').prop("disabled", true);
+		$('#cropdone').prop("disabled", true);
+	}
+	function rotateLeft(){		
+		cropper.rotate(-45);
+	}
+	function rotateRight(){		
+		cropper.rotate(45);
+	}
+	function cropDone(btn){		
+		if (document.getElementById("cropdone").disabled){
+			return;
+		}
+		ret = cropper.getData(true);
+		cropper.destroy();
+		$.ajax({
+			url: '{% url "crop_user_image" %}', 
+			data:{'user_image_id': user_image_id, 'x':ret.x, 'y':ret.y, 
+				  'width':ret.width, 'height':ret.height, 'rotate':ret.rotate},
+			type: 'post',				
+			success: function (data) {
+				document.getElementById("prod-img").style.objectFit ="contain";
+				document.getElementById("prod-img").src = "data:image/png;base64," + data;
+				user_image = document.getElementById("prod-img").src;
+				$('#cropstart').prop("disabled", false);
+				$('#cropreset').prop("disabled", true);
+				$('#cropzoomin').prop("disabled", true);
+				$('#cropzoomout').prop("disabled", true);
+				$('#croprotateleft').prop("disabled", true);
+				$('#croprotateright').prop("disabled", true);
+				$('#cropremove').prop("disabled", true);
+				$('#cropdone').prop("disabled", true);
+
+				setTimeout(function (){
+					// Validate print size
+					var img = document.getElementById('prod-img');
+					var width = img.naturalWidth;
+					var height = img.naturalHeight;
+					var max_width = Math.floor(width / ppi);
+					var max_height = Math.floor(height / ppi);
+					var currwidth = $("#size-slider").slider("value");
+
+					if (currwidth > max_width) {
+						$("#size_validation").html("With this image, the best quality printing can be done up to size of width: " + max_width + " inch, height: " + max_height + " inch");
+					} else {
+						$("#size_validation").html("");
+					}
+					
+					set_user_image_id();
+					set_size_slider(max_width);
+					get_applicable_frames();
+					calc_total_price();
+				}, 500);
+
+			},
+			error: function(xhr){
+				alert("An error occured: " + xhr.status + " " + xhr.statusText + " Apologies for the inconvenience!! Please let us know the details and we will be happy to help sort it out."); 
+				return;
+			}
+		});	
+	}
 	</script>
 	{% endblock jscripts %}	
 		

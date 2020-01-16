@@ -1,0 +1,263 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+        <div class="container">
+			<div class="row">
+				<!-- breadcrumb-->
+				<div class="col-sm-12">
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+							<li aria-current="page" class="breadcrumb-item active">My Account</li>
+						</ol>
+					</nav>
+				</div>
+			</div>
+			<section id="tabs">
+				<h6 class="section-title h1">My Account</h6>
+				<div class="row">
+					<div class="col-xs-12 col-md-12">
+					{% if user_form.errors or businessprofile_form.errors or shipping_form.errors or billing_form.errors or msg %}
+						<div id="errors" class="alert alert-warning alert-dismissable">
+							<button type="button" class="close" data-dismiss="alert">&times;</button>
+							<div class="inner">
+								{% if user_form.errors or businessprofile_form.errors %}
+									<p>There were issues in the information you entered. Please correct following:</p>
+								{% endif %}
+								<!-- Error messaging -->
+								{{ user_form.non_field_errors }}
+								{{ businessprofile_form.non_field_errors }}
+								{% if user_form.errors %}
+									Arte'Venue Account:<br/>
+									<ul>
+										<!-- Forms -->
+										{% for field in user_form %}
+											{% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+										{% endfor %}
+									</ul>
+								{% endif %}
+								{% if businessprofile_form.errors %}
+									Business Profile:<br/>
+									<ul>
+										{% for field in businessprofile_form %}
+											{% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+										{% endfor %}
+									</ul>
+								{% endif %}
+								{% if shipping_form.errors %}
+									Shipping Address:<br/>
+									<ul>
+										{% for field in billing_form %}
+											{% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+										{% endfor %}
+									</ul>
+								{% endif %}
+								{% if billing_form.errors %}
+									Billing Address:<br/>
+									<ul>
+										{% for field in billing_form %}
+											{% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+										{% endfor %}
+									</ul>
+								{% endif %}
+																		
+								{% if msg %}
+								<ul>
+									<!-- Validations -->
+									<li>{{msg}}</li>
+								</ul>
+								{% endif %}							
+							</div>
+						</div>
+					{% endif %} 
+					</div>
+				</div>
+				<!-- /Error messaging -->
+				<div class="row">
+					<div class="col-xs-12 col-md-12">
+						<nav>
+							<div class="nav nav-tabs nav-fill" id="nav-tab" role="tablist">
+								<a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Arte'Venue Account</a>
+								{% if businessprofile_form %}
+								<a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">Business Profile</a>
+								{% endif %}
+								<a class="nav-item nav-link" id="nav-contact-tab" data-toggle="tab" href="#nav-contact" role="tab" aria-controls="nav-contact" aria-selected="false">Addresses</a>
+								{% if egift_giver or egift_receiver %}
+								<a class="nav-item nav-link" id="nav-about-tab" data-toggle="tab" href="#nav-about" role="tab" aria-controls="nav-about" aria-selected="false">eGifts</a>
+								{% endif %}
+							</div>
+						</nav>
+						<div class="tab-content py-3 px-3 px-sm-0" id="nav-tabContent">						
+							<div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+								<div class="row">
+									<!-- <div class="col-sm-4"> -->
+									<div class="col-sm-12 col-md-6">
+										<form id = "accnt" method = "post">
+											{% csrf_token %}
+											<div class="card">
+												<h3> <strong>Your Arte'Venue Account</strong></h3>
+												{% for hidden in user_form.hidden_fields %}
+												  {{ hidden }}
+												{% endfor %}
+
+												{% for field in user_form.visible_fields %}
+												  <div class="form-group">
+													<label for="{{ field.id_for_label }}">{{ field.label }}</label>
+													{{ field|add_class:'form-control' }}
+													{% for error in field.errors %}
+													  <span class="help-block">{{ error }}</span>
+													{% endfor %}
+												  </div>
+												{% endfor %}
+												<!--<input class = "btn btn-primary" name = "u_form" type="submit" value="Save Changes"></button>-->
+											</div>
+											<div class = "col-sm-12 mt-3">
+												<div class = "text-center">
+													<input class = "btn btn-primary" name = "u_form" type="submit" value = "Save Changes"></button>
+												</div>			
+											</div>										
+										</form>
+									</div>
+								</div>
+							</div>
+							<div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+								{% if businessprofile_form %}
+								<div class="col-sm-12">
+									<div class="card">
+										<form id = "bus_form" method = "post">
+											{% csrf_token %}
+											<h3><strong>Your Business Profile</strong></h3>
+											{% include 'artevenue/business_profile_form_include.html' %}
+											<div class = "col-sm-12 mt-3">
+												<div class = "text-center">
+													<!-- <button class = "btn btn-primary" form = "bus_form" type="submit">Save Changes</button> -->
+													<input class = "btn btn-primary" name = "b_form" type="submit" value="Save Changes"></button>
+												</div>			
+											</div>										
+										</form>
+									</div>
+								</div>
+								{% endif %}
+							</div>
+							<div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">
+								<div class = "row">
+									{% if shipping_form %}
+									<div class="col-sm-12 col-md-6">
+										<div class="card">
+											<form id = "ship_addr_form" method = "post">
+												{% csrf_token %}
+											<h3><strong>Your Shipping Address</strong></h3>
+
+											{% for hidden in shipping_form.hidden_fields %}
+											  {{ hidden }}
+											{% endfor %}
+
+											{% for field in shipping_form.visible_fields %}
+											  <div class="form-group">
+												<label for="{{ field.id_for_label }}">{{ field.label }}</label>
+												{{ field|add_class:'form-control' }}
+												{% for error in field.errors %}
+												  <span class="help-block">{{ error }}</span>
+												{% endfor %}
+											  </div>
+											{% endfor %}
+												<div class = "col-sm-12 mt-3">
+													<div class = "text-center">
+														<input class = "btn btn-primary" name = "ship_form" type="submit" value = "Save Shipping Address"></button>
+													</div>			
+												</div>										
+											</form>
+										</div>
+									</div>
+									{% endif %}
+
+									{% if billing_form %}
+									<div class="col-sm-12 col-md-6">
+										<div class="card">
+											<form id = "bill_addr_form" method = "post">
+												{% csrf_token %}
+											<h3><strong>Your Billing Address</strong></h3>
+
+											{% for hidden in billing_form.hidden_fields %}
+											  {{ hidden }}
+											{% endfor %}
+
+											{% for field in billing_form.visible_fields %}
+											  <div class="form-group">
+												<label for="{{ field.id_for_label }}">{{ field.label }}</label>
+												{{ field|add_class:'form-control' }}
+												{% for error in field.errors %}
+												  <span class="help-block">{{ error }}</span>
+												{% endfor %}
+												</div>
+											{% endfor %}
+												<div class = "col-sm-12 mt-3">
+													<div class = "text-center">
+														<input class = "btn btn-primary" name = "bill_form" type="submit" value = "Save Biling Address"></button>
+													</div>			
+												</div>										
+											</form>
+										</div>
+									</div>
+								{% endif %}
+								</div>
+							</div>
+							<div class="tab-pane fade" id="nav-about" role="tabpanel" aria-labelledby="nav-about-tab">
+								{% if egift_giver %}
+								<div class="col-sm-12 col-md-6" style="overflow: auto;">
+									<div class="card">
+										<h3> <strong>You have bought following eGifts</strong></h3>
+										{% for eg in egift_giver %}
+										<div class="form-group">
+											<label for="">
+												Order No. {{eg.gift_rec_id}}, dated {{eg.gift_date}}, bought for {{eg.receiver_name}} 
+												<a class = "btn btn-link" href = "{% url 'egift_card_review' eg.gift_rec_id %}">
+													<i class = "fa fa-ellipsis-h"></i>
+												</a>
+											</label>
+										</div>
+										{% endfor %}
+									</div>
+								</div>
+								{% endif %}
+								{% if egift_receiver %}
+								<div class="col-sm-12 col-md-6" style="overflow: auto;">
+									<div class="card">
+										<h3> <strong>You have received following eGifts</strong></h3>
+										{% for eg in egift_receiver %}
+										<div class="form-group">
+											<label for="">
+												Voucher Code: <strong>{{eg.voucher.voucher_code}}</strong>, Gift Amount: {{eg.gift_amount}}
+												{% if egift_redemption %}
+													<br/>Redemptions:<br/>
+													{% for er in egift_redemption %}
+														{% if eg.gift_rec_id == er.egift_id %}
+															Amount: {{er.redemption_amount|floatformat}}, {{er.redemption_date}}<br />
+														{% endif %}
+													{% endfor %}
+												{% endif %}
+												
+											</label>
+										</div>
+										{% endfor %}									
+									</div>
+								</div>
+								{% endif %}
+							</div>
+						</div>
+					
+					</div>
+				</div>
+			</section>
+		</div>
+	
+	{% endblock sitecontent %}
+
+	
+	{% block jscripts %}
+
+	{% endblock jscripts %}
+			
+	

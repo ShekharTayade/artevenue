@@ -102,6 +102,11 @@ def show_frame_my_art(request):
 	
 	return {'show_frames':show_frames, 'ecom_site':ecom}	
 
+@register.inclusion_tag('artevenue/pick_your_style.html')	
+def pick_style():
+	return {}
+
+
 @register.inclusion_tag('artevenue/show_create_your_space.html')
 def show_create_your_space(request):
 	ecom = get_object_or_404 (Ecom_site, store_id=settings.STORE_ID )
@@ -120,4 +125,9 @@ def show_curated_collections():
 	'''Get trending categories'''
 	#featured_cat = Stock_image_category.objects.filter(featured_collection = True)	
 	
+	return {}
+	
+	
+@register.inclusion_tag('artevenue/best_sellers.html')
+def best_sellers():
 	return {}

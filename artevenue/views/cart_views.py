@@ -14,6 +14,8 @@ import datetime
 from decimal import Decimal
 import json
 
+from ipaddr import client_ip
+
 from artevenue.models import Cart, Stock_image, User_image, Stock_collage, Original_art, Cart_item
 from artevenue.models import Product_view, Promotion, Order, Voucher, Voucher_user, Cart_item_view
 from artevenue.models import Cart_user_image, Cart_stock_image, Cart_stock_collage, Cart_original_art
@@ -70,7 +72,7 @@ def show_cart(request):
 			'acrylic_id', 'mount_size', 'product__name', 'image_width', 'image_height', 'stretch_id', 'board_id',
 			'product__thumbnail_url', 'cart_id', 'promotion__discount_value', 'promotion__discount_type', 'mount__color',
 			'item_unit_price', 'item_sub_total', 'item_disc_amt', 'item_tax', 'item_total', 'product_type',
-			'product__image_to_frame', 'promotion_id'
+			'product__image_to_frame', 'promotion_id', 'moulding__width_inner_inches', 'product__description'
 			).order_by('product_type')
 
 	except Cart.DoesNotExist:
@@ -282,6 +284,7 @@ def add_to_cart(request):
 	disc_amt = price['disc_amt']
 	disc_applied = price['disc_applied']
 	promotion_id = price['promotion_id']
+	
 	#####################################
 	# END::::    Get the item price
 	#####################################	
@@ -456,6 +459,7 @@ def add_to_cart(request):
 			usercart.voucher_disc_amount = Decimal(voucher_disc_amount)
 			usercart.cart_disc_amt = usercart.cart_disc_amt + disc_amt
 			#usercart.cart_sub_total = usercart.cart_sub_total + item_sub_total
+			usercart.cart_unit_price = cart_sub_total
 			usercart.cart_sub_total = cart_sub_total
 			#usercart.cart_tax  = usercart.cart_tax + item_tax
 			usercart.cart_tax  = cart_tax
@@ -744,6 +748,7 @@ def add_to_cart(request):
 				referral = None,
 				referral_disc_amount = 0,
 				quantity =  qty,
+				cart_unit_price = unit,
 				cart_sub_total = item_sub_total,
 				cart_disc_amt = disc_amt,
 				cart_tax  = item_tax,
@@ -898,6 +903,7 @@ def add_to_cart(request):
 			err_flg = True
 			msg = 'Apologies!! We had a system issue. Please use the "Contact Us" link at the bottom of this page and let us know. We will be glad to help you.'
 	
+	
 	return( JsonResponse({'msg':msg, 'cart_qty':cart_qty, 'err_flg':err_flg}, safe=False) )
 		
 @csrf_exempt		
@@ -957,7 +963,7 @@ def update_cart_item(request):
 	item_unit_price = item_unit_price
 	
 	# Calculate tax and sub_total
-	item_sub_total = ( item_total / (1 + (tax_rate/100)) )
+	item_sub_total = round( ( item_total / (1 + (tax_rate/100)) ), 2)
 	item_tax = item_total - item_sub_total
 	#############################################################
 	
@@ -1178,25 +1184,19 @@ def delete_cart_item(request):
 	# Get related order
 	order = Order.objects.filter( cart = cart ).first()
 	order_item = {}
-
+	
 	if order:
 		order_item = Order_items_view.objects.filter(
 					order = order,
 					product_id = cart_item.product_id,
 					product_type_id = cart_item.product_type_id,
 					moulding = cart_item.moulding,
-					moulding_size = cart_item.moulding_size,
-					item_total = cart_item.item_total,
 					print_medium = cart_item.print_medium,
-					print_medium_size = cart_item.print_medium_size,
 					mount = cart_item.mount,
 					mount_size = cart_item.mount_size,
 					board = cart_item.board,
-					board_size = cart_item.board_size,
 					acrylic = cart_item.acrylic,
-					acrylic_size = cart_item.acrylic_size,
 					stretch = cart_item.stretch,
-					stretch_size = cart_item.stretch_size,
 					image_width = cart_item.image_width,
 					image_height = cart_item.image_height 
 				).first()	
@@ -1226,6 +1226,7 @@ def delete_cart_item(request):
 			ci = Cart_stock_collage.objects.get(cart_item_ptr_id = cart_item.cart_item_id)
 		if cart_item.product_type_id == 'ORIGINAL-ART':
 			ci = Cart_original_art.objects.get(cart_item_ptr_id = cart_item.cart_item_id)
+
 		ci.delete()	
 			
 		# If this was the last item in the cart then delete the cart as well
@@ -1274,12 +1275,25 @@ def delete_cart_item(request):
 				)
 				o.save()
 
-			cart_total = cart.cart_total - cart_item.item_total
-			
+			# TAX Calculations
+			taxes = get_taxes()
+			#if product exists then it's an image tax
+			if cart_item.product_type_id == 'STOCK-IMAGE' :
+				tax_rate = taxes['stock_image_tax_rate']
+			elif cart_item.product_type_id == 'USER-IMAGE' :
+				tax_rate = taxes['user_image_tax_rate']
+			elif cart_item.product_type_id == 'STOCK-COLLAGE' :
+				tax_rate = taxes['stock_collage_tax_rate']
+			elif cart_item.product_type_id == 'ORIGINAL-ART' :
+				tax_rate = taxes['original_art_tax_rate']
+			elif cart_item.product_type_id == 'FRAME' :
+				tax_rate = taxes['frame_tax_rate']
+
+			'''
 			########################################################
 			#	Get voucher details, if any. Adjust the totals based
 			#	on the applicable voucher amount 
-			########################################################
+			########################################################					
 			voucher_disc_amount = cart.voucher_disc_amount
 			cart_disc_amt = cart.cart_disc_amt - cart_item.item_disc_amt
 			if cart.voucher_id:
@@ -1288,7 +1302,7 @@ def delete_cart_item(request):
 					disc_type = voucher.discount_type
 					disc_value = voucher.discount_value
 					if disc_type == 'PERCENTAGE':
-						voucher_disc_amount = cart_total * voucher.discount_value/100
+						voucher_disc_amount = cart_sub_total * voucher.discount_value/100
 						# Remove old voucher discount and add new 
 						cart_disc_amt = cart_disc_amt - cart.voucher_disc_amount + voucher_disc_amount 
 						cart_total = cart_total - cart.voucher_disc_amount + voucher_disc_amount
@@ -1312,18 +1326,35 @@ def delete_cart_item(request):
 			elif cart_item.product_type_id == 'FRAME' :
 				tax_rate = taxes['frame_tax_rate']
 
+			'''
 			# Reclaculate tax & sub total after applying voucher
+			cart_total = cart.cart_total - cart_item.item_total
 			cart_sub_total = round( cart_total / (1 + (tax_rate/100)), 2 )			
 			cart_tax = cart_total - cart_sub_total
 			
 			# Update cart
 			cart.quantity = cart.quantity - cart_item.quantity
-			cart.cart_disc_amt = cart_disc_amt
+			cart.cart_unit_price = cart.cart_unit_price - cart_item.item_unit_price
+			if cart.voucher_id:
+				cart.voucher_disc_amount = cart.voucher_disc_amount - cart_item.item_disc_amt
+			cart.cart_disc_amt = cart.cart_disc_amt - cart_item.item_disc_amt
 			cart.cart_sub_total = cart_sub_total
 			cart.cart_tax  = cart_tax
 			cart.cart_total = cart_total
 			cart.save()				
-				
+			'''
+			## Update for any existing voucher already applied to cart
+			if cart.voucher_id:
+				voucher = Voucher.objects.get(voucher_id = cart.voucher_id)
+				response = apply_voucher_py_new(request, cart.cart_id, voucher.voucher_code, 
+					cart_total, cart_sub_total, False)
+				res = json.loads(response.content.decode('utf-8'))
+				if res['status'] == 'SUCCESS' or res['status'] == 'SUCCESS-':
+					print('OK')
+				else:
+					msg = "There was an issue while apply your Coupan: " + res['status']
+					err_flg = True
+			'''		
 	except cart.DoesNotExist:
 		msg = "Cart does not exist"
 	
@@ -1601,6 +1632,7 @@ def apply_referral(request, cart_total):
 @csrf_exempt	
 def add_to_cart_new(request):
 
+	today_dt = datetime.datetime.today()
 	err_flg = False
 	msg = "Success" # to return message to the front end
 
@@ -1626,7 +1658,7 @@ def add_to_cart_new(request):
 		moulding_size = rnin
 	else: 
 		moulding_size = None
-	print_medium_id = request.POST.get('print_medium_id', '')
+	print_medium_id = request.POST.get('print_medium_id', 'NA')
 	print_medium_size = Decimal(request.POST.get('print_medium_size', '0'))
 	mount_id = request.POST.get('mount_id', '0')
 	if mount_id == '0' or mount_id == 'None' or mount_id == '':
@@ -1637,6 +1669,10 @@ def add_to_cart_new(request):
 		mount_w_right = Decimal(request.POST.get('mount_w_right', '0'))
 		mount_w_left = Decimal(request.POST.get('mount_w_top', '0'))
 		mount_w_left = Decimal(request.POST.get('mount_w_bottom', '0'))
+		if mount_size > 5 :
+			err_flg = True
+			return( JsonResponse({'msg':'Sorry, mount size should be between 1 and 5 inch', 'cart_qty':qty}, safe=False) )
+		
 	else:
 		mount_size = None
 		mount_w_left = None
@@ -1686,6 +1722,9 @@ def add_to_cart_new(request):
 	#####################################
 
 
+	ip_address = get_ip_addr(request)
+
+
 	#####################################
 	#         Get the item price
 	#####################################
@@ -1716,12 +1755,10 @@ def add_to_cart_new(request):
 	#####################################	
 	if item_unit_price == 0 or item_unit_price is None:
 		err_flg = True
-		return( JsonResponse({'msg':'Price not avaiable for this image', 'cart_qty':qty}, safe=False) )
+		return( JsonResponse({'msg':'Price not available for this image', 'cart_qty':qty}, safe=False) )
 	##################################################
 	# END:	if item price not found, don't add to cart
 	##################################################
-
-
 
 	##################################################
 	#	Get the product object
@@ -1751,7 +1788,7 @@ def add_to_cart_new(request):
 	##################################################
 
 
-
+	
 	########################################################
 	#	Calculate sub total, tax for the item
 	########################################################
@@ -1769,10 +1806,11 @@ def add_to_cart_new(request):
 		tax_rate = taxes['stock_image_tax_rate']
 	if prod.product_type_id == 'FRAME':
 		tax_rate = taxes['frame_tax_rate']	
-		
+	
 	# Calculate tax and sub_total
+	item_unit_price = item_unit_price * qty
 	item_sub_total = round( (item_price*qty) / (1 + (tax_rate/100)), 2 )
-	item_tax = round( (item_price*qty) - item_sub_total )
+	item_tax = round( (item_price*qty) - item_sub_total, 2 )
 	########################################################
 	#	END: Calculate sub total, tax for the item
 	########################################################
@@ -1847,6 +1885,7 @@ def add_to_cart_new(request):
 	#
 	# Get the related cart item, if it's existing
 	########################################################
+	cart_disc_amt = 0
 	cart_item = {}
 	if cart_exists:
 		''' Check if product or user image exists in cart '''
@@ -1884,6 +1923,7 @@ def add_to_cart_new(request):
 	#	Get voucher details, if any. Adjust the totals based
 	#	on the applicable voucher amount 
 	########################################################
+	'''
 	if usercart:
 		voucher_disc_amount = usercart.voucher_disc_amount
 		## if it's the same cart item, then remove earlier discount and add new discount
@@ -1903,13 +1943,16 @@ def add_to_cart_new(request):
 					cart_total = cart_total - usercart.voucher_disc_amount + voucher_disc_amount
 				else:
 					None	# Do nothing, the cash value is already part of cart_disc_amt and cart total already includes that
+	'''
 	########################################################
 	#	END: Apply Voucher, if any
 	########################################################
+
 	
 	########################################################
 	#	Calculate sub total, tax for the CART
 	########################################################
+	'''
 	taxes = get_taxes()
 	if prod.product_type_id == 'STOCK-IMAGE':
 		tax_rate = taxes['stock_image_tax_rate']
@@ -1921,12 +1964,21 @@ def add_to_cart_new(request):
 		tax_rate = taxes['stock_image_tax_rate']
 	if prod.product_type_id == 'FRAME':
 		tax_rate = taxes['frame_tax_rate']	
+	'''
+	## Before tax and vou, referral disc
+	if usercart:
+		if cart_item_flag == 'TRUE' or cart_item :
+			cart_unit_price = item_unit_price
+		else:
+			cart_unit_price = usercart.cart_unit_price + item_unit_price
+	else:
+		cart_unit_price = item_unit_price
 		
-	# Calculate tax and sub_total
-	cart_sub_total = round( (cart_total) / (1 + (tax_rate/100)), 2 )
-	cart_tax = (cart_total) - cart_sub_total
+	# Calculate tax and sub_total(after discount)
+	cart_sub_total = round( (cart_total) / (1 + (tax_rate/100)), 2 ) 
+	cart_tax = round((cart_total) - cart_sub_total, 2)
 	########################################################
-	#	END: Calculate sub total, tax for the item
+	#	END: Calculate sub total, tax for the cart
 	########################################################
 
 	########################################################
@@ -1937,17 +1989,33 @@ def add_to_cart_new(request):
 			## To remove the existing cart item qty and use new qty
 			if cart_item:
 				cart_item_qty = cart_item.quantity 
+				unit_price = usercart.cart_unit_price - cart_item.item_unit_price + item_unit_price
+				disc = usercart.cart_disc_amt
 			else:
 				cart_item_qty = 0
+				unit_price = usercart.cart_unit_price + item_unit_price
+				disc = usercart.cart_disc_amt 
 			uc = Cart.objects.filter(cart_id = usercart.cart_id).update(
-					voucher_disc_amount = voucher_disc_amount,
+					#voucher_disc_amount = voucher_disc_amount,
 					quantity = usercart.quantity - cart_item_qty + qty,
+					cart_unit_price = unit_price,
 					cart_sub_total = cart_sub_total,
-					cart_disc_amt  = cart_disc_amt,
+					cart_disc_amt  = disc,
 					cart_tax  = cart_tax,
 					cart_total = cart_total,
-					updated_date = today
+					updated_date = today_dt,
+					ip_address = ip_address
 				)
+			
+			## Update usercart object to have the latest values
+			usercart.quantity = usercart.quantity - cart_item_qty + qty
+			#usercart.cart_unit_price = cart_unit_price
+			usercart.cart_sub_total = cart_sub_total
+			#usercart.cart_disc_amt  = cart_disc_amt
+			usercart.cart_tax  = cart_tax
+			usercart.cart_total = cart_total
+			usercart.updated_date = today_dt
+			
 		else:
 			## For a new cart, there will not be any voucher or referral discount.
 			## Only amount discount will include will be promotion discount for the
@@ -1961,13 +2029,15 @@ def add_to_cart_new(request):
 				referral = None,
 				referral_disc_amount = 0,
 				quantity =  qty,
+				cart_unit_price = item_unit_price,
 				cart_sub_total = item_sub_total,
-				cart_disc_amt = (item_disc_amt * qty),
+				cart_disc_amt = 0,
 				cart_tax  = item_tax,
 				cart_total = item_price,
 				cart_status = 'AC',
-				created_date = today,
-				updated_date = today
+				created_date = today_dt,
+				updated_date = today_dt,
+				ip_address = ip_address
 			)
 			newusercart.save()	
 	except IntegrityError as e:
@@ -1980,7 +2050,6 @@ def add_to_cart_new(request):
 	########################################################
 	#	END: Update the CART
 	########################################################
-
 
 	########################################################
 	#	Update the CART ITEM
@@ -2018,7 +2087,7 @@ def add_to_cart_new(request):
 		usercartitems.quantity = qty
 		usercartitems.item_unit_price = item_unit_price
 		usercartitems.item_sub_total = item_sub_total
-		usercartitems.item_disc_amt = (item_disc_amt*qty)
+		#usercartitems.item_disc_amt = (item_disc_amt*qty)
 		usercartitems.item_tax  = item_tax
 		usercartitems.item_total = round(item_price*qty)
 		usercartitems.moulding_id = moulding_id
@@ -2035,10 +2104,22 @@ def add_to_cart_new(request):
 		usercartitems.stretch_size = stretch_size
 		usercartitems.image_width = image_width
 		usercartitems.image_height = image_height
-		usercartitems.updated_date =  today
+		usercartitems.updated_date =  today_dt
 
-		usercartitems.save()	
+		usercartitems.save()		
 	
+		## Update for any existing voucher already applied to cart
+		if cart.voucher_id:
+			voucher = Voucher.objects.get(voucher_id = cart.voucher_id)
+			response = apply_voucher_py_new(request, cart.cart_id, voucher.voucher_code, 
+				cart.cart_total, cart.cart_sub_total, False)
+			res = json.loads(response.content.decode('utf-8'))
+			if res['status'] == 'SUCCESS' or res['status'] == 'SUCCESS-':
+				print('OK')
+			else:
+				msg = "There was an issue while apply your Coupan: " + res['status']
+				err_flg = True
+				
 	
 	except IntegrityError as e:
 		err_flg = True
@@ -2071,7 +2152,16 @@ def add_to_cart_new(request):
 
 
 
-def apply_voucher_py_new(request, cart_id, voucher_code, cart_total):
+def apply_voucher_py_new(request, cart_id, voucher_code, cart_total, car_sub_total=0,
+		voucher_use_check=True):
+	## If it's an egift, it's cash, so we just deduct the amount from cart total after
+	## tax.
+	## If it's a voucher, then we deduct it from cart sub total and then apply tax.
+
+	##voucher_use_check is used to determine if a new product is being added on existing
+	## cart with voucher. If so, call this method from add_to_cart_new with 
+	## this argument as false, so this method won't check if the voucher is applied to the cart.
+	
 	status = "SUCCESS"	
 	if voucher_code == '':
 		return JsonResponse({"status":"INVALID-CODE"})
@@ -2092,30 +2182,47 @@ def apply_voucher_py_new(request, cart_id, voucher_code, cart_total):
 	############################################	
 	if user is not None:
 		try:
-			eGift = Egift.objects.get(voucher = voucher, receiver = user)		
+			eGift = Egift.objects.get(voucher = voucher, receiver_email = user.email)		
 		except Egift.DoesNotExist:
 			eGift = {}
 	else:
 		eGift = {}	
 	############################################
 	## END: Get eGift record for logged in user
-	############################################	
-
+	############################################
 
 	############################################
 	## Get the active cart and any voucher disc 
 	## already applied
 	############################################	
-	cart = Cart.objects.filter(cart_id = cart_id, cart_status = "AC").first()	
+	cart = Cart.objects.filter(cart_id = cart_id, cart_status = "AC").first()
+	#cart_items = Cart_item_view.objects.filter(cart_id = cart_id)
 	# Check if voucher discount is already applied to cart
 	if cart.voucher_disc_amount:
 		applied_disc = cart.voucher_disc_amount
 	else:
 		applied_disc = 0
-	############################################
+	#################################################
 	## END:  Get the active cart and any voucher disc 
 	## already applied
-	############################################	
+	#################################################
+
+	#############################################
+	## Check if voucher is already applied, 
+	## if it's already used and then return
+	############################################
+	if voucher_use_check:
+		if cart.voucher:
+			if cart.voucher.voucher_code == voucher_code:
+				return JsonResponse({"status":"USED"})
+			else:
+				if cart.voucher:
+					return JsonResponse({"status":"ONLY-ONE"})		
+	#############################################
+	## END: Check if voucher is already applied, 
+	## if it's already used and then return
+	############################################
+
 	
 
 	#############################################
@@ -2131,7 +2238,7 @@ def apply_voucher_py_new(request, cart_id, voucher_code, cart_total):
 			return JsonResponse({"status":"USED"})		
 		if voucher_user.user != user:
 			return JsonResponse({"status":"USER-MISMATCH"})
-		if voucher_user.expiry_date < today.date():
+		if voucher.effective_to < today:
 			return JsonResponse({"status":"EXPIRED"})
 	#############################################
 	## END: Check if voucher applies to the user, 
@@ -2144,7 +2251,10 @@ def apply_voucher_py_new(request, cart_id, voucher_code, cart_total):
 	############################################	
 	disc_type = voucher.discount_type
 	disc_amount = 0
+	cart_sub_total = 0
+	cart_tax = 0
 	new_cart_total = 0
+	new_cart_sub_total = 0
 	voucher_bal_amount = 0
 	avl_disc_amount = 0
 	total_disc_amount = 0
@@ -2170,7 +2280,7 @@ def apply_voucher_py_new(request, cart_id, voucher_code, cart_total):
 			avl_disc_amount = 0
 			status = 'NO-MORE'
 		else:
-			avl_disc_amount = round(eGift.gift_amount - total_redemption - applied_disc)
+			avl_disc_amount = eGift.gift_amount - total_redemption - applied_disc
 
 		# Limit discount to total cart value
 		if avl_disc_amount > cart.cart_total: 
@@ -2180,8 +2290,29 @@ def apply_voucher_py_new(request, cart_id, voucher_code, cart_total):
 		else:
 			disc_amount = avl_disc_amount
 			new_cart_total = round(cart.cart_total - disc_amount)
-			
-		total_disc_amount = round(disc_amount + applied_disc)
+			'''
+			########################
+			########################
+			########################
+			########################
+			cart_sub_total = round(cart.cart_sub_total - disc_amount)
+			taxes = get_taxes()
+			####################################################
+			### How to apply tax if a cart contains different 
+			### product types such as STOCK IMAGE and USER IMAGE,
+			### both have different tax rates
+			####################################################						
+			tax_rate = taxes['stock_image_tax_rate']
+			cart_tax = round( (cart_sub_total * tax_rate / 100 ), 2 )
+			# Reclaculate tax & cart total after applying discount
+			new_cart_total = cart_sub_total + cart_tax
+			cart_tax = new_cart_total - cart_sub_total
+			########################
+			########################
+			########################
+			########################			
+			'''
+		total_disc_amount = disc_amount + applied_disc
 		voucher_bal_amount = eGift.gift_amount - total_redemption - total_disc_amount
 
 	## If it's not eGift, then it has to be an all appliable voucher.
@@ -2193,42 +2324,54 @@ def apply_voucher_py_new(request, cart_id, voucher_code, cart_total):
 			#	return JsonResponse({"status":"USED"})
 
 			## Check one time use
-			used_voucher = Voucher_used.objects.filter( voucher = voucher,
-				user = user)
-			if used_voucher:
-				return JsonResponse({"status":"USED"})
+			if voucher_use_check:
+				used_voucher = Voucher_used.objects.filter( voucher = voucher,
+					user = user)
+				if used_voucher:
+					return JsonResponse({"status":"USED"})
 				
 			## For all "applicable vouchers" only allowed disc type is %
 			if disc_type == "PERCENTAGE":
 				##if there is any voucher already in cart, remove the amount
 				if cart.voucher_disc_amount > 0:
-					cart_total = cart.cart_total + cart.voucher_disc_amount
+					cart_sub_total = round(cart.cart_sub_total + cart.voucher_disc_amount, 2)
 				else:
-					cart_total = cart.cart_total
+					cart_sub_total = cart.cart_sub_total
 				## Calculate discount amount and new cart total
-				disc_amount = cart_total * voucher.discount_value/100
-				new_cart_total = round(cart_total - ( cart_total * voucher.discount_value/100 ))
+				disc_amount = round(cart_sub_total * voucher.discount_value/100, 2)
+				new_cart_sub_total = round(cart_sub_total - ( cart_sub_total * voucher.discount_value/100 ), 2)
+				total_disc_amount =  disc_amount
 				voucher_bal_amount =  0
 			elif disc_type == "CASH":
-				None 
-				
-			if new_cart_total < 0:
+				None
+				######new_cart_sub_total = cart.cart_sub_total 
+				######total_disc_amount =  disc_amount + applied_disc
+			if new_cart_sub_total < 0:
 				# Limit the discount to the total cart value
-				new_cart_total = 0
-			total_disc_amount = round(disc_amount)
+				new_cart_sub_total = 0
+			
 		else:
 			return JsonResponse({"status":"DOESNOT-APPLY"})
-	#############################################
-	## END: Process eGift or Voucher transactions 
-	############################################	
 
+		taxes = get_taxes()
+		####################################################
+		### How to apply tax if a cart contains different 
+		### product types such as STOCK IMAGE and USER IMAGE,
+		### both have different tax rates
+		####################################################						
+		tax_rate = taxes['stock_image_tax_rate']
 
+		# Reclaculate tax & sub total after applying discount
+		#cart_sub_total = round( new_cart_total / (1 + (tax_rate/100)), 2 )
+		#cart_tax = new_cart_total - cart_sub_total
+		cart_tax =  round((new_cart_sub_total * tax_rate)/100 ,2)
+		new_cart_total = round(new_cart_sub_total + cart_tax)
 
 	#############################################
 	## Update cart and cart item. 
 	## Order, order item, if any, will get updated
 	## when user navigates to order pages
-	############################################	
+	############################################
 	if cart :		
 		try:
 			c = Cart (
@@ -2241,15 +2384,19 @@ def apply_voucher_py_new(request, cart_id, voucher_code, cart_total):
 				referral = cart.referral,
 				referral_disc_amount = cart.referral_disc_amount,
 				quantity = cart.quantity,
-				cart_sub_total = cart.cart_sub_total,
+				cart_unit_price = cart.cart_unit_price,
+				cart_sub_total = new_cart_sub_total,
 				cart_disc_amt  = cart.cart_disc_amt - cart.voucher_disc_amount + total_disc_amount,
-				cart_tax  = cart.cart_tax,
+				cart_tax  = cart_tax,
 				cart_total = new_cart_total,
 				created_date = cart.created_date,
 				updated_date =  today,
 				cart_status = cart.cart_status
 			)
 			c.save()
+
+			## Update cart amounts based on the voucher applied.
+			update_cart_voucher_amounts(request, cart_id)
 
 			# if there is no more balance left in voucher, then update the 
 			# voucher as used.
@@ -2261,13 +2408,18 @@ def apply_voucher_py_new(request, cart_id, voucher_code, cart_total):
 						user = voucher_user.user,
 						effective_from = voucher_user.effective_from,
 						effective_to = voucher_user.effective_to,
-						used_date = today
+						used_date = today,
+						created_date = voucher_user.created_date,
+						updated_date = today
 					)
 					v.save()
 
 		except Error as e:
 			status = 'INT-ERR'
 
+	#############################################
+	## END: Process eGift or Voucher transactions 
+	############################################	
 	return JsonResponse({"status":status, 'disc_amount': total_disc_amount, 
 				'cart_total':new_cart_total, 'voucher_bal_amount':voucher_bal_amount,
 				'cart_disc_amt':cart.cart_disc_amt, 'disc_type':disc_type})
@@ -2357,7 +2509,7 @@ def validatePromotions(request):
 						
 					# Calculate tax and sub_total
 					item_sub_total = round( total_price / (1 + (tax_rate/100)), 2 )
-					item_tax = total_price - item_sub_total
+					item_tax = round(total_price - item_sub_total,2)
 					
 					#############################################################
 					## update cart item and cart
@@ -2443,3 +2595,138 @@ def validatePromotions(request):
 								updated_date = today
 							) 
 	return change_flag
+	
+
+
+############################################################################
+## When a voucher is applied to a cart, this method calculates and updates
+## the cart item sub total, discount amount, tax and item total AND
+## cart sub total, tax and cart total.
+## Execute this method every time a voucher is applied or there is a change
+## to any of the amounts of cart item or cart
+############################################################################
+def update_cart_voucher_amounts(request, cart_id):
+	cart = Cart.objects.get(cart_id = cart_id, cart_status = "AC")
+
+	cart_sub_total = 0
+	cart_tax = 0
+	cart_total = 0
+	
+	######################################################################
+	## Check for any voucher applied & proceed only if voucher is applied
+	######################################################################
+	if cart.voucher_id:
+		cart_items = Cart_item_view.objects.filter(cart_id = cart_id)
+
+		## Get taxes
+		taxes = get_taxes()
+
+		## Summation of all item sub totals (unit_price - disc_amt)
+		c_sub = cart_items.aggregate(Sum('item_sub_total'))
+		if c_sub['item_sub_total__sum']:
+			cart_sub = c_sub['item_sub_total__sum']
+		else:
+			cart_sub = 0
+		
+		################################################################
+		## For each item, we look at how much percentage of cart level
+		## sub total is each item sub total and then subtract that much
+		## amount from item sub total
+		################################################################		
+		for ci in cart_items:
+			#####################################
+			#         Get the item price
+			#####################################
+			price = get_prod_price(ci.product_id, 
+					prod_type=ci.product_type_id,
+					image_width=ci.image_width, image_height=ci.image_height,
+					print_medium_id = ci.print_medium_id,
+					acrylic_id = ci.acrylic_id,
+					moulding_id = ci.moulding_id,
+					mount_size = ci.mount_size,
+					mount_id = ci.mount_id,
+					board_id = ci.board_id,
+					stretch_id = ci.stretch_id)
+			total_price = price['item_price']
+			msg = price['msg']
+			cash_disc = price['cash_disc']
+			percent_disc = price['percent_disc']
+			item_unit_price = price['item_unit_price']
+			disc_amt = price['disc_amt']
+			disc_applied = price['disc_applied']
+			promotion_id = price['promotion_id']
+			#####################################
+			# END::::    Get the item price
+			#####################################	
+
+			## Get applicable tax rate
+			if ci.product_type_id == 'STOCK-IMAGE':
+				tax_rate = taxes['stock_image_tax_rate']
+			if ci.product_type_id == 'USER-IMAGE':
+				tax_rate = taxes['user_image_tax_rate']
+			if ci.product_type_id == 'STOCK-COLLAGE':
+				tax_rate = taxes['stock_collage_tax_rate']
+			if ci.product_type_id == 'ORIGINAL-ART':
+				tax_rate = taxes['original_art_tax_rate']
+
+
+			# Calculate tax and sub_total
+			# total price below includes the promotion discount, if any
+			item_sub_total = round( (total_price*ci.quantity) / (1 + (tax_rate/100)), 2 )
+			item_tax = round(total_price - item_sub_total, 2)
+		
+			## Get the percentage of item subtotal of cart subtotal
+			voucher = Voucher.objects.get(voucher_id = cart.voucher_id)
+			if voucher.discount_type == 'PERCENTAGE':
+				perc = voucher.discount_value
+				## Add the voucher discount 
+				item_disc_amt = disc_amt + (item_sub_total * perc / 100)
+				## Now apply that much percentage of voucher discount to this item
+				item_sub_total = round( item_sub_total - (item_sub_total * perc / 100), 2 )				
+			else:
+				perc = item_sub_total * 100 / cart_sub
+				## Add the voucher discount 
+				item_disc_amt = disc_amt + (cart.voucher_disc_amount * perc / 100)
+				## Now apply that much percentage of voucher discount to this item
+				item_sub_total = round( item_sub_total - (cart.voucher_disc_amount * perc / 100), 2)
+			
+					
+			# Calculate tax and sub_total
+			item_tax = round((item_sub_total * tax_rate) / 100, 2)
+			item_total = round(item_sub_total + item_tax)
+			
+			# Update cart item
+			if ci.product_type_id == 'STOCK-IMAGE':
+				c = Cart_stock_image.objects.filter(cart_item_id = ci.cart_item_id).update(
+					item_sub_total = item_sub_total, item_tax = item_tax,
+					item_disc_amt = item_disc_amt, item_total = item_total)
+			if ci.product_type_id == 'USER-IMAGE':
+				c = Cart_user_image.objects.filter(cart_item_id = ci.cart_item_id).update(
+					item_sub_total = item_sub_total, item_tax = item_tax,
+					item_disc_amt = item_disc_amt, item_total = item_total)
+			if ci.product_type_id == 'STOCK-COLLAGE':
+				c = Cart_stock_collage.objects.filter(cart_item_id = ci.cart_item_id).update(
+					item_sub_total = item_sub_total, item_tax = item_tax,
+					item_disc_amt = item_disc_amt, item_total = item_total)
+			if ci.product_type_id == 'ORIGINAL-ART':
+				c = Cart_original_art.objects.filter(cart_item_id = ci.cart_item_id).update(
+					item_sub_total = item_sub_total, item_tax = item_tax,
+					item_disc_amt = item_disc_amt, item_total = item_total)
+
+			## Cart level amounts
+			cart_sub_total = cart_sub_total + item_sub_total
+			cart_tax = cart_tax + item_tax
+			cart_total = cart_total + item_total
+
+		## Update cart sub total, tax and total
+		c = Cart.objects.filter(cart_id = cart_id).update(
+			cart_sub_total = cart_sub_total,
+			cart_tax = cart_tax,
+			cart_total = cart_total
+			)
+			
+	return 
+				
+def get_ip_addr(request):
+	ipaddr = client_ip(request)
+	return ipaddr

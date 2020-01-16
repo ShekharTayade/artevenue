@@ -1,0 +1,103 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block page-title %}
+<title>Create Artist profile | Create Artist profile on Arte'Venue</title>
+{% endblock page-title %}
+
+{% block page-description %}
+<meta name="description" content="Create your artist profile using this webpage.">
+{% endblock page-description %}
+
+{% block page-keywords %}  
+<meta name="keywords" content="platform for artist, artist profile, showcase artists">
+{% endblock page-keywords %}  
+
+{% block page-author %}  
+<meta name="author" content="Arte'venue">
+{% endblock page-author %}  
+
+{% block add_to_head %}
+   <script src="//cdn.tinymce.com/4/tinymce.min.js"></script>
+   <script>tinymce.init({ selector:'textarea' });</script>
+{% endblock add_to_head %}
+
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+
+	
+    <div class="container">
+		<div class="row mt-3">
+			<div class = "col-4" style = "border:1px solid #ced4da; border-radius: 0.25rem; padding:15px;">
+				<div class = "row">
+					<div class = "col-5">
+						<form id = "img-form" method = "post" enctype='multipart/form-data'>										
+							{% csrf_token %}
+						<!-- <span id = "artist"> Click browse button to select an image</span> -->
+						<div class = "btn btn-default btn-file" style = "border:2px solid gainsboro;">
+							<input name="image_to_frame" class="form-control" id="user_image" onchange = "$('#upld_btn').click()" type="file" accept="image/png, image/jpeg, image/gif, image/bmp" required>
+							<img src = "{% static 'img/upload_icon1.png' %}"><br /> Upload<input hidden name="user_id" syle = "display:none;" class="form-control" id="user_id" value = "{{request.user}}">
+						</div>
+						<button hidden id= "upld_btn" class="btn btn-primary" type = "submit" > <i class = "fa fa-upload"></i> Upload </button>
+						</form>
+					</div>
+					<div class = "col-7">
+						<span style = "color:#696969;">Upload your profile picture</span>
+					</div>
+				</div>
+				<!-- <img class="img-thumbnail img-display pull-right" src="{% if artist.profile_photo %} {{artist.profile_photo.url}} {% endif %}" alt="Photo"> -->
+			</div>
+			<div class="col-5">
+				<input id='profile_name' name='profile_name' maxlength="500" class = "form-control"
+					placeholder="Name as you wish to display" value = "{{artist.profile_name}}" required>
+				<input id='profile_tagline' name='profile_tagline' maxlength="500" class = "form-control"
+					placeholder="A tag line you may want to include" value = "{{artist.profile_tagline}}">
+			</div>
+		</div>
+		<div class="row mt-3">
+			<div class="col-12">
+				PROFILE:
+			</div>
+		</div>
+		<div class="row mt-3">
+			<div class="col-12">
+				<textarea >Input your profile here. You have 2000 characters limit.</textarea>
+			</div>
+		</div>
+		<div class="row mt-3 mb-5"  style = "background-color:#11b6bd; color:#fff; padding:10px;">
+			<div class="col-12">
+				<div class = "text-left">
+					<a href = "" style = "color:#fff;">											
+						<i class = "fa fa-save fa-lg">
+						</i>
+						SAVE
+					</a>
+				</div>
+				<div class = "text-center">
+					<a href = "" style = "color:#fff;">					
+						PREVIEW
+						<i class = "fa fa-eye fa-lg">
+						</i>
+					</a>
+				</div>
+				<div class = "text-right">
+					<a href = "" style = "color:#fff;">					
+						NEXT
+						<i class = "fa fa-caret-square-o-right fa-lg">
+						</i>
+					</a>
+				</div>
+			</div>
+		</div>
+    </div>
+
+	
+	{% endblock sitecontent %}
+
+	
+	{% block jscripts %}
+		
+	{% endblock jscripts %}
+			
+	

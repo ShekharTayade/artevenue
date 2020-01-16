@@ -1,8 +1,10 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from artevenue.models import Business_profile, Contact_us, User_image, Pin_code, Referral
-from artevenue.models import User_shipping_address, User_billing_address, Profile_group, Egift
+from artevenue.models import Business_profile, Contact_us, User_image
+from artevenue.models import Pin_code, Referral, Order, UserProfile
+from artevenue.models import User_shipping_address, User_billing_address
+from artevenue.models import Profile_group, Egift, Channel_order_amz
 from artevenue.validators import validate_artevenue_email, validate_contact_name
 from artevenue.validators import validate_image_size, validate_india_mobile_no
 from django.core.validators import validate_slug, MinLengthValidator
@@ -41,9 +43,21 @@ class businessuserForm(UserCreationForm):
 
         
 class businessprofile_Form(forms.ModelForm):
+	business_code = forms.CharField(
+		widget=forms.TextInput(attrs={'placeholder': 'Enter your business code (8 char max)'}),
+		required=False,
+		max_length=8,
+		error_messages={'unique':"This code has already been used. Please choose another code."},
+		help_text = "This is the code that you can give to your clients to earn the referral fee. It is unique to you and must be quoted by clients when they sign up with Arte'Venue."
+	) 
+
+	company = forms.CharField(
+		widget=forms.TextInput(),
+		required=True
+	)	
 	address_1 = forms.CharField(
 		widget=forms.TextInput(attrs={'placeholder': 'Suit / Floor / Building'}),
-		required=False
+		required=True
 	) 
 
 	address_2 = forms.CharField(
@@ -53,18 +67,18 @@ class businessprofile_Form(forms.ModelForm):
 
 	pin_code = forms.CharField(
 		widget=forms.TextInput(),
-		required=False
+		required=True
 	)	
 
 	city = forms.CharField(
 		widget=forms.TextInput(),
-		required=False
+		required=True
 	)	
 	
 	phone_number= forms.CharField( widget=forms.TextInput(
 		attrs={'placeholder': 'Enter your 10 digit mobile number without prefix +91, or 0.'}
 		),
-		required=False,
+		required=True,
 		validators=[validate_india_mobile_no]
 	)	
 	
@@ -77,10 +91,13 @@ class businessprofile_Form(forms.ModelForm):
 			pincodeObj = None
 
 		return pincodeObj
-    
+ 
+	def clean_business_code(self):
+		return self.cleaned_data['business_code'] or None 
+		
 	class Meta:
 		model = Business_profile
-		fields = ('contact_name', 'phone_number', 'company', 'address_1', 'address_2',
+		fields = ('business_code', 'contact_name', 'phone_number', 'company', 'address_1', 'address_2',
 			'city', 'state', 'pin_code', 'country','gst_number',
 			'bank_name', 'bank_branch', 'bank_acc_no', 'ifsc_code')
 
@@ -96,10 +113,11 @@ class contactUsForm(forms.ModelForm):
 		required=False,
 		validators=[validate_india_mobile_no]
 	)
-    
+	    
 	class Meta:
 		model = Contact_us
-		fields = '__all__'
+		fields = ( 'first_name', 'last_name', 'email_id', 'phone_number', 'subject',
+			'message' )		
         
 class User_imageForm(forms.ModelForm):
 	image_to_frame = forms.ImageField(
@@ -112,6 +130,11 @@ class User_imageForm(forms.ModelForm):
 
         
 class businessprof_Form(forms.ModelForm):
+	business_code = forms.CharField(
+		widget=forms.TextInput(attrs={'placeholder': 'Enter your business code (8 char max)'}),
+		required=False,
+		help_text = "This is the code that you can give to your clients to earn the referral fee. It is unique to you and must be quoted by clients when they sign up with Arte'Venue."
+	) 
 	address_1 = forms.CharField(
 		widget=forms.TextInput(attrs={'placeholder': 'Suit / Floor / Building'}),
 		required=False
@@ -163,7 +186,7 @@ class businessprof_Form(forms.ModelForm):
 		
 	class Meta:
 		model = Business_profile
-		fields = ('id', 'contact_name', 'phone_number', 'company', 
+		fields = ('id', 'business_code', 'contact_name', 'phone_number', 'company', 
 			'address_1', 'address_2',
 			'city', 'state', 'pin_code', 'country','gst_number',
 			'bank_acc_no', 'ifsc_code', 'bank_name', 'bank_branch')		
@@ -185,6 +208,7 @@ class userForm(forms.ModelForm):
 		widget=forms.EmailInput(attrs={'readonly':'readonly'}),
 		#disabled=True
 		)	
+	
 	last_login = forms.DateTimeField( 
 		required=True, 
 		widget=forms.DateTimeInput(attrs={'readonly':'readonly'}),
@@ -381,4 +405,75 @@ class egiftForm(forms.ModelForm):
 		if self.user.email == email_id :
 			raise ValidationError("Please don't gift yourself :-)")
 		return email_id
-		
+
+
+class OrderStatusUpdate(forms.ModelForm):		
+	order_number = forms.CharField(max_length=2000, 
+			label='Order Number:',
+			widget = forms.TextInput(attrs={'readonly':'readonly'}))
+	order_date = forms.DateField( 
+			label='Order Date:',
+			widget = forms.TextInput(attrs={'readonly':'readonly'}))
+			
+	order_id = forms.CharField(
+		label='',
+		widget=forms.HiddenInput(),
+		required=True,
+		)
+				
+	class Meta:
+		model = Order
+		fields = ['order_number', 'order_date','order_status', 'order_id']
+	
+'''
+class Amzon_artevenue_orders_list(forms.ModelForm):
+	id = forms.CharField(
+		widget=forms.HiddenInput(),
+		required=False
+	)
+
+	class Meta:
+		model = Channel_order_amz
+		fields = ['id', 'order_id', 'artevenue_order_date', 'amazon_order_no',
+			'amazon_order_date', 'buyer_full_name', 'total']
+'''
+
+class userProfileForm(forms.ModelForm):
+	user_id = forms.CharField(
+		widget=forms.HiddenInput(),
+		required=False,
+	) 	
+	phone_number= forms.CharField( widget=forms.TextInput(
+		attrs={'placeholder': 'Enter your 10 digit mobile number without prefix +91, or 0'}
+		),
+		required=False,
+		validators=[validate_india_mobile_no]
+	)	
+	date_of_birth = forms.DateField(input_formats = ['%Y-%m-%d','%m/%d/%Y','%m/%d/%y'],
+			widget=forms.DateInput(attrs={'placeholder': 'May be you will get lucky on your birthday :)'},),
+			required=False
+		)
+	subject_interests = forms.CharField( widget=forms.TextInput(
+		attrs={'placeholder': 'Tell us about the art subjects you are interested in'}
+		),
+		required=False,
+	)
+	business_referral_code= forms.CharField( widget=forms.TextInput(
+		attrs={'placeholder': 'If you have, enter business referral code'}
+		),
+		max_length = 8,
+		required=False,
+	)	
+	business_profile_id = forms.CharField(
+		widget=forms.HiddenInput(),
+		required=False,
+	) 	
+	id = forms.IntegerField(
+		widget=forms.HiddenInput(),
+		required=False,
+	) 	
+
+	class Meta:
+		model = UserProfile
+		fields = ('id', 'user_id', 'phone_number', 'date_of_birth', 'gender', 
+			'subject_interests', 'business_profile_id')

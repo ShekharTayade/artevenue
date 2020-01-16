@@ -23,16 +23,11 @@
 
 <script>
 
-		function getFramedImg (prod_id, image_width, moulding_id, mount_color, mount_size, prod_url) {
-
-			//if (moulding_id == "None" || moulding_id == '') {
-			//	document.getElementById("disp-img").src = prod_url;
-			//	$("#show-prod").modal('show');
-			//} else {
+		function getFramedImg (prod_id, prod_type='STOCK-IMAGE', image_width, moulding_id, mount_color, mount_size, prod_url) {
 				// Get the framed image
 				$.ajax({
 						url: "{% url 'get_framed_image' %}", 
-						data: {'prod_id':prod_id, 'moulding_id': moulding_id,
+						data: {'prod_id':prod_id, 'prod_type': prod_type, 'moulding_id': moulding_id, 
 								'mount_color':mount_color, 'mount_size':mount_size, 'image_width':image_width
 							}, 
 						dataType: 'text', 
@@ -50,11 +45,6 @@
 		
 		function getFramedUserImg (user_image_id, image_width, moulding_id, mount_color, mount_size, prod_url) {
 
-			//if (moulding_id == "None" || moulding_id == '') {
-			//	document.getElementById("disp-img").src = prod_url;
-			//	$("#show-prod").modal('show');
-			//} else {
-				// Get the framed image
 				$.ajax({
 						url: "{% url 'get_FramedUserImage_by_id' %}", 
 						data: {'user_image_id':user_image_id, 'moulding_id': moulding_id,

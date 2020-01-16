@@ -1,0 +1,321 @@
+{% load static %}
+{% load widget_tweaks %}
+
+<div class = "row">
+	<div class = "col-12">
+		{% for ord in amz_orders %}
+		<div class = "row" style = "background-color:#11b6bd; color:#fff; padding:5px;">
+			<div class = "col-7 col-md-6">
+				Amazon Ord No.: <strong>{{ord.amazon_order_no}}</strong>
+			</div>
+			<div class = "col-5 col-md-6">
+				Dt: {{ord.amazon_order_date|date:'d M y'}}
+				<button class = "btn btn-primary pull-right" onclick = "">
+						<i class = "fa fa-edit"> Edit</i>
+				</button>		
+			</div>
+		</div>
+		<div class = "row">
+			<div class = "col-12 col-md-6">
+			Buyer Name: {{ord.buyer_full_name}}
+			</div>
+		</div>
+		<div class = "row">
+			<div class = "col-7 col-md-6">
+			Email: {{ord.shipping_email_id}}
+			</div>
+			<div class = "col-5 col-md-6">
+			Phone: {{ord.shipping_phone_number}}
+			</div>
+		</div>
+		<hr>
+		<div class = "row">
+			<div class = "col-12 col-md-6">		
+				Shipping Address:
+				<div class = "row">
+					<div class = "col-12 col-md-6">
+						<small>
+							{{ord.shipping_full_name}}
+						</small>	
+					</div>
+				</div>
+				<div class = "row">
+					<div class = "col-6 col-md-6">
+						<small>
+							{{ord.shipping_address_1}}
+						</small>	
+					</div>
+					<div class = "col-6 col-md-6">
+						<small>
+							{{ord.shipping_address_2}}
+						</small>
+					</div>
+				</div>
+				<div class = "row">
+					<div class = "col-12 col-md-6">
+						<small>
+							{{ord.shipping_landmark}}
+						</small>
+					</div>
+				</div>
+				<div class = "row">
+					<div class = "col-6 col-md-6">
+						<small>
+							{{ord.shipping_city}}
+						</small>
+					</div>
+					<div class = "col-6 col-md-6">
+						<small>
+							{{ord.shipping_state}}
+						</small>
+					</div>
+				</div>
+				<div class = "row">
+					<div class = "col-6 col-md-6">
+						<small>
+							{{ord.shipping_pin_code}}
+						</small>
+					</div>				
+				</div>
+			</div>
+			<div class = "col-12 col-md-6">		
+				Billing Address:
+				<div class = "row">
+					<div class = "col-12 col-md-6">
+						<small>
+							{{ord.billing_full_name}}
+						</small>	
+					</div>
+					<div class = "col-12 col-md-6">
+						<small>
+							GST No.:{{ord.gst_number}}
+						</small>	
+					</div>
+				</div>
+				<div class = "row">
+					<div class = "col-6 col-md-6">
+						<small>
+							{{ord.billing_address_1}}
+						</small>	
+					</div>
+					<div class = "col-6 col-md-6">
+						<small>
+							{{ord.billing_address_2}}
+						</small>
+					</div>
+				</div>
+				<div class = "row">
+					<div class = "col-12 col-md-6">
+						<small>
+							{{ord.billing_landmark}}
+						</small>
+					</div>
+				</div>
+				<div class = "row">
+					<div class = "col-6 col-md-6">
+						<small>
+							{{ord.billing_city}}
+						</small>
+					</div>
+					<div class = "col-6 col-md-6">
+						<small>
+							{{ord.billing_state}}
+						</small>
+					</div>
+				</div>
+				<div class = "row">
+					<div class = "col-6 col-md-6">
+						<small>
+							{{ord.billing_pin_code}}
+						</small>
+					</div>				
+				</div>
+			</div>
+		</div>
+		<hr>
+		<div class = "row">
+			<div class = "col-6">	
+				<small>
+				Shipping Mode: {{ord.shipping_mode}}
+				</small>
+			</div>
+			<div class = "col-6">	
+				<small>
+				Shipping Method: {{ord.shipping_method}}
+				</small>				
+			</div>
+		</div>
+		<div class = "row">
+			<div class = "col-6">	
+				<small>
+				Shipped Dt: {{ord.shipped_date|date:'d M y'}}
+				</small>
+			</div>
+			<div class = "col-6">	
+				<small>
+				Delivered Dt: {{ord.delivered_date|date:'d M y'}}
+				</small>
+			</div>
+		</div>
+		<div class = "row">
+			<div class = "col-12">	
+				<small>
+				Tracking No.: 7234627344
+				</small>
+			</div>
+		</div>
+		<hr>
+		<div class = "row">
+			<div class = "col-6">	
+				Qty:  {{ord.quantity}}
+			</div>
+			<div class = "col-6">	
+				Ord Total:  {{ord.total|floatformat}}
+			</div>
+		</div>
+		<div class = "row">
+			<div class = "col-6">	
+				<small>
+				Unit Price:  {{ord.unit_price}}
+				</small>
+			</div>
+			<div class = "col-6">	
+				<small>
+				Disc:  {{ord.disc_amt}}
+				</small>
+			</div>
+		</div>
+		<div class = "row">
+			<div class = "col-6">	
+				<small>
+				Sub Total:  {{ord.sub_total}}
+				</small>
+			</div>
+			<div class = "col-6">	
+				<small>
+				Tax:  {{ord.tax}}
+				</small>
+			</div>
+		</div>
+		<hr>		
+		<div class = "row">
+			<div class = "col-6 col-md-4">
+			Arte'Venue Ord No.:  {{ord.order.order_number}}
+			</div>
+			<div class = "col-6 col-md-6">
+			Dt:  {{ord.order.order_date}}
+			</div>
+		</div>
+		<hr>
+		<div class = "row">
+			<div class = "col-12">
+				<strong>Order Items:</strong>
+			</div>
+		</div>
+		
+		{% for o in order_details %}
+		{% if o.channel_order_amz_id == ord.id %}
+		<div class = "row">
+			<div class = "col-6">	
+				<img src = "{{o.amazon_data.framed_url}}" alt="Image" class = "image-c">
+			</div>
+			<div class = "col-6">	
+				<div class = "row">
+					<div class = "col-12">	
+						<small>
+							SKU: {{o.amazon_data.amazon_sku}}
+						</small>
+					</div>
+					<div class = "col-12">	
+						<small>
+							Amz ASIN: {{o.amazon_data.amazon_ASIN}}
+						</small>
+					</div>
+					<div class = "col-12">	
+						<small>
+							Amz Ord Itm ID: {{o.amazon_data.amazon_order_item_ID}}
+						</small>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+		<div class = "row">
+			<div class = "col-6">	
+				<small>Qty:  {{o.quantity|floatformat}}</small>
+			</div>
+			<div class = "col-6">	
+				<small>Item Total:  {{o.total|floatformat}}</small>
+			</div>
+		</div>
+		<div class = "row">
+			<div class = "col-6">	
+				<small>
+				Unit Price:  {{o.unit_price}}
+				</small>
+			</div>
+			<div class = "col-6">	
+				<small>
+				Disc:  {{o.disc_amt}}
+				</small>
+			</div>
+		</div>
+		<div class = "row">
+			<div class = "col-6">	
+				<small>
+				Sub Total:  {{o.sub_total}}
+				</small>
+			</div>
+			<div class = "col-6">	
+				<small>
+				Tax:  {{o.tax}}
+				</small>
+			</div>
+		</div>
+		<div class = "row">
+			<div class = "col-6">	
+				<small>
+				Print On: {{o.amazon_data.print_medium_name}}
+				</small>
+			</div>
+			<div class = "col-6">	
+				<small>
+				Print Size: {{o.amazon_data.image_width}}" X {{o.amazon_data.image_height}}"
+				</small>
+			</div>
+			{% if o.amazon_data.moulding_name %}
+			<div class = "col-6">	
+				<small>
+				Frame: {{o.amazon_data.moulding_name}} ({{o.amazon_data.moulding.part_number}})
+				</small>
+			</div>
+			<div class = "col-6">	
+				<small>
+				Size: {{o.amazon_data.moulding.width_inches}}"
+				</small>
+			</div>
+			{% endif %}
+			{% if o.amazon_data.mount_name %}
+			<div class = "col-6">	
+				<small>
+				Mount: {{o.amazon_data.mount.name|title}}
+				</small>
+			</div>
+			<div class = "col-6">	
+				<small>
+				Size: {{o.amazon_data.mount_size}}"
+				</small>
+			</div>
+			{% endif %}
+		</div>
+		<hr>
+		{% endif %}
+		{% endfor %}
+		<div class = "row">			
+			<div class = "col-12">
+				<hr class = "hr-thick mb-5">
+			</div>
+		</div>
+		{% endfor %}
+	</div>
+</div>

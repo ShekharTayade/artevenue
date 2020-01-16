@@ -5,8 +5,9 @@
 body{
 	margin:0px;
 	padding:0px;
-	font-family: 'Raleway', sans-serif;
+	font-family: 'Open Sans', sans-serif;
 	font-size:14px;
+    letter-spacing: 0.5px;
 }
 
 a, button, img {
@@ -178,11 +179,11 @@ a, button, img {
 	border-bottom: 1px solid rgba(0, 0, 0, 0.07);
 	padding: .6rem 1rem;
 	font-size: 15px;
-    font-weight: 600;
+    font-weight: 400;
 	letter-spacing: .6px;
 }
 .dropdown-item:focus, .dropdown-item:hover {
-	background-color: #ff9900;
+	background-color: #11b6bd;
     color: #fff;
 }
 
@@ -229,7 +230,7 @@ a.cart_top span {
 }
 
 .main_banner {
-    background-color: #e8e8e8;
+    /*background-color: #e8e8e8;*/
     width: 100%;
 }
 hgroup.hgroup h1 {
@@ -406,15 +407,6 @@ ul.slick-dots li.slick-active button {
 }
 /*tranding end*/
 
-.curated_section{
-	width:100%;
-	display:block;
-	padding-top:10px;
-	padding-bottom:10px;
-	/*background-color:#dbdbdb;*/
-	background-color:#fff;
-	
-}
 
 .curted_pic {
     /*border: 10px solid #fff;*/
@@ -537,6 +529,40 @@ ul.slick-dots li.slick-active button {
 /*    z-index: 1; */
 }
 /*footer start*/
+#footer {
+    padding: 4% 4.6%;
+}
+#footer p.about-us,#footer li,
+#footer ul li a, #footer ul li i,
+#footer ul li .btn{
+    color:#979797;
+    line-height: 1.9em;
+    font-weight: 600;
+    font-size: 13px !important;
+    list-style: none;
+}
+.footer-heading{
+letter-spacing: 2px;
+}
+#footer a{
+    text-decoration: none;
+}
+#footer li i.fa {
+    margin: 0 0px;
+}
+.newsletter{
+    border: 3px solid #777;
+    padding: 30px 15px 20px;
+}
+
+.newsletter .btn{
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.footer-heading, .newsletter h5{
+letter-spacing: 3px;
+}
 .footer{
 	width:100%;
 	display:block;
@@ -703,3 +729,30 @@ ul.footer-social-icon a:hover {
 	color:#ff9900;
 }
 /*footer end*/
+
+
+.free_shipping {
+    background-color: 
+    #fafafa;
+    padding: 50px 30px;
+}
+
+.details {
+    padding: 3% 0% 6% 34%;
+}
+
+.details .shipping_heading {
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 1.7px;
+    margin: 0;
+}
+
+.sign_up_form {
+    margin-top: 5em;
+}
+
+.sign_up_form .sign_up {
+    padding: 13% 8% 15% 9%;
+}
+

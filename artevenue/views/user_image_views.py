@@ -17,7 +17,14 @@ from .frame_views import *
 from .image_views import *
 
 from artevenue.forms import User_imageForm
-from PIL import ExifTags
+from PIL import Image, ExifTags
+
+import requests
+from io import BytesIO
+import base64
+from io import StringIO
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.core.files.base import ContentFile
 
 today = datetime.date.today()
 
@@ -242,3 +249,36 @@ def remove_user_image(request):
 	
 	img_str = ''
 	return HttpResponse(img_str)
+
+@csrf_exempt
+def crop_user_image(request):
+	user_image_id = request.POST.get('user_image_id', '')
+
+	x = request.POST.get('x', '')
+	y = request.POST.get('y', '')
+	width = request.POST.get('width', '')
+	height = request.POST.get('height', '')
+	rotate = request.POST.get('rotate', '')
+	if user_image_id:
+		user_image = User_image.objects.filter(product_id = user_image_id).first()
+		
+		img=Image.open(user_image.image_to_frame)		
+		if rotate != '' and rotate != '0':
+			img = img.rotate(-int(rotate), expand=True)
+		img = img.crop( (int(x), int(y), int(x)+int(width), int(y)+int(height)) )
+		
+		tempfile = img
+		tempfile_io = BytesIO()
+		tempfile.save(tempfile_io, format='JPEG')
+		img_content = ContentFile(tempfile_io.getvalue(), 'temp.jpeg')
+				
+		user_image.image_to_frame = img_content
+		user_image.save()
+		
+		
+		buffered = BytesIO()
+		img.save(buffered, format='JPEG')
+		img_data = buffered.getvalue()
+		img_str = base64.b64encode(img_data)	
+		
+		return HttpResponse(img_str)

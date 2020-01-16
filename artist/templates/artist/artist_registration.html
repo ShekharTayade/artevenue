@@ -1,0 +1,447 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block page-title %}
+<title>Artist sign up for sell of original as well as art prints of their artwork | Arte'venue Artist</title>
+{% endblock page-title %}
+
+{% block page-description %}
+<meta name="description" content="Arists sign up to showcase, sell their orginal art work and art prints.">
+{% endblock page-description %}
+
+{% block page-keywords %}  
+<meta name="keywords" content="platform for artist, artist profiles, original art from artists, artist art prints for sale, artist art for sale">
+{% endblock page-keywords %}  
+
+{% block page-author %}  
+<meta name="author" content="Arte'venue">
+{% endblock page-author %}  
+
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+
+	
+    <div id="highlighted-slider" class="container ccontainer">
+
+		<div class = "mt-2" style = "background-color:#11b6bd; color:#fff; padding:30px;">
+			<div class="row">
+				<div class="col-12">
+					<div class = "text-center small_text_on_mobiles">
+						<strong>WHY JOIN ARTE'VENUE?</strong>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-6 mt-3">
+					<div class = "small_text_on_mobiles">
+						Arte'Venue is larget platform in India for art and art prints. <br>
+						Wide collection of artworks draws large number of buyers to the website giving
+						artists more visiblity to showcase their art.
+					</div>
+				</div>
+				<div class="col-6 mt-3">
+					<div class = "small_text_on_mobiles">
+						Have your own web page(ex. https://www.artevenue.com/vijaykumar)<br/>
+						Display your profile, and have your own gallary showcasing your artwork <br />
+						All this free of cost to you
+					</div>
+				</div>
+			</div>
+			<!--<div class="row mt-3" style = "background-color:#fff;" >
+				<div class="col-4 mt-3" style = "padding-left:0px !important; padding-right:0px !important;">
+					<div class = "small_text_on_mobiles text-center">
+						<img src="{% static 'img/business_page/art-pieces.png' %}" alt='' style = "float: left;">
+						<strong>ACCESS TO 2,50,000+ DESIGNS</strong>
+						<br />
+						Use actual art prices in your mockup that can be ordered later
+					</div>
+				</div>
+				<div class="col-4  mt-3" style = "padding-left:0px !important; padding-right:0px !important;">
+					<div class = "small_text_on_mobiles text-center">
+						<img src="{% static 'img/business_page/referral-fee.png' %}" alt='' style = "float: left;">
+						<strong>GET REFERRAL FEE ON ALL ORDERS</strong>
+						<br />
+						Get a referral fee on every sale that happens through you
+					</div>
+				</div>
+				<div class="col-4  mt-3" style = "padding-left:0px !important; padding-right:0px !important;">
+					<div class = "small_text_on_mobiles text-center">
+						<img src="{% static 'img/business_page/free-shipping.png' %}" alt='' style = "float: left;">
+						<strong>GET FREE SHIPPING ANYWHERE IN INDIA</strong>
+						<br />
+						Get fast and free shipping anywhere in India on all orders
+					</div>
+				</div>
+				<div class="col-4  mt-3" style = "padding-left:0px !important; padding-right:0px !important;">
+					<div class = "small_text_on_mobiles text-center">
+						<img src="{% static 'img/business_page/bulk-orders.png' %}" alt='' style = "float: left;">
+						<strong>BULK ORDERS FOR ANY SCALE</strong>
+						<br />
+						Order in any numbers and we will deliver on time
+					</div>
+				</div>
+				<div class="col-4  mt-3" style = "padding-left:0px !important; padding-right:0px !important;">
+					<div class = "small_text_on_mobiles text-center">
+						<img src="{% static 'img/business_page/customise.png' %}" alt='' style = "float: left;">
+						<strong>CUSTOMIZE ORDERS AS PER NEED</strong>
+						<br />
+						Choose size, frame, mount color to match your interiors
+					</div>
+				</div>
+				<div class="col-4  mt-3" style = "padding-left:0px !important; padding-right:0px !important;">
+					<div class = "small_text_on_mobiles text-center">
+						<img src="{% static 'img/business_page/customise.png' %}" alt='' style = "float: left;">
+						<strong>BE 100% ASSURED ABOUT QUALITY</strong>
+						<br />
+						Our orders contain 100% satisfaction guarantee and return options
+					</div>
+				</div>
+			</div> -->
+		</div>
+		<div class="row mt-3">
+			<div class="col-12">
+				<div class = "small_text_on_mobiles">
+					<strong>LET'S START WITH BASIC INFORMATION TO CREATE YOUR ACCOUNT</strong>
+				</div>
+			</div>
+		</div>
+				
+				
+				
+        <div class="box box-default mb-5">
+
+            <div class="row">
+                <div class="col-md-12">
+                    <form id = "reg_form" method="post" novalidate>
+                        {% csrf_token %}
+						<input hidden name="curr_pg" value="{{request.path}}" >		
+                        <div class="row">						
+                            <div class="col-sm-4" style="border: 1px solid lightgrey; border-radius: 10px; padding: 5px 10px 10px 10px;">
+                                <div class="panel panel-default cpanel cpanel-default">
+                                    <div class="w3-container">
+                                        {% include 'includes/form.html' %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-sm-8" style="border: 1px solid lightgrey; border-radius: 10px; padding: 5px 10px 10px 10px;;">
+                                <div class="panel panel-default cpanel cpanel-default">
+								
+									{% include 'artist/artist_registration_include.html' %}
+									
+                                </div>
+                            </div>
+							<div class = "col-sm-12 mt-3">
+								<div class = "text-center">
+									<button id = "submit-btn" class = "btn btn-primary " type="submit">Sign Up</button>
+								</div>			
+							</div>											
+							
+							
+                        </div>
+
+                    </form>        
+                </div>
+            </div>
+			
+			{% include "artevenue/message-modal_ok.html" %}
+			
+        </div>
+
+    </div>
+
+	
+	{% endblock sitecontent %}
+
+	
+	{% block jscripts %}
+	<script>
+	  grecaptcha.ready(function() {
+		  grecaptcha.execute('6Le2ZqAUAAAAAIAvZ7dRPJkj5zLI2IYAxfPktXqE', {action: 'signup'}).then(function(token) {
+			$("#artist-signup-recaptcha").val(token);
+		  });
+	  });
+	</script>
+
+		<script> 
+			function displayTnC() {
+				$('#terms').modal('show');
+			}
+		</script>
+		
+		<script>
+			function checkTnC() {
+				var chkbox = document.getElementById("tnc");
+				var sts = chkbox.checked
+				var msg = document.getElementById("tnc_err");
+				if (sts) {
+					msg.style.display = "none";
+				} else {
+					msg.style.display = "block";
+				}
+			}
+		</script>
+		<script>
+			function activateButton(element) {
+
+				checkTnC();
+				sts = element.checked;
+				if(sts) {        
+					document.getElementById("submit-btn").disabled = false;
+					
+				}
+				else  {
+					document.getElementById("submit-btn").disabled = true;
+				}
+			}   
+		</script>
+
+		<script>
+		   $(document).ready(function () {
+				activateButton($("#tnc"));
+			});
+		</script>		
+
+
+	<script>
+		function autocomplete(inp, arr) {
+		  /*the autocomplete function takes two arguments,
+		  the text field element and an array of possible autocompleted values:*/
+		  var currentFocus;
+		  /*execute a function when someone writes in the text field:*/
+		  inp.addEventListener("input", function(e) {
+			  var a, b, i, val = this.value;
+			  /*close any already open lists of autocompleted values*/
+			  closeAllLists();
+			  if (!val) { return false;}
+			  currentFocus = -1;
+			  /*create a DIV element that will contain the items (values):*/
+			  a = document.createElement("DIV");
+			  a.setAttribute("id", this.id + "autocomplete-list");
+			  a.setAttribute("class", "autocomplete-items");
+			  /*append the DIV element as a child of the autocomplete container:*/
+			  this.parentNode.appendChild(a);
+			  /*for each item in the array...*/
+			  for (i = 0; i < arr.length; i++) {
+				/*check if the item starts with the same letters as the text field value:*/
+				if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+				  /*create a DIV element for each matching element:*/
+				  b = document.createElement("DIV");
+				  /*make the matching letters bold:*/
+				  b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+				  b.innerHTML += arr[i].substr(val.length);
+				  /*insert a input field that will hold the current array item's value:*/
+				  b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+				  /*execute a function when someone clicks on the item value (DIV element):*/
+				  b.addEventListener("click", function(e) {
+					  /*insert the value for the autocomplete text field:*/
+					  inp.value = this.getElementsByTagName("input")[0].value;
+					  /*close the list of autocompleted values,
+					  (or any other open lists of autocompleted values:*/
+					  closeAllLists();
+				  });
+				  a.appendChild(b);
+				}
+			  }
+		  });
+		  /*execute a function presses a key on the keyboard:*/
+		  inp.addEventListener("keydown", function(e) {
+			  var x = document.getElementById(this.id + "autocomplete-list");
+			  if (x) x = x.getElementsByTagName("div");
+			  if (e.keyCode == 40) {
+				/*If the arrow DOWN key is pressed,
+				increase the currentFocus variable:*/
+				currentFocus++;
+				/*and and make the current item more visible:*/
+				addActive(x);
+			  } else if (e.keyCode == 38) { //up
+				/*If the arrow UP key is pressed,
+				decrease the currentFocus variable:*/
+				currentFocus--;
+				/*and and make the current item more visible:*/
+				addActive(x);
+			  } else if (e.keyCode == 13) {
+				/*If the ENTER key is pressed, prevent the form from being submitted,*/
+				e.preventDefault();
+				if (currentFocus > -1) {
+				  /*and simulate a click on the "active" item:*/
+				  if (x) x[currentFocus].click();
+				}
+			  }
+		  });
+		  function addActive(x) {
+			/*a function to classify an item as "active":*/
+			if (!x) return false;
+			/*start by removing the "active" class on all items:*/
+			removeActive(x);
+			if (currentFocus >= x.length) currentFocus = 0;
+			if (currentFocus < 0) currentFocus = (x.length - 1);
+			/*add class "autocomplete-active":*/
+			x[currentFocus].classList.add("autocomplete-active");
+		  }
+		  function removeActive(x) {
+			/*a function to remove the "active" class from all autocomplete items:*/
+			for (var i = 0; i < x.length; i++) {
+			  x[i].classList.remove("autocomplete-active");
+			}
+		  }
+		  function closeAllLists(elmnt) {
+			/*close all autocomplete lists in the document,
+			except the one passed as an argument:*/
+			var x = document.getElementsByClassName("autocomplete-items");
+			for (var i = 0; i < x.length; i++) {
+			  if (elmnt != x[i] && elmnt != inp) {
+				x[i].parentNode.removeChild(x[i]);
+			  }
+			}
+		  }
+		  /*execute a function when someone clicks in the document:*/
+		  document.addEventListener("click", function (e) {
+			  closeAllLists(e.target);
+		  });
+		}
+
+		/*An array containing all the country names in the world:*/
+		var countries = ["Afghanistan","Albania","Algeria","Andorra","Angola","Anguilla","Antigua & Barbuda","Argentina","Armenia","Aruba","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bermuda","Bhutan","Bolivia","Bosnia & Herzegovina","Botswana","Brazil","British Virgin Islands","Brunei","Bulgaria","Burkina Faso","Burundi","Cambodia","Cameroon","Canada","Cape Verde","Cayman Islands","Central Arfrican Republic","Chad","Chile","China","Colombia","Congo","Cook Islands","Costa Rica","Cote D Ivoire","Croatia","Cuba","Curacao","Cyprus","Czech Republic","Denmark","Djibouti","Dominica","Dominican Republic","Ecuador","Egypt","El Salvador","Equatorial Guinea","Eritrea","Estonia","Ethiopia","Falkland Islands","Faroe Islands","Fiji","Finland","France","French Polynesia","French West Indies","Gabon","Gambia","Georgia","Germany","Ghana","Gibraltar","Greece","Greenland","Grenada","Guam","Guatemala","Guernsey","Guinea","Guinea Bissau","Guyana","Haiti","Honduras","Hong Kong","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Isle of Man","Israel","Italy","Jamaica","Japan","Jersey","Jordan","Kazakhstan","Kenya","Kiribati","Kosovo","Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania","Luxembourg","Macau","Macedonia","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Marshall Islands","Mauritania","Mauritius","Mexico","Micronesia","Moldova","Monaco","Mongolia","Montenegro","Montserrat","Morocco","Mozambique","Myanmar","Namibia","Nauro","Nepal","Netherlands","Netherlands Antilles","New Caledonia","New Zealand","Nicaragua","Niger","Nigeria","North Korea","Norway","Oman","Pakistan","Palau","Palestine","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Poland","Portugal","Puerto Rico","Qatar","Reunion","Romania","Russia","Rwanda","Saint Pierre & Miquelon","Samoa","San Marino","Sao Tome and Principe","Saudi Arabia","Senegal","Serbia","Seychelles","Sierra Leone","Singapore","Slovakia","Slovenia","Solomon Islands","Somalia","South Africa","South Korea","South Sudan","Spain","Sri Lanka","St Kitts & Nevis","St Lucia","St Vincent","Sudan","Suriname","Swaziland","Sweden","Switzerland","Syria","Taiwan","Tajikistan","Tanzania","Thailand","Timor L'Este","Togo","Tonga","Trinidad & Tobago","Tunisia","Turkey","Turkmenistan","Turks & Caicos","Tuvalu","Uganda","Ukraine","United Arab Emirates","United Kingdom","United States of America","Uruguay","Uzbekistan","Vanuatu","Vatican City","Venezuela","Vietnam","Virgin Islands (US)","Yemen","Zambia","Zimbabwe"];
+		var cities = []
+			
+		/*initiate the autocomplete function on the "myInput" element, and pass along the countries array as possible autocomplete values:*/
+		autocomplete(document.getElementById("id_pin_code"), {{pin_code_arr|safe}});	
+		autocomplete(document.getElementById("id_city"), {{city_arr|safe}});	
+
+		
+		var pin_code_arr = [];
+		var city_arr = [];
+		var cstate_arr = [];
+		var country_arr = [];
+
+		
+		function getCities(ipin_code) {
+		
+			$.ajax({
+				url: '{% url "get_addr_pin_city_state" %}', 
+				data: { 'pin_code':ipin_code},
+				dataType: 'text', 
+				type: 'POST',
+				success: function (data) {
+					data = JSON.parse(data);
+					pin_code = data.pin_code;
+					city = data.city;
+					cstate = data.cstate;
+					country = data.country;
+
+					pin_code_arr = [];
+					city_arr = [];
+					cstate_arr = [];
+					country_arr = [];
+
+					pp = Object.keys(pin_code).map(function(key) {
+					  return pin_code_arr.push(pin_code[key].pin_code);
+					});
+					
+					cc = Object.keys(city).map(function(key) {
+					  return city_arr.push(city[key].city);
+					});
+					
+					ss = Object.keys(cstate).map(function(key) {
+					  return cstate_arr.push(cstate[key].state);
+					});
+
+					cn = Object.keys(country).map(function(key) {
+					  return country_arr.push(country[key].country__country_name);
+					});
+
+					
+					autocomplete(document.getElementById("id_city"), city_arr);	
+
+					cc = document.getElementById("id_city").value;
+					if (cc == '' || cc == null){
+						document.getElementById("id_city").value = city_arr[0];
+					} else {
+						if (city_arr.indexOf(cc) == -1 ){
+							document.getElementById("id_city").value = city_arr[0];
+						}
+					}
+					cs = document.getElementById("id_state").value;
+					if (cs == '' || cs == null){
+						document.getElementById("id_state").value = cstate_arr[0];
+					} else {
+						if (cstate_arr.indexOf(cs) == -1 ){
+							document.getElementById("id_state").value = cstate_arr[0];
+						}
+					}
+					cnt = document.getElementById("id_country").value;
+					if (cnt == '' || cnt == null){
+						document.getElementById("id_country").value = country_arr[0];
+					} else {
+						if (country_arr.indexOf(cnt) == -1 ){
+							document.getElementById("id_country").value = country_arr[0];
+						}
+					}					
+					
+				},
+				error: function(xhr){
+					alert("An error occured: " + xhr.status + " " + xhr.statusText + " Apologies for the inconvenience!! Please let us know the details and we will be happy to help sort it out."); 
+					return;
+				}
+			});							
+		}
+			
+			
+		// Validate the addresses
+		$( '#reg_form' ).submit( function ( event ) {
+		
+			event.preventDefault();
+			
+			var err_displyed = false;
+			// **********  Validate Shippng adress
+			var pin = document.getElementById("id_pin_code").value;
+			var city = document.getElementById("id_city").value;
+			var cstate = document.getElementById("id_state").value;
+			var country = document.getElementById("id_country").value;
+			$.ajax({
+				url: '{% url "validate_address" %}', 
+				data: { 'pin_code':pin, 'city':city, 'cstate':cstate, 'country':country},
+				dataType: 'text', 
+				type: 'POST',
+				success: function (data) {
+					data = JSON.parse(data);
+					msg = data.msg;
+					var str = '';
+					if (msg[0] != "SUCCESS"){
+						var i;
+						var html = '';
+						$("#err_div").show();
+						html = "<ul> " ;
+						for (i = 0; i < msg.length; i++) { 
+					
+							html = html + " <li> " + msg[i]  + " </li> ";
+						}	
+						html = html + " </ul>";
+						$("#error_msg").html(html);
+						err_displyed = true;
+						document.body.scrollTop = 0; // For Safari
+						document.documentElement.scrollTop = 0;
+						$("#msg").html('There are errors in the information you entered. Please correct.');
+						$("#msg-modal").modal('show');
+					} else {
+						$("#error_msg").html('');
+						$("#err_div").hide();
+						$("#reg_form").unbind('submit').submit();
+					}
+				},
+				error: function(xhr){
+					alert("An error occured: " + xhr.status + " " + xhr.statusText + " Apologies for the inconvenience!! Please let us know the details and we will be happy to help sort it out."); 
+					return;
+				}
+			});							
+
+		})
+		
+	</script>
+
+		
+	{% endblock jscripts %}
+			
+	

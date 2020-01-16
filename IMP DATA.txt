@@ -69,6 +69,12 @@ RECAPTCHA:
 Site Key - 6Le2ZqAUAAAAAIAvZ7dRPJkj5zLI2IYAxfPktXqE
 Secret Key - 6Le2ZqAUAAAAALbzG6uSjImGZ2hHY_B6r_Cug74i
 
+
+PAYU
+~~~~~~~~~~~~~~~~~~~~~~~~~
+Email: dugarneeraj@gmail.com
+Password: Nsj211001&
+
 GoDaddy:
 ~~~~~~~~~~~~~~~~~~~~~
 login-
@@ -79,12 +85,51 @@ Customer ID: 186164730
 	    Pin: 2107
 
 Support -
-	support@artevenue.com / $1arte_venue
+	support@artevenue.com / support@jpn78
 	
 Factory:
 	factory@artevenue.com / factory@jpn78 		
 
 Neeraj:
-	username: dugarneeraj@gamil.com
-	pwd: Nsj211001&
+	username: dugarneeraj@artevenue.com
+	pwd: nsj211001/
 
+Media:
+	username: media@artevenue.com
+	pwd: media@jpn78
+
+
+SOCIAL:
+~~~~~~~~~~~~~~~~~~~~~
+FB, Insta:	media@artevenue.com / Montage@54
+
+
+Arte'Venue Google Account:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Email: info.artevenue@gmail.com 
+Pwd: art_venue@321
+
+
+Homelane Order Excel File
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+Pwd: media@jpn78
+
+
+Google Cloud Platform API Key
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+AIzaSyAU6oAKwFdD1EdTfD8B3pFny35ECmRxsRI
+
+
+Naukri
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+shekhar@artevenue.com / Arch8262$1
+
+
+Online Chat	->	tawk.to
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+shekharrtayade@gmail.com / Arch8262~1
+
+
+Amazon Seller 
+~~~~~~~~~~~~~~~~~~~~
+shekhar@artevenue.com / Arch8262~1

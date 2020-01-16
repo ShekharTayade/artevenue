@@ -1,0 +1,133 @@
+{% load static %}
+<div id="footer">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-3 col-md-6">
+				<ul class="list-unstyled">
+					<li><a href="about_us">About Us</a></li>
+					<li><a href="{% url 'terms_conditions' %}">Terms and Conditions</a></li>
+					<li><a href="{% url 'privacy_policy' %}">Privacy Policy</a></li>
+					<li><a href="{% url 'faq' %}">FAQ</a></li>
+					<li><button class = "btn btn-link" onclick="$('#cancellation-modal').modal('show');" style = "color:#999; padding:0px; margin:0px;">
+					Order Cancellation</button></li>
+					<li><button class = "btn btn-link" onclick="$('#refund-modal').modal('show');"  style = "color:#999; padding:0px; margin:0px;">
+					Refund Policy</button></li>
+				</ul>
+			</div>
+			<!-- /.col-lg-3-->
+			<div class="col-lg-3 col-md-6">
+				<h4 class="mb-3">User section</h4>
+				{% if user.is_authenticated %}
+					<ul class="list-unstyled">
+						<li><a href="{% url 'my_account' %}">My Account</a></li>
+						<li><a href="{% url 'my_orders' %}">My Orders</a></li>
+						<li class="dropdown-divider"></li>
+						<li><a href="{% url 'logout' %}">Logout</a></li>
+						<li> <a href="{% url 'password_change' %}">Change Password</a></li>   
+					</ul>
+				{% else %}
+					<ul class="list-unstyled">
+						<li>
+							<a href="#" data-toggle="modal" data-target="#login-modal">Login</a>
+						</li>
+						<li><a href="{% url 'register' %}">Sign Up</a></li>
+						<li><a href="{% url 'find_orders' %}">Find My Orders</a></li>
+					</ul>
+				{% endif %}
+			</div>
+			<!-- /.col-lg-3-->
+			<div class="col-lg-3 col-md-6">
+				<h4 class="mb-3">Where to find us:</h4>
+				<p><strong>{{ ecom_site.store_name }}</strong><br>
+				{{ ecom_site.store_address1 }}<br>
+				{% if ecom_site.store_address2 %}
+				{{ ecom_site.store_address2 }}<br>
+				{% endif %}
+				{{ ecom_site.store_city }} {{ ecom_site.store_zip }} &nbsp;{{ ecom_site.store_country }}<br>
+				{% if ecom_site.support_phonenumber %}
+					<i class="fa fa-mobile"></i> {{ecom_site.support_phonenumber }}<br />
+				{% endif %}
+
+				</p><a href="{% url 'contact_us' %}">Go to contact page</a>
+				<hr class="d-block d-md-none">
+			</div>
+			<!-- /.col-lg-3-->
+			<div class="col-lg-3 col-md-6">
+				<p class="social pull-right">
+					<a href="https://www.facebook.com/Artevenueofficial/" class="facebook external"><i class="fa fa-facebook"></i></a>
+					<!--<a href="#" class="twitter external"><i class="fa fa-twitter"></i></a>-->
+					<a href="https://www.instagram.com/artevenue/" class="instagram external"><i class="fa fa-instagram"></i></a>
+					<!--<a href="#" class="gplus external"><i class="fa fa-google-plus"></i></a>-->
+					<!--<a href="#" class="email external"><i class="fa fa-envelope"></i></a>-->
+				</p>
+			</div>
+		<!-- /.col-lg-3-->
+		</div>
+		<div class = "row mt-3">
+			<div class = "col-sm-12">
+			<div class = "text-center">
+				<small>This site is protected by reCAPTCHA and the Google
+				<a href="https://policies.google.com/privacy">Privacy Policy</a> and
+				<a href="https://policies.google.com/terms">Terms of Service</a> apply.	
+				</small>
+			</div>
+			</div>
+		</div>
+	<!-- /.row-->
+	</div>
+<!-- /.container-->
+
+
+	<div id="cancellation-modal" tabindex="-1" role="dialog" aria-labelledby="Login" aria-hidden="true" class="modal fade">
+		<div class="modal-dialog modal-md">
+			<div class="modal-content">
+				<div class="modal-header" style = "background-color:#11b6bd;color:#fff">
+					<h3 class="modal-title" >Order Cancellation Policy</h3>
+					<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
+				</div>
+				<div class="modal-body">
+					<div class = "col-12">
+						Our products are customized as per your order. The production process 
+						starts as soon as you place the order. We are unable to cancel your order
+						after the payment is made and you receive the confirmation.<br />
+						However, we are happy to cancel the order for you before our production process
+						begins, which is typically within an hour of you placing an order. 
+						In case you wish to cancel please call/write back to us as soon as possible, and 
+						we can let you know if the order can be cancelled.<br />
+						If the order is cancelled, we will ask you for your bank details and it will take
+						up to 7 business days to make process the refund.
+					</div>				
+				</div>
+			</div>
+		</div>		
+	</div>
+
+
+	<div id="refund-modal" tabindex="-1" role="dialog" aria-labelledby="Login" aria-hidden="true" class="modal fade">
+		<div class="modal-dialog modal-md">
+			<div class="modal-content">
+				<div class="modal-header" style = "background-color:#11b6bd;color:#fff">
+					<h3 class="modal-title" >Refund Policy</h3>
+					<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
+				</div>
+				<div class="modal-body">
+					<div class = "col-12">
+						Arte'Venue shall refund the money or replace the artwork or products 
+						only in the event the artwork or product was delivered in damaged condition 
+						or not as per order specifications, subject to small variations as described in
+						terms and conditions. <br />
+						The User shall
+						inform Arte'Venue about the damaged product/Artwork within 24 hours of delivery.
+						Arte'Venue shall not be liable to replace the Artwork/product or refund the
+						money if Arte'Venue is informed after completion of 24 hours from time of
+						delivery.
+					</div>				
+				</div>
+			</div>
+		</div>		
+	</div>
+
+</div>
+<!-- /#footer-->
+<!-- *** FOOTER END ***-->
+  

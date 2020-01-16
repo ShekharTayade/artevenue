@@ -49,6 +49,7 @@ STORE_ID = 1
 
 INSTALLED_APPS = [
 	'artevenue.apps.ArtevenueConfig',
+	'artist.apps.ArtistConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -66,6 +67,9 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.instagram',	
     'allauth.socialaccount.providers.twitter',
 	'rest_framework',
+	'django.contrib.sitemaps',
+	'tinymce',
+	'indian_numbers',
 	]
 
 MIDDLEWARE = [
@@ -128,17 +132,14 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 
+USE_L10N = False
 LANGUAGE_CODE = 'en-IN'
-
-TIME_ZONE = 'Asia/Calcutta'
-
-USE_I18N = True
-
-USE_L10N = True
-
 USE_TZ = True
-
+TIME_ZONE = 'Asia/Calcutta'
+USE_THOUSAND_SEPARATOR = True
+THOUSAND_SEPARATOR = ','
 NUMBER_GROUPING = (3, 2, 0)
+
 
 ACCOUNT_EMAIL_REQUIRED=True
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
@@ -211,20 +212,17 @@ PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
 
 LOGOUT_REDIRECT_URL = 'index'
-
+LOGIN_REDIRECT_URL = 'index'
 LOGOUT_URL = 'logout'
-
 ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS = True
-LOGIN_REDIRECT_URL = 'checkSubscription'
-
 LOGIN_URL = 'login'
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
-# Cookie expiry in 2 weeks
-SESSION_COOKIE_AGE = 1209600
+# Cookie expiry in 5 days
+SESSION_COOKIE_AGE = 432000
 
-SOCIAL_AUTH_FACEBOOK_KEY = ''  # App ID
-SOCIAL_AUTH_FACEBOOK_SECRET = ''  # App Secret
+SOCIAL_AUTH_FACEBOOK_KEY = '2449878791952932'  # App ID
+SOCIAL_AUTH_FACEBOOK_SECRET = '890a83fd34bca4ddcd81842203ad16ad'  # App Secret
 
 SOCIAL_AUTH_TWITTER_KEY = ''
 SOCIAL_AUTH_TWITTER_SECRET = ''
@@ -243,10 +241,6 @@ EMAIL_SUBJECT_PREFIX = 'ArteVenue.com: '
 
 MEDIA_URL = ('/media/')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
-print("Project Dir: " + PROJECT_DIR)
-print("BASE Dir: " + BASE_DIR)
-print("MEdia Root: " + MEDIA_ROOT)
-
 
 MOULDING_ROOT = os.path.join(BASE_DIR, 'artevenue/static/img/')
 TMP_FILES = os.path.join(BASE_DIR, 'artevenue/static/tmp/')

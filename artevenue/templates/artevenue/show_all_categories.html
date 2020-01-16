@@ -1,13 +1,22 @@
 {% extends 'artevenue/estore_base.html' %}
 {% load static %}
+{% load indian_numbers_tags %}
 {% load show_trending_categories from prod_template_tags %}
+{% block page-title %} 
+	<title>All art categories</title>
+{% endblock page-title %} 
+{% block page-description %}
+<meta name="description" content="Show all categories of art available at ArteVenue.com">
+{% endblock page-description %}
+{% block page-keywords %}
+<meta name="keywords" content="art, Artvenue, All art categories, Art prints, Wall Art, Buy Art, Buy Art prints, Print photos online, Print Art online">
+{% endblock page-keywords %}	<!-- Only Override the site content block -->
 
 	<!-- Only Override the site content block -->
 	{% block sitecontent %}
-        <div class="container">
+        <div class="container-fluid">
 			<div class="row">
-
-				<div class="col-lg-12">
+				<div class="col-12">
 					<nav aria-label="breadcrumb">
 						<ol class="breadcrumb">
 							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
@@ -17,74 +26,32 @@
 				</div>
 
 
-				<div class="col-lg-12">
+				<div class="col-12">
 					<div class="box-cat">
-						<h1>All Categories</h1>
-					 </div>
-
+						<h1>ALL CATEGORIES</h1>
+					</div>
 					{% show_trending_categories %}
-					<!-- Category header -->
-					<div class="box-cat info-bar">
-						<div class="row">
-
-							<div class="col-md-12 col-lg-12 products-number-sort">
-								<form class="form-inline d-block d-lg-flex justify-content-between flex-column flex-md-row">
-									<div class="products-number">
-										<strong>Show</strong><a href="?page={{categories.number}}&sort={{sortOrder}}&show=50" class="btn btn-sm {% if show == '50' or show == None %} btn-primary {% else %} btn-outline-secondary {% endif %}">50</a><a href="?page={{categories.number}}&sort={{sortOrder}}&show=100" class="btn btn-sm {% if show == '100' %} btn-primary {% else %} btn-outline-secondary {% endif %}">100</a><a href="?page={{categories.number}}&sort={{sortOrder}}&show=ALL" class="btn btn-sm {% if show == 'ALL' %} btn-primary {% else %} btn-outline-secondary {% endif %}">All</a><span>results/page</span>
-									</div>
-									<div class = "pull-right">
-										<input type="text" placeholder="Search" class="form-control">
-										<a data-toggle="collapse" href="#" class="btn navbar-btn d-none d-lg-inline-block"><span class="sr-only">Toggle search</span><i class="fa fa-search"></i></a>
-
-									</div>
-								</form>
-							</div>
-
-						</div>
-					</div>
-
-					<small>{{categories.paginator.count}} results found</small>
-					<div class = "row">
-					{% for c in categories %}
-					<div class="col-lg-2 col-md-6">
-						<div class="cat-card">
-
-							<a href="{% url 'category_stock_images' c.category_id %}">
-								<h4 style="color:#000 !important">{{c.name|title|default:'Unspecified'|default_if_none:'Unspecified'}}</h4>
-								<!--<p>{{c.description}}</p>-->
-								<p>(<span data-counter-up class="badge">{{c.stock_image_stock_image_category__count}}</span>)</p>
-							</a>
-						</div>
-					</div>
 					
-					{% endfor categories %}
-					</div>
-					<div class="box info-bar">
-						<div class="row">
-							<div class="col-md-12 col-lg-12 products-showing">
-								<div class = "text-center">
-									{% if categories.has_previous %}
-										<a class="btn btn-sm btn-primary" href="?page=1&sort={{sortOrder}}&show={{show}}">&laquo; First</a>
-										<a class="btn btn-sm btn-primary"  href="?page={{ categories.previous_page_number }}&sort={{sortOrder}}">Prev</a>
-									{% else %}
-										<a class="btn btn-sm btn btn-secondary disabled" href="#">&laquo; First</a>
-										<a class="btn btn-sm btn btn-secondary disabled"  href="#">Prev</a>
-									{% endif %}
-									Showing Page {{ categories.number }} of {{ categories.paginator.num_pages }}
-									{% if categories.has_next %}
-										<a class="btn btn-sm btn-primary" href="?page={{ categories.next_page_number }}&sort={{sortOrder}}&show={{show}}">Next</a>
-										<a class="btn btn-sm btn-primary" href="?page={{ categories.paginator.num_pages }}&sort={{sortOrder}}&show={{show}}">Last &raquo;</a>
-									{% else %}
-										<a class="btn btn-sm btn-secondary disabled" href="#">Next</a>
-										<a class="btn btn-sm btn-secondary disabled" href="#">Last &raquo;</a>
-									{% endif %}				
-								</div>
-							</div>
+					<div class = "row mt-2">
+						<div class="col-12">
+							<span class = "ml-4" style="font-size:0.7rem;">{{cnt}} categories, containing {{all_cnt|intcomma_indian}} artwork</span>
 						</div>
 					</div>
-				</div>
-				<!-- /.col-lg-9-->
-				
+					<hr style="margin:0.3rem 0;">
+					<div class = "row">
+						{% for c in categories %}
+						<div class="col-lg-2 col-md-3 col-6">
+							<div class="cat-card">
+
+								<a href="{% url 'art_by_category' c.category_id %}">
+									<p style="color:#000 !important; margin-bottom: 0.1rem;">{{c.name|title|default:'Unspecified'|default_if_none:'Unspecified'}}</p>
+									<p><span style="font-size:0.6rem; color:#272e38;" data-counter-up >({{c.stock_image_stock_image_category__count}})</span></p>
+								</a>
+							</div>
+						</div>
+						
+						{% endfor categories %}
+					</div>				
 			</div>
 		</div>
 	{% endblock sitecontent %}

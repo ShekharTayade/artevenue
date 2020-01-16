@@ -2,21 +2,23 @@
 {% if ecom_site.show_frame_my_art_section %}
 
 <div class="main_banner">
-	<div class="">	
-		<div class="row">			
-			<div class="say_pic px-bottom" style = "padding:0px !important;">
-				<div id = "wrapper">
-					<img src="{% static 'img/frame_my_photos_new.jpg' %}" class="img-responsive" usemap="#frame-map">
-					<a id = "anchor-frame" href="{% url 'user_image' %}"></a>				
-					<img src="{% static 'img/frame_my_photos_new.jpg' %}" class="img-responsive mobile" usemap="#frame-map">
-					<a id = "anchor-frame-mobile" href="{% url 'user_image' %}" class = "mobile"></a>
-				</div>
-				<!-- <map name="frame-map">
-					<area shape="rect" coords="30,200,475,435" href="{% url 'user_image' %}" alt="Start Framing">
-				</map> -->
+	<div class="row">			
+		<div class="say_pic mt-5" style = "padding:0px !important;">
+			<div id = "wrapper">
+				<img class = "d-none d-sm-block" src="{% static 'img/artevenue-my-frame.gif' %}" class="img-responsive" usemap="#frame-map">			
+				<a id = "anchor-frame" href="{% url 'user_image' %}"></a>
+				<img class = "d-block d-sm-none" src="{% static 'img/artevenue-my-frame_mobile.gif' %}" class="img-responsive mobile" usemap="#frame-map">
+				<a id = "anchor-frame-mobile" href="{% url 'user_image' %}" class = "mobile"></a>
+				<!--<a id = "anchor-frame" href="{% url 'user_image' %}">
+					<video autoplay loop muted playsinline> 
+						<source src="{% static 'img/artevenue-my-frame.mp4' %}" type="video/mp4">
+						Your browser does not support the video tag.
+					</video>			
+				</a>-->
 			</div>
 		</div>
 	</div>
+		
 </div>
 
 

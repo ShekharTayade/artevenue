@@ -6,9 +6,37 @@
 										{% for hidden in businessprofile_form.hidden_fields %}
 										  {{ hidden }}
 										{% endfor %}									
-									
 										<div class = "row">
-											<div class = "col-sm-6 ">
+											<div class = "col-12">
+												<div class="form-group">
+													{{ businessprofile_form.business_code.label_tag }}
+													{% if businessprofile_form.is_bound %}
+														{% if businessprofile_form.business_code.errors %}
+												
+															{% render_field businessprofile_form.business_code class="form-control is-invalid" %}
+															{% for error in businessprofile_form.business_code.errors %}
+																<div class="invalid-feedback">
+																  {{ error }}
+																</div>
+															{% endfor %}
+												
+														{% else %}
+															{% render_field businessprofile_form.business_code class="form-control is-valid" %}
+														{% endif %}
+													{% else %}
+														{% render_field businessprofile_form.business_code class="form-control" %}
+													{% endif %}
+												
+													{% if businessprofile_form.business_code.help_text %}
+														<small class="form-text text-muted">
+															{{ businessprofile_form.business_code.help_text }}
+														</small>
+													{% endif %}
+												</div>
+											</div>
+										</div>
+										<div class = "row">
+											<div class = "col-12 col-md-6">
 												<div class="form-group">
 													{{ businessprofile_form.contact_name.label_tag }}
 													{% if businessprofile_form.is_bound %}
@@ -35,7 +63,7 @@
 													{% endif %}
 												</div>
 											</div>
-											<div class = "col-sm-6">
+											<div class = "col-12 col-md-6">
 												<div class="form-group">
 													{{ businessprofile_form.phone_number.label_tag }}
 													{% if businessprofile_form.is_bound %}
@@ -66,7 +94,7 @@
 										</div>
 
 										<div class = "row">
-											<div class = "col-sm-6">
+											<div class = "col-12 col-md-6">
 												<div class="form-group">
 													{{ businessprofile_form.company.label_tag }}
 													{% if businessprofile_form.is_bound %}
@@ -93,7 +121,7 @@
 													{% endif %}
 												</div>
 											</div>
-											<div class = "col-sm-6">
+											<div class = "col-12 col-md-6">
 												<div class="form-group">
 													{{ businessprofile_form.gst_number.label_tag }}
 													{% if businessprofile_form.is_bound %}
@@ -121,15 +149,12 @@
 												</div>
 											</div>
 										</div>
-
-
 										
 										<div class = "row">
-
 											<div class = "col-sm-12">
 												<label> Company Address</label>
 											</div>
-											<div class = "col-sm-6">
+											<div class = "col-12 col-md-6">
 												<div class="form-group">
 													{% if businessprofile_form.is_bound %}
 														{% if businessprofile_form.address_1.errors %}
@@ -155,7 +180,7 @@
 													{% endif %}
 												</div>
 											</div>	
-											<div class = "col-sm-6">
+											<div class = "col-12 col-md-6">
 												<div class="form-group">
 													{% if businessprofile_form.is_bound %}
 														{% if businessprofile_form.address_2.errors %}
@@ -184,7 +209,7 @@
 											</div>
 										</div>
 										<div class = "row">
-											<div class="col-md-3">
+											<div class="col-12 col-md-3">
 												<div class = "form-group">
 													Pin Code
 													{% if businessprofile_form.is_bound %}
@@ -212,7 +237,7 @@
 												</div>
 
 											</div>
-											<div class = "col-sm-5">
+											<div class = "col-12 col-sm-5">
 							
 												<div class="form-group">
 													City
@@ -241,7 +266,7 @@
 												</div>													
 												
 											</div>
-											<div class="col-md-4">
+											<div class="col-12 col-md-4">
 												<div class="form-group">
 													State
 													{% if businessprofile_form.is_bound %}
@@ -272,7 +297,7 @@
 										</div>
 									
 										<div class = "row">
-											<div class="col-md-3">
+											<div class="col-12 col-md-3">
 
 												<div class="form-group">
 													Country
@@ -304,13 +329,13 @@
 										</div>
 										<hr>
 										<div class = "row">
-											<p class="col-md-12">
-												Please enter your bank details for speedy credit of your benefit:
+											<p class="col-12 col-md-12">
+												Please enter your bank details for speedy credit of your referral fees:
 											</p>
 										</div>
 										
 										<div class = "row">
-											<div class="col-md-6">
+											<div class="col-12 col-md-6">
 
 												<div class="form-group">
 													Bank Name
@@ -338,7 +363,7 @@
 													{% endif %}
 												</div>						
 											</div>
-											<div class="col-md-6">
+											<div class="col-12 col-md-6">
 
 												<div class="form-group">
 													Bank Branch
@@ -368,7 +393,7 @@
 											</div>
 										</div>
 										<div class = "row">
-											<div class="col-md-6">
+											<div class="col-12 col-md-6">
 												<div class="form-group">
 													Account Number
 													{% if businessprofile_form.is_bound %}
@@ -395,7 +420,7 @@
 													{% endif %}
 												</div>						
 											</div>
-											<div class="col-md-6">
+											<div class="col-12 col-md-6">
 
 												<div class="form-group">
 													IFSC Code

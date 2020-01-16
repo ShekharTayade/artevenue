@@ -1,94 +1,199 @@
-
-<!-- READ THE INSTRUCTIONS BELOW BEFORE USING THIS TEMPLATE
- 1. Start your page with this template and modify. Rename this template with HTML name and then modify.
- 2. We keep as it is the header portion of the page (which is top hidden block and the navigation) 
-    and the footer portion (footer block) on each page.
- 3. Override only the "slide-show", "features", and "jointhem-blog" blocks on each page
- 4. Keep the top "hidden" clock and the nav-bar as it is, which forms the header section of the page.
- 5. Overriding the parent blocks will start from "slide-show" block 
- 6. Keep the <div>s  given below as it is in the "slide-show" and "features" blocks to keep the same styling matching the home page. 
-    If overriding the parent block without any content then remove the <div>s too, just keep block and endblock. 
- 7. For most of the pages, you can keep the title of the page in "slide-show" block and put all the content in "features" block. 
-    The "jointhem-blog" block can be kept empty.
- 8. PLEASE REMEBER :- 
-    TO OVERRIDE A BLOCK USE THE CORRESPONDING BLOCK AND <div>s, 
-    TO KEEP THE BLOCK EMPTY JUST USE THE BLOCK OPEN AND ENDBLOCK, 
-    AND TO KEEP ABLOCK AS IT IS DON'T USE THE BLOCK NAMES HERE SO THOSE BLOCKS FROM PARENT WILL BE USED AS IT IS. 
- -->
-
-<!-- Extend the home page to keep the same styling for header and footer sections. -->
-
 {% extends 'artevenue/estore_base.html' %}
 {% load widget_tweaks %}
 {% load static %}
+
+{% block page-title %} 
+<title>Buy Art Prints, Canvas Prints & Unique Art Online | Arte'venue Signup</title>
+{% endblock page-title %} 
+ 
+{% block page-description %} 
+<meta name="description" content="Sign up on Arte'venue today and get access to 2,50,000+ unique art prints and free delivery across India. Get started now.">
+{% endblock page-description %} 
+  
+{% block page-keywords %} 
+<meta name="keywords" content="art for sale, buy art online, art for sale online, art prints, canvas prints">
+{% endblock page-keywords %} 
+
+{% block page-author %}   
+<meta name="author" content="Arte'Venue">
+{% endblock page-author %} 
+
+
 	<!-- Only Override the site content block -->
 	{% block sitecontent %}
-    <div id="highlighted-slider" class="container ccontainer">
-        <div class="box box-default">
-            <div class="box-header with-border row">
-				<div class="col-md-2" >
-					<h3>Sign Up </h3>
-				</div>
-				<div class="col-md-10" >
-					<div class="quote-leftbar" >
-						Sign up with us and get exciting offers, early intimations of sales and promotions.<br />
-						Please sign up below...
+    <div id="highlighted-slider" class="container ccontainer mb-5">
+        <div class="sign-up-box">			
+			<div class = "row">
+				<div class = "col-12 col-md-6 sign-up-left-box">
+					<div class = "sign-up-left-text">
+					<h1>Hi there, Welcome to Arte'Venue!!</h1>
+					<br />
+					<h3>Sign up and </h3>
+					<ul>
+					{% if promo_voucher %}
+							<li>Get {{ promo_voucher.promotion.discount_value|floatformat }}
+								% off when you place your first order, use coupan code "{{promo_voucher.voucher.voucher_code}}"</li>
+							<small>Hurry up, "{{promo_voucher.voucher.voucher_code}}" offer expires on {{promo_voucher.promotion.effective_to|date:"D d M Y"}}!</small>
+							<li>Early intimations of exciting promotions, sales and offers</li>
+							<li>Thousands of new products every week</li>
+							<li>Personalized service from Arte'Venue</li>
+							<br />
+					{% else %}
+							<li>Early intimations of exciting promotions, sales and offers</li>
+							<li>Thousands of new products every week</li>
+							<li>Personalized service from Arte'Venue</li>
+					{% endif %}
+					</ul>
 					</div>
-				</div>				
-            </div>
-
-            <div class="row justify-content-center">
-                <div class="col-12">
-                    <form method="post" novalidate">
-                        {% csrf_token %}
+				</div>
+				<div class = "col-12 col-md-6 sign-up-right">
+					
+					<form method="post" novalidate">
+						{% csrf_token %}
+						{% load socialaccount %}	
+						{% providers_media_js %}
 						<input hidden name="curr_pg" value="{{request.path}}" >						
 						<input hidden id="signup-recaptcha" name="signup-recaptcha">	
-							                                  
-						<div class="panel panel-default cpanel cpanel-default">
-							<div class="w3-container">
-								<div class = "row">
-									<div class = "col-2">
-										<img id = "prod-img" src = "{% static 'img/signup_pic.jpg' %}" class = "image-fluid">
-									</div>
-									<div class = "col-1">
-									</div>
-									<div class = "col-8">
-										{% if msg %}
-											<p style="font-size:1.2rem; color:red">{{msg}}</p>
-										{% endif %}
-										{% for hidden in form.hidden_fields %}
-										  {{ hidden }}
-										{% endfor %}
+						
+						<div class = "row">
+							<div class ="col-12">
+															
+								{% if msg %}
+									<p style="color:red">{{msg}}</p>
+								{% endif %}
+								{% for hidden in form.hidden_fields %}
+								  {{ hidden }}
+								{% endfor %}
+							</div>
+						</div>
 
-										{% for field in form.visible_fields %}
-										  <div class="form-group">
-											<label class = "control-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-											{{ field|add_class:'form-control' }}
-											{% for error in field.errors %}
-											  <span class="" style="color:red;">{{ error }}</span>
-											{% endfor %}
-										  </div>
-										{% endfor %}
-									</div>
+						{% if form.errors or validation_msg%}
+						<div id="errors" class="alert alert-warning alert-dismissable">
+							<button type="button" class="close" data-dismiss="alert">&times;</button>
+							<div class="inner">
+								{{ form.non_field_errors }}
+								<ul>
+									<!-- Forms -->
+									{% for field in form %}
+										{% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+									{% endfor %}
+									<!-- Validations -->
+									{% for v in validation_msg %}
+										<li>{{v}}</li>
+									{% endfor %}									
+								</ul>
+							</div>
+						</div>
+						{% endif %} 
+
+
+						<div class ="row">
+							<div class ="col-12">
+								<div class="form-group" style = "display:flex;">
+									<input placeholder="Username" type="text" name="username" 
+									maxlength="254" autofocus="" class="form-control"
+									required="" id="id_username"
+									value = "{{form.username.value|default_if_none:''}}"
+									>
+								</div>							
+							</div>
+						</div>
+						<div class ="row">
+							<div class ="col-6">
+								<div class="form-group">
+									<input placeholder="First Name" type="text" name="first_name" 
+									maxlength="30" class="form-control" id="id_first_name"
+									value = "{{form.first_name.value|default_if_none:''}}">
 								</div>
 							</div>
-							<div class="text-center">
-								<small><input id = "tnc" name="tnc" type="checkbox" value="" checked onchange="activateButton(this);"> I have read and understood the Arte'Venue <a href="">terms of usage</a> and <a href="">privacy policy</a></small>
+							<div class ="col-6">
+								<div class="form-group">
+									<input placeholder="Last Name" type="text" name="last_name" 
+									maxlength="30" class="form-control" id="id_last_name"
+									value = "{{form.last_name.value|default_if_none:''}}">
+								</div>
+							</div>
+						</div>
+						<div class = "row">
+							<div class ="col-12">
+								<div class="form-group" style = "display:flex;">
+									<input placeholder="Email Id" type="email" name="email" maxlength="254" 
+										class="form-control" required="" id="id_email" 
+										value = "{{form.email.value|default_if_none:''}}">
+								</div>						
+							</div>
+						</div>
+						
+						<div class = "row">
+							<div class ="col-6">
+								<div class="form-group">
+									<input placeholder="Password" type="password" name="password1" class="form-control" required="" id="id_password1">
+								</div>
+							</div>
+							<div class ="col-6">
+								<div class="form-group">
+									<input placeholder="Password Confirmation" type="password" name="password2" class="form-control" required="" id="id_password2">
+								</div>
+							</div>
+						</div>
+						<div class = "row">
+							<div class ="col-12">
+								<div class="form-group">
+									<input placeholder="Business Referral Code" type="text" 
+									name="business_code" class="form-control" required="" 
+									id="business_code"
+									maxlength=8
+									value = "{{business_code}}">
+									<small class = "text-muted">If you have been referred by a business and have the referral code, please enter the code here.</small>
+								</div>
+							</div>
+						</div>
+						<div class="row text-center">
+							<div class = "col-12">
+								<small><input id = "tnc" name="tnc" type="checkbox" value="" checked onchange="activateButton(this);"> I have read and understood the Arte'Venue <a href="{% url 'terms_conditions' %}">terms of usage</a> and <a href="{% url 'privacy_policy' %}">privacy policy</a></small>
 								<div id="tnc_err" style="display:none;" class="alert alert-danger">
 									<button type="button" class="close float:left" data-dismiss="">×</button>
-										To signup please read and accept terms and conditions!
+										To sign up please read and accept terms and conditions!
+								</div>
+								<div class="text-center" style="margin-top: 0px;margin-bottom: 3px;">
+									<button id = "submit-btn" type="submit" class="btn btn-primary" style="border-radius: 0;width: 150px">Sign Me Up</button>
 								</div>
 							</div>
 						</div>
-
-						
-						<div class="text-center" style="margin-top: 0px;margin-bottom: 3px;">
-							<button id = "submit-btn" type="submit" class="btn btn-primary" style="border-radius: 0;width: 150px">Sign Me Up</button>
+						<hr>
+						<h5>
+							Sign Up Using Your Social Media Account
+						</h5>
+						<div class = "well">
+							<div class = "row">
+								<div class="col-3 text-center">
+									<a class="btn auth-provider-button hover-on" href="{% provider_login_url 'facebook' method='js_sdk' %}">
+									  <img src="{% static 'img/facebook_logo.svg' %}" alt="Facebook Login" style="height:38px;border:0;">
+									</a>
+								</div>
+								<div class="col-3 text-center">
+									<a class="btn auth-provider-button hover-on" href="">
+									  <img src="{% static 'img/google_logo.svg' %}" alt="Google Login" style="height:38px;border:0;">
+									</a>
+								</div>
+								<div class="col-3 text-center">
+									<a class="btn auth-provider-button hover-on" href="">
+									  <img src="{% static 'img/twitter_Logo.svg' %}" alt="Twitter Login" style="height:38px;border:0;">
+									</a>
+								</div>
+								<div class="col-3 text-center">
+									<a class="btn auth-provider-button hover-on" href="">
+									  <img src="{% static 'img/instagram_logo.jpg' %}" alt="Instagram Login" style="height:38px;border:0;">
+									</a>
+								</div>
+							</div>
 						</div>
-                        
-                    </form>
+						<hr>
+					</form>				
 				</div>
-            </div>
+			</div>
+						
+
         </div>
     </div>
 	{% endblock sitecontent %}

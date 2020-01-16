@@ -1,0 +1,103 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block page-title %}
+<title>Manage Amazon Orders</title>
+{% endblock page-title %}
+
+{% block page-description %}
+<meta name="description" content="Manage Orders from Amzon">
+{% endblock page-description %}
+
+{% block page-keywords %}  
+<meta name="keywords" content="">
+{% endblock page-keywords %}  
+
+{% block page-author %}  
+<meta name="author" content="Arte'venue">
+{% endblock page-author %}  
+
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+	
+    <div class="container mt-3">
+		<div class="row">
+			<div class="col-12">
+				<h2>Enter New Amazon Order Details</h2>
+			</div>
+		</div>
+		<div class="row mt-3">
+			<div class="col-2">
+				<div class="form-group">
+					<label>Amazon Order No.:</label>
+					<input name = "ordno" id = "ordno" 
+						class = "form-control" type="text" maxlength="20"/>
+				</div>				
+			</div>
+			<div class="col-2">
+				<div class="form-group">
+					<label>Order Dt.:</label>
+					<input name = "orddt" id = "orddt" 
+						class = "form-control" type="date"/>
+				</div>				
+			</div>
+			<div class="col-2">
+				<div class="form-group">
+					<label>Qty:</label>
+					<input name = "ordqty" id = "ordqty" 
+						class = "form-control" type="number"/>
+				</div>				
+			</div>
+			<div class="col-2">
+				<div class="form-group">
+					<label>Ord Sub Total</label>
+					<input name = "shipping_mode" id = "shipping_mode" type = "number"
+						class = "form-control"/>
+				</div>				
+			</div>
+			<div class="col-2">
+				<div class="form-group">
+					<label>Ord Tax</label>
+					<input name = "shipping_mode" id = "shipping_mode" type = "number"
+						class = "form-control"/>
+				</div>				
+			</div>
+			<div class="col-2">
+				<div class="form-group">
+					<label>Ord Total:</label>
+					<input name = "ordqty" id = "ordqty" 
+						class = "form-control" type="number"/>
+				</div>		
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-12">
+			</div>
+		</div>
+    </div>
+
+	
+	{% endblock sitecontent %}
+
+	
+	{% block jscripts %}
+	<script>
+    $(document).ready( function(){
+		var tbl = document.getElementById("ordTbl");
+		if (tbl != null) {
+			for (var i = 0; i < tbl.rows.length; i++) {
+				for (var j = 0; j < tbl.rows[i].cells.length; j++) {
+					tbl.rows[i].cells[j].onclick = (function (i, j) {
+						return function () {
+							alert(tbl.rows[i].cells[0].innerHTML);
+						};
+					}(i, j));
+				}
+			}
+		}
+    });
+	</script>
+	{% endblock jscripts %}
+			
+	

@@ -20,6 +20,8 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 import urllib
 
+from django.core.exceptions import PermissionDenied
+
 from artevenue.models import Order, Order_billing, PrePaymentGateway
 from artevenue.models import Payment_details, Cart, Egift, Voucher
 from artevenue.models import Voucher_user, Egift_card_design, Voucher_used
@@ -172,6 +174,10 @@ def payment_done(request):
 	c = {}
 	c.update(csrf(request))
 
+	sts = request.POST.get("status","")
+	if sts == "":
+		raise PermissionDenied
+
 	status=request.POST["status"]
 	firstname=request.POST["firstname"]
 	amount=request.POST["amount"]
@@ -263,7 +269,6 @@ def payment_done(request):
 			updated_date = today
 		)
 		o_email.save()
-		
 		
 		# Save the registration, subscription, payment, promotion code details 
 		paymnt = Payment_details(
@@ -368,9 +373,14 @@ def payment_unsuccessful(request):
 		
 	order = Order.objects.get(order_id = order_id)
 
+	if order.user:
+		user = order.user
+		#user = authenticate(request, email=email, username=username, password=password)
+		login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+
 	return render(request, 'artevenue/payment_unsuccessful.html',
 			{ "txnid":txnid, "status":status, "amount":amount, 'msg':msg,
-			'db_err':db_err, 'firstname':firstname, 'order':order,
+			'firstname':firstname, 'order':order,
 			'pay_status':pay_status}
 		)	
 			

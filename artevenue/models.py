@@ -10,6 +10,9 @@ from PIL import Image, ExifTags
 from io import StringIO, BytesIO
 from django.conf import settings
 
+#from artist.models import Artist
+#from django.apps import apps
+#Artist = apps.get_model('artist', 'Artist')
 
 class Ecom_site(models.Model):
 	store_id = models.AutoField(primary_key=True, null=False)
@@ -40,27 +43,34 @@ class Ecom_site(models.Model):
 	show_frame_my_art_section = models.BooleanField(null=False, default=False)
 	frame_my_art_header = models.CharField(max_length = 50 , blank=True, default='')
 	number_of_frame_my_art_slides = models.IntegerField(null=True, blank=True)
-	#email_support_enabled = models.BooleanField(null=False, default=False)
-	#support_email = models.EmailField(null=True)
+	email_support_enabled = models.BooleanField(null=False, default=False)
+	support_email = models.EmailField(null=True)
+	gst_number = models.CharField(max_length = 30 , blank=True, default='')
+	pan_number = models.CharField(max_length = 30 , blank=True, default='')
+	tan_number = models.CharField(max_length = 30 , blank=True, default='')
 
 	def __str__(self):
 		return str(self.store_id)
 
 	
 class Contact_us(models.Model):
-    first_name = models.CharField(max_length=150, blank=False, null =False)
-    last_name = models.CharField(max_length=150, blank=False, null =False)
-    email_id = models.EmailField(blank=False, null=False)
-    phone_number = models.CharField(max_length=30, blank=True, default='')
-    subject = models.CharField(max_length=200, blank=False, null =False)
-    message = models.CharField(max_length=4000, blank=False, null =False)
-    msg_datetime = models.DateTimeField(null=True, auto_now_add=True, editable=False)
-    response = models.CharField(max_length=4000, blank=True, default='',editable=False)
-    resp_datetime = models.DateTimeField(null=True, editable=False)
-    reponded_by = models.CharField(max_length=30, blank=True, default='', editable=False)
-    
-    def __str__(self):
-        return self.first_name + " " + self.last_name 
+	first_name = models.CharField(max_length=150, blank=False, null =False)
+	last_name = models.CharField(max_length=150, blank=False, null =False)
+	email_id = models.EmailField(blank=False, null=False)
+	phone_number = models.CharField(max_length=30, blank=True, default='')
+	subject = models.CharField(max_length=200, blank=False, null =False)
+	message = models.CharField(max_length=4000, blank=False, null =False)
+	msg_datetime = models.DateTimeField(null=True, auto_now_add=True, editable=False)
+	response = models.CharField(max_length=4000, blank=True, default='',editable=False)
+	resp_datetime = models.DateTimeField(null=True, editable=False)
+	reponded_by = models.CharField(max_length=30, blank=True, default='', editable=False)
+	email_sent_to_artevenue = models.BooleanField(null=False, default=False)
+	email_sent_to_sender = models.BooleanField(null=False, default=False)
+	sms_sent_to_artevenue = models.BooleanField(null=False, default=False)
+	sms_sent_to_sender = models.BooleanField(null=False, default=False)
+	
+	def __str__(self):
+		return self.first_name + " " + self.last_name 
 		
 	
 # Model - voucher
@@ -429,6 +439,7 @@ class Product_type(models.Model):
 		choices=TYPE_CHOICES)
 	is_shipping_required = models.BooleanField(null=False, default=False)
 	tax = models.ForeignKey(Tax, models.CASCADE, null=True)
+	apply_inventory = models.BooleanField(null=False, default=False)
 
 	def __str__(self):
 		return self.product_type_id		
@@ -462,6 +473,7 @@ class Stock_image(models.Model):
 	key_words = models.CharField(max_length = 2000, null=True)
 	url = models.CharField(max_length = 1000, blank=True, default='')
 	thumbnail_url = models.CharField(max_length = 1000, blank=True, default='')
+	category_disp_priority = models.IntegerField(null = True)
 
 	def __str__(self):
 		return str( self.product_id ) + " " + self.name
@@ -473,9 +485,10 @@ class User_image (models.Model):
 	user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
 	image_to_frame = models.ImageField(upload_to='uploads/%Y/%m/%d/', blank=True, default="")
 	status = models.CharField(max_length = 3, blank=True, null=False)
-	created_date = models.DateTimeField(auto_now_add=True, null=False)	
-	updated_date = models.DateTimeField(auto_now=True, null=False)	
+	created_date = models.DateTimeField(auto_now_add=True, null=False)
+	updated_date = models.DateTimeField(auto_now=True, null=False)
 	image_to_frame_thumbnail = models.ImageField(upload_to='uploads/%Y/%m/%d/', blank=True, default="")
+	category_disp_priority = models.IntegerField(null = True)
 	def __str__(self):
 		return str( self.product_id ) + " " + self.image_to_frame.name
 
@@ -552,11 +565,34 @@ class Stock_collage(models.Model):
 	collage_layout = models.ForeignKey('Collage_layout', models.CASCADE, null=False)
 	name = models.CharField(max_length = 200, null=False)
 	is_published = models.BooleanField(null=False, default=False)
+	category_disp_priority = models.IntegerField(null = True)
 
 	def __str__(self):
 		return str( self.product_id ) + " " + self.name
 	
 class Original_art(models.Model):
+	IMAGE_TYPE = (
+		('ART', 'Art Work'),
+		('PHT', 'Photograph'),
+	)
+	MEDIUM = (
+		('OIL', 'Oil'),
+		('ACR', 'Acrylic'),
+		('WTR', 'Water Color'),
+		('GOU', 'Gouache'),
+		('INK', 'Ink'),
+		('PEN', 'Pen'),
+		('PST', 'Pastel'),
+		('PNC', 'Pencil'),
+		('COL', 'Charcoal'),
+	)
+	SURFACE = (
+		('CVS', 'Canvas'),
+		('PPR', 'Paper'),
+		('FAB', 'Fabric'),	
+		('GLS', 'Glass'),	
+		('WOD', 'Wood'),	
+	)
 	product_id = models.AutoField(primary_key=True, null=False)
 	product_type = models.ForeignKey(Product_type, models.CASCADE, null=True)
 	name = models.CharField(max_length = 200, null=False)
@@ -571,7 +607,7 @@ class Original_art(models.Model):
 	featured = models.BooleanField(null=False, default=False)
 	has_variants = models.BooleanField(null=False, default=False)
 	aspect_ratio = models.DecimalField(max_digits = 21, decimal_places=18, null=True)
-	image_type =  models.CharField(max_length = 1, null=True)
+	image_type =  models.CharField(max_length = 1, null=True, choices = IMAGE_TYPE)
 	orientation = models.CharField(max_length = 20, null=True)
 	max_width = models.DecimalField(max_digits = 6, decimal_places=2, null=True)
 	max_height = models.DecimalField(max_digits = 6, decimal_places=2, null=True)
@@ -582,6 +618,20 @@ class Original_art(models.Model):
 	key_words = models.CharField(max_length = 2000, null=True)
 	url = models.CharField(max_length = 1000, blank=True, default='')
 	thumbnail_url = models.CharField(max_length = 1000, blank=True, default='')
+	high_resolution_url = models.CharField(max_length = 1000, blank=True, default='')
+	art_width = models.DecimalField(max_digits = 6, decimal_places=2, null=True)
+	art_height = models.DecimalField(max_digits = 6, decimal_places=2, null=True)
+	art_medium = models.CharField(max_length = 3, blank=True, default='',
+		choices=MEDIUM)
+	art_surface = models.CharField(max_length = 3, blank=True, default='',
+		choices=SURFACE)
+	art_surface_desc = models.CharField(max_length = 500, blank=True, default='')
+	category_disp_priority = models.IntegerField(null = True)
+	art_print_allowed = models.BooleanField(null=False, default=False)
+	original_art_price = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	available_qty = models.IntegerField(null=True)	
+	sold_qty = models.IntegerField(null=True)	
+	stock_image = models.ForeignKey(Stock_image, models.PROTECT, null=True)
 
 	def __str__(self):
 		return self.name + " - By " + self.artist
@@ -590,6 +640,12 @@ class Original_art(models.Model):
 class Stock_image_stock_image_category(models.Model):
 	stock_image = models.OneToOneField(Stock_image, models.PROTECT, null=False)
 	stock_image_category = models.ForeignKey(Stock_image_category, models.CASCADE, null=True) 
+
+
+class Original_art_original_art_category(models.Model):
+	original_art = models.OneToOneField(Original_art, models.PROTECT, null=False)
+	stock_image_category = models.ForeignKey(Stock_image_category, models.CASCADE,
+	null=True, related_name="original_art_category") 
 
 	
 class Collage_layout(models.Model):
@@ -638,6 +694,13 @@ class Product_view(models.Model):
 	created_date = models.DateTimeField(auto_now_add=True, null=False)	
 	updated_date = models.DateTimeField(auto_now=True, null=False)	
 	collage_layout_id = models.IntegerField(null=True)
+	high_resolution_url = models.CharField(max_length = 1000, blank=True, default='')
+	art_width = models.DecimalField(max_digits = 6, decimal_places=2, null=True)
+	art_height = models.DecimalField(max_digits = 6, decimal_places=2, null=True)
+	art_medium = models.CharField(max_length = 3, blank=True, default='')
+	art_surface = models.CharField(max_length = 3, blank=True, default='')
+	art_surface_desc = models.CharField(max_length = 500, blank=True, default='')
+	category_disp_priority = models.IntegerField(null = True)
 	
 	class Meta:
 		managed = False
@@ -693,6 +756,14 @@ class Promotion(models.Model):
 	def __str__(self):
 		return str(self.promotion_id) + '-' + self.name
 
+class Promotion_voucher(models.Model):
+	promotion = models.ForeignKey(Promotion, on_delete=models.CASCADE, null=False)
+	voucher = models.ForeignKey(Voucher, on_delete=models.CASCADE, null=False)
+	show_popup = models.BooleanField(null=False, default=False)
+	pop_at_start = models.BooleanField(null=False, default=False)	
+	pop_at_close = models.BooleanField(null=False, default=False)
+	popup_duration = models.TimeField(null=True)
+	
 class Promotion_images(models.Model):
 	image_id = models.AutoField(primary_key=True, null=False)
 	promotion = models.ForeignKey(Promotion, models.CASCADE)
@@ -748,7 +819,8 @@ class Promotion_product_view(models.Model):
 	id = models.AutoField(primary_key=True)
 	promotion = models.ForeignKey(Promotion, models.CASCADE, null=False)
 	product_id = models.IntegerField(null=False)
-
+	product_type = models.ForeignKey(Product_type, models.CASCADE, null=False) 
+	
 	class Meta:
 		managed = False
 		db_table = 'promotion_product_view'	
@@ -837,6 +909,7 @@ class Moulding(models.Model):
 	description = models.CharField(max_length = 1000, blank=True, default = '')
 	price = models.DecimalField(max_digits=12, decimal_places=2, null=True)
 	price_type = models.ForeignKey(Price_type, models.CASCADE, null=True)
+	width_inner_inches = models.DecimalField(max_digits=12, decimal_places=2, null=True)
 	width_inches = models.DecimalField(max_digits=12, decimal_places=2, null=True)
 	depth_inches = models.DecimalField(max_digits=12, decimal_places=2, null=True)
 	available_on = models.DateField(blank=True, null=True)
@@ -881,6 +954,13 @@ class Moulding_image(models.Model):
 #  CART 
 ###################
 class Cart(models.Model):
+	CART_STATUS = (
+		('AC', 'Active'),
+		('AB', 'Abandoned'),
+		('CO', 'Checked Out'),
+	)
+	
+	
 	cart_id = models.AutoField(primary_key=True, null=False)
 	store = models.ForeignKey(Ecom_site, models.PROTECT)
 	session_id = models.CharField(max_length = 40, blank=True, default='') # to store the session_key in case of anonymous user
@@ -890,14 +970,16 @@ class Cart(models.Model):
 	referral = models.ForeignKey('Referral', on_delete=models.PROTECT, null=True)
 	referral_disc_amount = models.DecimalField(max_digits=12, decimal_places=2, null=False, default=0)
 	quantity = models.IntegerField(null=True)
+	cart_unit_price = models.DecimalField(max_digits=12, decimal_places=2,  null=False, default=0)
 	cart_sub_total = models.DecimalField(max_digits=12, decimal_places=2,  null=False, default=0)
 	cart_disc_amt  = models.DecimalField(max_digits=12, decimal_places=2,  null=False, default=0)
 	cart_tax  = models.DecimalField(max_digits=12, decimal_places=2,  null=False, default=0)
 	cart_total = models.DecimalField(max_digits=12, decimal_places=2,  null=False, default=0)
-	cart_status = models.CharField(max_length = 2, blank=True, default='AC') #"AC" Active, "AB":Abandoned, "CO" Checked-out
+	cart_status = models.CharField(max_length = 2, blank=True, default='AC',
+		choices=CART_STATUS, )
 	created_date = models.DateTimeField(auto_now_add=True, null=False)	
 	updated_date = models.DateTimeField(auto_now=True, null=False)	
-
+	ip_address = models.CharField(max_length = 50, blank=True, default = '' )
 	def __str__(self):
 		return str(self.cart_id)
 
@@ -1055,7 +1137,7 @@ class Business_profile(models.Model):
 	ifsc_code = models.CharField(max_length = 11, default = '', blank = True)
 	bank_name = models.CharField(max_length = 500, default = '', blank = True)
 	bank_branch = models.CharField(max_length = 600, default = '', blank = True)
-
+	business_code = models.CharField(max_length=8, null=True, blank = True, unique=True)
 
 	def __str__(self):
 		return self.company + " - " + self.contact_name
@@ -1085,7 +1167,15 @@ class Business_commission(models.Model):
 
 #############################################################################
 #  	ORDER
-############################	
+#############################################################################
+class Order_channel(models.Model):
+	channel_id = models.CharField(primary_key=True, max_length = 3)
+	channel_name = models.CharField(max_length = 20, blank = False, null = False)
+	
+	def __str__(self):
+		return self.channel_id + ' - ' + self.channel_name
+		
+
 class Order (models.Model):
 	ORD_STATUS = (
 		('PP', 'Payment Pending'),
@@ -1099,7 +1189,7 @@ class Order (models.Model):
 	order_id = models.AutoField(primary_key=True, null=False)
 	order_number = models.CharField(max_length = 15, blank = True, default = '')
 	order_date =  models.DateField(blank=True, null=True)
-	cart = models.ForeignKey(Cart,on_delete=models.PROTECT, null=False)
+	cart = models.ForeignKey(Cart,on_delete=models.PROTECT, null=True)
 	store = models.ForeignKey(Ecom_site, models.PROTECT)
 	session_id = models.CharField(max_length = 40, blank=True, default='') # to store the session_key in case of anonymous user
 	user = models.ForeignKey(User, on_delete=models.PROTECT, null=True)
@@ -1107,6 +1197,7 @@ class Order (models.Model):
 	voucher_disc_amount = models.DecimalField(max_digits=12, decimal_places=2, null=False, default=0)
 	referral = models.ForeignKey('Referral', on_delete=models.PROTECT, null=True)
 	referral_disc_amount = models.DecimalField(max_digits=12, decimal_places=2, null=False, default=0)
+	unit_price = models.DecimalField(max_digits=12, decimal_places=2, null=False, default=0)
 	quantity = models.IntegerField(null=True)
 	sub_total = models.DecimalField(max_digits=12, decimal_places=2,  null=False, default=0)
 	order_discount_amt = models.DecimalField(max_digits=12, decimal_places=2,  null=False, default=0)
@@ -1115,14 +1206,18 @@ class Order (models.Model):
 	order_total = models.DecimalField(max_digits=12, decimal_places=2,  null=False, default=0)
 	shipping_method = models.ForeignKey(Shipping_method, models.PROTECT, null=True) #Null is allowed, in case it's a store pickup
 	shipper = models.ForeignKey(Shipper, models.PROTECT, null=True) #Null is allowed, in case it's a store pickup	
-	shipping_status = models. ForeignKey(Shipping_status, models.PROTECT, null=True) #Null is allowed, in case it's a store pickup
+	shipping_status = models.ForeignKey(Shipping_status, models.PROTECT, null=True) #Null is allowed, in case it's a store pickup
 	order_status = models.CharField(max_length = 2, blank=True, 
 		choices=ORD_STATUS, default='PP') 
 	created_date = models.DateTimeField(auto_now_add=True, null=False)	
 	updated_date = models.DateTimeField(auto_now=True, null=False)	
-
+	invoice_number = models.CharField(max_length = 15, blank = True, default = '')
+	invoice_date = models.DateTimeField(null=True)
+	channel = models.ForeignKey('Order_channel', on_delete=models.PROTECT, null = False, default = 'ART')
+	
 	def __str__(self):
 		return str(self.order_id) + ' - ' + str(self.user)
+
 
 class Order_sms_email(models.Model):
 	order = models.OneToOneField(Order, on_delete=models.CASCADE, null=False)
@@ -1139,7 +1234,7 @@ class Order_sms_email(models.Model):
 class Order_items (models.Model):
 	order_item_id = models.AutoField(primary_key=True, null=False)
 	order = models.ForeignKey(Order,on_delete=models.PROTECT, null=False)
-	cart_item = models.ForeignKey(Cart_item, on_delete=models.PROTECT, null=False)
+	cart_item = models.ForeignKey(Cart_item, on_delete=models.PROTECT, null=True)
 	promotion = models.ForeignKey(Promotion, models.PROTECT, null=True)
 	quantity = models.IntegerField(null=False)
 	item_unit_price = models.DecimalField(max_digits=12, decimal_places=2, null=False, default=0)
@@ -1168,7 +1263,7 @@ class Order_items (models.Model):
 		abstract = True
 		unique_together = ("order_item_id", "order")	
 	def __str__(self):
-		return str(self.order_id) + str(order_item_id)
+		return str(self.order_id) + str(self.order_item_id)
 		
 class Order_stock_image(Order_items):
 	stock_image = models.ForeignKey('Stock_image', models.CASCADE, null=False)
@@ -1282,7 +1377,7 @@ class Order_billing (models.Model):
 	gst_number = models.CharField(max_length=30, blank=True, default='')
 
 	def __str__(self):
-		return str(self.order) + full_name
+		return str(self.order) + self.full_name
 
 	
 ############################
@@ -1300,6 +1395,22 @@ class Generate_number(models.Model):
 	type = models.CharField(max_length = 50, null=False, primary_key = True)
 	description = models.CharField(max_length = 1000, null=True)
 	current_number = models.IntegerField(null=False)	
+
+
+class User_collection(models.Model):
+	user_collection_id = models.AutoField(primary_key=True, null=False)
+	name = models.CharField(max_length=500, blank=False, null =False)
+	user = models.ForeignKey(User, on_delete=models.PROTECT, null=True)
+	created_date = models.DateTimeField(auto_now_add=True, null=False)	
+	updated_date = models.DateTimeField(auto_now=True, null=False)	
+	
+class User_space(models.Model):
+	user_space_id = models.AutoField(primary_key=True, null=False)
+	user_collection = models.ForeignKey(User_collection, on_delete=models.CASCADE)
+	name = models.CharField(max_length=500, blank=False, null =False)
+	created_date = models.DateTimeField(auto_now_add=True, null=False)	
+	updated_date = models.DateTimeField(auto_now=True, null=False)	
+
 
 #############################################################################
 #  	WISH LIST
@@ -1348,7 +1459,11 @@ class Wishlist_item(models.Model):
 	image_height = models.DecimalField(max_digits=3, decimal_places=0, blank=False, null=False)	
 	created_date = models.DateTimeField(auto_now_add=True, null=False)	
 	updated_date = models.DateTimeField(auto_now=True, null=False)	
-	
+	user_collection = models.ForeignKey(User_collection, 
+		on_delete=models.CASCADE, null=True)
+	user_space = models.ForeignKey(User_space, on_delete=models.CASCADE, 
+		null=True)
+		
 
 	class Meta:
 		abstract = True
@@ -1395,6 +1510,10 @@ class Wishlist_item_view(models.Model):
 	created_date = models.DateTimeField(auto_now_add=True, null=False)	
 	updated_date = models.DateTimeField(auto_now=True, null=False)	
 	product_type = models.ForeignKey(Product_type, models.PROTECT, null=False)
+	user_collection = models.ForeignKey(User_collection, 
+		on_delete=models.SET_NULL, null=True)
+	user_space = models.ForeignKey(User_space, on_delete=models.SET_NULL, 
+		null=True)
 	
 	class Meta:
 		managed = False
@@ -1498,7 +1617,7 @@ class Payment_details (models.Model):
 	amount = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
 	payment_txn_status = models.CharField(max_length=10, blank=True, default='')
 	payment_txn_id = models.CharField(max_length=250, blank=True, default='')
-	payment_txn_amount=models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
+	payment_txn_amount=models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
 	payment_txn_posted_hash=models.CharField(max_length=250, blank=True, default='')
 	payment_txn_key=models.CharField(max_length=250, blank=True, default='')
 	payment_txn_productinfo=models.CharField(max_length=250, blank=True, default='')
@@ -1547,8 +1666,153 @@ class User_sms_email(models.Model):
 	def __str__(self):
 		return str(self.user)
 
+class UserProfile(models.Model):
+	GENDER_CHOICES = (
+		('', 'Not Specified'),
+		('M', 'Male'),
+		('F', 'Female'),
+		('T', 'LGBT'),
+	)    
+	user = models.OneToOneField(User, on_delete=models.CASCADE, unique=True)
+	phone_number = models.CharField(max_length=30, blank=True, default='')
+	date_of_birth = models.DateField(blank=True, null= True)
+	gender = models.CharField(
+		max_length=1,
+		choices=GENDER_CHOICES,
+		default='',
+		blank = True
+	)
+	subject_interests = models.CharField(max_length=2000, blank=True, default='')
+	business_profile = models.ForeignKey(Business_profile, on_delete = models.SET_NULL, null=True, blank=True)
+
+	def __str__(self):
+		return str(self.User)
+
+'''
+############################
+#  	INVOICE
+############################	
+class Invoice (models.Model):
+	PRINT_STATUS = (
+			('N', 'Not printed'),
+		('P', 'Printed'),
+	)
+	invoice_id = models.AutoField(primary_key=True, null=False)
+	invoice_number = models.CharField(max_length = 15, blank = True, default = '')
+	invoice_date =  models.DateField(blank=True, null=True)
+	order = models.ForeignKey(Order,on_delete=models.PROTECT, null=False)
+	store = models.ForeignKey(Ecom_site, models.PROTECT)
+	session_id = models.CharField(max_length = 40, blank=True, default='') # to store the session_key in case of anonymous user
+	user = models.ForeignKey(User, on_delete=models.PROTECT, null=True)
+	voucher = models.ForeignKey(Voucher, models.PROTECT, null=True)
+	voucher_disc_amount = models.DecimalField(max_digits=12, decimal_places=2, null=False, default=0)
+	referral = models.ForeignKey('Referral', on_delete=models.PROTECT, null=True)
+	referral_disc_amount = models.DecimalField(max_digits=12, decimal_places=2, null=False, default=0)
+	unit_price = models.DecimalField(max_digits=12, decimal_places=2,  null=False, default=0)
+	quantity = models.IntegerField(null=True)
+	sub_total = models.DecimalField(max_digits=12, decimal_places=2,  null=False, default=0)
+	order_discount_amt = models.DecimalField(max_digits=12, decimal_places=2, null=False, default=0)
+	tax = models.DecimalField(max_digits=12, decimal_places=2,  null=False, default=0)
+	shipping_cost = models.DecimalField(max_digits=12, decimal_places=2, null=False, default=0)
+	invoice_total = models.DecimalField(max_digits=12, decimal_places=2, null=False, default=0)
+	shipping_method = models.ForeignKey(Shipping_method, models.PROTECT, null=True) #Null is allowed, in case it's a store pickup
+	shipper = models.ForeignKey(Shipper, models.PROTECT, null=True) #Null is allowed, in case it's a store pickup	
+	shipping_status = models. ForeignKey(Shipping_status, models.PROTECT, null=True) #Null is allowed, in case it's a store pickup
+	print_status = models.CharField(max_length = 1, blank=True, 
+		choices=PRINT_STATUS, default='PP') 
+	cust_email_sent = models.BooleanField(null=False, default=False) 
+	created_date = models.DateTimeField(auto_now_add=True, null=False)	
+	updated_date = models.DateTimeField(auto_now=True, null=False)	
+
+	def __str__(self):
+		return str(self.invoice_id) + ' - ' + str(self.user)
+
+
+class Invoice_items (models.Model):
+	invoice_item_id = models.AutoField(primary_key=True, null=False)
+	invoice = models.ForeignKey(Invoice,on_delete=models.PROTECT, null=False)
+	cart_item = models.ForeignKey(Cart_item, on_delete=models.PROTECT, null=False)
+	promotion = models.ForeignKey(Promotion, models.PROTECT, null=True)
+	quantity = models.IntegerField(null=False)
+	item_unit_price = models.DecimalField(max_digits=12, decimal_places=2, null=False, default=0)
+	item_sub_total = models.DecimalField(max_digits=12, decimal_places=2,  null=False, default=0)
+	item_disc_amt  = models.DecimalField(max_digits=12, decimal_places=2,  null=False, default=0)
+	item_tax  = models.DecimalField(max_digits=12, decimal_places=2,  null=False, default=0)
+	item_total = models.DecimalField(max_digits=12, decimal_places=2,  null=False, default=0)
+	moulding = models.ForeignKey(Moulding,on_delete=models.PROTECT, null=True)
+	moulding_size = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	print_medium = models.ForeignKey(Print_medium, models.PROTECT, null=False, default='PAPER')
+	print_medium_size = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	mount = models.ForeignKey(Mount, models.PROTECT, null=True)
+	mount_size = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	board = models.ForeignKey(Board, models.PROTECT, null=True)
+	board_size = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	acrylic = models.ForeignKey(Acrylic, models.PROTECT, null=True)
+	acrylic_size = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	stretch = models.ForeignKey(Stretch, models.PROTECT, null=True)
+	stretch_size = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	image_width = models.DecimalField(max_digits=3, decimal_places=0, blank=False, null=False)
+	image_height = models.DecimalField(max_digits=3, decimal_places=0, blank=False, null=False)	
+	created_date = models.DateTimeField(auto_now_add=True, null=False)	
+	updated_date = models.DateTimeField(auto_now=True, null=False)	
+
+	class Meta:
+		abstract = True
+		unique_together = ("invoice_item_id", "invoice")	
+	def __str__(self):
+		return str(self.invoice_id) + str(self.invoice_item_id)
+		
+class Invoice_stock_image(Invoice_items):
+	stock_image = models.ForeignKey('Stock_image', models.CASCADE, null=False)
+
+class Invoice_user_image(Invoice_items):
+	user_image = models.ForeignKey('User_image', models.CASCADE, null=False)
+
+class Invoice_stock_collage(Invoice_items):
+	stock_collage = models.ForeignKey('Stock_collage', models.CASCADE, null=False)
+
+class Invoice_original_art(Invoice_items):
+	original_art = models.ForeignKey('Original_art', models.CASCADE, null=False)
+
+
+class Invoice_items_view (models.Model):
+	invoice_item_id = models.AutoField(primary_key=True, null=False)
+	invoice = models.ForeignKey(Invoice,on_delete=models.PROTECT, null=False)
+	cart_item = models.ForeignKey(Cart_item, on_delete=models.PROTECT, null=False)
+	product = models.ForeignKey(Product_view, models.PROTECT, null=False)
+	promotion = models.ForeignKey(Promotion, models.PROTECT, null=True)
+	quantity = models.IntegerField(null=False)
+	item_unit_price = models.DecimalField(max_digits=12, decimal_places=2, null=False, default=0)
+	item_sub_total = models.DecimalField(max_digits=12, decimal_places=2,  null=False, default=0)
+	item_disc_amt  = models.DecimalField(max_digits=12, decimal_places=2,  null=False, default=0)
+	item_tax  = models.DecimalField(max_digits=12, decimal_places=2,  null=False, default=0)
+	item_total = models.DecimalField(max_digits=12, decimal_places=2,  null=False, default=0)
+	moulding = models.ForeignKey(Moulding,on_delete=models.PROTECT, null=True)
+	moulding_size = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	print_medium = models.ForeignKey(Print_medium, models.PROTECT, null=False, default='PAPER')
+	print_medium_size = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	mount = models.ForeignKey(Mount, models.PROTECT, null=True)
+	mount_size = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	board = models.ForeignKey(Board, models.PROTECT, null=True)
+	board_size = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	acrylic = models.ForeignKey(Acrylic, models.PROTECT, null=True)
+	acrylic_size = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	stretch = models.ForeignKey(Stretch, models.PROTECT, null=True)
+	stretch_size = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	image_width = models.DecimalField(max_digits=3, decimal_places=0, blank=False, null=False)
+	image_height = models.DecimalField(max_digits=3, decimal_places=0, blank=False, null=False)	
+	created_date = models.DateTimeField(auto_now_add=True, null=False)	
+	updated_date = models.DateTimeField(auto_now=True, null=False)	
+	product_type = models.ForeignKey(Product_type, models.PROTECT, null=False) 	
+
+	class Meta:
+		managed = False
+		db_table = 'invoice_items_view'		
+'''
+
 class Homelane_data(models.Model):
-	product = models.OneToOneField(Stock_image, on_delete=models.CASCADE, primary_key=True)
+	homelane_key =  models.AutoField(primary_key=True)
+	product = models.ForeignKey(Stock_image, on_delete=models.CASCADE, null=False)
 	product_name = models.CharField(max_length = 128, null=True, default = '')
 	description = models.CharField(max_length = 2000, blank=True, default = '')
 	part_number = models.CharField(max_length = 30, null=True)
@@ -1600,9 +1864,159 @@ class Homelane_data(models.Model):
 	image_height = models.DecimalField(max_digits=3, decimal_places=0, blank=False, null=False)	
 	created_date = models.DateTimeField(auto_now_add=True, null=False)	
 	updated_date = models.DateTimeField(auto_now=True, null=False)	
+	ordered = models.BooleanField(null=False, default=False)
+	order_number = models.CharField(max_length = 15, blank = True, default = '')
+	order_date = models.DateField(blank=True, null=True)
 	
 	def __str__(self):
 		return str( self.product_id ) + " " + self.product_name
+
+class Amazon_data(models.Model):
+	PARENT_CHILD = (
+		('P', 'Parent'),
+		('C', 'Child'),
+	)
+	amazon_key =  models.AutoField(primary_key=True)
+	amazon_sku =  models.CharField(max_length = 15, null=True, default = '')
+	product = models.ForeignKey(Stock_image, on_delete=models.CASCADE, null=False)
+	product_name = models.CharField(max_length = 128, null=True, default = '')
+	description = models.CharField(max_length = 2000, blank=True, default = '')
+	part_number = models.CharField(max_length = 30, null=True)
+	product_type = models.ForeignKey(Product_type, models.CASCADE, null=True)
+	category = models.ForeignKey(Stock_image_category, models.CASCADE, null=True)
+	category_name = models.CharField(max_length = 128, null=True, default = '')
+	is_published = models.BooleanField(null=False, default=False)
+	aspect_ratio = models.DecimalField(max_digits = 21, decimal_places=18, null=True)
+	image_type =  models.CharField(max_length = 1, null=True)
+	orientation = models.CharField(max_length = 20, null=True)
+	max_width = models.DecimalField(max_digits = 6, decimal_places=2, null=True)
+	max_height = models.DecimalField(max_digits = 6, decimal_places=2, null=True)
+	min_width = models.DecimalField(max_digits = 6, decimal_places=2, null=True)
+	publisher = models.CharField(max_length = 600, null=True)
+	artist = models.CharField(max_length = 600, null=True)
+	colors = models.CharField(max_length = 600, null=True)
+	key_words = models.CharField(max_length = 2000, null=True)
+	url = models.CharField(max_length = 1000, blank=True, default='')
+	thumbnail_url = models.CharField(max_length = 1000, blank=True, default='')
+	framed_url = models.CharField(max_length = 1000, blank=True, default='')
+	framed_thumbnail_url = models.CharField(max_length = 1000, blank=True, default='')
+	promotion = models.ForeignKey(Promotion, models.PROTECT, null=True)
+	promotion_name = models.CharField(max_length = 128, null=True, default = '')
+	quantity = models.IntegerField(null=True)
+	item_unit_price = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	item_sub_total = models.DecimalField(max_digits=12, decimal_places=2,  null=True)
+	item_disc_amt  = models.DecimalField(max_digits=12, decimal_places=2,  null=True)
+	item_tax  = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	item_total = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	moulding = models.ForeignKey(Moulding,on_delete=models.PROTECT, null=True)
+	moulding_name = models.CharField(max_length = 30, null=True, default = '')
+	moulding_size = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	print_medium = models.ForeignKey(Print_medium, models.PROTECT, null=False, default='PAPER')
+	print_medium_name = models.CharField(max_length = 30, null=True, default = '')
+	print_medium_size = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	mount = models.ForeignKey(Mount, models.PROTECT, null=True)
+	mount_name = models.CharField(max_length = 30, null=True, default = '')
+	mount_size = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	board = models.ForeignKey(Board, models.PROTECT, null=True)
+	board_name = models.CharField(max_length = 30, null=True, default = '')
+	board_size = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	acrylic = models.ForeignKey(Acrylic, models.PROTECT, null=True)
+	acrylic_name = models.CharField(max_length = 30, null=True, default = '')
+	acrylic_size = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	stretch = models.ForeignKey(Stretch, models.PROTECT, null=True)
+	stretch_name = models.CharField(max_length = 30, null=True, default = '')
+	stretch_size = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	image_width = models.DecimalField(max_digits=3, decimal_places=0, blank=False, null=False)
+	image_height = models.DecimalField(max_digits=3, decimal_places=0, blank=False, null=False)	
+	created_date = models.DateTimeField(auto_now_add=True, null=False)
+	updated_date = models.DateTimeField(auto_now=True, null=False)	
+	ordered = models.BooleanField(null=False, default=False)
+	order_number = models.CharField(max_length = 15, blank = True, default = '')
+	order_date = models.DateField(blank=True, null=True)
+	parent_child = models.CharField(max_length = 1, null=True, default = 'P',
+		choices = PARENT_CHILD)
+	parent_amz_sku = models.CharField(max_length = 15, null=True, default = '')
+	def __str__(self):
+		return str( self.product_id ) + " " + self.product_name
+
+class Channel_order_amz(models.Model):
+	SHIP_MODE = (
+		('S', 'Self(ArteVenue)'),
+		('A', 'Amazon'),	
+	)
+	order_channel = models.ForeignKey(Order_channel, on_delete = models.PROTECT, null=False, default='AMZ')
+	order = models.ForeignKey(Order, on_delete = models.PROTECT, blank = False, null = False)
+	artevenue_order_date = models.DateField(blank=True, null=True)
+	amazon_order_no = models.CharField(max_length = 25, blank = True, default = '')
+	amazon_order_date = models.DateField(blank=True, null=True)
+	buyer_full_name = models.CharField(max_length=500, blank=False, null=False)
+	shipping_full_name = models.CharField(max_length=500, blank=False, null=False)
+	shipping_address_1 = models.CharField(max_length=600, blank=False, null=False)
+	shipping_address_2 = models.CharField(max_length=600, blank=True, default='')
+	shipping_land_mark = models.CharField(max_length=600, blank=True, default='')
+	shipping_city = models.CharField(max_length=600, blank=False, null=False)
+	shipping_state = models.ForeignKey(State, on_delete = models.PROTECT, null=True, related_name = 'shipping_state')
+	shipping_pin_code = models.ForeignKey(Pin_code, on_delete = models.PROTECT, null=True, related_name = 'shipping_pin_code')
+	shipping_country = models.ForeignKey(Country, on_delete = models.PROTECT, null=False, default= "IND", related_name = 'shipping_country')
+	shipping_phone_number = models.CharField(max_length=30, blank=True, default='')
+	shipping_email_id = models.EmailField(blank=True, default='')
+	billing_full_name = models.CharField(max_length=500, blank=False, null=False)
+	billing_address_1 = models.CharField(max_length=600, blank=False, null=False)
+	billing_address_2 = models.CharField(max_length=600, blank=True, default='')
+	billing_land_mark = models.CharField(max_length=600, blank=True, default='')
+	billing_city = models.CharField(max_length=600, blank=False, null=False)
+	billing_state = models.ForeignKey(State, on_delete = models.PROTECT, null=True, related_name = 'billing_state')
+	billing_pin_code = models.ForeignKey(Pin_code, on_delete = models.PROTECT, null=True, related_name = 'billing_pin_code')
+	billing_country = models.ForeignKey(Country, on_delete = models.PROTECT, null=False, default= "IND", related_name = 'billing_country')
+	billing_phone_number = models.CharField(max_length=30, blank=True, default='')
+	billing_email_id = models.EmailField(blank=True, default='')
+	shipping_mode = models.CharField(max_length=1, choices = SHIP_MODE, blank=True, default='S')
+	shipping_method = models.ForeignKey(Shipping_method, on_delete = models.PROTECT, blank=True, null=True)
+	gst_number = models.CharField(max_length=30, blank=True, default='')
+	quantity = models.IntegerField(null=True)
+	unit_price = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	sub_total = models.DecimalField(max_digits=12, decimal_places=2,  null=True)
+	disc_amt  = models.DecimalField(max_digits=12, decimal_places=2,  null=True)
+	tax  = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	total = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	shipped_date = models.DateField(null=True)
+	delivered_date = models.DateField(null=True)
+	created_date = models.DateTimeField(auto_now_add=True, null=False)	
+	updated_date = models.DateTimeField(auto_now=True, null=False)	
+
+class Channel_order_amz_items(models.Model):
+	channel_order_amz = models.ForeignKey(Channel_order_amz, on_delete = models.PROTECT, null=False)
+	amazon_data = models.ForeignKey(Amazon_data, on_delete = models.PROTECT, null=False)
+	amazon_ASIN = models.CharField(max_length=20, blank=False, null = False)
+	amazon_order_item_ID = models.CharField(max_length=20, blank=True, null = True)
+	quantity = models.IntegerField(null=True)
+	unit_price = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	sub_total = models.DecimalField(max_digits=12, decimal_places=2,  null=True)
+	disc_amt  = models.DecimalField(max_digits=12, decimal_places=2,  null=True)
+	tax  = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	total = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	created_date = models.DateTimeField(auto_now_add=True, null=False)	
+	updated_date = models.DateTimeField(auto_now=True, null=False)
+
+
+class Newsletter_subscription(models.Model):
+	email = models.EmailField(null=False)
+	subscription_active = models.BooleanField(null=False, default=False)
+	subscription_start_date = models.DateField(blank=True, null=True)
+	subscription_end_date = models.DateField(blank=True, null=True)
+	created_date = models.DateTimeField(auto_now_add=True, null=False)	
+	updated_date = models.DateTimeField(auto_now=True, null=False)	
+
+
+class User_ip_address(models.Model):
+	session_id = models.CharField(max_length = 40, blank=True, default='') # to store the session_key in case of anonymous user
+	userlogged_in = models.BooleanField(null=False, default=False)
+	user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+	site_visit_datetime = models.DateTimeField(auto_now_add=True, null=False)
+	latest_site_visit_datetime = models.DateTimeField(auto_now_add=True, null=True)
+	num_of_visits = models.IntegerField(null=False, default=1)
+	ip_address = models.CharField(max_length = 50, blank=True, default = '')
+
 		
 @receiver(post_save, sender=User_image, dispatch_uid="update_image_profile")
 def update_image(sender, instance, **kwargs):

@@ -1,46 +1,53 @@
 {% extends 'artevenue/estore_base.html' %}
 {% load static %}
-	<!-- Only Override the site content block -->
-	{% block sitecontent %}
-	<div class="container">
-		<div class="col-lg-12">
-			<div class = "row">
-				<div class="box">		
-					<h3 class="block-title">Payment Unsuccessful</h3>                
-					<div class = "col-sm-6">
-						<div class="panelbox" style = "height:270px">
-							<div class="panelbox-content">
-								<h4 class="tag-title">Hey {{firstname}}, the payment for order no. {{order.order_number}} didn't not go through!</h4>
-								<div class = "alert alert-danger">
-								<P>Transaction status is: {{ status | upper}}</p>
-								<P>ID for this transaction is: {{ txnid }}</p>
-								</div>
-								<p>&nbsp;</p>
-								<p>&nbsp;</p>
-								<p>&nbsp;</p>
-								<div>
-									<span class="pull-left">
-										<p>Please try again</p>
-										<a class = "btn btn-primary" href="{% url 'show_cart' %}">Cart</a>
-									</span>
+{% load widget_tweaks %}
 
-									<span class="pull-right">
-										<p>Return to home page</p>
-										<a class = "btn btn-primary" href="{% url 'index' %}">Home</a>
-									</span>
-								</div>
-							</div>
-						</div>
+{% block page-title %}
+<title>Payment Cancelled</title>
+{% endblock page-title %}
+
+{% block page-description %}
+<meta name="description" content="Cancellation of payment by user at payment gateway">
+{% endblock page-description %}
+
+{% block page-keywords %}  
+<meta name="keywords" content="">
+{% endblock page-keywords %}  
+
+{% block page-author %}  
+<meta name="author" content="Arte'venue">
+{% endblock page-author %}  
+
+	{% block sitecontent %}
+	<div class="container mb-5">
+		<div class = "row">
+			<div class="col-12">
+				<h1>Payment Unsuccessful</h1>                
+				<h3 class="tag-title">Hey {{firstname}}, the payment for order no. {{order.order_number}} didn't not go through!</h3>
+				<P>Transaction status is: {{ status | upper}}</p>
+				<P>ID for this transaction is: {{ txnid }}</p>
+				<div class = "row">
+					<div class = "col-12">
+						<span class="pull-left">
+							<p>Please try again</p>
+							<a class = "btn btn-primary" href="{% url 'show_cart' %}">
+								<i class = "fa fa-shopping-cart"> Cart</i>
+							</a>
+						</span>
+
+						<span class="pull-right">
+							<p>Return to home page</p>
+							<a class = "btn btn-primary" href="{% url 'index' %}">
+								<i class = "fa fa-home"> Home</i>
+							</a>
+						</span>
 					</div>
 				</div>
             </div>
         </div>
     </div>
 
-{% endblock features %}
+{% endblock %}
 
-
-{% block registration %}
-{% endblock registration %}
-<!-- Footer-section remains as it is, no override -->
-
+{% block jscripts %}
+{% endblock %}

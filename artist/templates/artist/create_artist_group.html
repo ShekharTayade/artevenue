@@ -1,0 +1,65 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block page-title %}
+<title>Bulk Art Supplies & Art Prints For Sale | Arte'venue Business</title>
+{% endblock page-title %}
+
+{% block page-description %}
+<meta name="description" content="Bulk art supplies & art prints for home, office and retail space. Sign up on Arte'venue business and access 2,50,000 art, 70+ categories & 300+ artists.">
+{% endblock page-description %}
+
+{% block page-keywords %}  
+<meta name="keywords" content="bulk art supplies, art prints for sale, buy art in bulk, unique art for sale">
+{% endblock page-keywords %}  
+
+{% block page-author %}  
+<meta name="author" content="Arte'venue">
+{% endblock page-author %}  
+
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+
+	
+    <div id="highlighted-slider" class="container ccontainer">
+		<div class="row">
+			<div class="col-6 text-center" style="border: 1px solid lightgrey; border-radius: 10px; padding: 5px 10px 10px 10px;">
+				<div class="panel panel-default cpanel cpanel-default">
+					<div class="w3-container pref-head mb-3">
+						<h2>
+							Exisiting Artist Groups
+						</h2>
+					</div>
+					<div class="w3-container">
+						<div class = "row">
+							{% for c in curr_groups %}
+								<div class = "col-4">
+									Group ID : <input disabled value = "{{c.group_id}}">
+								</div>
+							{% endfor %}
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-6 text-center" style="border: 1px solid lightgrey; border-radius: 10px; padding: 5px 10px 10px 10px;">
+				<div class="panel panel-default cpanel cpanel-default">
+					<form method="post" novalidate>
+						<input hidden name="curr_pg" value="{{request.path}}" >		
+						{% csrf_token %}
+						<div class="w3-container pref-head mb-3">
+							<h2>
+								Artist Group Creation
+							</h2>
+						</div>
+						<div class="w3-container">
+							{% include 'includes/form.html' %}
+						</div>
+						<button type="submit" class="btn btn-primary">Create</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	{% endblock sitecontent %}
+

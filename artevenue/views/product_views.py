@@ -9,11 +9,12 @@ from datetime import datetime
 import datetime
 import json
 
-from artevenue.models import Ecom_site, Stock_image, Stock_image_category, Publisher_price
+from artevenue.models import Ecom_site, Stock_image, Stock_image_category
+from artevenue.models import Publisher_price, Original_art_original_art_category, Original_art
 from artevenue.models import Stock_image_stock_image_category, Cart_stock_image, Cart_item_view
 from artevenue.models import Print_medium, Publisher_price, Promotion_stock_image, Promotion_product_view
 from artevenue.models import Curated_collection, Curated_category, Promotion
-from artevenue.models import Wishlist, Wishlist_item_view
+from artevenue.models import Wishlist, Wishlist_item_view, Homelane_data
 
 from .frame_views import *
 from .image_views import *
@@ -22,8 +23,8 @@ from .price_views import *
 today = datetime.date.today()
 		
 @csrf_exempt		
-def category_stock_images(request, cat_id = ''):
-	if cat_id == None:
+def category_stock_images(request, cat_id = '', page = 1):
+	if cat_id is None or cat_id == '':
 		return
 
 	ikeywords = request.GET.get('keywords', '')
@@ -32,7 +33,8 @@ def category_stock_images(request, cat_id = ''):
 	sortOrder = request.GET.get("sort")
 	show = request.GET.get("show", '50')
 	
-	page = 1 # default
+	if page is None or page == 0:
+		page = 1 # default
 
 	prod_categories = Stock_image_category.objects.filter(store_id=settings.STORE_ID, trending = True )
 
@@ -138,6 +140,7 @@ def category_stock_images(request, cat_id = ''):
 	else:
 		products = products.order_by('part_number')
 
+
 	prod_filters = ['ORIENTATION', 'ARTIST', 'IMAGE-TYPE', 'COLORS']	
 	prod_filter_values ={}
 	orientation_values = products.values('orientation').distinct()
@@ -206,6 +209,7 @@ def category_stock_images(request, cat_id = ''):
 		template = "artevenue/prod_display_include.html"
 	else :
 		template = "artevenue/category_products.html"
+		#template = "artevenue/art_by_category.html"
 
 	return render(request, template, {'prod_categories':prod_categories, 
 		'category_prods': category_prods, 'product_category':product_cate, 
@@ -223,7 +227,10 @@ def show_categories(request):
 	categories_list = Stock_image_category.objects.annotate(Count(
 		'stock_image_stock_image_category')).filter(
 		stock_image_stock_image_category__count__gt = 0).order_by('name')
-		
+
+	all_cnt = Stock_image.objects.filter(is_published = True).count()
+
+	'''
 	if show == None or show == '50':
 		perpage = 50 #default
 		show = '50'
@@ -245,10 +252,10 @@ def show_categories(request):
 	end_index = index + 5 if index <= max_index - 5 else max_index
 	page_range = list(paginator.page_range)[start_index:end_index]
 	#=====================
-	
-	
-	return render(request, "artevenue/show_all_categories.html", {'categories':categories,
-	'sortOrder':sortOrder, 'show':show, 'page_range':page_range})
+	'''
+
+	return render(request, "artevenue/show_all_categories.html", {'categories':categories_list,
+	'cnt': categories_list.count(), 'all_cnt':all_cnt})
 		
 		
 
@@ -399,10 +406,10 @@ def stock_image_detail(request, prod_id = '', iuser_width='', iuser_height=''):
 	##############################################
 	## Get the similar products
 	##############################################
-	similar_products = None
+	similar_products = {}
 	## First get rpoducts by same artist
 	similar_products_artist = Stock_image.objects.filter(  
-			artist = product.artist)
+			artist = product.artist).exclude(product_id = prod_id)
 	## If same artist has more than 8 products, then filter further
 	if similar_products_artist:
 		if similar_products_artist.count() > 8 :
@@ -418,8 +425,8 @@ def stock_image_detail(request, prod_id = '', iuser_width='', iuser_height=''):
 					similar_products_kw = similar_products_cat.filter( key_words__in = product.key_words )
 					if similar_products_kw :
 						if similar_products_kw.count() > 8:
-							similar_products = similar_products_kw[:8]
-						elif similar_products_kw.count() == 0:
+							similar_products = similar_products_kw
+						else :
 							similar_products = similar_products_cat.filter(
 								product_id__in = prods_in_cat)
 					else:
@@ -430,8 +437,8 @@ def stock_image_detail(request, prod_id = '', iuser_width='', iuser_height=''):
 				else:
 					similar_products = Stock_image.objects.filter(  
 							artist = product.artist)
-			elif similar_products.count() == 0:
-				similar_products = Stock_image.objects.filter(  
+			else :
+					similar_products = Stock_image.objects.filter(  
 						artist = product.artist)
 		else:
 			similar_products = Stock_image.objects.filter(  
@@ -475,6 +482,8 @@ def stock_image_detail(request, prod_id = '', iuser_width='', iuser_height=''):
 	paper_mouldings_apply = mouldings['paper_mouldings_apply']
 	paper_mouldings_show = mouldings['paper_mouldings_show']
 	moulding_diagrams = mouldings['moulding_diagrams']
+	paper_mouldings_corner = mouldings['paper_mouldings_corner']
+	canvas_mouldings_corner = mouldings['canvas_mouldings_corner']
 	# get mounts
 	mounts = get_mounts(request)
 
@@ -486,9 +495,6 @@ def stock_image_detail(request, prod_id = '', iuser_width='', iuser_height=''):
 
 	# get Stretches
 	stretches = get_stretches(request)
-
-	# get the images with all mouldings
-	###############img_with_all_mouldings = get_ImagesWithAllFrames(request, prod_id, 16)
 	
 	# Check if request contains any components, if it does send those to the front end
 	cart_item_view = {}
@@ -497,6 +503,11 @@ def stock_image_detail(request, prod_id = '', iuser_width='', iuser_height=''):
 	wishlist_item_view = {}
 	if wishlist_item_id != '':
 		wishlist_item_view = Wishlist_item_view.objects.filter(wishlist_item_id = wishlist_item_id).first()
+
+	prod_data = get_price_for_6_prods(prod_id, product.aspect_ratio)
+	ready_prod_data_paper = prod_data['size_price_paper']
+	ready_prod_data_canvas = prod_data['size_price_canvas']
+
 	'''
 	return render(request, "artevenue/stock_image_detail.html", {'product':product,
 		'prod_categories':prod_categories, 'printmedium':printmedium, 'product_category':product_category,
@@ -508,15 +519,18 @@ def stock_image_detail(request, prod_id = '', iuser_width='', iuser_height=''):
 		'cart_item':cart_item_view, 'wishlist_item':wishlist_item_view, 'iuser_width':iuser_width, 
 		'iuser_height':iuser_height} )	
 	'''
-	return render(request, "artevenue/stock_image_detail.html", {'product':product,
+	return render(request, "artevenue/stock_image_detail_new.html", {'product':product,
 		'prod_categories':prod_categories, 'printmedium':printmedium, 'product_category':product_category,
 		'mouldings_apply':paper_mouldings_apply, 'mouldings_show':paper_mouldings_show, 'mounts':mounts,
 		'per_sqinch_paper':per_sqinch_paper, 'per_sqinch_canvas':per_sqinch_canvas, 'acrylics':acrylics,
 		'boards':boards, 
 		#######'img_with_all_mouldings':img_with_all_mouldings, 
-		'stretches':stretches,
+		'stretches':stretches, 'ENV':settings.EXEC_ENV,
 		'cart_item':cart_item_view, 'iuser_width':iuser_width, 'iuser_height':iuser_height,
-		'prods':similar_products, 'price':price, 'wishlist_prods':wishlist_prods} )
+		'prods':similar_products, 'price':price, 'wishlist_prods':wishlist_prods,
+		'paper_mouldings_corner':paper_mouldings_corner, 'canvas_mouldings_corner':canvas_mouldings_corner,
+		'ready_prod_data_paper':ready_prod_data_paper, 'ready_prod_data_canvas':ready_prod_data_canvas,
+		'wishlist_item':wishlist_item_view } )
 
 
 
@@ -544,6 +558,8 @@ def get_item_price (request):
 
 	# Get data from the request.
 	json_data = json.loads(request.body.decode("utf-8"))
+
+
 
 	major_array = []
 	sub_array = []
@@ -745,8 +761,6 @@ def get_item_price (request):
 	print( "Disc Amt: " + str(disc_amt))
 	print( "Item Price: " + str(item_price))
 	'''
-	print( "Item Price FROM new=======================: " + str(item_price))
-
 	return JsonResponse({"msg":msg, "item_price" : item_price, 'cash_disc':cash_disc,
 				'percent_disc':percent_disc, 'item_unit_price':item_price_withoutdisc,
 				'disc_amt':disc_amt, 'disc_applied':disc_applied, 'promotion_id':promotion_id})
@@ -802,20 +816,18 @@ def get_item_price_by_cart_item (cart_item_id):
 	#item_price = round(item_price, -1)
 	item_price = Decimal(round(float(item_price),-1))
 
-	print( "======================")
-	print( "Disc Amt: " + str(disc_amt))
-	print( "Item Price: " + str(item_price))
-
 
 	return ({"msg":msg, "item_price" : item_price, 'cash_disc':cash_disc,
 				'percent_disc':percent_disc, 'item_unit_price':item_unit_price,
 				'disc_amt':disc_amt, 'disc_applied':disc_applied, 'promotion_id':promotion_id})
 
 			
-def get_product_promotion(prod_id):
+def get_product_promotion(prod_id, prod_type = None):
 	cash_disc = 0
 	percent_disc = 0
 	promo_id = None
+	if prod_type == None:
+		prod_type = 'STOCK-IMAGE'
 			
 	## Check for store wide promotion
 	promo = Promotion.objects.filter(effective_from__lte = today, 
@@ -831,6 +843,7 @@ def get_product_promotion(prod_id):
 	else:
 		# Product promotions #	
 		promo_prod = Promotion_product_view.objects.filter(product_id = prod_id,
+				product_type_id = prod_type,
 				promotion__effective_from__lte = today, 
 				promotion__effective_to__gte = today).select_related('promotion').first()
 
@@ -879,6 +892,7 @@ def all_stock_images(request):
 	keyword_filter = False # Turned on only if a keyword filter is present (through the AJAX call)
 	sortOrder = request.GET.get("sort")
 	show = request.GET.get("show", '50')
+	result_limit = request.GET.get("result_limit", '0-50')
 	
 	page = 1 # default
 	
@@ -890,6 +904,7 @@ def all_stock_images(request):
 
 	products = Stock_image.objects.filter(product_id__in = category_prods, 
 		is_published = True)
+
 			
 	if request.user.is_authenticated:
 		user = User.objects.get(username = request.user)
@@ -921,6 +936,7 @@ def all_stock_images(request):
 		sub_array = []
 		size_key = None
 		size_val = None
+		result_limit = '0-50'
 		
 		t_f = Q()
 		for majorkey, subdict in json_data.items():
@@ -955,13 +971,14 @@ def all_stock_images(request):
 					keyword_filter = True
 				if majorkey == 'PAGE':									
 					page = s_keys[s]
+				if majorkey == 'RESULT-LIMIT':									
+					result_limit = s_keys[s]
 				if majorkey == 'SORT':
 					sortOrder =  s_keys[s]
 				if majorkey == 'SHOW':
 					show =  str(s_keys[s])
 			
 			t_f = t_f & f
-		print (t_f)
 		products = products.filter( t_f )	
 						
 	# Apply keyword filter (through ajax or search)
@@ -973,19 +990,14 @@ def all_stock_images(request):
 
 	dt =  today.day
 	if dt >= 1 and dt <= 5:
-		products = Stock_image.objects.filter(product_id__in = category_prods, 
-			is_published = True).order_by('?')
+		products = products.order_by('?')
 	elif dt > 5 and dt <= 10:
-		products = Stock_image.objects.filter(product_id__in = category_prods, 
-			is_published = True).order_by('product_id')
+		products = products.order_by('product_id')
 	elif dt > 10 and dt <= 20:
-		products = Stock_image.objects.filter(product_id__in = category_prods, 
-			is_published = True).order_by('name')
+		products = products.order_by('name')
 	else:
-		products = Stock_image.objects.filter(product_id__in = category_prods, 
-		is_published = True).order_by('part_number')
+		products = products.order_by('part_number')
 
-	
 	prod_filters = ['ORIENTATION', 'ARTIST', 'IMAGE-TYPE', 'COLORS']	
 	prod_filter_values ={}
 	orientation_values = products.values('orientation').distinct()
@@ -1016,6 +1028,44 @@ def all_stock_images(request):
 	prod_filter_values['COLORS'] = im_arr
 	
 	price = Publisher_price.objects.filter(print_medium_id = 'PAPER') 
+
+
+	slab_0_50 = 'NO'
+	slab_50_100 = 'NO'
+	slab_100_150 = 'NO'
+	slab_150_200 = 'NO'
+	slab_200_plus = 'NO'
+	
+	sliced_count = 0
+	total_count = products.count()
+	if total_count > 50000 and result_limit != '0-50':		
+		slab_0_50 = 'YES'
+	if total_count > 50000 and result_limit != '50-100':		
+		slab_50_100 = 'YES'
+	if total_count > 100000 and result_limit != '100-150':
+		slab_100_150 = 'YES'
+	if total_count > 150000  and result_limit != '150-200':		
+		slab_150_100 = 'YES'
+	if total_count > 200000  and result_limit != '200+':
+		slab_200_plus = 'YES'
+
+
+	if result_limit == '0-50':
+		products = products[:50000]
+	elif result_limit == '50-100':
+		products = products[50001:100000]
+	elif result_limit == '100-150':
+		products = products[100001:150000]
+	elif result_limit == '150-200':
+		products = products[150001:200000]
+	elif result_limit == '200+':
+		products = products[200001:]
+
+	sliced_count = products.count()
+	print(result_limit)
+
+
+
 
 	if show == None :
 		show = 50
@@ -1058,15 +1108,17 @@ def all_stock_images(request):
 		'category_prods': category_prods, 'product_category':product_cate, 
 		'products':products, 'prods':prods, 'sortOrder':sortOrder, 'show':show,'prod_filters':prod_filters,
 		'prod_filter_values':prod_filter_values, 'price':price,
-		'width':width, 'height':height, 'page_range':page_range} )
+		'width':width, 'height':height, 'page_range':page_range, 'total_count':total_count,
+		'sliced_count':sliced_count, 'result_limit':result_limit, 'slab_0_50':slab_0_50,
+		'slab_50_100':slab_50_100, 'slab_100_150':slab_100_150, 'slab_150_200':slab_150_200,
+		'slab_200_plus':slab_200_plus} )
 
 		
 		
 @csrf_exempt		
-def curated_collections(request, cat_id):
+def curated_collections(request, cat_id=None):
 	if cat_id == None:
 		return
-
 	ikeywords = request.GET.get('keywords', '')
 	keywords = ikeywords.split()
 	keyword_filter = False # Turned on only if a keyword filter is present (through the AJAX call)
@@ -1082,7 +1134,7 @@ def curated_collections(request, cat_id):
 				
 	dt =  today.day
 	curated_coll = Curated_collection.objects.filter(curated_category_id = cat_id,
-			product_type_id = 'STOCK-IMAGE').values('product_id')
+			product_type_id = 'STOCK-IMAGE', product__is_published = True).values('product_id')
 	try:
 		product_cate = Curated_category.objects.get(category_id = cat_id);
 	except Curated_category.DoesNotExist:
@@ -1090,13 +1142,13 @@ def curated_collections(request, cat_id):
 	products = Stock_image.objects.filter(product_id__in = curated_coll)
 	
 	if dt >= 1 and dt <= 5:
-		products = products.order_by('key_words')
+		products = products.order_by('category_disp_priority', 'key_words')
 	elif dt > 5 and dt <= 10:
-		products = products.order_by('product_id')
+		products = products.order_by('category_disp_priority', 'product_id')
 	elif dt > 10 and dt <= 20:
-		products = products.order_by('name')
+		products = products.order_by('category_disp_priority', 'name')
 	else:
-		products = products.order_by('part_number')
+		products = products.order_by('category_disp_priority', 'part_number')
 	
 	width = 0
 	height = 0
@@ -1305,4 +1357,682 @@ def image_by_image_code(request):
 			{'prods':prods, 'show':show, 'perpage':perpage, 'width':16,
 			'page_range':page_range})
 
+
+def get_stock_images(request, cat_id = None, page = None, curated_coll_id = None):
+
+	if page is None:
+		page = request.GET.get("page_num", 1)
+
+	sortOrder = request.GET.get("sort")
+	show = request.GET.get("show", "50")
+	result_limit = request.GET.get("result_limit", "0-50")
+	filt_colors = request.GET.get("filt_colors", "")
+	colors = filt_colors.split('|')
+	
+	filt_size = request.GET.get("filt_size", "")
+	filt_width = request.GET.get("filt_width", "")
+	filt_height = request.GET.get("filt_height", "")
+	filt_artist = request.GET.get("filt_artist", "")
+	artists = filt_artist.split('|')
+	
+	filt_orientation = request.GET.get("filt_orientation", "")
+	orientation = filt_orientation.split('|')
+
+	filt_image_type = request.GET.get("filt_image_type", "")
+	image_type = filt_image_type.split('|')
+
+	ikeywords = request.GET.get('keywords', '')	
+	keywords = ikeywords.split()
+	keyword_filter = False # Turned on only if a keyword filter is present (through the AJAX call)
+
+	if page is None or page == 0:
+		page = 1 # default
+
+	prod_categories = Stock_image_category.objects.filter(store_id=settings.STORE_ID, trending = True )
+
+	if cat_id:
+		category_prods = Stock_image_stock_image_category.objects.filter(
+				stock_image_category_id = cat_id).values('stock_image_id')		
+		product_cate = get_object_or_404 (Stock_image_category, category_id = cat_id)
+		products = Stock_image.objects.filter(product_id__in = category_prods, 
+				is_published = True)
+	elif curated_coll_id:
+		curated_coll = Curated_collection.objects.filter(curated_category_id = curated_coll_id,
+				product_type_id = 'STOCK-IMAGE').values('product_id')
+		try:
+			product_cate = Curated_category.objects.get(category_id = curated_coll_id);
+		except Curated_category.DoesNotExist:
+			product_cate = {}
+		products = Stock_image.objects.filter(product_id__in = curated_coll, 
+			is_published = True)
+	else :
+		category_prods = Stock_image_stock_image_category.objects.values('stock_image_id')		
+		product_cate = {}		
+		products = Stock_image.objects.filter(product_id__in = category_prods, 
+				is_published = True)
+
+	if request.user.is_authenticated:
+		user = User.objects.get(username = request.user)
+		wishlist = Wishlist.objects.filter(
+			user = user).values('wishlist_id')
+		wishlistitems = Wishlist_item_view.objects.filter(
+			wishlist_id__in = wishlist, product_type_id = 'STOCK-IMAGE')
+	else:
+		session_id = request.session.session_key
+		wishlist = Wishlist.objects.filter(
+			session_id = session_id).values('wishlist_id')
+		wishlistitems = Wishlist_item_view.objects.filter(
+			wishlist_id__in = wishlist, product_type_id = 'STOCK-IMAGE')
+
+	wishlist_prods = []
+	if wishlistitems:
+		for w in wishlistitems:
+			wishlist_prods.append(w.product_id)
 		
+	
+	###### Apply the user selected filters
+	t_f = Q()
+	f = Q()
+
+	if filt_size:
+		# Get the size
+		idx = filt_size.find("_")
+		filt_width = int(filt_size[:idx])
+		filt_height = int(filt_size[(idx+1):])
+		ratio = round(Decimal(filt_width)/Decimal(filt_height), 18)
+		#f = f | Q( aspect_ratio = ratio) & Q(max_width__gte = filt_width) & Q(max_height__gte = filt_height)
+		products = products.filter(aspect_ratio = ratio, max_width__gte = filt_width, max_height__gte = filt_height)
+
+	t_f = t_f & f 
+	
+	f = Q()
+	for i in image_type :
+		if i == '':
+			continue
+		f = f | Q(image_type = i)
+
+	t_f = t_f & f 
+		
+	f = Q()
+	for o in orientation:
+		if o == '':
+			continue
+		f = f | Q(orientation = o)
+	t_f = t_f & f 
+	
+	f = Q()
+	for a in artists:
+		if a == '':
+			continue	
+		f = f | Q(artist = a)
+	t_f = t_f & f 
+	
+	f = Q()
+	for c in colors:
+		if c == '':
+			continue
+		f = f | Q(key_words__icontains = c)
+	t_f = t_f & f 
+	
+	print (t_f)
+	products = products.filter( t_f )
+
+	# Apply keyword filter (through ajax or search)
+	for word in keywords:
+		if word == '':
+			continue
+		products = products.filter( 
+			Q(key_words__icontains = word) |
+			Q(artist__icontains = word) |
+			Q(name__icontains = word) |
+			Q(part_number__icontains = word)
+			)
+		
+	dt =  today.day
+	if dt >= 1 and dt <= 5:
+		products = products.order_by('?')
+	elif dt > 5 and dt <= 10:
+		products = products.order_by('product_id')
+	elif dt > 10 and dt <= 20:
+		products = products.order_by('name')
+	else:
+		products = products.order_by('part_number')
+
+	
+	price = Publisher_price.objects.filter(print_medium_id = 'PAPER') 
+	
+	prod_filters = ['ORIENTATION', 'ARTIST', 'IMAGE-TYPE', 'COLORS']	
+	prod_filter_values ={}
+	orientation_values = products.values('orientation').distinct()
+	
+	or_arr = []
+	for v in orientation_values:
+		if v['orientation'] not in or_arr:
+			or_arr.append ( v['orientation'] )
+	prod_filter_values['ORIENTATION'] = or_arr 
+	
+	artist_values = products.values('artist').distinct().order_by('artist')
+	ar_arr = []
+	for a in artist_values:
+		if a['artist'] not in ar_arr:
+			ar_arr.append(a['artist'] )
+	prod_filter_values['ARTIST'] = ar_arr 
+	
+	image_type_values = products.values('image_type').distinct()
+	im_arr = []
+	for i in image_type_values:
+		if i['image_type'] not in im_arr:
+			im_arr.append(i['image_type'] )
+	prod_filter_values['IMAGE-TYPE'] = im_arr
+
+
+	#image_type_values = products.values('colors').distinct()
+	im_arr = ['Red', 'Orange',  'Yellow', 'Green', 'Blue', 'Purple', 'Pink', 'Brown', 'black', 'White']
+	prod_filter_values['COLORS'] = im_arr
+	
+
+	####################################
+	####### Limiting the result set
+	####################################
+	slab_0_50 = 'NO'
+	slab_50_100 = 'NO'
+	slab_100_150 = 'NO'
+	slab_150_200 = 'NO'
+	slab_200_plus = 'NO'
+	
+	sliced_count = 0
+	total_count = products.count()
+	if total_count > 50000 and result_limit != '0-50':		
+		slab_0_50 = 'YES'
+	if total_count > 50000 and result_limit != '50-100':		
+		slab_50_100 = 'YES'
+	if total_count > 100000 and result_limit != '100-150':
+		slab_100_150 = 'YES'
+	if total_count > 150000  and result_limit != '150-200':		
+		slab_150_100 = 'YES'
+	if total_count > 200000  and result_limit != '200+':
+		slab_200_plus = 'YES'
+
+
+	if result_limit == '0-50':
+		products = products[:50000]
+	elif result_limit == '50-100':
+		products = products[50001:100000]
+	elif result_limit == '100-150':
+		products = products[100001:150000]
+	elif result_limit == '150-200':
+		products = products[150001:200000]
+	elif result_limit == '200+':
+		products = products[200001:]
+
+	sliced_count = products.count()
+	####################################
+	####### END: Limiting the result set
+	####################################
+
+
+
+	if show == None :
+		show = 50
+	
+	if show == '50':
+		perpage = 50 #default
+		show = '50'
+	else:
+		if show == '100':
+			perpage = 100
+			show = '100'
+		else:
+			if show == '1000':
+				perpage = 1000
+				show = '1000'
+			else:
+				show = '50' # default
+				perpage = 50
+				
+	paginator = Paginator(products, perpage) 
+	if not page:
+		page = request.GET.get('page')
+	
+	prods = paginator.get_page(page)			
+	
+	#=====================
+	index = prods.number - 1 
+	max_index = len(paginator.page_range)
+	start_index = index - 5 if index >= 5 else 0
+	end_index = index + 5 if index <= max_index - 5 else max_index
+	page_range = list(paginator.page_range)[start_index:end_index]
+	#=====================
+	
+	template = "artevenue/art_by_category.html"
+
+	env = settings.EXEC_ENV
+	
+	return render(request, template, {'prod_categories':prod_categories, 
+		'category_prods': category_prods, 'product_category':product_cate, 
+		'products':products, 'prods':prods, 'sortOrder':sortOrder, 'show':show,'prod_filters':prod_filters,
+		'prod_filter_values':prod_filter_values, 'price':price, 'ikeywords':ikeywords,
+		'page':page, 'wishlistitems':wishlistitems, 'wishlist_prods':wishlist_prods,
+		'filt_width':filt_width, 'filt_height':filt_height, 'page_range':page_range, 'result_limit':result_limit,
+		'filt_colors':filt_colors, 'filt_size':filt_size, 'filt_artist':filt_artist,
+		'filt_orientation':filt_orientation, 'filt_image_type':filt_image_type,
+		'total_count':total_count, 'sliced_count':sliced_count, 'result_limit':result_limit,
+		'slab_0_50':slab_0_50, 'slab_50_100':slab_50_100, 'slab_100_150':slab_100_150, 
+		'slab_150_200':slab_150_200, 'slab_200_plus':slab_200_plus, 'env':env} )
+
+
+
+
+@csrf_exempt		
+def original_art_by_category(request, cat_id = '', page = 1):
+	ikeywords = request.GET.get('keywords', '')
+	keywords = ikeywords.split()
+	keyword_filter = False # Turned on only if a keyword filter is present (through the AJAX call)
+	sortOrder = request.GET.get("sort")
+	show = request.GET.get("show", '50')
+	
+	if page is None or page == 0:
+		page = 1 # default
+
+	prod_categories = Original_art_original_art_category.objects.filter(
+		stock_image_category__store_id=settings.STORE_ID, 
+		stock_image_category__trending = True )
+
+	if cat_id:
+		category_prods = Original_art_original_art_category.objects.filter(
+				stock_image_category_id = cat_id).values('original_art_id')
+		
+		product_cate = get_object_or_404 (Stock_image_category, category_id = cat_id)
+	else :
+		category_prods = Original_art_original_art_category.objects.values('original_art_id')		
+		product_cate = {}
+		
+	products = Original_art.objects.filter(product_id__in = category_prods, 
+				is_published = True)
+
+	if request.user.is_authenticated:
+		user = User.objects.get(username = request.user)
+		wishlist = Wishlist.objects.filter(
+			user = user).values('wishlist_id')
+		wishlistitems = Wishlist_item_view.objects.filter(
+			wishlist_id__in = wishlist, product_type_id = 'ORIGINAL-ART')
+	else:
+		session_id = request.session.session_key
+		wishlist = Wishlist.objects.filter(
+			session_id = session_id).values('wishlist_id')
+		wishlistitems = Wishlist_item_view.objects.filter(
+			wishlist_id__in = wishlist, product_type_id = 'ORIGINAL-ART')
+
+	wishlist_prods = []
+	if wishlistitems:
+		for w in wishlistitems:
+			wishlist_prods.append(w.product_id)
+		
+	width = 0
+	height = 0
+	if request.is_ajax():
+		#Apply the user selected filters -
+
+		# Get data from the request.
+		json_data = json.loads(request.body.decode("utf-8"))
+
+		major_array = []
+		sub_array = []
+		size_key = None
+		size_val = None
+		
+		t_f = Q()
+		for majorkey, subdict in json_data.items():
+			#######################################
+			s_keys = json_data[majorkey]
+			f = Q()
+			for s in s_keys:
+				if majorkey == 'SIZE':
+					# Get the size
+					idx = s.find("_")
+					width = int(s[:idx])
+					height = int(s[(idx+1):])
+					ratio = round(Decimal(width)/Decimal(height), 18)
+					f = f | ( Q( aspect_ratio = ratio) & Q(max_width__gte = width) & Q(max_height__gte = height))
+			
+				if majorkey == 'IMAGE-TYPE':
+					f = f | Q(image_type = s)
+				if majorkey == 'ORIENTATION':
+					f = f | Q(orientation = s)
+				#if majorkey == 'SIZE':
+					#f = f | ( (Q(max_width__gte = width) & Q(max_height__gte = height) ) &  Q(aspect_ratio = ratio) )
+				if majorkey == 'ARTIST':
+					f = f | Q(artist = s)
+				if majorkey == 'COLORS':
+					#f = f | Q(colors__icontains = s)
+					f = f | Q(key_words__icontains = s)
+				if majorkey == 'KEY-WORDS':
+					ikeywords = s_keys[s] 
+					print("Keywords: " + ikeywords)
+					keywords = ikeywords.split()
+					#f = f | Q(key_words__icontains = keywords)
+					keyword_filter = True
+				if majorkey == 'PAGE':									
+					page = s_keys[s]
+				if majorkey == 'SORT':
+					sortOrder =  s_keys[s]
+				if majorkey == 'SHOW':
+					show =  str(s_keys[s])
+			
+			t_f = t_f & f
+		print (t_f)
+		products = products.filter( t_f )	
+
+	# Apply keyword filter (through ajax or search)
+	for word in keywords:
+		products = products.filter( 
+			Q(key_words__icontains = word) |
+			Q(artist__icontains = word)
+			)
+		
+	dt =  today.day
+	if dt >= 1 and dt <= 5:
+		products = products.order_by('?')
+	elif dt > 5 and dt <= 10:
+		products = products.order_by('product_id')
+	elif dt > 10 and dt <= 20:
+		products = products.order_by('name')
+	else:
+		products = products.order_by('part_number')
+
+
+	prod_filters = ['ORIENTATION', 'ARTIST', 'COLORS']	
+	prod_filter_values ={}
+	orientation_values = products.values('orientation').distinct()
+	
+	or_arr = []
+	for v in orientation_values:
+		if v['orientation'] not in or_arr:
+			or_arr.append ( v['orientation'] )
+	prod_filter_values['ORIENTATION'] = or_arr 
+	
+	artist_values = products.values('artist').distinct().order_by('artist')
+	ar_arr = []
+	for a in artist_values:
+		if a['artist'] not in ar_arr:
+			ar_arr.append(a['artist'] )
+	prod_filter_values['ARTIST'] = ar_arr 
+	
+
+	#image_type_values = products.values('colors').distinct()
+	im_arr = ['Red', 'Orange',  'Yellow', 'Green', 'Blue', 'Purple', 'Pink', 'Brown', 'black', 'White']
+	prod_filter_values['COLORS'] = im_arr
+	
+	price = Publisher_price.objects.filter(print_medium_id = 'PAPER') 
+
+	if show == None :
+		show = 50
+	
+	if show == '50':
+		perpage = 50 #default
+		show = '50'
+	else:
+		if show == '100':
+			perpage = 100
+			show = '100'
+		else:
+			if show == '1000':
+				perpage = 1000
+				show = '1000'
+			else:
+				show = '50' # default
+				perpage = 50
+				
+	paginator = Paginator(products, perpage) 
+	if not page:
+		page = request.GET.get('page')
+	
+	prods = paginator.get_page(page)			
+	
+	#=====================
+	index = prods.number - 1 
+	max_index = len(paginator.page_range)
+	start_index = index - 5 if index >= 5 else 0
+	end_index = index + 5 if index <= max_index - 5 else max_index
+	page_range = list(paginator.page_range)[start_index:end_index]
+	#=====================
+	
+	if request.is_ajax():
+
+		template = "artevenue/prod_display_include_orginal_art.html"
+	else :
+		template = "artevenue/original_art_by_category.html"
+		#template = "artevenue/art_by_category.html"
+
+	return render(request, template, {'prod_categories':prod_categories, 
+		'category_prods': category_prods, 'product_category':product_cate, 
+		'products':products, 'prods':prods, 'sortOrder':sortOrder, 'show':show,'prod_filters':prod_filters,
+		'prod_filter_values':prod_filter_values, 'price':price, 'ikeywords':ikeywords,
+		'page':page, 'wishlistitems':wishlistitems, 'wishlist_prods':wishlist_prods,
+		'width':width, 'height':height, 'page_range':page_range} )
+
+
+def original_art_detail(request, prod_id = ''):
+	cart_item_id = request.GET.get("cart_item_id", "")
+	wishlist_item_id = request.GET.get("wishlist_item_id", "")
+	if not prod_id or prod_id == '' :
+		prod_id = request.GET.get("product_id", "")
+	
+	if prod_id == None:
+		return
+	
+
+	# get the product
+	product = get_object_or_404(Original_art, is_published = True, pk=prod_id)
+		
+	product_category = Original_art_original_art_category.objects.get(original_art = product)
+	
+	prod_categories = Original_art_original_art_category.objects.filter(
+		stock_image_category__store_id=settings.STORE_ID)
+	
+	printmedium = Print_medium.objects.all()
+
+	##############################################
+	## Get the similar products
+	##############################################
+	similar_products = {}
+	## First get rpoducts by same artist
+	similar_products_artist = Original_art.objects.filter(  
+			artist = product.artist).exclude(product_id = prod_id)
+	## If same artist has more than 8 products, then filter further
+	if similar_products_artist:
+		if similar_products_artist.count() > 8 :
+			## Filter for the same artist and same category
+			prods_in_cat = Original_art_original_art_category.objects.filter(
+				stock_image_category_id = product_category.stock_image_category).values('stock_image_id')
+				
+			similar_products_cat = similar_products_artist.filter(
+				product_id__in = prods_in_cat)
+			## Same artist has more than 8 products in same category, filter further
+			if similar_products_cat: 
+				if similar_products_cat.count() > 8 :
+					## Filter for having same key words
+					similar_products_kw = similar_products_cat.filter( key_words__in = product.key_words )
+					if similar_products_kw :
+						if similar_products_kw.count() > 8:
+							similar_products = similar_products_kw
+						else :
+							similar_products = similar_products_cat.filter(
+								product_id__in = prods_in_cat)
+					else:
+						similar_products = similar_products_cat.filter(
+							product_id__in = prods_in_cat)
+						
+				## if the filter causes the result to be empty, revert to earlier filter
+				else:
+					similar_products = Original_art.objects.filter(  
+							artist = product.artist)
+			else :
+					similar_products = Original_art.objects.filter(  
+						artist = product.artist)
+		else:
+			similar_products = Original_art.objects.filter(  
+					artist = product.artist)
+
+	## Restrict the result to 10 products
+	if similar_products:
+		if similar_products.count() > 8:
+			similar_products = similar_products[:8]
+
+	price = Publisher_price.objects.filter(print_medium_id = 'PAPER') 
+
+
+	if request.user.is_authenticated:
+		user = User.objects.get(username = request.user)
+		wishlist = Wishlist.objects.filter(
+			user = user).values('wishlist_id')
+		wishlistitems = Wishlist_item_view.objects.filter(
+			wishlist_id__in = wishlist)
+	else:
+		session_id = request.session.session_key
+		wishlist = Wishlist.objects.filter(
+			session_id = session_id).values('wishlist_id')
+		wishlistitems = Wishlist_item_view.objects.filter(
+			wishlist_id__in = wishlist)
+
+	wishlist_prods = []
+	if wishlistitems:
+		for w in wishlistitems:
+			wishlist_prods.append(w.product_id)
+
+	
+	# Get image price on paper and canvas
+	per_sqinch_price = get_per_sqinch_price(prod_id, 'STOCK-IMAGE')
+	per_sqinch_paper = per_sqinch_price['per_sqin_paper']
+	per_sqinch_canvas = per_sqinch_price['per_sqin_canvas']
+
+	# get mouldings
+	mouldings = get_mouldings(request)
+	# defaul we send is for PAPER
+	paper_mouldings_apply = mouldings['paper_mouldings_apply']
+	paper_mouldings_show = mouldings['paper_mouldings_show']
+	moulding_diagrams = mouldings['moulding_diagrams']
+	# get mounts
+	mounts = get_mounts(request)
+
+	# get arylics
+	acrylics = get_acrylics(request)
+	
+	# get boards
+	boards = get_boards(request)
+
+	# get Stretches
+	stretches = get_stretches(request)
+
+	# get the images with all mouldings
+	###############img_with_all_mouldings = get_ImagesWithAllFrames(request, prod_id, 16)
+	
+	# Check if request contains any components, if it does send those to the front end
+	cart_item_view = {}
+	if cart_item_id != '':
+		cart_item_view = Cart_item_view.objects.filter(cart_item_id = cart_item_id).first()
+	wishlist_item_view = {}
+	if wishlist_item_id != '':
+		wishlist_item_view = Wishlist_item_view.objects.filter(wishlist_item_id = wishlist_item_id).first()
+
+	art_width = product.art_width
+	art_height = product.art_height
+	return render(request, "artevenue/original_art_detail.html", {'product':product,
+		'prod_categories':prod_categories, 'printmedium':printmedium, 'product_category':product_category,
+		'mouldings_apply':paper_mouldings_apply, 'mouldings_show':paper_mouldings_show, 'mounts':mounts,
+		'per_sqinch_paper':per_sqinch_paper, 'per_sqinch_canvas':per_sqinch_canvas, 'acrylics':acrylics,
+		'boards':boards, 
+		#######'img_with_all_mouldings':img_with_all_mouldings, 
+		'stretches':stretches,
+		'cart_item':cart_item_view, 'art_width':art_width, 'art_height':art_height,
+		'prods':similar_products, 'price':price, 'wishlist_prods':wishlist_prods} )
+
+
+@csrf_exempt
+def get_ready_products(request, prod_id=None, prod_width=None, print_medium=None):
+	
+	if prod_id == None:
+		prod_id = int(request.POST.get('prod_id', '0'))
+		
+	if prod_width == None:
+		prod_width = Decimal(request.POST.get('prod_width', '0'))
+	
+	if print_medium == None:
+		print_medium = request.POST.get('print_medium', 'PAPER')
+			
+	
+	## Common components
+	acrylic_id = 1
+	moulding_id = 18  # Simple Black
+	if print_medium == 'PAPER':
+		mount_id = 3 # Offwhite
+		mount_color = '#fffff0'  # Offwhite
+		mount_size = 1 if prod_width <= 24 else 2 if prod_width <= 42 else 3
+		board_id = 1
+	else:
+		mount_id = 0
+		mount_color = ''  
+		mount_size = 0
+		board_id = 0
+		
+	stretch_id = 1
+	
+	# Get Product
+	product = Stock_image.objects.get( product_id = prod_id )
+	env = settings.EXEC_ENV
+
+	if env == 'DEV' or env == 'TESTING':	
+		response = requests.get(product.url)
+		img_source = Image.open(BytesIO(response.content))
+	else:
+		img_source = Image.open(settings.PROJECT_DIR + '/' + settings.STATIC_URL + product.url)			
+	
+	# Get moulding
+	moulding = Moulding_image.objects.filter(moulding_id = moulding_id, image_type = "APPLY").values(
+				'url', 'moulding__width_inches', 'border_slice').first()
+	
+	if moulding:	
+		m_width_inch = float(moulding['moulding__width_inches'])
+		
+		# Image width displayed in browser in inches
+		disp_inch = 450//96
+		
+		ratio = float(disp_inch / prod_width)
+		
+		border = int(m_width_inch * ratio* 96)		
+		#border = int(m_width_inch * 96/ user_width)
+		
+		m_size = int(mount_size * 96 * ratio)
+		#m_size = int(mount_size * 960 / user_width)
+		
+		if m_size > 0 and mount_color != '' and mount_color != '0' and mount_color != 'None':
+
+			img_with_mount = addMount(img_source, mount_color, m_size, m_size, m_size, m_size)
+			
+			framed_img = applyBorder( request, img_with_mount, moulding['url'], border, border, border, border,
+							float(moulding['border_slice']), float(moulding['border_slice']), 
+							float(moulding['border_slice']), float(moulding['border_slice']) )
+		else:
+			framed_img = applyBorder( request, img_source, moulding['url'], border, border, border, border,
+							float(moulding['border_slice']), float(moulding['border_slice']), 
+							float(moulding['border_slice']), float(moulding['border_slice']) )
+	else :
+		# No moulding, returing the image as it is.
+		framed_img = Image.new("RGB", (img_source.width, img_source.height), 0)
+		framed_img.paste(img_source, (0,0))		
+	'''
+	response = HttpResponse(content_type="image/png")
+	framed_img.save(response, "PNG")
+	return response
+	#return framed_img
+	'''
+	
+	##framed_img = dropShadow(framed_img)
+
+	buffered = BytesIO()
+	framed_img.save(buffered, format='JPEG')
+	img_data = buffered.getvalue()
+	img_str = base64.b64encode(img_data)
+
+
+	return HttpResponse(img_str)

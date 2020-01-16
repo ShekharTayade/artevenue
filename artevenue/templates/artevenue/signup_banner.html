@@ -1,0 +1,40 @@
+{% load static %}
+<div class = "container-fluid">
+<div class="row sign_up_form" style="background-color:#393939; color:#fff;">
+	<div class="col-md-6 show_on_large_only">
+		<div class="curated-container">
+			<img src="{% static 'img/signup_banner.jpg' %}">
+		</div>
+	</div>
+	<div class="col-12 col-sm-12 col-md-6">
+		<div class="sign_up">
+		<div class="row">
+			<div class="col-12 col-sm-12 col-md-offset-1 col-md-12">
+				<h2>SIGN UP NOW AND GET 15% OFF <span>——</span></h2>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-12 col-sm-12 col-md-offset-1 col-md-12">
+				<p>Get great deals and offers from Arte'Venue exclusively for you. Sign up for updates now.</p>
+			</div>
+		</div>
+		<div class="row">
+			<form action="{% url 'register' %}" style="width: 100%">
+				<div class="input-group mt-2">
+					<div class="col-12 col-sm-12 col-md-offset-1 col-md-8">
+						<input type="email" name="email" class="form-control" placeholder="Enter your email" style="border-radius:0px;  border:none;">
+					</div>
+					<div class="col-12 col-sm-12 col-md-offset-1 col-md-4">
+						 <span class="input-group-btn">
+						 <button class="btn btn-primary" type="submit" style="border-radius:0px; background-color:#777; border:none;">
+							Sign Up
+						 </button>
+						 </span>
+					</div>
+				</div>				
+			</form>
+		</div>
+		</div>
+	</div>
+</div>
+</div>

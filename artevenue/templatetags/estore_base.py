@@ -42,6 +42,7 @@ def admin_menu(request):
 	
 	
 @register.inclusion_tag('artevenue/estore_menu_with_search.html')	
+#@register.inclusion_tag('artevenue/estore_menu_two_lines.html')	
 def menubar(request):
 
 	ecom = get_object_or_404 (Ecom_site, store_id=settings.STORE_ID )
@@ -54,6 +55,11 @@ def menubar(request):
 	level1_menuitems = Stock_image_category.objects.annotate(Count(
 			'stock_image_stock_image_category')).filter(parent_id__isnull = True,
 			stock_image_stock_image_category__count__gt = 1000).order_by('-stock_image_stock_image_category__count')
+
+	level1_menuitems_original_art = Stock_image_category.objects.annotate(Count(
+			'original_art_category')).filter(parent_id__isnull = True,
+			original_art_category__count__gt = 0).order_by('-original_art_category__count')
+
 
 	# Level 2
 	level2_menuitems = Stock_image_category.objects.filter(parent_id__in = level1_menuitems)
@@ -83,18 +89,54 @@ def menubar(request):
 	return {'level0_menuitems':level0_menuitems, 
 			'level1_menuitems':level1_menuitems,
 			'level2_menuitems':level2_menuitems,
-			'usercart':usercart}
+			'usercart':usercart,
+			'level1_menuitems_original_art':level1_menuitems_original_art}
+
+
+@register.inclusion_tag('artevenue/artevenue_text.html')	
+def artevenue_text(request):
+	ecom = get_object_or_404 (Ecom_site, store_id=settings.STORE_ID )
+
+	if request:
+		if request.user:
+			return {'ecom_site':ecom, 'request':request, 'user': request.user}
+		else:
+			return {'ecom_site':ecom, 'request':request}
+	else:
+		return {'ecom_site':ecom}
+
+
+@register.inclusion_tag('artevenue/why_artevenue_text.html')	
+def why_artevenue_text():
+	return {}
+
+@register.inclusion_tag('artevenue/signup_banner.html')	
+def signup_banner():
+	return {}
+
 
 @register.inclusion_tag('artevenue/footer.html')	
 def site_footer(request):
 	ecom = get_object_or_404 (Ecom_site, store_id=settings.STORE_ID )
+	#Level 0
+	level0_menuitems = Menu.objects.filter(store = ecom, effective_from__lte = today, 
+		effective_to__gte = today, level=0).order_by('sort_order')
+
+	# Level 1
+	level1_menuitems = Stock_image_category.objects.annotate(Count(
+			'stock_image_stock_image_category')).filter(parent_id__isnull = True,
+			stock_image_stock_image_category__count__gt = 1000).order_by('-stock_image_stock_image_category__count')
+
 	if request:
 		if request.user:
-			return {'ecom_site':ecom, 'request':request, 'user': request.user}
+			return {'ecom_site':ecom, 'request':request, 'user': request.user,
+			'level0_menuitems':level0_menuitems, 'level1_menuitems':level1_menuitems,}
 		else: 
-			return {'ecom_site':ecom, 'request':request}
+			return {'ecom_site':ecom, 'request':request, 'level0_menuitems':level0_menuitems, 
+			'level1_menuitems':level1_menuitems,}
 	else:
-		return {'ecom_site':ecom}
+		return {'ecom_site':ecom, 'level0_menuitems':level0_menuitems, 
+			'level1_menuitems':level1_menuitems,}
 		
 
 @register.inclusion_tag('artevenue/copy_right.html')	

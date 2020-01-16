@@ -1,0 +1,97 @@
+@charset "UTF-8";
+@import url("https://fonts.googleapis.com/css?family=Pacifico|Source+Sans+Pro:400,700");
+@page {
+  margin: 3cm;
+/*  @bottom-left {
+    color: #a9a;
+    font-family: Pacifico;
+    content: '♥ Thank you!'; }
+  @bottom-right {
+    color: #a9a;
+    content: 'SAM';
+    font-family: Pacifico;
+    font-size: 8pt; } */
+}
+
+html {
+  color: #14213d;
+  font-family: Source Sans Pro;
+  font-size: 10pt;
+  line-height: 1.2; }
+  html body {
+    margin: 0; }
+  html h1 {
+    color: #1ee494;
+    font-family: Pacifico;
+    font-size: 40pt;
+    margin: 0; }
+
+	html text-center{
+		left:225px;
+	}
+		
+	
+	html logo {
+	}
+	
+	html dl {
+		position: absolute;
+		right:0px;
+		top:0px;
+	}
+
+	html rct {
+		position: absolute;
+		margin: 5em 0 4em; 
+		left:0px;
+		text-decoration-style: solid;
+	}
+	html rct rct_h {
+		font-size: 12pt;
+	}
+	
+	html doc_head {
+		position: absolute;
+		margin: 3em 0 4em; 
+		left:225px;
+		font-size:15pt;
+		text-decoration:underline;
+		text-decoration-style: solid;
+	}
+	
+	html doc_dt {
+		position: absolute;
+		margin: 4em 0 4em; 
+		left:450px;
+		font-size:10pt;
+	}	
+	
+	html doc_txt{
+		display: block;
+		position: absolute;
+		margin: 10em 0 4em; 
+		font-size:12pt;
+	}	
+		
+	html doc_footer{
+		display: block;
+		page-break-after: always;
+		margin: 25em 0 4em; 
+		}
+	
+	html doc_footer footer_left{
+		position: absolute;
+		font-size:15pt;
+	}
+	
+	html doc_footer footer_center{
+		position: absolute;
+		left:225px;
+		font-size:10pt;
+	}	
+	
+	html doc_footer footer_right{
+		position: absolute;
+		right:0px;
+		font-size:10pt;
+	}		

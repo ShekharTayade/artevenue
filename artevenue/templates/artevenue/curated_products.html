@@ -1,8 +1,20 @@
 {% extends 'artevenue/estore_base.html' %}
 {% load static %}
+{% block page-title %} 
+	<title>Curated art works from '{{ product_category.name }}' category</title>
+{% endblock page-title %} 
+{% block page-description %}
+<meta name="description" content="Displaying specially selected art works from '{{product_category.name}}' category. Arte'Venue.com has a large collection of over 250,000
+art works from artists across the world. We deliver customized art prints at your door steps.">
+{% endblock page-description %}
+{% block page-keywords %}
+<meta name="keywords" content="Art, {{product_category.name}}, Art prints, Wall Art, Buy Art, Buy Art prints, Print photos online, Print Art online,
+	Custom Framing, Online Framing, Online Art, Online Art prints">
+{% endblock page-keywords %}
+
 	<!-- Only Override the site content block -->
 	{% block sitecontent %}
-        <div class="container">
+        <div class="container-fluid">
 			<div class="row">
 
 				<!-- breadcrumb-->
@@ -38,7 +50,7 @@
 									<li><span class="badge badge-secondary">{{prod_cat_count}}</span>
 									{% for p in prod_categories %}
 										<ul class="list-unstyled">
-											<li><a href="{% url 'category_stock_images' p.category_id %}" class="nav-link">{{p.name|title}}</a></li>
+											<li><a href="{% url 'art_by_category' p.category_id %}" class="nav-link">{{p.name|title}}</a></li>
 										</ul>
 									{% endfor prod_categories %}
 										<a href="{% url 'show_all_categories' %}"><small>See All...</small></a>
@@ -355,6 +367,9 @@
 			}			
 			
 			filter = filter + '}';
+			
+			document.body.scrollTop = 0; // For Safari
+			document.documentElement.scrollTop = 0; 
 						
 			{% if product_category.category_id %}								
 				$.ajax({url: '{% url "curated_collections" product_category.category_id %}', 
@@ -369,21 +384,6 @@
 						return;
 					}
 				});			
-			{% else %}
-			
-				$.ajax({url: '{% url "all_stock_images" %}', 
-					data: filter, 
-					dataType: 'text', 
-					type: 'POST',
-					success: function (data) {
-						$("#img-display").html(data);
-					},
-					error: function(xhr){
-						alert("An error occured: " + xhr.status + " " + xhr.statusText + " Apologies for the inconvenience!! Please let us know the details and we will be happy to help sort it out."); 
-						return;
-					}
-				});			
-			
 			{% endif %}
 		}
 	</script>

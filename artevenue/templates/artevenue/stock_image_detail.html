@@ -1,33 +1,44 @@
 {% extends 'artevenue/estore_base.html' %}
 {% load static %}
+{% load utils %}
+
+{% block estore-title %}
+	<title>Get customized Art print. Name {{product.name}}, by {{product.artist}}.
+		Options to choose size, print medium, frame and mount.</title>
+{% endblock estore-title %}
+
+
 {% load moulding_url %}
 {% load update_cart_message from estore_base %}
 	<!-- Only Override the site content block -->
 	{% block sitecontent %}
-        <div class="container">
+        <div id="" class = "container-fluid">
 			<div class="row">
-				<div class="col-lg-12">
+				<div class="col-12">
 					<!-- breadcrumb-->
 					<nav aria-label="breadcrumb">
 						<ol class="breadcrumb">
 							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
 							<li class="breadcrumb-item"><a href="{% url 'show_all_categories' %}">Categories</a></li>
-							<li class="breadcrumb-item active"><a href="{% url 'category_stock_images' product_category.stock_image_category_id %}">{{ product_category.stock_image_category.name }}</a></li>
+							<li class="breadcrumb-item active"><a href="{% url 'art_by_category' product_category.stock_image_category_id %}">{{ product_category.stock_image_category.name }}</a></li>
 							<li class="breadcrumb-item active">{{ product.product_id }}</li>
 						</ol>
 					</nav>
 				</div>
-				<div class="col-lg-12">
+				<div class="col-12">
 					<div id="productMain" class="row">
-						<div id = "img-div" class="col-md-6">
+						<div class = "col-12 col-md-2 img-thumbs">
+							
+						</div>
+						<div class = "col-12 col-md-5 img-div mt-5">
 							{% if product.publisher == '1001' %}
 								<div class="item img-magnifier-container" 
 										onmouseenter="startMagnify()" 
 										onmouseleave="stopMagnify()"
 										ontouchstart="startMagnify()" 
 										ontouchend="stopMagnify()"> 
-										<img id = "prod-img" src="{% static product.url %}" data-action = "zoom" class="img-fluid"/>
-										
+									<!-- <img id = "prod-img" src="{% static product.url %}" data-action = "zoom" class="img-fluid"/> -->
+									<img id = "prod-img" src="{% static product.url %}" style = "max-width: 100%; margin:0px;"/>
 								</div>
 							
 							{% else %}
@@ -35,12 +46,11 @@
 										onmouseenter="startMagnify()" 
 										onmouseleave="stopMagnify()"
 										ontouchstart="startMagnify()" 
-										ontouchend="stopMagnify()"> 
-										<img id = "prod-img" src="{% static product.url %}" data-action = "zoom" class="img-fluid"/>
-
-										<!-- direct pull -->
-										<!-- <img id = "prod-img" src="{{product.url}}" data-action = "zoom" class="img-fluid"/> -->
-										
+										ontouchend="stopMagnify()">
+										<!-- 
+										style = "box-shadow: 3px 4px 4px 0 #444444, 3px 6px 4px 0#444444;" -->
+										<img id = "prod-img" src="{% static product.url %}" data-action = "zoom" class="img-fluid"
+												style = "max-width: 100%; margin:0px;"/>										
 								</div>
 							{% endif %}
 							<div id="diagram-div"  style = "display:none;">
@@ -55,18 +65,24 @@
 										<img id = "frame_diagram" style = "float:left;" src = ''>
 									</div>
 									<div class = "col-6" style = "padding:20px; vertical-align: middle;">									
-										</br>
+										<br />
 										<span id = "frame-desc"></span>
 									</div>
 								</div>
 								</small>
 							</div>
+
+							<button class="btn btn-sm" style = "background-color:#fff;"
+									onclick="addProdToWishlist({{product.product_id}},1)">
+								<i class="fa fa-heart-o fa-lg" ></i>
+								<small>Add to Favourites</small>
+							</button>
+							
 						</div>
 
-						<div class="col-md-6">
-							<div class="box">
-								<div class = "row">
-								<div class = "col-md-12">
+						<div class="col-12 col-md-5">
+							<div class = "row">
+								<div class = "col-12">
 									<div class= "pull-left">
 										<span id = "prod-name">{{ product.name }}</span><br />
 										<span id = "artist"> {%if product.artist %} By {{product.artist}} {% endif %} </span>
@@ -85,85 +101,340 @@
 										<div id = "disc_amt_nv" style = "display:none;"></div>
 										<div id = "item_total_price_nv" style = "display:none;"></div>
 									</div>
-								</div>
-								</div>
-								
-								<div class = "row">
-									<div class = "col-md-12">
-										{{ product.description }}
-									</div>
-								</div>
+								</div>								
+							</div>
 
-								
-								<div class = "size-box">
-									<div id = "size-title" style = "display:none">
-										Select Print Size <small style = "color:#828282">(inches)</small>
-									</div>
+<!------------------------>							
+
+							<div class = "row mt-3">
+								<div class = "col-6">
 									<div class = "row">
-										<div class = "col-md-6">
-											<!-- Size Slider -->
-											<div id = "size-title"> Choose Image Size: <small style = "color:#828282">(inches)</small></div>
+										<div class = "col-12" style = "">
+											<div id = "print-med" class = "size-title">Print On:</div>
+										</div>
+										<div class = "col-12">
+										{% for m in printmedium %}
+											{% if m.medium_id != 'NA' %}
+												<span id= "m-{{m.medium_id}}" class = "p_size p_clicked pull-left"
+													onclick = "set_print_medium('{{m.medium_id}}'); {% if m.medium_id == 'PAPER' %} $('#mouldings_include_paper').show(); $('#mouldings_include_canvas').hide(); {% else %}  $('#mouldings_include_paper').hide(); $('#mouldings_include_canvas').show();  {% endif %}">
+													{{ m.medium_id|upper }}
+												</span>
+											{% endif %}
+										{% endfor printmedium %}
+										</div>
+									</div>									
+								</div>
+								<div class = "col-6">
+									<div class = "row">
+										<div class = "col-12">
+											<div class = "form-group">
+												<div class = "label pull-right"  style = "font-size:0.7rem;">
+													<input id = "no-frame" type = "checkbox">
+													BUY WITHOUT FRAME
+												</div>
+											</div>
+										</div>
+										<div class = "col-12 mt-1">
+											<div class="label pull-right" style = "font-size:0.6rem;">
+												PRINT SIZE: 
+												<span id="print-size-display">12" X 9"</span>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="row mt-3">
+								<div class="col-12">							
+									<nav>
+										<div class="nav nav-tabs nav-fill" id="nav-tab" role="tablist">
+											<a class="nav-item nav-link active" id="nav-frame-tab" data-toggle="tab" href="#nav-frame" role="tab" aria-controls="nav-home" aria-selected="true">FRAMED</a>
+											<a class="nav-item nav-link" id="nav-customize-tab" data-toggle="tab" href="#nav-customize" role="tab" aria-controls="nav-profile" aria-selected="false">CUSTOMIZE <small>(Size, Frame, Mount)</small></a>
+										</div>
+									</nav>
+								</div>
+							</div>
+
+							<div class="tab-content px-sm-0" id="nav-tabContent" style = "padding:0 15px !important;">
+								<div class="tab-pane fade show active" id="nav-frame" role="tabpanel" aria-labelledby="nav-frame-tab">
+									<div class="row" style = "padding:15px;">										
+										<div class="col-12">
+											<div id = "mouldings_include_paper">
+												{% include 'artevenue/show_ready_products_paper.html' %}
+											</div>
+											<div id = "mouldings_include_canvas" style="display:none;">
+												{% include 'artevenue/show_ready_products_canvas.html' %}
+											</div>											
+										</div>
+									</div>
+								</div>
+								
+								<div class="tab-pane fade" id="nav-customize" role="tabpanel" aria-labelledby="nav-customze-tab">
+									<div class="row mt-3">
+										<div class="col-12 col-md-6">
+											<div id = "print-size" class = "size-title">PRINT SIZE <small style = "color:#828282">(inches)</small>:</div>
 											<div id="size-slider"></div>
-											<!-- <div id="size">
-											</div> -->
+										</div>
+										<div class = "col-12 col-md-6">
 											<div class = "row">
-												<div class = "col-sm-6">
+												<div class = "col-6">												
 													<div class = "form-group">
-														<label>Width</label>
+														<label>Width:</label>
 														<input class = "form-control" name = "i_width" id = "i_width" type = "number" value="16">
 													</div>
 												</div>
-												<div class = "col-sm-6">
+												<div class = "col-6">												
 													<div class = "form-group">
-														<label>Height</label>
-														<input class = "form-control" name = "i_height" id = "i_height" type = "number"> 
+														<div class = "form-group">
+															<label>Height:</label>
+															<input class = "form-control" name = "i_height" id = "i_height" type = "number"> 
+														</div>
 													</div>
 												</div>
 											</div>
 										</div>
-										<div class = "col-sm-6">
-											<div id = "size-title">
-												Select Print Medium
+									</div>
+									<hr>
+									<div class = "row">
+										<div id = "moulding-show">
+											<div class = "col-12">
+												<span class = "size-title">FRAME:</span>
 											</div>
-											<select id = "print-medium-select" 
-												class = "size-select custom-select"
-												onclick = "" 
-												onchange = "set_print_medium(this.value); get_applicable_frames();">
-												{% for m in printmedium %}
-												<option value = "{{m.medium_id}}">
-													{{ m.medium_id }}
-												</option>
-												{% endfor printmedium %}
-											</select>
-											<div style = "margin-top:5px; font: 0.85rem 'Roboto', sans-serif;" id="stretched" class = "checkbox pull-right" style = "display:none;">
+										</div>
+									</div>
+									<div id = "mouldings_include">
+										<!--{% include 'artevenue/mouldings_include_customize.html' %}-->
+										{% include 'artevenue/mouldings_include_customize.html' %}
+									</div>											
+									<hr>
+									<span id = "mount-show">
+										<div class = "row">
+											<div class = "col-3">
+												<span class = "size-title">MOUNT COLOR:</span>
+											</div>
+											{% for m in mounts %}
+											<div class = "col-1 mr-3">
+												<button class = "btn mount" 
+													id = "mnt_{{m.mount_id}}"
+													style = "border:1px solid grey; background-color:{{m.color}};" 
+													data-toggle="tooltip" 
+													title = "{{m.name}}"  
+													onclick = "set_mount('{{m.mount_id}}');
+															   set_mount_color('{{m.color}}');
+															   ">
+												</button>
+											</div>
+											{% endfor %}
+										</div>
+										<div class = "row mt-3">
+											<div class = "col-5">
+												<span class = "size-title">MOUNT WIDTH <small>(Inches)</small>:</span>
+											</div>
+											<div class = "col-7">
+												<input class = "form-control" 
+													type = "number"  
+													onchange="set_mount_size(this.value, this.value, this.value, this.value, this.value);" 
+													name = "mount-size" 
+													id = "mount-size" 
+													min = "1" max = "5" 
+													value = "1" >
+											</div>
+										</div>
+									</span>
+
+									<div class = "row" id ="stretched">
+										<div class = "col-12" style = "margin-top:-5px; font: 0.85rem 'Roboto', sans-serif;" class = "checkbox row">
+											<label class="checkbox-inline">
+												<input id="in_stretched" name="in_stretched"
+													onchange = "set_stretch()"
+													type = "checkbox"> <strong>Stretched?</strong>
+											</label>
+										</div>
+										<div class = "col-12" style = "margin-bottom:15px;">
+											<small>Check the checkbox to get the canvas streched on a wooden frame</small>
+											<span class = "">
+												<i class = "fa fa-question-circle" 
+													data-toggle="tooltip" title="Click to know more!"
+													id="strt" 
+													onclick="$('#stretched-modal').modal('show');">
+													<span style = "color:#11b6bd; font-size:0.7rem; text-decoration:underline;">What does 'Stretched' mean</span>
+												</i>
+											</span>
+										</div>
+									</div>										
+								</div>
+							</div>
+
+							<div class = "row mt-3">
+								<div class = "col-7">
+									<div id = "selected_size" style="font-size:0.65rem;">
+										<span id="print-size">
+											Print Size: 12 X 12
+										<span>
+										<span id="framed-size">
+											, Framed Size: 12 X 12 inches
+										</span>
+									</div>
+									<div id = "selected_med" style="font-size:0.65rem;">
+										<span id="prod-desc">
+											Print on paper, Simple Black frame 1.2 inch, offwhite 1 inch mount
+										</span>
+									</div>
+								</div>							
+								<div class = "col-5">
+									<div class = "d-flex justify-content-center">
+										<button class="btn btn-primary" 
+											onclick="addProdToCart({{product.product_id}}, 1)">
+											<i class="fa fa-shopping-cart"></i>
+											Add to cart
+										</button>
+									</div>
+								</div>
+							</div>
+							
+<!------------------------>							
+							
+
+
+
+<!--							<div class = "size-box">
+								<div class = "row">
+									<div class = "col-12 col-md-6"  style = "padding-bottom:15px;">
+										<div class = "row">
+											<div class = "col-12" style = "">
+												<div id = "print-med" class = "size-title">Print On:</div>
+											</div>
+										</div>
+										<div class = "row">
+											<div class = "col-12" style = "margin-top:10px; margin-bottom:15px;">
+											{% for m in printmedium %}
+												{% if m.medium_id != 'NA' %}
+													<span id= "m-{{m.medium_id}}" class = "p_size p_clicked pull-left"
+														onclick = "set_print_medium('{{m.medium_id}}'); get_applicable_frames()">
+														{{ m.medium_id|title }}
+													</span>
+												{% endif %}
+											{% endfor printmedium %}
+											</div>
+										</div>
+										<div class = "row" id ="stretched">
+											<div class = "col-12" style = "margin-top:-5px; font: 0.85rem 'Roboto', sans-serif;" class = "checkbox row">
 												<label class="checkbox-inline">
 													<input id="in_stretched" name="in_stretched"
 														onchange = "set_stretch()"
-														type = "checkbox"> Stretched? <i class = "fa fa-question-circle-o" rel="tooltip" title="Check this box if would like the Canvas to be stretched" id="strt"></i>
+														type = "checkbox"> <strong>Stretched?</strong>
 												</label>
 											</div>
-										</div>
-									</div>
-								</div>
-								<div class = "size-box" style = "display:none">
-									<div class = "row">
-										<div class = "col-sm-6">
-											<div id = "size-title">
-												Acrylic?
+											<div class = "col-12" style = "margin-bottom:15px;">
+												<small>Check the checkbox to get the canvas streched on a wooden frame</small>
+												<span class = "">
+													<i class = "fa fa-question-circle" 
+														data-toggle="tooltip" title="Click to know more!"
+														id="strt" 
+														onclick="$('#stretched-modal').modal('show');">
+														<span style = "color:#11b6bd; font-size:0.7rem; text-decoration:underline;">What does 'Stretched' mean</span>
+													</i>
+												</span>
 											</div>
-											<select id = "acrylic-select" class="size-select custom-select">
-												<option value = "YES">
-													Yes
-												</option>
-												<option value = "NO">
-													No
-												</option>
-											</select>
+										</div>
+										<div class = "row">
+											<div class = "col-12">
+												<div id = "print-med" class = "size-title">Print Size <small style = "color:#828282">(inches)</small>:</div>
+											</div>
+										</div>										
+										<div class = "row">
+											<div class = "col-6">
+												<div class = "form-group">
+													<label>Width</label>
+													<input class = "form-control" name = "i_width" id = "i_width" type = "number" value="16">
+												</div>
+											</div>
+											<div class = "col-6">
+												<div class = "form-group">
+													<label>Height</label>
+													<input class = "form-control" name = "i_height" id = "i_height" type = "number"> 
+												</div>
+											</div>												
 										</div>
 									</div>
+									<div class = "col-12 col-md-6"  style = "padding-bottom:15px;">
+										<div class = "row">
+											<div class = "col-12">
+												<div class = "size-title">Choose From Standard Sizes</div>
+											</div>
+											<div class = "col-12">
+												<select id = "print-medium-select" 
+													class = "size-select custom-select"
+													onclick = "" 
+													onchange = "set_size(this.value); get_applicable_frames();">
+													<option value = "12">
+														12" X {{12|get_height:product.aspect_ratio}}"
+													</option>
+													<option value = "18">
+														18" X {{18|get_height:product.aspect_ratio}}"
+													</option>
+													<option value = "24">
+														24" X {{24|get_height:product.aspect_ratio}}"
+													</option>
+													<option value = "30">
+														30" X {{30|get_height:product.aspect_ratio}}"
+													</option>
+													<option value = "36">
+														36" X {{36|get_height:product.aspect_ratio}}"
+													</option>
+												</select>
+											</div>	
+										</div>
+										<div class = "row mt-5">
+											<div class = "col-12">
+												<div class = "size-title"> Or Customize</div>
+												<div id="size-slider"></div>
+											</div>
+										</div>											
+									</div>
 								</div>
-								<div class = "fine-print"> There may be tiny variation in delivered sizes due to aspect ratio and other factors</div>
 							</div>
+							<div class = "row">
+								<div class = "col-12 col-md-5 sticky">
+									<button class="btn btn-primary  pull-right" 
+										onclick="addProdToCart({{product.product_id}}, 1)">
+										<i class="fa fa-shopping-cart"></i>
+										Add to Cart
+									</button>
+								</div>									
+							</div>
+							
+							<div id = "moulding-show" class = "size-box">
+								<div class = "row">
+									<div class="col-lg-12">
+										<a class = "btn btn-link pull-left" style = "font-size:1rem; color:#4d4d4d; padding-left:0px;" class = "pull-left">Select Frame</a>
+										<button class = "btn btn-link pull-right" id = "frame-btn" onclick="removeFrame();"><i class="fa fa-times-circle"></i>Remove Frame</button>
+										<br />
+									</div>
+								</div>
+								<div id = "mouldings_include">
+									{% include 'artevenue/mouldings_include.html' %}
+								</div>
+
+							</div>
+							<div class = "size-box" style = "display:none">
+								<div class = "row">
+									<div class = "col-sm-6">
+										<div id = "size-title">
+											Acrylic?
+										</div>
+										<select id = "acrylic-select" class="size-select custom-select">
+											<option value = "YES">
+												Yes
+											</option>
+											<option value = "NO">
+												No
+											</option>
+										</select>
+									</div>
+								</div>
+							</div>
+							<div class = "fine-print"> There may be tiny variation in delivered sizes due to aspect ratio and other factors</div>
 							<div class = "d-flex justify-content-center">
 								<button class="btn btn-primary" 
 									onclick="addProdToCart({{product.product_id}}, 1)">
@@ -171,28 +442,26 @@
 									Add to cart
 								</button>
 
-								<button class="btn btn-sm" style = "background-color:#fff;">
-									<i class="fa fa-heart" onclick="addProdToWishlist({{product.product_id}},1)"></i>
-									<small>Add to wishlist</small>
+								<button class="btn btn-sm" style = "background-color:#fff;"
+										onclick="addProdToWishlist({{product.product_id}},1)">
+									<i class="fa fa-heart" ></i>
+									<small>Add to Favourites</small>
 								</button>
 							</div>
 							
-							<!-- Show Mount -->
 							<div class = "box">
-								<div class = "row mb-3">
+								<div class = "row mb-1">
 									<div class="col-sm-12">
 										<a class = "btn btn-link pull-left" style = "font-size:1rem; color:#4d4d4d; text-decoration:underline; padding-left:0px;" href = "#moulding-show"> Choose Frame</a>
-										<button class = "btn btn-link pull-right" style = "font-size:1rem; color:#4d4d4d; text-decoration:underline;" onclick="removeFrame();"> Remove Frame</button>
+										<button class = "btn btn-link pull-right" style = "font-size:1rem; color:#4d4d4d;" onclick="removeFrame();"><i class="fa fa-times-circle"></i>Remove Frame</button>
 									</div>
 								</div>
 								<hr>
 								<div id = "mount-show">
 									<div class = "row">
 										<div class="col-sm-12">
-											<span style = "font-size:1rem; color:#4d4d4d;" class = "pull-left" id = "frame-name">Choose Mount</span>
-											<div class = "pull-right">
-												<button onclick = "set_mount('0'); set_mount_color('0');" class = "btn btn-link"><i class="fa fa-remove"></i>Remove Mount</button>
-											</div>
+											<a class = "btn btn-link pull-left" style = "font-size:1rem; color:#4d4d4d; text-decoration:underline; padding-left:0px;" class = "pull-left" id = "frame-name">Choose Mount</a>
+											<button class = "btn btn-link pull-right" onclick = "set_mount('0'); set_mount_color('0');" class = "btn btn-link"><i class="fa fa-times-circle"></i>Remove</button>
 										</div>
 									</div>
 									<div class = "row ml-1 mb-3">
@@ -215,7 +484,7 @@
 												Colors
 											</div>
 											{% for m in mounts %}
-											<div class = "col-1 mr-1">
+											<div class = "col-1 mr-3">
 												<button class = "btn mount" 
 													id = "mnt_{{m.mount_id}}"
 													style = "border:1px solid grey; background-color:{{m.color}};" 
@@ -229,94 +498,163 @@
 											{% endfor %}
 										</div>
 									</div>
-									<!-- <div class = "row ml-1">
-										<strong>Width (Inches)</strong>
-										<div class="col-sm-10">
-											<div class = "row">
-											<div class = "col-sm-2">
-											<label for="mounth-w-top"> <span class = "size-text">Top</span></label>
-											<input class = "form-control" type = "number" name = "mount-w-top" id = "mount-w-top" min = "1" max = "5" value = "1" >
-											</div>
-											<div class = "col-sm-2">
-											<label for="mounth-w-bottom"> <span class = "size-text">Bottom</span></label>
-											<input class = "form-control" type = "number" name = "mount-w-bottom" id = "mount-w-bottom" min = "1" max = "5" value = "1" >
-											</div>
-											<div class = "col-sm-2">
-											<label for="mounth-width"> <span class = "size-text">Left</span></label>
-											<input class = "form-control" type = "number" name = "mount-w-left" id = "mount-w-left" min = "1" max = "5" value = "1" >
-											</div>
-											<div class = "col-sm-2">
-											<label for="mounth-width"> <span class = "size-text">Right</span></label>
-											<input class = "form-control" type = "number" name = "mount-w-right" id = "mount-w-right" min = "1" max = "5" value = "1" >
-											</div>
-											</div>
-										</div>
-									</div>	-->
 								</div>
-							</div>
+							</div> -->
 							
 							
 						</div>
-		
 					</div>
-					<!-- END: ProductMain -->
+					
+					<div class = "row">
+						<div class = "col-12 col-md-6">
+							<div id="accordion">
+								<div class="card">
+									<div class="card-header" id="headingOne">
+										<h5 class="mb-0">
+											<button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+												<span class = "size-title">ABOUT THIS ART</span>
+											</button>
+										</h5>
+									</div>
+
+									<div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+										<div class="card-body">
+											<table class = "table table-borderless">
+												<thead>
+												</thead>
+												<tbody>
+													<tr>
+														<td>Title</td>
+														<td>{{product.name}}</td>
+													</tr>
+													<tr>
+														<td>Artist</td>
+														<td>{{product.artist}}</td>
+													</tr>
+													<tr>
+														<td>Max Print Width</td>
+														<td>{{product.max_width|floatformat}} inch
+													</tr>
+													<tr>
+														<td>Max Print Height</td>
+														<td>{{product.max_height|floatformat}} inch
+													</tr>
+													<tr>
+														<td>Orientation</td>
+														<td>{{product.orientation}}
+													</tr>
+												</tbody>
+											</table>
+										</div>
+									</div>
+								</div>
+								<div class="card">
+									<div class="card-header" id="headingTwo">
+										<h5 class="mb-0">
+											<button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+												<span class = "size-title">SPECIFICATIONS</span>
+											</button>
+										</h5>
+									</div>
+									<div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+										<div class="card-body">
+											<table class = "table table-borderless">
+												<thead>
+													<tr>
+														<th>Component</th>
+														<th>Specifications</th>
+													</tr>
+												</thead>
+												<tbody>
+													<span class = "comp-frame">
+														<tr>
+															<td>Frame</td>
+															<td>
+																"Simple Black", 1" inch width. Made of Polystyrene, which is light weight, strong and durable. It has classy finish.
+															</td>
+														</tr>
+													</span>
+													<span class = "comp-paper">
+														<tr>
+															<td>Paper</td>
+															<td>
+																250 GSM, professional quality, highly durable
+															</td>
+														</tr>
+													</span>
+													<span class = "comp-canvas">
+														<tr>													
+															<td>Canvas</td>
+															<td>
+																250 GSM, professional quality, highly durable
+															</td>
+														</tr>
+													</span>
+												</tbody>
+											</table>
+										</div>
+									</div>
+								</div>
+								<div class="card">
+									<div class="card-header" id="headingTwo">
+										<h5 class="mb-0">
+											<button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseTwo">
+												<span class = "size-title">SHIPPING</span>
+											</button>
+										</h5>
+									</div>
+									<div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
+										<div class="card-body">
+											Ships in 1-2 days. We ship by FedEx.
+										</div>
+									</div>
+								</div>
+
+							</div>
+						</div>
+
+					</div>
 				</div>
 			</div>
 
-			<!-- Show Moulding -->
-			<div id = "moulding-show" class = "size-box">
-				<div class = "row">
-					<div class="col-lg-12">
-						<span class = "pull-left" id = "frame-name">Select Frame</span>
-						<button class = "btn btn-link pull-right" id = "frame-btn" onclick="removeFrame();"><i class="fa fa-remove"></i>Remove Frame</button>
-						<br />
-					</div>
-				</div>
-				<div id = "mouldings_include">
-					{% include 'artevenue/mouldings_include.html' %}
-				</div>
-
-			</div>
 			<!-- Similar products -->
 			{% if prods %}
-			<div id = "similar-show" class = "size-box mt-5">
-				<div id = "similar_include" style = "background-color:#fafafa">
+			<div id = "similar-show" class = "size-box mt-5" style = "background-color:#fafafa">
+				<div id = "similar_include">
 					{% include 'artevenue/similar_products.html' %}
 				</div>
 
 			</div>
 			{% endif %}
 
-			{% if recent_view_prods %}
-			<div class="row same-height-row">
-				<div class="col-lg-3 col-md-6">
-					<div class="box same-height">
-						<h3>Recently Viewed</h3>
-					</div>
-				</div>
-				{% for r in recent_view_prods %}
-				<div class="col-lg-3 col-md-6">
-					<div class="product same-height">
-						<div class="flip-container">
-							<div class="flipper">
-								<div class="front"><a href=""><img src="" alt="" class="img-fluid"></a></div>
-								<div class="back"><a href=""><img src="" alt="" class="img-fluid"></a></div>
-							</div>
-						</div><a href="#" class="invisible"><img src="" alt="" class="img-fluid"></a>
-						<div class="text">
-							<h3>Fur coat</h3>
-						<p class="price">$143</p>
-						</div>
-					</div>
-					<!-- /.product-->
-				</div>
-				{% endfor recent_view_prods %}
-			</div>
-			{% endif %}				
-
 			{% include 'artevenue/cart-add-message.html' %}
 			{% include 'artevenue/wishlist-add-message.html' %}
 			{% include 'artevenue/loader-message.html' %}
+
+
+			<div id="stretched-modal" tabindex="-1" role="dialog" aria-labelledby="Strecher" aria-hidden="true" class="modal fade">
+				<div class="modal-dialog modal-sm">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h3 class="modal-title">Stretched Canvas Print</h3>
+							<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
+						</div>
+						<div class="modal-body">
+							<div class="">
+								<img src = "{% static 'img/canvas_stretched.jpg' %}" style = "display:block; margin-left:auto; margin-right:auto; width:200px;">
+								<ul class = "mt-3" style = "font-size:0.75rem;">
+									<li>Please check the "Streched" checkbox to get the art 
+										printed on canvas and streched on a wooden frame as 
+									shown above. </li>
+									<li>If not checked, we print art on canvas, roll it and 
+									deliver it in a tube.</li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
 
 		</div>
 		
@@ -341,11 +679,7 @@
 		  }
 		}
 	</script>
-	
-	<script>
-		//document.addEventListener('contextmenu', event => event.preventDefault());
-	</script>
-	
+		
 	<script>
 
 		// Global variables to store IDs of pricing components
@@ -361,7 +695,12 @@
 		var stretch_id = '0'; 
 		
 		jQuery(document).ready(function(){
-
+			$body = $("body");
+			$(document).on({
+				ajaxStart: function() { $body.addClass("loading");},
+				ajaxStop: function() { $body.removeClass("loading");}
+			});
+			
 			$('[data-toggle="tooltip"]').tooltip();  
 
 			{% if product %}
@@ -379,13 +718,18 @@
 				{% endif %}
 				set_components_for_item(true);			
 			{% else %}
-				if ({{iuser_width}} > 0) {
-					set_size_slider({{iuser_width}});
-					$( "#size-slider" ).slider( "option", "value", {{iuser_width}});
-				} else {
+				{% if iuser_width %}
+					if ({{iuser_width}} > 0) {
+						set_size_slider({{iuser_width}});
+						$( "#size-slider" ).slider( "option", "value", {{iuser_width}});
+					} else {
+						set_size_slider(16);
+						$( "#size-slider" ).slider( "option", "value", 16);
+					}
+				{% else %}
 					set_size_slider(16);
 					$( "#size-slider" ).slider( "option", "value", 16);
-				}
+				{% endif %}
 				set_components_for_item(false);
 			{% endif %}
 			
@@ -399,8 +743,24 @@
 				}
 				//Calculate the price
 				calc_total_price();
-			});			
-			
+			});
+
+			getFramedImgForReadyProd({{product.product_id}}, 12, 'PAPER');
+			getFramedImgForReadyProd({{product.product_id}}, 18, 'PAPER');
+			getFramedImgForReadyProd({{product.product_id}}, 24, 'PAPER');
+			getFramedImgForReadyProd({{product.product_id}}, 30, 'PAPER');
+			getFramedImgForReadyProd({{product.product_id}}, 36, 'PAPER');
+			getFramedImgForReadyProd({{product.product_id}}, 42, 'PAPER');
+
+			getFramedImgForReadyProd({{product.product_id}}, 12, 'CANVAS');
+			getFramedImgForReadyProd({{product.product_id}}, 18, 'CANVAS');
+			getFramedImgForReadyProd({{product.product_id}}, 24, 'CANVAS');
+			getFramedImgForReadyProd({{product.product_id}}, 30, 'CANVAS');
+			getFramedImgForReadyProd({{product.product_id}}, 36, 'CANVAS');
+			getFramedImgForReadyProd({{product.product_id}}, 42, 'CANVAS');
+
+			//set_ready_product('PAPER', 12);
+			$('#no-frame').prop('checked',true);
 		});	
 
 		function enable_all_functionality(truefalse){
@@ -492,6 +852,8 @@
 		function set_print_medium(pm_id){
 			print_medium_id = pm_id;
 			if (pm_id == "CANVAS") {
+				$("#m-CANVAS").addClass("p_clicked");
+				$("#m-PAPER").removeClass("p_clicked");
 				$("#acrylic-select").hide();
 				$("#mount-show").hide();
 				{% for m in mounts %}
@@ -516,6 +878,8 @@
 				set_board("0");
 				
  			} else {
+				$("#m-PAPER").addClass("p_clicked");
+				$("#m-CANVAS").removeClass("p_clicked");
 				$("#acrylic-select").show();
 				$("#mount-show").show();
 				{% for m in mounts %}
@@ -531,8 +895,18 @@
 			//Calculate the price
 			calc_total_price();			
 		}
+		function get_print_medium(){
+			var pm = '';
+			{% for m in printmedium %}
+				if ($('#m-{{m.medium_id}}').hasClass('p_clicked')) {
+					pm = '{{m.medium_id}}';
+				}
+			{% endfor printmedium %}
+			return pm;
+		
+		}
 
-		function set_moulding(m_id){
+		function set_moulding(m_id){			
 			moulding_id = m_id;
 			if ( moulding_id != '0' &&  moulding_id != '') {
 				getFramedImg ('{{product.product_id}}', moulding_id, mount_color, mount_size);
@@ -560,6 +934,10 @@
 				
 				//Calculate the price
 				calc_total_price();
+			} else {
+				moulding_id = '0';
+				mount_id = '0';
+				getFramedImg ('{{product.product_id}}', moulding_id, mount_color, mount_size);
 			}
 			
 		}
@@ -575,6 +953,11 @@
 			mount_w_right = mnt_w_right
 			mount_w_top = mnt_w_top;
 			mount_w_bottom = mnt_w_bottom;
+			if (parseInt(mount_size) > 5){
+				mount_size = '5';
+				alert('Mount size be between 1 and 5 inches only');
+				$('#mount-size').val('5');
+			}
 			if (mount_size != '0' && mount_size != null && mount_size != 'None') {
 				if (print_medium_id == 'PAPER') {
 					getFramedImg ('{{product.product_id}}', moulding_id, mount_color, mount_size);
@@ -600,8 +983,8 @@
 		function set_acrylic(acry_id){
 			acrylic_id = acry_id;
 		}
-		function set_board(board_id){
-			board_id = board_id;
+		function set_board(brd_id){
+			board_id = brd_id;
 		}
 		function set_stretch(strt_id){
 			stretch_id = strt_id;
@@ -620,7 +1003,6 @@
 		}
 		
 		function getFramedImg (prod_id, moulding_id, mount_color, mount_size) {
-
 			var currwidth = parseFloat($("#size-slider").slider("value"));
 
 			// Get the framed image
@@ -632,7 +1014,8 @@
 					dataType: 'text', 
 				success: function (data) {
 					document.getElementById("prod-img").src = "data:image/png;base64," + data;
-					//$("#prod-img").html(data);
+					document.body.scrollTop = 0; // For Safari
+					document.documentElement.scrollTop = 0;
 					},
 				error: function(xhr){
 					alert("An error occured: " + xhr.status + " " + xhr.statusText); 
@@ -709,7 +1092,7 @@
 					//$("#size").html("Width: " + currwidth + ", Height: " + currheight);
 					$("#i_width").val(currwidth);
 					$("#i_height").val(currheight);
-					
+					$("#print-size-display").html(currwidth.toString() + " X " + currheight.toString());
 					// Apply the moulding when the size changes
 					print_medium_id = $('#print-medium-select').val();
 					if (moulding_id != '0'  && moulding_id != '') {
@@ -737,7 +1120,8 @@
 		var total_price = 0;
 		
 		//Get Print Medium
-		var print_medium = $('#print-medium-select').val();
+		//var print_medium = $('#print-medium-select').val();
+		print_medium_id = get_print_medium();
 		
 		// Set the pricing compoenents appropriately:
 		if (print_medium_id == 'PAPER') {
@@ -824,84 +1208,91 @@
 				error: function(xhr){
 					//alert("An error occured: " + xhr.status + " " + xhr.statusText); 
 				}
-		});
-		
-		console.log("==========================================================");
+		});		
 	}		
-
 	</script>
 	
 	
 	<script>
-	function addProdToCart(prod_id, qty) {
-		var cart_qty;
-		var total_price = $("#item_total_price_nv").html();	
-		if (total_price == '0'){
-			alert("Sorry, this product is not available.");
-			return;
-		}			
-		var discount = $("#disc").html();
-		var promotion_id = $("#promotion_id_nv").html();
-		var disc_amt = $("#disc_amt_nv").html();
-		var item_unit_price = $("#item_unit_price_nv").html();
+		function addProdToCart(prod_id, qty) {
+			var cart_qty;
+			var total_price = $("#item_total_price_nv").html();	
+			if (total_price == '0'){
+				alert("Sorry, this product is not available.");
+				return;
+			}			
+			var discount = $("#disc").html();
+			var promotion_id = $("#promotion_id_nv").html();
+			var disc_amt = $("#disc_amt_nv").html();
+			var item_unit_price = $("#item_unit_price_nv").html();
 
-		
-		var ratio = parseFloat("{{product.aspect_ratio}}"); 
-		var currwidth = parseFloat($("#size-slider").slider("value"));
-		var currheight = Math.round(currwidth / ratio);
-		var sqin = currwidth * currheight;
-		
-		print_medium_id = $('#print-medium-select').val();
-		print_medium_size = sqin;
-		moulding_size = (currwidth + currheight) * 2;
-		//mount_size = (currwidth + currheight) * 2;  // Taken from the mout_size set earlier (not sqin)
-		acrylic_size = currwidth * currheight;
-		board_size = currwidth * currheight;
-		stretch_size = (currwidth + currheight) * 2;
-		
-		//
-		var cart_item_flag = 'FALSE';
-		{% if cart_item %}
-			cart_item_flag = 'TRUE';
-		{% endif %}
-		
-		// Update the cart
-		$.ajax({
-			url: "{% url 'add_to_cart' %}", 
-			data: {'prod_id':prod_id, 'qty':qty, 'moulding_id': moulding_id,
-					'width':currwidth, 'height':currheight,
-					'moulding_size' : moulding_size,
-					'print_medium_id':print_medium_id, 'print_medium_size':print_medium_size, 
-					'mount_id':mount_id, 'mount_size':mount_size,
-					'mount_w_left' : mount_w_left, 'mount_w_right':mount_w_right, 
-					'mount_w_top':mount_w_top, 'mount_w_bottom' : mount_w_bottom, 
-					'acrylic_id':acrylic_id, 'acrylic_size':acrylic_size,
-					'board_id':board_id, 'board_size':board_size, 'stretch_id':stretch_id,
-					'stretch_size':stretch_size, 
-					'total_price':total_price, 'image_width':currwidth, 'image_height':currheight,
-					'discount':discount, 'promotion_id':promotion_id, 'disc_amt':disc_amt,
-					'item_unit_price':item_unit_price, 'prod_type':'STOCK-IMAGE',
-					'cart_item_flag':cart_item_flag}, 
-			dataType: 'text', 
-				type: 'POST',
-			success: function (data) {
-				data = JSON.parse(data);
-				if (data.msg.toUpperCase() != 'SUCCESS'){
-						alert("Sorry, a system error occured: " + data.msg);
-				} else {					
-						
-					cart_qty = data.cart_qty;
-					//Update items in cart
-					$("#itemsincart").html(cart_qty); 
-					$('#msg-modal').modal('show');
-				}
-			},
-			error: function(xhr){
-				alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+			var m_size = parseInt($('#mount-size').val());
+			if(typeof m_size == "undefined"){			
+				alert("Sorry, mount width can be between 1 and 5 inch.");
+				return;
 			}
-		});
-	}
-	
+			if ( m_size > 5 ){
+				alert("Sorry, mount width can be between 1 and 5 inch.");
+				return;
+			}
+			
+			var ratio = parseFloat("{{product.aspect_ratio}}"); 
+			var currwidth = parseFloat($("#size-slider").slider("value"));
+			var currheight = Math.round(currwidth / ratio);
+			var sqin = currwidth * currheight;
+			
+			//print_medium_id = $('#print-medium-select').val();
+			print_medium_id = get_print_medium();
+			print_medium_size = sqin;
+			moulding_size = (currwidth + currheight) * 2;
+			//mount_size = (currwidth + currheight) * 2;  // Taken from the mout_size set earlier (not sqin)
+			acrylic_size = currwidth * currheight;
+			board_size = currwidth * currheight;
+			stretch_size = (currwidth + currheight) * 2;
+			
+			//
+			var cart_item_flag = 'FALSE';
+			{% if cart_item %}
+				cart_item_flag = 'TRUE';
+			{% endif %}
+			
+			// Update the cart
+			$.ajax({
+				url: "{% url 'add_to_cart' %}", 
+				data: {'prod_id':prod_id, 'qty':qty, 'moulding_id': moulding_id,
+						'width':currwidth, 'height':currheight,
+						'moulding_size' : moulding_size,
+						'print_medium_id':print_medium_id, 'print_medium_size':print_medium_size, 
+						'mount_id':mount_id, 'mount_size':mount_size,
+						'mount_w_left' : mount_w_left, 'mount_w_right':mount_w_right, 
+						'mount_w_top':mount_w_top, 'mount_w_bottom' : mount_w_bottom, 
+						'acrylic_id':acrylic_id, 'acrylic_size':acrylic_size,
+						'board_id':board_id, 'board_size':board_size, 'stretch_id':stretch_id,
+						'stretch_size':stretch_size, 
+						'total_price':total_price, 'image_width':currwidth, 'image_height':currheight,
+						'discount':discount, 'promotion_id':promotion_id, 'disc_amt':disc_amt,
+						'item_unit_price':item_unit_price, 'prod_type':'STOCK-IMAGE',
+						'cart_item_flag':cart_item_flag}, 
+				dataType: 'text', 
+					type: 'POST',
+				success: function (data) {
+					data = JSON.parse(data);
+					if (data.msg.toUpperCase() != 'SUCCESS'){
+							alert(data.msg);
+					} else {					
+							
+						cart_qty = data.cart_qty;
+						//Update items in cart
+						$("#itemsincart").html(cart_qty); 
+						$('#msg-modal').modal('show');
+					}
+				},
+				error: function(xhr){
+					alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+				}
+			});
+		}
+		
 	
 		// ---- Add Product to Cart ----//
 		function addProdToWishlist(prod_id, qty) {
@@ -1016,9 +1407,83 @@
 			});	
 		}
 	</script>
+
+
+	<script>
+		function show_streched_img(){
+			$("#show_streched_img").modal('show');	
+		}
+	</script>
 	
+	
+	<script>
+		function getFramedImgForReadyProd(prod_id, prod_width, p_medium) {
+
+			// Get the framed image
+			$.ajax({
+					url: "{% url 'get_ready_products' %}", 
+					data: {'prod_id':prod_id, 'prod_width':prod_width, 'print_medium':p_medium}, 
+					dataType: 'text', 
+					type: 'POST', 
+				success: function (data) {
+					if (p_medium == 'PAPER') {
+						document.getElementById("prod-width-" + prod_width + '-paper').src = "data:image/png;base64," + data;
+					} else {
+						document.getElementById("prod-width-" + prod_width + '-canvas').src = "data:image/png;base64," + data;
+					}
+				},
+				error: function(xhr){
+					alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+				}
+			});
+		}
+	</script>
+	
+	<script>
+		function set_ready_product(print_med, p_width){
+
+			prod_id = '{{product.product_id}}';
+			
+			set_moulding('18');
+			set_mount('1');
+			set_mount_color('#fffff0');
+			set_board('1');
+			set_stretch('1');
+			set_size_slider(p_width);
+			
+			// Get the framed image
+			$.ajax({
+					url: "{% url 'get_framed_image' %}", 
+					data: {'prod_id':prod_id, 'moulding_id': moulding_id,
+							'mount_color':mount_color, 'mount_size':mount_size, 'image_width':p_width
+						}, 
+					dataType: 'text', 
+				success: function (data) {
+					document.getElementById("prod-img").src = "data:image/png;base64," + data;
+					/*document.body.scrollTop = 0; 
+					document.documentElement.scrollTop = 0;*/
+					},
+				error: function(xhr){
+					alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+				}
+			});
+		
+		}
+		
+	</script>
+	
+	<script>
+		$('#no-frame').change(function () {
+			if ( $(this).is(':checked') ) {
+				removeFrame();
+			} else {			
+				set_mount('1');
+				set_mount_color('#fffff0');
+				set_acrylic('1');
+				set_board('1');
+				set_stretch('1');
+				set_moulding('18');
+			}
+		});
+	</script>
 	{% endblock jscripts %}	
-		
-
-
-		

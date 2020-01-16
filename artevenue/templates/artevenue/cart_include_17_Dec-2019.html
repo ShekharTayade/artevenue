@@ -1,0 +1,266 @@
+{% load static %}	
+{% load utils %}	
+	
+			<div class="row">
+
+				<div class="col-lg-12">
+				  <!-- breadcrumb-->
+				  <nav aria-label="breadcrumb">
+					<ol class="breadcrumb">
+						<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+						<li aria-current="page" class="breadcrumb-item active">Shopping cart</li>
+					</ol>
+				  </nav>
+				</div>
+
+
+				<div id="cart" class="col-lg-9">
+					<div class="box">
+						<form method="post" id = "checkoutform" onsubmit = "return validate_checkout();" action="{% url 'checkout_step1_address' %}">
+							{% csrf_token %}
+							<!-- Invisible field to hold the cart id -->
+							<input hidden id = "cart_id" name = "cart_id" value = "{{usercart.cart_id }}">
+							<!-- Hidden fields for sub_total and tax -->
+							<input hidden id = "sub_total" name = "sub_total" value = "{{usercart.cart_sub_total|floatformat}}">
+							<input hidden id = "tax" name = "tax" value = "{{usercart.cart_tax|floatformat}}">
+							<input hidden id = "disc_amt_nv" name = "disc_amt_nv" value = "{{usercart.cart_disc_amt|floatformat}}">
+							<input hidden id = "cart_total_nv" name = "cart_total_nv" value = "{{usercart.cart_total|floatformat}}">
+							<h1>Shopping cart</h1>
+							<p class="text-muted">You have {% if usercart %} {{usercart.quantity}} {% else %} 0 {% endif %} item(s) in your cart.</p>
+							<div class="table table-responsive">
+								<table id = "cartTbl" class="table table-responsive">
+									<thead>
+										<tr>
+											<th width="10%">Item</th>
+											<th width="25%">Details</th>
+											<th width="10%" style = "text-align:right;">Qty</th>
+											<th width="10%" style = "text-align:right;">Unit Price</th>
+											<th width="10%" style = "text-align:right;">Disc</th>
+											<th width="10%" style = "text-align:right;"> Tax</th>
+											<th width="10%" style = "text-align:right;">Total</th>
+											<th width="10%"></th>
+										</tr>
+									</thead>
+									<tbody>
+										{% for i in usercartitems %}
+										<tr>
+											<td>
+												<img src = "{% if i.product_type == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product__image_to_frame}} {% else %} {% static i.product__thumbnail_url %} {% endif %}" style = "width:50px; height:50px; object-fit:contain;">
+												<!--
+												{% if i.product__publisher == '1001' %}
+													<img src = "{% if i.product_type == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product__image_to_frame}} {% else %} {% static i.product__thumbnail_url %} {% endif %}" style = "width:75px; height:75px; object-fit:contain;">
+												{% else %}
+													<img src = "{% if i.product_type == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product__image_to_frame}} {% else %} {{i.product__thumbnail_url}} {% endif %}" style = "width:75px; height:75px; object-fit:contain;">
+												{% endif %}
+												-->
+												<br />
+
+												<div class = "pull-left">
+													<button style="padding-left:0px;" type ="button" class = "btn btn-link pull-left" onclick = "getFramedImg('{{i.product_id}}', '{{i.product_type}}', {% if i.product_type == 'ORIGINAL-ART' %} '{{i.art_width}}'  {% else %} '{{i.image_width}}' {% endif %}, '{{i.moulding_id | default_if_none:0}}', '{{i.mount__color | default_if_none:0}}','{{i.mount_size | default_if_none:0}}', '{{i.product__url | default_if_none:""}}');">
+														<small>{{i.product__name|truncatechars:10 }}</small>
+													</button>
+												</div>
+											</td>
+											<td>
+													{% with width=i.moulding__width_inner_inches|add_width_frame_mount:i.mount_size %}
+													<small>
+													{% if i.product_type == 'ORIGINAL-ART' %}
+														<li>{{i.product__description}}</li>
+													{% else %}													
+														<li>Print on {{i.print_medium_id|title}}</li>
+													{% endif %}
+													{% if i.moulding_id %}
+														<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+														<li>Frame: {{i.moulding__name }} ({{i.moulding__width_inches}} inch, Polystyrene)</li>
+														{% if i.mount_id %}
+															<li>Mount: {{i.mount_size }}", Color: {{i.mount__name|title }} </li>
+														{% endif %}
+														<li>Total Size: 
+															{{ i.image_width|add_width:width|add_width:width }}" X {{i.image_height|add_width:width|add_width:width }}"</li>
+													{% else %}
+														<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+													{% endif %}
+													
+													{% if i.acrylic_id %}
+														<li>Acrylic covered</li>
+													{% endif %}
+													{% if i.stretch_id %}
+														<li>Canvas Stretched</li>
+													{% endif %}
+													</small>
+													{% endwith %}
+											</td>
+											<td style = "text-align:right;">
+												<input type="number" value="{{i.quantity}}" class="form-control"
+													onchange = 'updateItemQty("{{i.cart_item_id}}", $(this).val());'>
+											</td>
+											<td style = "text-align:right;">{{i.item_unit_price|floatformat}}</td>
+											<td style = "text-align:right;">											
+												<!-- {% if i.promotion__discount_type == "PERCENTAGE" %}
+													{{i.promotion__discount_value|floatformat}}%
+												{% else %}
+													{{i.promotion__discount_value|floatformat}}
+												{% endif %} -->
+												{{i.item_disc_amt|floatformat}}
+											</td>
+											<td style = "text-align:right;">
+												{{i.item_tax|floatformat}}
+											</td>
+											<td style = "text-align:right">{{i.item_total|floatformat}}</td>
+											<td>
+												<ul style="list-style-type:none; padding-left:5px;">
+													{% if i.product_type == 'STOCK-IMAGE' %}
+													<li>
+													<a>
+														<i style = "cursor: pointer; color:#007bff;" 
+															data-toggle="tooltip" title="Edit!" class="fa fa-edit"
+															onclick = "edit_item('{{i.cart_item_id}}', '{{i.product_id}}');">
+															<small> Edit</small>
+														</i>
+													</a>
+													</li>
+													<li>
+													{% endif %}
+													<a> 
+														<i style = "cursor: pointer; color:#007bff;" data-toggle="tooltip" title="Delete from Cart!" 
+															onclick="deleteItem('{{i.cart_item_id}}', '{{sub_total|floatformat}}', '{{total_tax|floatformat}}', '{{usercart.cart_total|floatformat}}', '{{i.item_total|floatformat}}');"
+															class="fa fa-trash-o"><small> Delete</small>
+														</i>
+													</a>
+													</li>
+												</ul>
+											</td>
+										</tr>
+										{% endfor usercartitems %}
+										
+									</tbody>
+									<tfoot>
+										<tr>
+											<th colspan="2">Total</th>
+											<!--<th colspan="1" style = "text-align:right">{{total_bare|floatformat}}</th>-->
+											<th colspan="1" style = "text-align:right">{{usercart.quantity|floatformat}}</th>
+											<th colspan="1" style = "text-align:right">{{usercart.cart_unit_price|floatformat}}</th>
+											<!--<th colspan="1" style = "text-align:right">{{usercart.cart_disc_amt|floatformat}}</th> -->
+											<th colspan="1" style = "text-align:right">{{usercart.cart_disc_amt|floatformat}}</th>
+											<th colspan="1" style = "text-align:right">{{usercart.cart_tax|floatformat}}</th>
+											<th colspan="1" style = "text-align:right">{{usercart.cart_total|floatformat}}</th>
+											<th></th>
+										</tr>
+									</tfoot>
+								</table>
+							</div>
+
+							<!--convert python data to json -->
+							{% for j in usercartitems %}
+								{{ j|json_script:j.cart_item_id }}			
+							{% endfor usercartitems %}
+							
+
+							<!-- /.table-responsive-->
+							<div class="box-footer d-flex justify-content-between flex-column flex-lg-row">
+								<div class="left"><a href="{% url 'index' %}" class="btn btn-outline-secondary">
+									<i class="fa fa-chevron-left"></i> Continue shopping</a>
+								</div>
+								<div class="right">
+									<button 
+										id = "checkout_btn"
+										type="submit" 
+										class="btn btn-primary" 
+										form = "checkoutform" 
+										value="submit">
+											Proceed to checkout <i class="fa fa-chevron-right"></i>
+									</button>
+								</div>
+							</div>
+						</form>
+					</div>
+					<!-- /.box-->
+
+				</div> 
+				<!-- /.col-lg-8-->
+
+					
+				<div class="col-lg-3">
+					<div id="order-summary" class="box">
+						<div class="box-header">
+							<h3 class="mb-0">Cart summary</h3>
+						</div>
+						<div class="table-responsive">
+							<table class="table">
+								<tbody>
+									<tr>
+										<td>Cart subtotal</td>
+										<th class="pull-right">{{usercart.cart_sub_total|floatformat}}</th>
+									</tr>
+									<tr>
+										<td>Tax</td>
+										<th class="pull-right">{{usercart.cart_tax|floatformat}}</th>
+									</tr>
+
+								
+									<tr>
+										<td>Shipping & handling</td>
+										<th><span class="pull-right">{{shipping_cost}}</span></th>
+									</tr>
+									<tr class="total">
+										<td>Cart Total</td>
+										<th class="pull-right"><i class = "fa fa-inr"> </i> <span id ="cart_total" >{{usercart.cart_total|floatformat:"0"|default:"0"}}</span></th>
+									</tr>
+
+									<tr>
+										<td>Discount</td>
+										<th id = "disc_amt" style = "color:green" class="pull-right">
+											{{usercart.cart_disc_amt|floatformat}}
+										</th>
+										 
+									</tr>									
+								</tbody>
+							</table>
+							<ul>
+							{% if usercart.referral_disc_amount > 0 %} 
+								<li>
+								<div id "vouch_text" style ="color: #999; font-size: 0.6rem;">
+									{{ref_msg}}
+								</div>
+								</li>
+							{% endif %}
+							{% if usercart.voucher %} 
+								<li>
+								<div id "vouch_text" style ="color: #999; font-size: 0.6rem;">
+									You have used coupan {{ usercart.voucher.voucher_code }}. 
+									Discount of <i class = "fa fa-inr"></i> {{usercart.voucher_disc_amount |floatformat }} is applied
+								</div>
+								</li>
+							{% endif %}
+							</ul>
+						</div>
+					</div>
+										
+					<div class="box">
+						<div class="box-header">
+							<h4 class="mb-0">Coupan/eGift code</h4>
+						</div>
+						<p class="text-muted">If you have a coupon/eGift code, please enter it in the box below.</p>
+						<form>
+							<div class="input-group">
+								<input id = "v_code" type="text" class="form-control"><span class="input-group-append">
+								<button onclick = "applyVoucher( '{{usercart.cart_id}}', $('#v_code').val(),'{{usercart.cart_total}}');" type="button" class="btn btn-primary"><i class="fa fa-gift"></i></button></span>
+							</div>
+							<div id="coupan-text"></div>
+							<!-- /input-group-->
+						</form>
+						<div style = "color:red" id="voucher-msg"></div>
+					</div>
+				</div>
+				<!-- /.col-md-4-->
+
+				<form id = "edit_form" hidden action = "{% url 'stock_image_detail' %}" method = 'GET'>
+					<input hidden id="cart_item_id" name = "cart_item_id" value = ''>
+					<input hidden id="product_id" name = "product_id" value = ''>
+				</form>
+
+			</div>
+
+			<script>
+				updateCartItemsNum("{{usercart.quantity}}");
+			</script>

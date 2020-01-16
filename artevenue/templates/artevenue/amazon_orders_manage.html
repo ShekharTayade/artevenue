@@ -1,0 +1,238 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block page-title %}
+<title>Manage Amazon Orders</title>
+{% endblock page-title %}
+
+{% block page-description %}
+<meta name="description" content="Manage Orders from Amzon">
+{% endblock page-description %}
+
+{% block page-keywords %}  
+<meta name="keywords" content="">
+{% endblock page-keywords %}  
+
+{% block page-author %}  
+<meta name="author" content="Arte'venue">
+{% endblock page-author %}  
+
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+
+	
+    <div class="container-fluid mt-3">
+		<div class="row mt-3">
+			<div class="col-12">
+			<h1> AMAZON ORDERS </h1>
+			</div>
+		</div>
+		<div class = "row">
+			<div class = "col-12">
+				<a type="button" id = "new-ord" 
+					class = "btn btn-primary"
+					href = "">
+					Create New Order
+				</a>
+			</div>
+		</div>
+		<hr>
+		<div class="row mb-2">
+			<div class = "col-12">
+				<strong>SEARCH ORDERS:</strong>
+			</div>
+		</div>
+		<div class="row mb-5">
+			<div class="col-12 col-md-4" style = "border-right:1px solid Gainsboro;">
+				<form action="">
+					<fieldset>
+						<div class = "row">
+							<div class = "col-6">
+								<div class="form-group">
+									<label>From:</label>
+									<input name = "fromdate" id = "fromdate" 
+										class = "form-control" type="date" onchange = "copy_date('FROMDATE');"/>
+								</div>
+							</div>
+							<div class = "col-6">
+								<div class="form-group">
+									<label>To:</label>
+									<input name = "todate" id = "todate" 
+										class = "form-control" type="date" onchange = "copy_date('TODATE');" />
+								</div>
+							</div>
+						</div>
+						<div class = "row">
+							<div class = "col-6">
+								<div class="form-group">
+									<label>Amazon Ord Number:</label>
+									<input name = "order_num" id = "order_num" 
+										class = "form-control" type="text"/>
+								</div>
+							</div>
+							<div class = "col-6">
+								<div class="form-group">
+									<label>Arte'Venue Ord No:</label>
+									<input name = "av_ord_no" id = "av_ord_no"
+										class = "form-control" type="text"/>
+								</div>
+							</div>
+							<div class = "col-6">
+								<div class="form-group">
+									<button type="button" id = "f-submit" 
+									class = "btn btn-primary"
+									onclick = "get_orders('1', 'NO');">Submit</button>
+								</div>
+							</div>
+						</div>
+					</fieldset>
+				</form>
+				<div class="row">	
+					<div class="col-12">
+						<span id = "orders" style="display:none;">
+							{% include 'artevenue/amazon_artevenue_orders_include.html' %}
+						</span>
+					</div>
+				</div>
+			</div>
+			<div class="col-12 col-md-8">
+				<span id = "ord_details" style="display:none;">
+				{% include 'artevenue/amazon_order_details.html' %}
+				</span>
+			</div>
+		</div>
+    </div>
+
+	
+	{% endblock sitecontent %}
+
+	
+	{% block jscripts %}
+	<script>
+		$( document ).ready(function() {
+			var today = new Date();
+
+			var from_dt = new Date();
+			from_dt.setDate( from_dt.getDate() - 7) 
+			var fm_dt = from_dt.getDate();
+			var fm_mn = from_dt.getMonth();
+			var fm_mn = fm_mn + 1; //Javascript month start from 0
+			var fm_yy = from_dt.getFullYear();			
+			document.getElementById("fromdate").value = ( parseInt(fm_yy) + "-" + zeroPad(fm_mn) + "-" + zeroPad(fm_dt) );
+
+			var to_dt = today.getDate();
+			var to_mn = today.getMonth();
+			var to_mn = to_mn + 1;
+			var to_yy = today.getFullYear();			
+			
+			document.getElementById("todate").value = ( parseInt(to_yy) + "-" + zeroPad(to_mn) + "-" + zeroPad(to_dt) );
+		
+		
+			// Trigger the inital fetch of orders
+			document.getElementById("f-submit").click();
+
+		});
+	</script>
+	
+	<script>
+		function zeroPad(val){
+			if(val < 10){
+				ret = "0" + String(val);
+			} else {
+				ret = String(val);
+			}
+			return ret;
+		}
+	</script>
+	
+	<script>
+    function orders_summary(){
+		var tbl = document.getElementById("ordTbl");
+		if (tbl != null) {
+			for (var i = 0; i < tbl.rows.length; i++) {
+				for (var j = 0; j < tbl.rows[i].cells.length; j++) {
+					tbl.rows[i].cells[j].onclick = (function (i, j) {
+						return function () {
+							var amz_ord_no = tbl.rows[i].cells[0].innerHTML;
+							//alert(tbl.rows[i].cells[0].innerHTML);
+							// Get details
+							$.ajax({
+									url: "{% url 'amazon_order_details' %}", 
+									data: {'amazon_order_no':amz_ord_no}, 
+									dataType: 'text', 
+									type: 'POST',
+								success: function (data) {
+										$("#ord_details").html(data);
+										$("#ord_details").css('display', 'block');
+									},
+								error: function(xhr){
+									alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+								}
+							});
+							
+							
+						};
+					}(i, j));
+				}
+			}
+		}
+    }
+	</script>
+	
+	<script>
+		function get_orders(page, pdfprint){
+			var query_data = {};
+			//Get the from, to dates
+			var fm_d = new Date(document.getElementById("fromdate").value);
+			if (fm_d > new Date()) {
+				$("#msg").html("From Date can't be greatrer than today");
+				$("#msg-modal").modal("show");
+				return;
+			}
+			var fm_dt = fm_d.getDate();
+			var fm_mn = fm_d.getMonth();
+			var fm_mn = fm_mn + 1; //Javascript month start from 0
+			var fm_yy = fm_d.getFullYear();			
+			var from_date = fm_yy + "-" + fm_mn + "-" + fm_dt;
+			  
+			var to_d = new Date(document.getElementById("todate").value);
+			var to_dt = to_d.getDate();
+			var to_mn = to_d.getMonth();
+			var to_mn = to_mn + 1; //Javascript month start from 0
+			var to_yy = to_d.getFullYear();			
+			var to_date = to_yy + "-" + to_mn + "-" + to_dt;
+			
+			if ( to_d < fm_d ) {
+				$("#msg").html("To Date can't be earlier than From Date");
+				$("#msg-modal").modal("show");
+				return;
+			}
+
+			amazon_order_no = $("#order_num").val();
+			av_order_no = $("#av_ord_num").val();
+
+			query_data = {'fromdate':from_date, 'todate':to_date, 'page':page, 
+				'amazon_order_no':amazon_order_no, 'av_order_no':av_order_no, 'pdfprint':pdfprint}
+
+			$.ajax({
+				url: "{% url 'get_amz_orders' %}", 
+				dataType: 'text',
+				data: query_data,
+				type: 'POST',
+				success: function (data) {
+					$("#orders").css('display', 'block');
+					$("#ord_details").css('display', 'none');
+					$("#orders").html(data);
+				},
+				error: function(xhr){
+					alert("An error occured: " + xhr.status + " " + xhr.statusText + " Apologies for the inconvenience!! Please let us know the details and we will be happy to help sort it out."); 
+					return;
+				}
+			});	
+		}
+	
+	</script>
+	{% endblock jscripts %}
+			
+	

@@ -14,9 +14,9 @@ import base64
 from io import StringIO
 from PIL import ExifTags
 
-## Frame.applyFrame(' http://www.podexchange.com/dsi/lowres/52/52_011FIS1332_lowres.jpg ', 'moulding/ornate_cocoa_apply.jpeg', 551, 16, 16)
+## Frame.applyFrame(' http://www.podexchange.com/dsi/lowres/52/52_011FIS1332_lowres.jpg ', 'moulding/classic_touch_apply.jpeg', 551, 16, 16)
 
-def applyFrame(img_source, frame_img, slice, user_width, user_height):
+def applyFrame(img_source, frame_img, slice, user_width, user_height, border_width):
 
 	#if prod_img.publisher == '1001':
 	#	img_source = Image.open('artevenue/'+settings.STATIC_URL + prod_img.url)			
@@ -41,8 +41,11 @@ def applyFrame(img_source, frame_img, slice, user_width, user_height):
 	width = int(user_img.width)
 	height = int(user_img.height)
 	
-	framepixels = int(user_img.width / user_width)
-
+	border = int(border_width * 960 / user_width)
+	
+	#framepixels = int(user_img.width / user_width)
+	framepixels = border
+	
 	## Create new image with expanded size for the frame
 	framed_size = (int(width + framepixels * 2), int(height + framepixels * 2))
 	new_img = Image.new("RGB", (framed_size), 0)

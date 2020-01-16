@@ -1,15 +1,24 @@
 {% extends 'artevenue/estore_base.html' %}
 {% load static %}
+{% block page-title %} 
+	<title>Favorites</title>
+{% endblock page-title %} 
+{% block page-description %}
+<meta name="description" content="Show favorites">
+{% endblock page-description %}
+{% block page-keywords %}
+<meta name="keywords" content="Artvenue, Favorite, wishlist">
+{% endblock page-keywords %}	<!-- Only Override the site content block -->
 	<!-- Only Override the site content block -->
 	{% block sitecontent %}
         <div class="container" id = "wishlist-display" >
-			{% include 'artevenue/wishlist_include.html' %}
+			{% include 'artevenue/wishlist_include_new.html' %}
 			
 			<p id="info"></p>
 		</div>
 
+		{% include 'artevenue/new_collection_modal.html' %}
 		{% include 'artevenue/show-product.html' %}
-		
 		{% include 'artevenue/message-modal_ok.html' %}
 		
 	{% endblock sitecontent %}
@@ -135,5 +144,55 @@
 					});
 				}
 			}
+		</script>
+		
+		<script>
+		function createCollection(){
+			
+			name = $("#collection_input").val();			
+			if (name == ''){
+				$("#err-msg").html("What would you like to name your new collection?");
+				return;
+			}			
+
+			$.ajax({
+				url: '{% url "create_collection" %}', 
+				data: {'collection_name':name},
+				dataType: 'text', 
+				type: 'POST',
+				success: function (data) {
+					result = JSON.parse(data);
+					collection_id = result.collection_id;
+					collection_name = result.collection_name;
+					
+					txt = "<div class='col-xs-12 col-md-12 mb-2'> " +
+								"<div class = 'text-center' " +
+									"style='border:1px solid #fff; background-color:#f7f7f7;'> " +
+									"<a class = 'btn btn-link text-muted' " +
+										"style = 'text-decoration:underline;' " +
+										"href='{% url 'user_collection' user_collection_id=0 %}'> ".replace('0', collection_id) +
+										collection_name +
+									"</a> " +
+								"</div> " +
+							"</div>" ;
+					$("#collection-list").append(txt);
+					$("#collection-modal").modal("hide");
+
+				},
+				error: function(xhr){
+					alert("An error occured: " + xhr.status + " " + xhr.statusText + " Apologies for the inconvenience!! Please let us know the details and we will be happy to help sort it out."); 
+					return;
+				}
+			});				
+		}
+		
+		</script>
+
+		<script>
+			$("#collection_input").keyup(function(event) {
+				if (event.keyCode === 13) {
+					$("#collection_move_btn").click();
+				}
+			});		
 		</script>
 		{% endblock jscripts %}

@@ -1,0 +1,38 @@
+{% load static %}
+{% load widget_tweaks %}
+
+<small>
+	<table id = "ordTbl" class="table table-responsive table-striped">
+		<thead>
+			<tr>
+				<th>Amazon Ord No.</th>
+				<th>Dt.</th>
+				<th style="text-align:right">Total</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for row in amz_orders %}
+			<tr>
+				<td>{{row.amazon_order_no}}
+				</td>
+				<td>{{row.amazon_order_date|date:'d-M-y'}}
+				</td>
+				<td  style="text-align:right">{{row.total}}
+				</td>
+				<td><button class = "btn btn-primary" onclick = "orders_summary();">
+						<i class = "fa fa-caret-right fa-2x"></i>
+					</button>
+				</td>
+			</tr>
+			{% empty %}
+				<td colspan=6>... No Orders Found ...
+				</td>
+			{% endfor %}
+		</tbody>
+		<tfoot>
+		
+		</tfoot>
+	</table>
+</small>
+

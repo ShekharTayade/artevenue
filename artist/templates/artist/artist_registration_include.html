@@ -1,0 +1,277 @@
+{% load static %}
+{% load widget_tweaks %}
+
+                                    <div class="w3-container">
+									
+										{% for hidden in artistform.hidden_fields %}
+										  {{ hidden }}
+										{% endfor %}									
+									
+										<div class = "row">
+											<div id = "err_div" class="col-md-12" style ="display:none;">
+												<div id = "error_msg" style =" font-size: 0.75rem; color:#dc3545; padding:5px; background-color: #e8e8e8;">
+												</div>
+											</div>
+										
+											<div class = "col-sm-6">
+												<div class="form-group">
+													{{ artistform.phone_number.label_tag }}
+													{% if artistform.is_bound %}
+														{% if artistform.phone_number.errors %}
+												
+															{% render_field artistform.phone_number class="form-control is-invalid" %}
+															{% for error in artistform.phone_number.errors %}
+																<div class="invalid-feedback">
+																  {{ error }}
+																</div>
+															{% endfor %}
+												
+														{% else %}
+															{% render_field artistform.phone_number class="form-control is-valid" %}
+														{% endif %}
+													{% else %}
+														{% render_field artistform.phone_number class="form-control" %}
+													{% endif %}
+												
+													{% if artistform.phone_number.help_text %}
+														<small class="form-text text-muted">
+															{{ artistform.phone_number.help_text }}
+														</small>
+													{% endif %}
+												</div>
+											</div>
+											<div class = "col-sm-6">
+												<div class="form-group">
+													{{ artistform.alternate_phone_number.label_tag }}
+													{% if artistform.is_bound %}
+														{% if artistform.alternate_phone_number.errors %}
+												
+															{% render_field artistform.alternate_phone_number class="form-control is-invalid" %}
+															{% for error in artistform.alternate_phone_number.errors %}
+																<div class="invalid-feedback">
+																  {{ error }}
+																</div>
+															{% endfor %}
+												
+														{% else %}
+															{% render_field artistform.alternate_phone_number class="form-control is-valid" %}
+														{% endif %}
+													{% else %}
+														{% render_field artistform.alternate_phone_number class="form-control" %}
+													{% endif %}
+												
+													{% if artistform.alternate_phone_number.help_text %}
+														<small class="form-text text-muted">
+															{{ artistform.alternate_phone_number.help_text }}
+														</small>
+													{% endif %}
+												</div>
+											</div>
+										</div>
+										
+										<div class = "row">
+
+											<div class = "col-sm-12">
+												<label> Address:</label>
+											</div>
+											<div class = "col-sm-6">
+												<div class="form-group">
+													{% if artistform.is_bound %}
+														{% if artistform.address_1.errors %}
+												
+															{% render_field artistform.address_1    class="form-control is-invalid" %}
+															{% for error in artistform.address_1.errors %}
+																<div class="invalid-feedback">
+																  {{ error }}
+																</div>
+															{% endfor %}
+												
+														{% else %}
+															{% render_field artistform.address_1    class="form-control is-valid" %}
+														{% endif %}
+													{% else %}
+														{% render_field artistform.address_1    class="form-control" %}
+													{% endif %}
+												
+													{% if artistform.address_1.help_text %}
+														<small class="form-text text-muted">
+															{{ artistform.address_1.help_text }}
+														</small>
+													{% endif %}
+												</div>
+											</div>	
+											<div class = "col-sm-6">
+												<div class="form-group">
+													{% if artistform.is_bound %}
+														{% if artistform.address_2.errors %}
+												
+															{% render_field artistform.address_2    class="form-control is-invalid" %}
+															{% for error in artistform.address_2.errors %}
+																<div class="invalid-feedback">
+																  {{ error }}
+																</div>
+															{% endfor %}
+												
+														{% else %}
+															{% render_field artistform.address_2    class="form-control is-valid" %}
+														{% endif %}
+													{% else %}
+														{% render_field artistform.address_2    class="form-control" %}
+													{% endif %}
+												
+													{% if artistform.address_2.help_text %}
+														<small class="form-text text-muted">
+															{{ artistform.address_2.help_text }}
+														</small>
+													{% endif %}
+												</div>														
+
+											</div>
+										</div>
+										<div class = "row">
+											<div class="col-md-3">
+												<div class = "form-group">
+												
+													<label for="pin_code" style="margin-bottom:0rem;">Pin Code:</label>
+													<input id="id_pin_code" name="pin_code" 
+														maxlength= "6" type="text" class="form-control" 
+														pattern = "[1-9][0-9]{5}" placeholder = "6 digit pin-code"
+														onchange = "getCities(this.value);"
+														value = "{{pin_code.pin_code}}">
+
+
+													<!-- Pin Code
+													{% if artistform.is_bound %}
+														{% if artistform.pin_code.errors %}
+												
+															{% render_field artistform.pin_code class="form-control is-invalid"  %}
+															{% for error in artistform.pin_code.errors %}
+																<div class="invalid-feedback">
+																  {{ error }}
+																</div>
+															{% endfor %}
+												
+														{% else %}
+															{% render_field artistform.pin_code class="form-control is-valid" %}
+														{% endif %}
+													{% else %}
+														{% render_field artistform.pin_code class="form-control" %}
+													{% endif %}
+												
+													{% if artistform.pin_code.help_text %}
+														<small class="form-text text-muted">
+															{{ artistform.pin_code.help_text }}
+														</small>
+													{% endif %} -->
+												</div>
+
+											</div>
+											<div class = "col-sm-5">
+							
+												<div class="form-group">
+
+													<label for="city" style="margin-bottom:0rem;">City:</label>
+													<input id="id_city" name="city" 
+														type="text" class="form-control" 
+														value = "{{city.city}}">
+
+
+													<!-- City
+													{% if artistform.is_bound %}
+														{% if artistform.city.errors %}
+												
+															{% render_field artistform.city class="form-control is-invalid" %}
+															{% for error in artistform.city.errors %}
+																<div class="invalid-feedback">
+																  {{ error }}
+																</div>
+															{% endfor %}
+												
+														{% else %}
+															{% render_field artistform.city class="form-control is-valid" %}
+														{% endif %}
+													{% else %}
+														{% render_field artistform.city class="form-control" %}
+													{% endif %}
+												
+													{% if artistform.city.help_text %}
+														<small class="form-text text-muted">
+															{{ artistform.city.help_text }}
+														</small>
+													{% endif %} -->
+												</div>													
+												
+											</div>
+											<div class="col-md-4">
+												<div class="form-group">
+													State:
+													{% if artistform.is_bound %}
+														{% if artistform.state.errors %}
+												
+															{% render_field artistform.state class="form-control is-invalid" %}
+															{% for error in artistform.state.errors %}
+																<div class="invalid-feedback">
+																  {{ error }}
+																</div>
+															{% endfor %}
+												
+														{% else %}
+															{% render_field artistform.state class="form-control is-valid" %}
+														{% endif %}
+													{% else %}
+														{% render_field artistform.state class="form-control" %}
+													{% endif %}
+												
+													{% if artistform.state.help_text %}
+														<small class="form-text text-muted">
+															{{ artistform.state.help_text }}
+														</small>
+													{% endif %}
+												</div>													  
+											  
+											</div>
+										</div>
+									
+										<div class = "row">
+											<div class="col-md-3">
+
+												<div class="form-group">
+													Country:
+													{% if artistform.is_bound %}
+														{% if artistform.country.errors %}
+												
+															{% render_field artistform.country class="form-control is-invalid"  %}
+															{% for error in artistform.country.errors %}
+																<div class="invalid-feedback">
+																  {{ error }}
+																</div>
+															{% endfor %}
+												
+														{% else %}
+															{% render_field artistform.country class="form-control is-valid" %}
+														{% endif %}
+													{% else %}
+														{% render_field artistform.country class="form-control" %}
+													{% endif %}
+												
+													{% if artistform.country.help_text %}
+														<small class="form-text text-muted">
+															{{ artistform.country.help_text }}
+														</small>
+													{% endif %}
+												</div>						
+											</div>
+
+										</div>
+										<hr>
+										<div class="row text-center">
+											<div class = "col-12">
+												<small><input id = "tnc" name="tnc" type="checkbox" value="" checked onchange="activateButton(this);"> I have read and understood the Arte'Venue <a href="">terms of usage for artists</a> and <a href="">privacy policy</a></small>
+												<div id="tnc_err" style="display:none;" class="alert alert-danger">
+													<button type="button" class="close float:left" data-dismiss="">×</button>
+														To signup please read and accept terms and conditions!
+												</div>
+											</div>
+										</div>
+
+                                    </div>

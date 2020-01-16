@@ -1,4 +1,4 @@
-from artevenue.models import Stock_image, Moulding_image, User_image
+from artevenue.models import Stock_image, Moulding_image, User_image, Product_view
 from django.contrib.auth.models import User
 from django.conf import settings
 
@@ -21,15 +21,33 @@ from io import StringIO
 '''
 
 def get_FramedImage(request):
-
 	prod_id = request.GET.get('prod_id', '')
 	m_id = request.GET.get('moulding_id', '') 
 	mount_color = request.GET.get('mount_color', '') 
-	mount_size = float(request.GET.get('mount_size', '0'))
-	user_width = float(request.GET.get('image_width', '0'))
+	m_size = request.GET.get('mount_size', '0')
+	if m_size == '' or m_size == '0':
+		mount_size = 0
+	else:
+		mount_size = float(m_size)
+		
+	u_width = request.GET.get('image_width', '0')
+	if u_width == '' or u_width == '0':
+		user_width = 0
+	else:
+		user_width = float(u_width)
+		
+	prod_type = request.GET.get('prod_type', '') 
+
+	if prod_id == '':
+		return HttpResponse('')
 
 	# Get image
-	prod_img = Stock_image.objects.filter( product_id = prod_id ).first()
+	if prod_type == '':
+		prod_type = 'STOCK-IMAGE'
+	
+
+	prod_img = Product_view.objects.filter( product_id = prod_id,
+			product_type_id = prod_type).first()
 	
 	'''  OPEN FILE FROM A Internet URL '''
 	#response = requests.get("http://www.podexchange.com/dsi/lowres/11/11_PSMLT-166_lowres.jpg")
@@ -37,8 +55,11 @@ def get_FramedImage(request):
 	#img_source = Image.open('artevenue/'+settings.STATIC_URL + prod_img.url)			
 	env = settings.EXEC_ENV
 	if env == 'DEV' or env == 'TESTING':
-		response = requests.get(prod_img.url)
-		img_source = Image.open(BytesIO(response.content))
+		if prod_type == 'STOCK-IMAGE':
+			response = requests.get(prod_img.url)
+			img_source = Image.open(BytesIO(response.content))
+		else :
+			img_source = Image.open(settings.BASE_DIR + "/artevenue" + settings.STATIC_URL + prod_img.url)
 	else:
 		img_source = Image.open(settings.PROJECT_DIR + '/' + settings.STATIC_URL + prod_img.url)			
 	
@@ -61,11 +82,12 @@ def get_FramedImage(request):
 		
 		ratio = disp_inch / user_width
 		
-		border = int(m_width_inch * ratio * 96)
-		
-		border = int(m_width_inch * 450 / user_width)
+		border = int(m_width_inch * ratio* 96)		
+		#border = int(m_width_inch * 96/ user_width)
 		
 		m_size = int(mount_size * 96 * ratio)
+		#m_size = int(mount_size * 960 / user_width)
+		
 		if m_size > 0 and mount_color != '' and mount_color != '0' and mount_color != 'None':
 
 			img_with_mount = addMount(img_source, mount_color, m_size, m_size, m_size, m_size)
@@ -88,7 +110,7 @@ def get_FramedImage(request):
 	#return framed_img
 	'''
 	
-	framed_img = dropShadow(framed_img)
+	##framed_img = dropShadow(framed_img)
 
 	buffered = BytesIO()
 	framed_img.save(buffered, format='JPEG')
@@ -362,7 +384,7 @@ def get_FramedUserImage(request):
 	return response
 	#return framed_img
 	'''
-	framed_img = dropShadow(framed_img)
+	##framed_img = dropShadow(framed_img)
 
 	buffered = BytesIO()
 	framed_img.save(buffered, format='JPEG')

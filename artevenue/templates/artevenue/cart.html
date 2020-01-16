@@ -1,6 +1,14 @@
 {% extends 'artevenue/estore_base.html' %}
 {% load static %}
-	<!-- Only Override the site content block -->
+{% block page-title %} 
+	<title>Shopping cart.</title>
+{% endblock page-title %} 
+{% block page-description %}
+<meta name="description" content="Displaying shopping cart.">
+{% endblock page-description %}
+{% block page-keywords %}
+<meta name="keywords" content="Art, arvenue, shopping cart">
+{% endblock page-keywords %}	<!-- Only Override the site content block -->
 	{% block sitecontent %}
         <div class="container" id = "cart-display" >
 			{% include 'artevenue/cart_include.html' %}
@@ -318,9 +326,14 @@
 			}
 		</script>
 		
-		
 		<script>
 		$(document).ready(function(){
+			$body = $("body");
+			$(document).on({
+				ajaxStart: function() { $body.addClass("loading");    },
+				ajaxStop: function() { $body.removeClass("loading"); }    
+			});
+			
 			if ('{{promo_removed}}' == 'Y') {
 				$('#msg').html("Promotions applied to one or more items in your cart have expired. Prices have been changed accordingly.");
 				$('#msg-modal').modal('show');
@@ -328,6 +341,7 @@
 					$('#msg-modal').modal('hide');
 				}, 6000);			
 			}
+
 		});
 		</script>
 	{% endblock jscripts %}

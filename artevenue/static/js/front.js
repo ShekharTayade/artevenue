@@ -25,7 +25,6 @@ $(function () {
 		autowidth:true,
 		//width: 300
 		
-		
     });
 
 

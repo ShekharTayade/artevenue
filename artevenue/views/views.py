@@ -3,14 +3,16 @@ from datetime import datetime
 import datetime
 from django.db import IntegrityError, DatabaseError, Error
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+
 from django.shortcuts import render,redirect
 from django.contrib import messages
 
 from artevenue.models import Ecom_site, Cart
 from artevenue.forms import contactUsForm, referralForm, egiftForm
 
-from artevenue.models import Pin_code, City, State, Country, Pin_city_state_country
-from artevenue.models import Referral, Egift_card_design, Egift, Voucher, Voucher_user
+from artevenue.models import Pin_code, City, State, Country, Pin_city_state_country, Newsletter_subscription
+from artevenue.models import Referral, Egift_card_design, Egift, Voucher, Voucher_user, User_ip_address
 from django.http import HttpResponse
 from django.conf import settings
 from django.core.mail import send_mail, EmailMultiAlternatives, EmailMessage
@@ -28,13 +30,50 @@ today = datetime.date.today()
 ecom = get_object_or_404 (Ecom_site, store_id=settings.STORE_ID )
 
 def index(request):
-
-
+	session_id = request.session.session_key
+	dt = datetime.datetime.today()
+	if session_id:
+		ip_addr = get_ip_addr(request)
+		ip_rec = User_ip_address.objects.filter(ip_address = ip_addr).first()
+		if request.user.is_authenticated:
+			usr = User.objects.get(username = request.user)
+			usr_logged = True
+		else:
+			usr = None
+			usr_logged = False
+		if ip_rec:
+			v_cnt = ip_rec.num_of_visits + 1
+			i = User_ip_address.objects.filter(ip_address = ip_addr).update(
+					latest_site_visit_datetime = dt, num_of_visits = v_cnt)
+			s_id = ip_rec.session_id
+			if s_id != session_id:
+				## New session from the same ip...
+				None
+			else:
+				## Same session from the same ip...
+				None
+		else:
+			
+			ip_rec = User_ip_address (
+				session_id = session_id,
+				userlogged_in =  usr_logged,
+				user = usr,
+				site_visit_datetime = dt,
+				latest_site_visit_datetime = dt,
+				num_of_visits = 1,
+				ip_address = ip_addr
+			)
+			ip_rec.save()
+		
+			
 	return render(request, "artevenue/estore_base.html",{})
 
 
-def contact_us(request):
+def offers(request) :
+	return render(request, "artevenue/offers.html")
 
+
+def contact_us(request):
 	if request.method == 'POST':
 		form = contactUsForm(request.POST)
 		if form.is_valid():
@@ -65,6 +104,31 @@ def privacy_policy(request):
 def faq(request):
 
 	return render(request, "artevenue/faq.html")
+
+def newsletter_subscription_confirmation(request):
+	email = request.GET.get('email','')
+
+	msg = 'SUCCESS'
+	if email:
+		try:
+			e = Newsletter_subscription.objects.get(email = email, subscription_active = True)
+		except Newsletter_subscription.DoesNotExist:
+			ns = Newsletter_subscription(
+				email = email,
+				subscription_active = True,
+				subscription_start_date = today,
+				subscription_end_date = None
+			)
+			ns.save()
+			msg = 'SUCCESS'
+			return render(request, "artevenue/newsletter_subscription_confirmation.html",
+				{'msg':msg, 'email':email})
+		if e:
+			msg = 'EXISTS'
+
+		return render(request, "artevenue/newsletter_subscription_confirmation.html",
+			{'msg':msg, 'email':email})
+
 	
 def show_prod_details(request):
 
@@ -73,7 +137,6 @@ def show_prod_details(request):
 
 def show_frame(request) :
 	return render(request, "show_frame.html")
-
 	
 @csrf_exempt	
 def sync_cart_session_user(request, sessionid):

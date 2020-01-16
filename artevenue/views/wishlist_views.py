@@ -13,13 +13,16 @@ import json
 
 from artevenue.models import Stock_image_category
 from artevenue.models import Promotion, Stock_image, Product_view
-from artevenue.models import Wishlist, Wishlist_stock_image, User_image 
+from artevenue.models import Wishlist, Wishlist_item, Wishlist_stock_image, User_image 
 from artevenue.models import Wishlist_user_image, Wishlist_stock_collage
 from artevenue.models import Wishlist_original_art, Wishlist_item_view
+from artevenue.models import User_collection, User_space
 
 from .product_views import *
 from .tax_views import *
 from .cart_views import *
+
+from django.contrib.auth.decorators import login_required
 
 today = datetime.date.today()
 ecom = get_object_or_404 (Ecom_site, store_id=settings.STORE_ID )
@@ -31,7 +34,7 @@ def add_to_wishlist(request):
 	prod_type = request.POST.get('prod_type', '')
 	qty = int(request.POST.get('qty', '0'))
 	wishlist_item_flag = request.POST.get('wishlist_item_flag', 'FALSE')
-	
+
 	image_width = Decimal(request.POST.get('image_width', '0'))
 	image_height = Decimal(request.POST.get('image_height', '0'))
 	
@@ -47,7 +50,7 @@ def add_to_wishlist(request):
 		moulding_size = rnin
 	else: 
 		moulding_size = None
-	print_medium_id = request.POST.get('print_medium_id', '')
+	print_medium_id = request.POST.get('print_medium_id', 'PAPER')
 	print_medium_size = Decimal(request.POST.get('print_medium_size', '0'))
 	mount_id = request.POST.get('mount_id', '0')
 	if mount_id == '0' or mount_id == 'None':
@@ -143,7 +146,7 @@ def add_to_wishlist(request):
 	
 	if item_unit_price == 0 or item_unit_price is None:
 		return( JsonResponse({'msg':'Price not avaiable for this image', 'cart_qty':qty}, safe=False) )
-		
+	
 	prod = None	
 	user_image = None
 	# Get the product
@@ -748,12 +751,21 @@ def show_wishlist(request):
 	shipping_cost = 0 
 	user_image = None
 	cart_quantity = 0
+	user_collection = {}
+	user_space = {}
+
 	''' Let's check if the user has a wishlist open '''
 	try:
 		if request.user.is_authenticated:
 			usr = User.objects.get(username = request.user)
 			userwishlist = Wishlist.objects.get(user = usr, wishlist_status = "AC")
 			cart_quantity = Cart.objects.filter(user = usr, cart_status = "AC").count()
+			
+			user_collection = User_collection.objects.filter(user = usr)
+			coll_ids = user_collection.values('user_collection_id')
+			user_space = User_space.objects.filter(
+				user_collection_id__in = coll_ids).order_by('user_collection_id')
+			
 		else:
 			sessionid = request.session.session_key		
 			if sessionid is None:
@@ -769,15 +781,18 @@ def show_wishlist(request):
 			'acrylic_id', 'mount_size', 'product__name', 'image_width', 'image_height',
 			'product__thumbnail_url', 'wishlist_id', 'promotion__discount_value', 'promotion__discount_type', 'mount__color',
 			'item_unit_price', 'item_sub_total', 'item_disc_amt', 'item_tax', 'item_total', 'product_type',
-			'product__image_to_frame', 'product__publisher'
-			).order_by('product_type')		
-			
+			'product__image_to_frame', 'product__publisher', 'product__art_width', 'product__art_height', 'product__art_medium',
+			'product__art_surface', 'product__art_surface_desc', 'product__high_resolution_url',
+			'user_collection_id', 'user_space_id', 'user_collection__name', 'user_space__name', 'product__description'
+			).order_by('user_collection_id', 'user_space_id', 'product_type')
+		
+
 	except Wishlist.DoesNotExist:
 			userwishlist = {}
 	
 	if request.is_ajax():
 
-		template = "artevenue/wishlist_include.html"
+		template = "artevenue/wishlist_include_new.html"
 	else :
 		template = "artevenue/wishlist.html"
 	
@@ -789,7 +804,8 @@ def show_wishlist(request):
 	
 	return render(request, template, {'userwishlist':userwishlist, 
 		'userwishlistitems': userwishlistitems, 'total_bare':total_bare,
-		'user_image':user_image, 'cart_quantity':cart_quantity})
+		'user_image':user_image, 'cart_quantity':cart_quantity, 
+		'user_collection':user_collection, 'user_space':user_space})
 
 @csrf_exempt	
 def delete_wishlist_item(request):
@@ -891,8 +907,7 @@ def move_item_to_cart(request, wishlist_item_id = None):
 	items_count = 0
 	try:
 		wishlistitem = Wishlist_item_view.objects.get(wishlist_item_id = wishlist_item_id)
-		wishlist = Wishlist.objects.filter(wishlist_id = wishlistitem.wishlist_id)
-		items_count = Wishlist_item_view.objects.filter(wishlist_id = wishlistitem.wishlist_id).count()
+		wishlist = Wishlist.objects.get(wishlist_id = wishlistitem.wishlist_id)
 	except Wishlist_item_view.DoesNotExist:
 		wishlistitem = None
 		
@@ -939,6 +954,8 @@ def move_item_to_cart(request, wishlist_item_id = None):
 			w = Wishlist_original_art.objects.filter(wishlist_item_id = wishlistitem.wishlist_item_id)
 		w.delete()
 		
+		items_count = Wishlist_item_view.objects.filter(wishlist_id = wishlistitem.wishlist_id).count()
+
 		if items_count == 1:
 			wishlist.delete()
 		else:
@@ -1020,4 +1037,298 @@ def move_all_to_cart(request, wishlist_items = None):
 		
 	return JsonResponse({'msg':'Items removed from your wish list', 'err_flg':err_flg}, safe=False)
 
+@login_required
+def user_collection(request, user_collection_id = None):
+	userwishlist = {}
+	userwishlistitems = {}
+	user_collection = {}
+	user_space = {}
 
+	''' Let's check if the user has a wishlist open '''
+	try:
+		if request.user.is_authenticated:
+			usr = User.objects.get(username = request.user)
+			userwishlist = Wishlist.objects.get(user = usr, wishlist_status = "AC")
+			
+			user_collection = User_collection.objects.filter(user = usr)
+			coll_ids = user_collection.values('user_collection_id')
+			user_space = User_space.objects.filter(
+				user_collection_id__in = coll_ids).order_by('user_collection_id')
+			
+		userwishlistitems = Wishlist_item_view.objects.select_related('product', 'user_collection', 'user_space').filter(
+				wishlist = userwishlist.wishlist_id, product__product_type_id = F('product_type_id'))
+		user_collection = User_collection.objects.get(user_collection_id = user_collection_id)
+		user_space = User_space.objects.filter(user_collection_id = user_collection_id)
+	except Wishlist.DoesNotExist:
+			userwishlist = {}	
+	except User_collection.DoesNotExist:
+		user_collection = {}
+	
+	return render(request, "artevenue/user_collection.html", {'userwishlist':userwishlist, 
+		'userwishlistitems': userwishlistitems, 
+		'user_collection':user_collection, 'user_space':user_space})
+
+
+@csrf_exempt
+def move_to_collection(request):
+	wishlist_item_id = request.POST.get('wishlist_item_id','')
+	user_collection_id = request.POST.get('user_collection_id', '')
+	upd = {}
+	space_name = ''
+
+	try:
+		itm = Wishlist_item_view.objects.get(
+			wishlist_item_id = wishlist_item_id)
+		
+		if itm.product_type_id == 'STOCK-IMAGE':			
+			upd = Wishlist_stock_image.objects.filter(
+				wishlist_item_id = wishlist_item_id).update(
+				user_collection_id = user_collection_id,
+				updated_date = today)
+		if itm.product_type_id == 'USER-IMAGE':			
+			upd = Wishlist_user_image.objects.filter(
+				wishlist_item_id = wishlist_item_id).update(
+				user_collection_id = user_collection_id,
+				updated_date = today)
+		if itm.product_type_id == 'ORIGINAL-ART':			
+			upd = Wishlist_oroginal_art.objects.filter(
+				wishlist_item_id = wishlist_item_id).update(
+				user_collection_id = user_collection_id,
+				updated_date = today)
+		if itm.product_type_id == 'STOCK-COLLAGE':			
+			upd = Wishlist_stock_collage.objects.filter(
+				wishlist_item_id = wishlist_item_id).update(
+				user_collection_id = user_collection_id,
+				updated_date = today)
+				
+	except Wishlist_item_view.DoesNotExist:
+		space_name = ''
+					
+	return JsonResponse({}, safe=False)
+
+
+@csrf_exempt
+def move_to_space(request):
+	wishlist_item_id = request.POST.get('wishlist_item_id','')
+	space_id = request.POST.get('space_id','')
+	user_collection_id = request.POST.get('user_collection_id', '')
+	upd = {}
+	space_name = ''
+
+	try:
+		itm = Wishlist_item_view.objects.get(
+			wishlist_item_id = wishlist_item_id)
+		
+		if itm.product_type_id == 'STOCK-IMAGE':			
+			upd = Wishlist_stock_image.objects.filter(
+				wishlist_item_id = wishlist_item_id).update(
+				user_space_id = space_id, 
+				user_collection_id = user_collection_id,
+				updated_date = today)
+		if itm.product_type_id == 'USER-IMAGE':			
+			upd = Wishlist_user_image.objects.filter(
+				wishlist_item_id = wishlist_item_id).update(
+				user_space_id = space_id, 
+				user_collection_id = user_collection_id,
+				updated_date = today)
+		if itm.product_type_id == 'ORIGINAL-ART':			
+			upd = Wishlist_oroginal_art.objects.filter(
+				wishlist_item_id = wishlist_item_id).update(
+				user_space_id = space_id, 
+				user_collection_id = user_collection_id,
+				updated_date = today)
+		if itm.product_type_id == 'STOCK-COLLAGE':			
+			upd = Wishlist_stock_collage.objects.filter(
+				wishlist_item_id = wishlist_item_id).update(
+				user_space_id = space_id, 
+				user_collection_id = user_collection_id,
+				updated_date = today)
+
+		if upd > 0 :
+			obj = User_space.objects.get(user_space_id = space_id)
+			if obj:
+				space_name = obj.name
+				
+	except Wishlist_item_view.DoesNotExist:
+		space_name = ''
+					
+	return JsonResponse({'space_name':space_name}, safe=False)
+
+
+@csrf_exempt
+def remove_from_collection(request):
+	wishlist_item_id = int(request.POST.get('wishlist_item_id','0'))
+	user_collection_id = int(request.POST.get('user_collection_id', '0'))
+
+	try:
+		itm = Wishlist_item_view.objects.get(
+			wishlist_item_id = wishlist_item_id)
+		
+		if itm.product_type_id == 'STOCK-IMAGE':			
+			upd = Wishlist_stock_image.objects.filter(
+				wishlist_item_id = wishlist_item_id).update(
+				user_collection_id = None, updated_date = today )
+		if itm.product_type_id == 'USER-IMAGE':			
+			upd = Wishlist_user_image.objects.filter(
+				wishlist_item_id = wishlist_item_id).update(
+				user_collection_id = None, updated_date = today )
+		if itm.product_type_id == 'ORIGINAL-ART':			
+			upd = Wishlist_oroginal_art.objects.filter(
+				wishlist_item_id = wishlist_item_id).update(
+				user_collection_id = None, updated_date = today )
+		if itm.product_type_id == 'STOCK-COLLAGE':			
+			upd = Wishlist_stock_collage.objects.filter(
+				wishlist_item_id = wishlist_item_id).update(
+				user_collection_id = None, updated_date = today )
+				
+	except Wishlist_item_view.DoesNotExist:
+		space_name = ''
+					
+	return JsonResponse({}, safe=False)
+
+@csrf_exempt
+def remove_from_space(request):
+	wishlist_item_id = int(request.POST.get('wishlist_item_id','0'))
+	user_collection_id = int(request.POST.get('user_collection_id','0'))
+
+	try:
+		itm = Wishlist_item_view.objects.get(
+			wishlist_item_id = wishlist_item_id)
+		
+		if itm.product_type_id == 'STOCK-IMAGE':			
+			upd = Wishlist_stock_image.objects.filter(
+				wishlist_item_id = wishlist_item_id).update(
+				user_collection_id = None, user_space_id = None, updated_date = today )
+		if itm.product_type_id == 'USER-IMAGE':			
+			upd = Wishlist_user_image.objects.filter(
+				wishlist_item_id = wishlist_item_id).update(
+				user_collection_id = None, user_space_id = None, updated_date = today )
+		if itm.product_type_id == 'ORIGINAL-ART':			
+			upd = Wishlist_oroginal_art.objects.filter(
+				wishlist_item_id = wishlist_item_id).update(
+				user_collection_id = None, user_space_id = None, updated_date = today )
+		if itm.product_type_id == 'STOCK-COLLAGE':			
+			upd = Wishlist_stock_collage.objects.filter(
+				wishlist_item_id = wishlist_item_id).update(
+				user_collection_id = None, user_space_id = None, updated_date = today )
+				
+	except Wishlist_item_view.DoesNotExist:
+		space_name = ''
+					
+	return JsonResponse({}, safe=False)
+
+
+@csrf_exempt
+def create_collection(request):
+	collection_name = request.POST.get('collection_name', '')
+	if collection_name == '':
+		return JsonResponse({'collection_name':''}, safe=False)
+
+	if request.user.is_authenticated:
+		user = User.objects.get(username = request.user)
+	else:
+		user = {}
+	
+	if not user:
+		return JsonResponse({'collection_name':''}, safe=False)
+		
+	uc = User_collection(
+		name = collection_name,
+		user = user)
+	uc.save()
+	return JsonResponse({'collection_name':collection_name,
+		'collection_id':uc.user_collection_id}, safe=False)
+
+
+@csrf_exempt
+def create_space(request):
+	collection_id = int(request.POST.get('collection_id', '0'))
+	space_name = request.POST.get('space_name', '')
+	if collection_id == '0':
+		return JsonResponse({'space_name':''}, safe=False)
+	if space_name == '':
+		return JsonResponse({'space_name':''}, safe=False)
+
+	if request.user.is_authenticated:
+		user = User.objects.get(username = request.user)
+	else:
+		user = {}
+	
+	if not user:
+		return JsonResponse({'space_name':''}, safe=False)
+		
+	us = User_space(
+		user_collection_id = collection_id,
+		name = space_name)
+	us.save()
+	return JsonResponse({'space_name':space_name,
+		'collection_id':collection_id,
+		'space_id':us.user_space_id}, safe=False)
+
+@csrf_exempt
+def remove_collection(request):
+	wishlist_item_id = request.POST.get('wishlist_item_id', '')
+	collection_id = request.POST.get('collection_id', '')
+	if collection_id == '':
+		return JsonResponse({'collection_id':''}, safe=False)
+
+	itm = Wishlist_item_view.objects.filter(
+		user_collection_id = collection_id)
+	
+	for i in itm:
+		if i.product_type_id == 'STOCK-IMAGE':			
+			upd = Wishlist_stock_image.objects.filter(
+				wishlist_item_id = i.wishlist_item_id).update(
+				user_collection_id = None, user_space_id = None, updated_date = today )
+		if i.product_type_id == 'USER-IMAGE':			
+			upd = Wishlist_user_image.objects.filter(
+				wishlist_item_id = i.wishlist_item_id).update(
+				user_collection_id = None, user_space_id = None, updated_date = today )
+		if i.product_type_id == 'ORIGINAL-ART':			
+			upd = Wishlist_oroginal_art.objects.filter(
+				wishlist_item_id = i.wishlist_item_id).update(
+				user_collection_id = None, user_space_id = None, updated_date = today )
+		if i.product_type_id == 'STOCK-COLLAGE':			
+			upd = Wishlist_stock_collage.objects.filter(
+				wishlist_item_id = i.wishlist_item_id).update(
+				user_collection_id = None, user_space_id = None, updated_date = today )
+
+	uc = User_collection.objects.filter(user_collection_id = collection_id).delete()
+				
+	return JsonResponse({'collection_id':collection_id}, safe=False)
+	
+
+@csrf_exempt
+def remove_space(request):
+	wishlist_item_id = request.POST.get('wishlist_item_id', '')
+	space_id = request.POST.get('space_id', '')
+	
+	if space_id == '':
+		return JsonResponse({'space_id':''}, safe=False)
+
+	itm = Wishlist_item_view.objects.filter(
+		user_space_id = space_id)
+	for i in itm:
+		if i.product_type_id == 'STOCK-IMAGE':			
+			upd = Wishlist_stock_image.objects.filter(
+				wishlist_item_id = i.wishlist_item_id).update(
+				user_collection_id = None, user_space_id = None, updated_date = today )
+		if i.product_type_id == 'USER-IMAGE':			
+			upd = Wishlist_user_image.objects.filter(
+				wishlist_item_id = i.wishlist_item_id).update(
+				user_collection_id = None, user_space_id = None, updated_date = today )
+		if i.product_type_id == 'ORIGINAL-ART':			
+			upd = Wishlist_oroginal_art.objects.filter(
+				wishlist_item_id = i.wishlist_item_id).update(
+				user_collection_id = None, user_space_id = None, updated_date = today )
+		if i.product_type_id == 'STOCK-COLLAGE':			
+			upd = Wishlist_stock_collage.objects.filter(
+				wishlist_item_id = i.wishlist_item_id).update(
+				user_collection_id = None, user_space_id = None, updated_date = today )
+
+	User_space.objects.filter(user_space_id = space_id).delete()
+			
+
+	return JsonResponse({'space_id':space_id}, safe=False)
+	
+		
