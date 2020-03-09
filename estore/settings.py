@@ -50,6 +50,8 @@ STORE_ID = 1
 INSTALLED_APPS = [
 	'artevenue.apps.ArtevenueConfig',
 	'artist.apps.ArtistConfig',
+	'blog.apps.BlogConfig',
+	'channelsales.apps.ChannelsalesConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -70,6 +72,7 @@ INSTALLED_APPS = [
 	'django.contrib.sitemaps',
 	'tinymce',
 	'indian_numbers',
+	'webmaster_verification',
 	]
 
 MIDDLEWARE = [
@@ -249,3 +252,30 @@ VENDOR_FILES = os.path.join(BASE_DIR, 'artevenue/static/vendor/')
 EGIFT_DESIGNS = os.path.join(BASE_DIR, 'artevenue/static/img/')
 
 GOOGLE_RECAPTCHA_SECRET_KEY = '6Le2ZqAUAAAAALbzG6uSjImGZ2hHY_B6r_Cug74i'
+
+WEBMASTER_VERIFICATION = {
+    'bing': '<bing verification code>',
+    'google': '<google verification code>',
+    'majestic': '<majestic verification code>',
+    'yandex': '<yandex verification code>',
+    'alexa': '<alexa verification code>',
+}
+
+TINYMCE_DEFAULT_CONFIG = {
+    'plugins': "table,spellchecker,paste,searchreplace",
+    'theme': "advanced",
+    'cleanup_on_startup': True,
+    'custom_undo_redo_levels': 10,
+}
+TINYMCE_SPELLCHECKER = True
+TINYMCE_COMPRESSOR = True
+TINYMCE_EXTRA_MEDIA = {
+    'css': {
+        'all': [
+            ...
+        ],
+    },
+    'js': [
+        ...
+    ],
+}

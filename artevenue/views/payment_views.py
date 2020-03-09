@@ -23,9 +23,9 @@ import urllib
 from django.core.exceptions import PermissionDenied
 
 from artevenue.models import Order, Order_billing, PrePaymentGateway
-from artevenue.models import Payment_details, Cart, Egift, Voucher
+from artevenue.models import Payment_details, Cart, Egift, Voucher, Business_profile
 from artevenue.models import Voucher_user, Egift_card_design, Voucher_used
-from artevenue.models import Order_sms_email, eGift_sms_email, Referral
+from artevenue.models import Order_sms_email, eGift_sms_email, Referral, Order_items_view
 
 MERCHANT_KEY = "ckibPj1d"
 key=""
@@ -35,28 +35,28 @@ env = settings.EXEC_ENV
 
 if env == 'DEV' or env == 'TESTING':
 	PAYU_BASE_URL = "https://sandboxsecure.payu.in/_payment"  # Testing
-	SURL = 'http://localhost:7000/payment_done/'
-	FURL = 'http://localhost:7000/payment_unsuccessful/'
-	CURL = 'http://localhost:7000/payment_unsuccessful/'
-	E_SURL = 'http://localhost:7000/egift_payment_done/'
-	E_FURL = 'http://localhost:7000/egift_payment_unsuccessful/'
-	E_CURL = 'http://localhost:7000/egift_payment_unsuccessful/'
+	SURL = 'http://localhost:7000/payment-done/'
+	FURL = 'http://localhost:7000/payment-unsuccessful/'
+	CURL = 'http://localhost:7000/payment-unsuccessful/'
+	E_SURL = 'http://localhost:7000/egift-payment-done/'
+	E_FURL = 'http://localhost:7000/egift-payment-unsuccessful/'
+	E_CURL = 'http://localhost:7000/egift-payment-unsuccessful/'
 elif env == 'PROD':
 	PAYU_BASE_URL = "https://secure.payu.in/_payment "  # LIVE 
-	SURL = 'https://www.artevenue.com/payment_done/'
-	FURL = 'https://www.artevenue.com/payment_unsuccessful/'
-	CURL = 'https://www.artevenue.com/payment_unsuccessful/'
-	E_SURL = 'https://www.artevenue.com/egift_payment_done/'
-	E_FURL = 'https://www.artevenue.com/egift_payment_unsuccessful/'
-	E_CURL = 'https://www.artevenue.com/egift_payment_unsuccessful/'
+	SURL = 'https://www.artevenue.com/payment-done/'
+	FURL = 'https://www.artevenue.com/payment-unsuccessful/'
+	CURL = 'https://www.artevenue.com/payment-unsuccessful/'
+	E_SURL = 'https://www.artevenue.com/egift-payment-done/'
+	E_FURL = 'https://www.artevenue.com/egift-payment-unsuccessful/'
+	E_CURL = 'https://www.artevenue.com/egift-payment-unsuccessful/'
 else:
 	PAYU_BASE_URL = "https://sandboxsecure.payu.in/_payment"  # Testing
-	SURL = 'http://localhost:7000/payment_done/'
-	FURL = 'http://localhost:7000/payment_unsuccessful/'
-	CURL = 'http://localhost:7000/payment_unsuccessful/'
-	E_SURL = 'http://localhost:7000/egift_payment_done/'
-	E_FURL = 'http://localhost:7000/egift_payment_unsuccessful/'
-	E_CURL = 'http://localhost:7000/egift_payment_unsuccessful/'
+	SURL = 'http://localhost:7000/payment-done/'
+	FURL = 'http://localhost:7000/payment-unsuccessful/'
+	CURL = 'http://localhost:7000/payment-unsuccessful/'
+	E_SURL = 'http://localhost:7000/egift-payment-done/'
+	E_FURL = 'http://localhost:7000/egift-payment-unsuccessful/'
+	E_CURL = 'http://localhost:7000/egift-payment-unsuccessful/'
 		
 
 
@@ -103,68 +103,136 @@ def payment_submit(request):
 	order_id = posted['order_id']
 	order = Order.objects.get(order_id = order_id)
 	
-	order_billing = Order_billing.objects.get(order_id = order.order_id)
-	##### Firstname, lastname, email and phonenumber are already in the 'posted'
-	##### as enetered by user
-	posted['amount'] = order.order_total
-	posted['productinfo'] = str(order.quantity) + ' items in Order Id: ' + order_id 
-	posted['surl'] = SURL
-	posted['furl'] = FURL
-	posted['service_provider'] = SERVICE_PROVIDER
-	posted['curl'] = CURL
-	posted['udf1'] = str(order.order_id) 
-	posted['udf2'] = str(order.voucher_id)
-	posted['udf3'] = str(order.referral_id)
-	posted['udf4'] = str(order.order_discount_amt)
-	posted['udf6'] = request.POST.get('company','')
-
-	print("Logging pre payment gateway******************")
-
+	####################################################################
+	## Check if this is a business order. If yes, check if deferred   ##
+	## payment is allowed.											  ##
+	####################################################################
+	bus = None
+	deferred_payment = False
 	try:
-		prePay = PrePaymentGateway (
-						first_name = posted['firstname'],
-						last_name = posted['lastname'],
-						phone_number = posted['phone'],
-						email_id = posted['email'],
-						rec_id = order.order_id,
-						date = today,
-						amount = order.order_total,
-						trn_type = 'ORD'
-						)
+		bus = Business_profile.objects.get( user_id = order.user_id )
+	except Business_profile.DoesNotExist: 
+		bus = None
+	
+	if bus:
+		if bus.profile_group.deferred_payment:
+			deferred_payment = True
+	
+	if deferred_payment:
 
-		prePay.save()
-	except Error as e:
-		print(e)
+		order_items = Order_items_view.objects.filter(order = order)
+		o = Order.objects.filter(order_id = order_id).update(
+			order_status = 'PC', deferred_payment = True, order_date = today.date(),
+			updated_date = today)
+		cart = Cart.objects.filter(cart_id = order.cart_id).update(cart_status = 'CO',
+			updated_date = today)
+		
+		## Update referral records, if any
+		if order.referral_disc_amount:
+			if order.referral_disc_amount > 0:
+				## Get referral record
+				ref = Referral.objects.filter(id = order.referral_id)
+				
+				## Check if user is a referrer or referee and update accordingly 
+				for r in ref:
+					if r.referred_by == order.user:
+						ref_upd = Referral.objects.filter(id = order.referral_id).update(
+							referred_by_claimed_date = today)
+					elif r.email_id == order.user.email:
+						ref_upd = Referral.objects.filter(id = order.referral_id).update(
+							referee_claimed_date = today)			
+		
+		## Update the voucher used table, if a voucher was used
+		if order.voucher_id and order.user:
+			vu = Voucher_used( 
+				voucher_id = order.voucher_id,
+				user = order.user,
+				created_date = today,
+				updated_date = today
+			)
+			vu.save()
+		
+
+		# Update email, sms table
+		o_email = Order_sms_email(
+			order = order,
+			customer_email_sent = False,
+			factory_email_sent = False,
+			customer_sms_sent = False,
+			factory_sms_sent = False,
+			created_date = today,	
+			updated_date = today
+		)
+		o_email.save()
+		
+		return render (request, 'artevenue/order_confirmation_deferred_payment.html', {"posted":posted,
+						'order':order, 'order_items':order_items })
+						
 	
-	hash_object = hashlib.sha256(b'randint(0,20)')
-	txnid=hash_object.hexdigest()[0:20]
-	hashh = ''
-	posted['txnid']=txnid
-	hashSequence = "key|txnid|amount|productinfo|firstname|email|udf1|udf2|udf3|udf4|udf5|udf6|udf7|udf8|udf9|udf10"
-	posted['key']=key
-	hash_string=''
-	hash_string+= MERCHANT_KEY
+	else:
 	
-	hashVarsSeq=hashSequence.split('|')
-	for i in hashVarsSeq:
+		order_billing = Order_billing.objects.get(order_id = order.order_id)
+		##### Firstname, lastname, email and phonenumber are already in the 'posted'
+		##### as enetered by user
+		posted['amount'] = order.order_total
+		posted['productinfo'] = str(order.quantity) + ' items in Order Id: ' + order_id 
+		posted['surl'] = SURL
+		posted['furl'] = FURL
+		posted['service_provider'] = SERVICE_PROVIDER
+		posted['curl'] = CURL
+		posted['udf1'] = str(order.order_id) 
+		posted['udf2'] = str(order.voucher_id)
+		posted['udf3'] = str(order.referral_id)
+		posted['udf4'] = str(order.order_discount_amt)
+		posted['udf6'] = request.POST.get('company','')
+
+		print("Logging pre payment gateway******************")
+
 		try:
-			hash_string+=str(posted[i])
-		except Exception:
-			hash_string+=''
-		hash_string+='|'
-	hash_string+=SALT
-	hashh=hashlib.sha512(hash_string.encode('utf8')).hexdigest().lower()
+			prePay = PrePaymentGateway (
+							first_name = posted['firstname'],
+							last_name = posted['lastname'],
+							phone_number = posted['phone'],
+							email_id = posted['email'],
+							rec_id = order.order_id,
+							date = today,
+							amount = order.order_total,
+							trn_type = 'ORD'
+							)
 
-	action = PAYU_BASE_URL
+			prePay.save()
+		except Error as e:
+			print(e)
+		
+		hash_object = hashlib.sha256(b'randint(0,20)')
+		txnid=hash_object.hexdigest()[0:20]
+		hashh = ''
+		posted['txnid']=txnid
+		hashSequence = "key|txnid|amount|productinfo|firstname|email|udf1|udf2|udf3|udf4|udf5|udf6|udf7|udf8|udf9|udf10"
+		posted['key']=key
+		hash_string=''
+		hash_string+= MERCHANT_KEY
+		
+		hashVarsSeq=hashSequence.split('|')
+		for i in hashVarsSeq:
+			try:
+				hash_string+=str(posted[i])
+			except Exception:
+				hash_string+=''
+			hash_string+='|'
+		hash_string+=SALT
+		hashh=hashlib.sha512(hash_string.encode('utf8')).hexdigest().lower()
 
-	if(posted.get("key")!=None and posted.get("txnid")!=None and posted.get("productinfo")!=None and posted.get("firstname")!=None and posted.get("email")!=None):
-		return render (request, 'artevenue/payment_submit.html', {"posted":posted,"hashh":hashh,
-						"MERCHANT_KEY":MERCHANT_KEY,"txnid":txnid,"hash_string":hash_string,
-						"action":action })
-	else:		
-		return render (request, 'artevenue/payment_submit.html', {"posted":posted,"hashh":hashh,
-						"MERCHANT_KEY":MERCHANT_KEY,"txnid":txnid,"hash_string":hash_string,
-						"action":"." })
+		action = PAYU_BASE_URL
+
+		if(posted.get("key")!=None and posted.get("txnid")!=None and posted.get("productinfo")!=None and posted.get("firstname")!=None and posted.get("email")!=None):
+			return render (request, 'artevenue/payment_submit.html', {"posted":posted,"hashh":hashh,
+							"MERCHANT_KEY":MERCHANT_KEY,"txnid":txnid,"hash_string":hash_string,
+							"action":action })
+		else:		
+			return render (request, 'artevenue/payment_submit.html', {"posted":posted,"hashh":hashh,
+							"MERCHANT_KEY":MERCHANT_KEY,"txnid":txnid,"hash_string":hash_string,
+							"action":"." })
 
 @csrf_protect
 @csrf_exempt						
@@ -226,6 +294,7 @@ def payment_done(request):
 	
 	try:
 		order = Order.objects.get(order_id = order_id)
+		order_items = Order_items_view.objects.filter(order = order)
 		o = Order.objects.filter(order_id = order_id).update(
 			order_status = 'PC', order_date = today.date(),
 			updated_date = today)
@@ -318,7 +387,7 @@ def payment_done(request):
 	return render(request, 'artevenue/payment_done.html',
 			{ "txnid":txnid, "status":status, "amount":amount, 'msg':msg,
 			'db_err':db_err, 'firstname':firstname, 'order':order,
-			'pay_status':pay_status}
+			'pay_status':pay_status, 'order_items':order_items}
 		)
 
 

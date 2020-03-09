@@ -38,7 +38,7 @@
 									<li><span class="badge badge-secondary">{{prod_cat_count}}</span>
 									{% for p in prod_categories %}
 										<ul class="list-unstyled">
-											<li><a href="{% url 'category_stock_images' p.category_id %}" class="nav-link">{{p.name|title}}</a></li>
+											<li><a href="{% url 'category_stock_images' cat_nm=p.name %}" class="nav-link">{{p.name|title}}</a></li>
 										</ul>
 									{% endfor prod_categories %}
 										<a href="{% url 'show_all_categories' %}"><small>See All...</small></a>
@@ -206,9 +206,9 @@
 					<div class="box-cat">
 						{% if ikeywords %}
 							<h1>Search Results</h1>
-							<p>{% if ikeywords %} You Searched for: "{{ikeywords}}" {% endif %}</p>
+							<p>{% if ikeywords %} You Searched for: "{{ikeywords}}"{% endif %}</p>
 						{% else %}
-							<h1>{% if product_category %} {{ product_category.name }} {% else %} All Art Prints {% endif %}</h1>
+							<h1>{% if product_category %} {{ product_category.name }} Art Prints{% else %} All Art Prints {% endif %}</h1>
 							<p>{% if product_category.description %} {{product_category.description}} {% else %} Please use filters to narrow your search{% endif %}</p>
 						{% endif %}
 					</div>
@@ -352,7 +352,7 @@
 				show_num = show;
 			} else {
 				if (show != 'ALL') {
-					show_num = '50' // default
+					show_num = '100' // default
 				} else {
 					show_num = show;  
 				}

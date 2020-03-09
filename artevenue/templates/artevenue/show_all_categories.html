@@ -1,5 +1,6 @@
 {% extends 'artevenue/estore_base.html' %}
 {% load static %}
+{% load utils %}
 {% load indian_numbers_tags %}
 {% load show_trending_categories from prod_template_tags %}
 {% block page-title %} 
@@ -43,7 +44,7 @@
 						<div class="col-lg-2 col-md-3 col-6">
 							<div class="cat-card">
 
-								<a href="{% url 'art_by_category' c.category_id %}">
+								<a href="{% url 'art_by_category' c.name|default_if_none:'NA'|replace:' ,-' %}">
 									<p style="color:#000 !important; margin-bottom: 0.1rem;">{{c.name|title|default:'Unspecified'|default_if_none:'Unspecified'}}</p>
 									<p><span style="font-size:0.6rem; color:#272e38;" data-counter-up >({{c.stock_image_stock_image_category__count}})</span></p>
 								</a>

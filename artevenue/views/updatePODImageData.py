@@ -24,6 +24,7 @@ today = datetime.date.today()
 
 def importPODImageData(): 
 
+	'''
 	url = "https://www.podexchange.com/pod-export/fc30cfbd-50ba-4d40-b29f-cdc10dd88f66.csv"
 	file = urllib.request.urlopen(url)
 	if file.code != 200:
@@ -32,10 +33,17 @@ def importPODImageData():
 	cr = csv.reader(codecs.iterdecode(file, 'utf-8'))	
 	
 	'''
-	file = open('/home/artevenue/website/estore/POD_file_06.Nov.2019.csv')
+	##### Down the POD file for processing -
+	downloadPODFile()
+	cfile = Path('PODFile.csv')
+	if not cfile.is_file():
+		print("PODFile.csv file did not downloaded")
+		return
+	file = open('PODFile.csv')	
 	cr = csv.reader(file, delimiter=',')
-	'''
+	
 
+	#### Start processing
 	cnt = 0
 	'''Get Product type (IMAGE) '''
 	prod_type = Product_type.objects.filter(product_type_id__iexact = "STOCK-IMAGE", store = ecom).first()
@@ -52,8 +60,9 @@ def importPODImageData():
 			cnt = cnt + 1
 			continue
 		cnt = cnt + 1
-		
+
 		print(cnt)
+
 		try:
 			row[0]
 			row[14]
@@ -72,9 +81,10 @@ def importPODImageData():
 		if row[0]:
 			prod = Stock_image.objects.filter(product_id = int(row[0])).first()
 			if not prod:
+
 				## Low Resolution Image
 				lowres_url = row[11].replace(' ', '%20')
-				print("NEW:- " + lowres_url)
+				print("NEW:- " + lowres_url + "\n")
 				try:
 					fl =  urllib.request.urlopen(lowres_url)
 				except HTTPError as e:
@@ -120,11 +130,10 @@ def importPODImageData():
 					if pos > 0:
 						loc = pos+1
 					lowres_img = lowres_url[loc:]
-					file = Path("/home/artevenue/website/estore/static/image_data/POD/images/" + lowres_img)
+					mfile = Path("/home/artevenue/website/estore/static/image_data/POD/images/" + lowres_img)
 					# If file does not exists then copy the file
-					if not file.is_file():	
-						print(lowres_url)
-						wget.download(lowres_url, out=img_dir)
+					if not mfile.is_file():	
+						wget.download(lowres_url.replace('%20', ' '), out=img_dir)
 					
 				thumbnail_url = row[12].replace(' ', '%20')
 				try :
@@ -172,12 +181,11 @@ def importPODImageData():
 					if pos_t > 0:
 						loc_t = pos_t+1
 					thumbnail_img = thumbnail_url[loc_t:]
-					file = Path("/home/artevenue/website/estore/static/image_data/POD/images/" + thumbnail_img)
+					tfile = Path("/home/artevenue/website/estore/static/image_data/POD/images/" + thumbnail_img)
 					# If file does not exists then copy the file
-					if not file.is_file():	
-						print(thumbnail_url)
-						wget.download(thumbnail_url, out=img_dir)
-							
+					if not tfile.is_file():	
+						wget.download(thumbnail_url.replace('%20', ' '), out=img_dir)
+						
 			
 			'''					'''
 			''' Publisher 		'''
@@ -211,7 +219,8 @@ def importPODImageData():
 					published = False
 									
 				## Get image file urls
-				lowres_url = row[11].replace(' ', '%20')
+				#lowres_url = row[11].replace(' ', '%20')
+				lowres_url = row[11]
 				pos = lowres_url.rfind('/')
 				loc = 0
 				if pos > 0:
@@ -219,12 +228,18 @@ def importPODImageData():
 				url = lowres_url[loc:]
 								
 				##
-				thumbnail_url = row[12].replace(' ', '%20')
+				#thumbnail_url = row[12].replace(' ', '%20')
+				thumbnail_url = row[12]
 				pos = thumbnail_url.rfind('/')
 				loc = 0
 				if pos > 0:
 					loc = pos+1
 				thumb_url = thumbnail_url[loc:]
+				
+				if prod:
+					disp_seq = prod.category_disp_priority
+				else:
+					disp_seq = None
 				
 				## Update Product
 				newprod = Stock_image(
@@ -254,7 +269,8 @@ def importPODImageData():
 					colors = '',
 					key_words = row[13],
 					url = 'image_data/POD/images/' + url,
-					thumbnail_url = 'image_data/POD/images/' + thumb_url			
+					thumbnail_url = 'image_data/POD/images/' + thumb_url,
+					category_disp_priority = disp_seq
 				)
 
 				newprod.save()

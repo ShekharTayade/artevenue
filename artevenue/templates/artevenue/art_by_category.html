@@ -1,15 +1,47 @@
 {% extends 'artevenue/estore_base.html' %}
 {% load static %}
 {% block page-title %} 
-	<title>Art from '{{product_category.name}}' category.</title>
+	{% if product_category.category_id == 5 %}
+		<title>Modern Abstract Art Prints Online | Abstract Prints</title>
+		<meta name="description" content="Buy Abstract Artworks Online with abstract watercolor prints. Arte’Venue has various Modern art prints with a large choice of Blue Abstract Prints for sale.">
+		<meta name="keywords" content="abstract prints abstract artworks online buy abstract art online abstract art posters abstract print design abstract watercolor prints blue abstract prints abstract painting prints modern abstract art prints">	
+	{% elif product_category.category_id == 2 %}
+		<title>Floral Art Prints for Sale | Floral Prints Framed</title>
+		<meta name="description" content="Decorate your walls with the best Modern Floral Art Print and Floral Triptych Wall Art. Order online for the Best Floral Art Prints on Arte’Venue.">
+		<meta name="keywords" content="modern floral art print floral art prints for sale abstract floral print best floral art prints floral print pictures floral prints framed floral triptych wall art">
+	{% elif product_category.category_id == 3 %}
+		<title>Landscape Vintage Posters | Landscape Art Prints for Sale</title>
+		<meta name="description" content="Bring home Fine Art Landscape Photography Prints with a variety of Landscape Framed Prints for you to choose from. Buy your Landscape Prints from Arte’Venue.">
+		<meta name="keywords" content="fine art landscape photography prints landscape art prints landscape art prints for sale landscape framed prints landscape painting prints landscape poster prints">	
+	{% elif product_category.category_id == 7 %}
+		<title>Coastal Art with Coastal Prints Online | Coastal Artwork</title>
+		<meta name="description" content="Dive into the different Coastal Art Prints at Arte’Venue. Shop Coastal Prints Online from styles like Abstract Coastal Art and Coastal Artwork as well.">
+		<meta name="keywords" content="abstract coastal art coastal art coastal art prints coastal artwork coastal print coastal prints online">	
+	{% elif product_category.category_id == 11 %}
+		<title>Quirky Animal Prints | Watercolour Animal Prints</title>
+		<meta name="description" content="Bring home liveliness with Colorful Animal Prints and Baby Animal Posters. Buy a variety of styles like Animal Illustration Prints and Geometric Animal Prints.">
+		<meta name="keywords" content="animal illustration prints animal print posters baby animal posters baby animal prints for nursery colourful animal prints forest animal prints framed animal prints geometric animal prints quirky animal prints sea animal prints vintage animal posters vintage animal prints watercolour animal prints woodland animal prints">	
+	{% elif product_category.category_id == 32 %}
+		<title>Motivation Framed Art | Inspirational Wall Art for Office</title>
+		<meta name="description" content="Decorate your walls with Inspirational Office Art and Inspiration Quotes Artwork. Buy from Arte’Venue’s online gallery featuring Motivational Artwork for Office.">
+		<meta name="keywords" content="inspirational artwork inspirational framed art inspirational office art inspirational quotes artwork inspirational wall art for office motivational art motivational artwork motivational artwork for office motivational framed art ">	
+	{% elif product_category.category_id == 74 %}
+		<title>Children's Art Print with Kids Art for Sale | Kids Prints</title>
+		<meta name="description" content="The joy and love of having Kids Framed Art and Children Art Prints on your wall is second to none. Buy our Kids Framed Art and add youthfulness to your walls.">
+		<meta name="keywords" content="inspirational artwork inspirational framed art inspirational office art inspirational quotes artwork inspirational wall art for office motivational art motivational artwork motivational artwork for office motivational framed art ">	
+	{% elif product_category.category_id == 74 %}
+		<title>Children's Art Print with Kids Art for Sale | Kids Prints</title>
+		<meta name="description" content="The joy and love of having Kids Framed Art and Children Art Prints on your wall is second to none. Buy our Kids Framed Art and add youthfulness to your walls.">
+		<meta name="keywords" content="childrens art prints kids art for sale kids art prints kids framed art kids prints">
+	{% else %}
+		<title>Artwork from '{{product_category.name}}' category.</title>
+		<meta name="description" content="Decorate your walls with great artwork from a large collection in {{product_category.name}} category.">
+		<meta name="keywords" content="Art, Abstract, Art prints, Wall Art, wall decor, Buy Art, Buy Art prints, Print photos online, Print Art online, Custom Framing, Online Framing, Online Art, Online Art prints">
+	{% endif %}
 {% endblock page-title %} 
 {% block page-description %}
-<meta name="description" content="Displaying art works from '{{product_category.name}}' category. Arte'Venue.com has a large collection of over 250,000
-art works from artists across the world. We deliver customized art prints at your door steps.">
 {% endblock page-description %}
 {% block page-keywords %}
-<meta name="keywords" content="Art, {{product_category.name}}, Art prints, Wall Art, Buy Art, Buy Art prints, Print photos online, Print Art online,
-	Custom Framing, Online Framing, Online Art, Online Art prints">
 {% endblock page-keywords %}
 
 	<!-- Only Override the site content block -->
@@ -51,13 +83,13 @@ art works from artists across the world. We deliver customized art prints at you
 									{% for p in prod_categories %}
 										<ul class="list-unstyled">
 											{% if p.category_id %}
-												<li><a href="{% url 'art_by_category' cat_id=p.category_id page=page%}" class="nav-link">{{p.name|title}}</a></li>
+												<li><a href="{% url 'art_by_category' cat_nm=p.name page=page%}" class="nav-link">{{p.name|title}}</a></li>
 											{% else %}
 												<li><a href="{% url 'art_by_category' %}" class="nav-link">{{p.name|title}}</a></li>
 											{% endif %}
 										</ul>
 									{% endfor prod_categories %}
-										<a href="{% url 'show_all_categories' %}"><small>See All...</small></a>
+										<a href="{% url 'show_all_categories' %}" style="color: #555; font-size: 0.65rem; text-decoration: underline;">See All...</a>
 									</li>
 								</ul>
 							</div>
@@ -224,8 +256,13 @@ art works from artists across the world. We deliver customized art prints at you
 							<h1>Search Results</h1>
 							<p>{% if ikeywords %} You Searched for: "{{ikeywords}}" {% endif %}</p>
 						{% else %}
-							<h1>{% if product_category %} {{ product_category.name }} {% else %} All Art Prints {% endif %}</h1>
-							<p>{% if product_category.description %} {{product_category.description}}{% endif %}</p>
+							<h1 style="text-decoration: underline;">{% if product_category %} {{ product_category.name }} Art Prints{% else %} All Art Prints {% endif %}</h1>
+							<h4>Choose From Wide Range of {% if product_category.name%}{{product_category.name}}{% endif %} Art Prints of Impressive Paintings, Artworks from Artists Across the World.<br/>
+							Bring Home the Art Prints that Breathe Life Into Your Room Walls.</h4>
+							{% if product_category.description %} <p>{{product_category.description}}</p>{% endif %}
+							<h5>Select from finished sizes or customize each artwork to suit your rooms, whether it's your living room, bedroom room, kitchen, Dining, Study or any other space.
+							Bring it home as framed art print by choosing the size, frame, print surface, mount. You may even choose to get it as stretched on canvas art print. Or get it just as a wall poster without the frame.
+							</h5>							
 						{% endif %}
 					</div>
 					 
@@ -238,7 +275,7 @@ art works from artists across the world. We deliver customized art prints at you
 				{% include 'artevenue/wishlist-add-message.html' %}
 				{% include 'artevenue/message-modal_ok.html' %}
 				{% if product_category.category_id %}
-					<form  hidden id="cat-form" action = "{% url 'art_by_category' cat_id=product_category.category_id %}">
+					<form  hidden id="cat-form" action = "{% url 'art_by_category' cat_nm=product_category.name %}">
 						<input id = "id_page_num" name = "page_num">
 						<input id = "id_sort" name = "sort">
 						<input id = "id_show" name = "show">

@@ -24,7 +24,7 @@ def get_amz_orders(request):
 	av_order_no = request.POST.get("av_order_no", "").replace('\n','').replace('\t','')
 	from_date = request.POST.get("fromdate", '')
 	if from_date != '' and from_date != 'NaN-NaN-NaN':
-		startDt = datetime.datetime.strptime(from_date, "%Y-%m-%d")	
+		startDt = datetime.datetime.strptime(from_date, "%Y-%m-%d")
 	else: 
 		startDt = None
 	to_date = request.POST.get("todate", '')

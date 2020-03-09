@@ -895,10 +895,13 @@ h1 {
 }
 
 #content #productMain .price {
-  font-size: 1.1rem;
-  font-weight: 400;
+  font-size: 1.3rem;
+  font-weight: 600;
   /*text-align: center;*/
   /*margin-top: 10px;*/
+  /*border: 1px solid #11b6bd;*/
+  color: #11b6bd;
+  padding:3px;
 }
 
 #content #productMain .buttons {
@@ -2067,16 +2070,14 @@ h1,
 
 h2,
 .h2 {
-    font-size: 1.6rem !important;
-    line-height: 1.5em !important;
-    font-weight: 600 !important;
+    font-size: 1.3rem !important;
 }
 
 @media(max-width:767px){
 h2,.h2 {
     font-size: 1.3rem !important;
     line-height: 1.5em !important;
-    font-weight: 600 !important;
+    font-weight: 400 !important;
 }
 }
 
@@ -2136,7 +2137,7 @@ hr {
 
 small,
 .small {
-  font-size: 80%;
+  font-size: 60%;
   font-weight: 400;
 }
 
@@ -2959,7 +2960,8 @@ code {
 
 .card-title {
   margin-bottom: 0.75rem;
-  font-weight:600;
+  font-weight:400;
+  font-size: 0.8rem;
 }
 
 .card-subtitle {

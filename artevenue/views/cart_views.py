@@ -30,7 +30,6 @@ from .price_views import *
 today = datetime.date.today()
 ecom = get_object_or_404 (Ecom_site, store_id=settings.STORE_ID )
 
-
 @csrf_exempt
 def show_cart(request):
 
@@ -155,12 +154,26 @@ def show_cart(request):
 		if usercart.voucher_disc_amount:
 			cart_without_disc = cart_without_disc + usercart.voucher_disc_amount
 
+	## If it's first order from the user. If yes, apply 'FIRST15' coupon
+	v_code = None
+	if usercart and request.user.is_authenticated:
+		if not usercart.voucher_id:
+			orders = Order.objects.filter(user = usr).exclude(order_status = 'PP')
+			if not orders:
+				voucher = Voucher.objects.get(voucher_id = 12, effective_from__lte = today, 
+						effective_to__gte = today, store_id = settings.STORE_ID)
+				if voucher:
+					v_code = voucher.voucher_code
+				else:
+					v_code = None
+		
 	return render(request, template, {'usercart':usercart, 
 		'usercartitems': usercartitems, 'shipping_cost':shipping_cost, 
 		'total_bare':total_bare, 'cart_total':cart_total, 
 		'ref_msg':ref_msg, 'ref_status':ref_status, 'referral_disc_amount':referral_disc_amount,
 		'MEDIA_ROOT':settings.MEDIA_ROOT, 'MEDIA_URL':settings.MEDIA_URL, 
-		'cart_without_disc':cart_without_disc, 'promo_removed':promo_removed})
+		'cart_without_disc':cart_without_disc, 'promo_removed':promo_removed,
+		'v_code': v_code })
 	
 def show_wishlist(request):
 
@@ -171,8 +184,6 @@ def show_wishlist(request):
 		template = "artevenue/show_wishlist.html"
 	
 	return render(request, template, {})
-
-	
 
 @csrf_protect
 @csrf_exempt	
@@ -1161,7 +1172,6 @@ def update_cart_item(request):
 			
 	
 	return( JsonResponse({'msg':msg, 'updated_qty':updated_qty}, safe=False) )
-
 	
 @csrf_exempt	
 def delete_cart_item(request):	
@@ -1365,8 +1375,6 @@ def delete_cart_item(request):
 		msg = 'Apologies!! Could not save your cart. Please use the "Contact Us" link at the bottom of this page and let us know. We will be glad to help you.'	
 	
 	return JsonResponse({'msg':msg}, safe=False)
-
-
 	
 @csrf_exempt
 def apply_voucher(request):	
@@ -1577,7 +1585,6 @@ def apply_voucher_py(request, cart_id, voucher_code, cart_total):
 				'cart_total':new_cart_total, 'voucher_bal_amount':voucher_bal_amount,
 				'cart_disc_amt':cart.cart_disc_amt, 'disc_type':disc_type})
 	
-
 @csrf_exempt
 def apply_referral(request, cart_total):	
 
@@ -2119,8 +2126,22 @@ def add_to_cart_new(request):
 			else:
 				msg = "There was an issue while apply your Coupan: " + res['status']
 				err_flg = True
-				
-	
+		## Check if it's first order for this user, if yes, apply FIRST15 voucher by default
+		else:
+			if request.user.is_authenticated:
+				orders = Order.objects.filter(user = userid).exclude(order_status = 'PP')
+				if not orders:
+					v_code = Voucher.objects.get(voucher_id = 12)
+					response = apply_voucher_py_new(request, cart.cart_id, v_code, 
+						cart.cart_total, cart.cart_sub_total, False)
+						
+				res = json.loads(response.content.decode('utf-8'))
+				if res['status'] == 'SUCCESS' or res['status'] == 'SUCCESS-':
+					print('OK')
+				else:
+					msg = "There was an issue while apply your Coupan: " + res['status']
+					err_flg = True
+
 	except IntegrityError as e:
 		err_flg = True
 		msg = 'Apologies!! Could not save your cart. Please use the "Contact Us" link at the bottom of this page and let us know. We will be glad to help you.'
@@ -2148,9 +2169,6 @@ def add_to_cart_new(request):
 			msg = 'Apologies!! We had a system issue. Please use the "Contact Us" link at the bottom of this page and let us know. We will be glad to help you.'
 	
 	return( JsonResponse({'msg':msg, 'cart_qty':cart_qty, 'err_flg':err_flg}, safe=False) )
-
-
-
 
 def apply_voucher_py_new(request, cart_id, voucher_code, cart_total, car_sub_total=0,
 		voucher_use_check=True):
@@ -2423,8 +2441,7 @@ def apply_voucher_py_new(request, cart_id, voucher_code, cart_total, car_sub_tot
 	return JsonResponse({"status":status, 'disc_amount': total_disc_amount, 
 				'cart_total':new_cart_total, 'voucher_bal_amount':voucher_bal_amount,
 				'cart_disc_amt':cart.cart_disc_amt, 'disc_type':disc_type})
-		
-		
+				
 ## Check and remove discounts is any promotion has expired and 
 ## update the cart.		
 def validatePromotions(request):
@@ -2442,10 +2459,13 @@ def validatePromotions(request):
 				sessionid = request.session.session_key
 				
 			usercart = Cart.objects.get(session_id = sessionid, cart_status = "AC")
-
+		'''
 		usercartitems = Cart_item_view.objects.select_related('product', 
 			'promotion').filter( cart = usercart.cart_id, 
 				product__product_type_id = F('product_type_id')).order_by(
+					'product_type')
+		'''
+		usercartitems = Cart_item_view.objects.filter(cart = usercart.cart_id).order_by(
 					'product_type')
 
 		# If any order exists against this cart
@@ -2596,8 +2616,6 @@ def validatePromotions(request):
 							) 
 	return change_flag
 	
-
-
 ############################################################################
 ## When a voucher is applied to a cart, this method calculates and updates
 ## the cart item sub total, discount amount, tax and item total AND

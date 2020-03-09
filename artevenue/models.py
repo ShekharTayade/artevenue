@@ -1110,10 +1110,56 @@ class Profile_group (models.Model):
 	discount_type = models.CharField(max_length=30, blank=True)
 	discount_percentage = models.DecimalField(max_digits=12, decimal_places=2, null=True)
 	effective_from = models.DateField(blank=True, null=True)
-	effective_to = models.DateField(blank=True, null=True)	
+	effective_to = models.DateField(blank=True, null=True)
+	deferred_payment = models.BooleanField(null=False, default=True)
+	payment_due_period_days = models.IntegerField(null=True)
 
 	def __str__(self):
 		return self.name
+
+class Channel_partner(models.Model):
+	user = models.OneToOneField(User, on_delete=models.CASCADE, null=False, related_name="channel_partner")
+	contact_name = models.CharField(max_length=500, blank=False)
+	company =  models.CharField(max_length=30, blank=True)
+	profile_group = models.ForeignKey(Profile_group, models.CASCADE, null=True)
+	address_1 = models.CharField(max_length=600, blank=False, null=False)
+	address_2 = models.CharField(max_length=600, blank=True, default='')
+	city = models.CharField(max_length=600, blank=False, null=False)
+	state = models.ForeignKey(State, on_delete = models.PROTECT, null=False)
+	pin_code = models.ForeignKey(Pin_code, on_delete = models.PROTECT, null=True)
+	country = models.ForeignKey(Country, on_delete = models.PROTECT, null=False, default= "IND")
+	phone_number = models.CharField(max_length=30, blank=False, null=False)
+	gst_number = models.CharField(max_length=30, blank=True, default='')
+	tax_id = models.CharField(max_length=30, blank=True, default='')
+	approval_date = models.DateField(blank=True, null=True)
+	created_date = models.DateTimeField(auto_now_add=True, null=False)	
+	updated_date = models.DateTimeField(auto_now=True, null=False)	
+	bank_acc_no = models.CharField(max_length = 20, default = '', blank = True)
+	ifsc_code = models.CharField(max_length = 11, default = '', blank = True)
+	bank_name = models.CharField(max_length = 500, default = '', blank = True)
+	bank_branch = models.CharField(max_length = 600, default = '', blank = True)
+	partner_code = models.CharField(max_length=8, null=True, blank = True, unique=True)
+
+	def __str__(self):
+		return self.partner_code
+
+
+class Channel_partner_profile (models.Model):
+	profile_id = models.AutoField(primary_key=True, null=False)
+	name = models.CharField(max_length=30, blank=True)
+	description = models.CharField(max_length=30, blank=True)
+	partner_discount_type = models.CharField(max_length=30, blank=True)
+	partner_discount_percentage = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	client_discount_type = models.CharField(max_length=30, blank=True)
+	client_discount_percentage = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	effective_from = models.DateField(blank=True, null=True)
+	effective_to = models.DateField(blank=True, null=True)
+	deferred_payment = models.BooleanField(null=False, default=True)
+	payment_due_period_days = models.IntegerField(null=True)
+
+	def __str__(self):
+		return self.name
+
 	
 class Business_profile(models.Model):
 	user = models.OneToOneField(User, on_delete=models.CASCADE, null=False, related_name="business_user")
@@ -1138,27 +1184,29 @@ class Business_profile(models.Model):
 	bank_name = models.CharField(max_length = 500, default = '', blank = True)
 	bank_branch = models.CharField(max_length = 600, default = '', blank = True)
 	business_code = models.CharField(max_length=8, null=True, blank = True, unique=True)
+	channel_partner = models.ForeignKey(Channel_partner, on_delete = models.CASCADE, null=True, blank = True)
 
 	def __str__(self):
 		return self.company + " - " + self.contact_name
 	
 
-class Business_commission(models.Model):
+class Business_referral_fee(models.Model):
 	month_year = models.CharField(max_length = 7, blank = False, 
 		null = False, help_text='Commission month (YYYY-MM)')
 	business_profile = models.ForeignKey(Business_profile, 
 		on_delete=models.CASCADE, null=False)
-	commission_amount = models.DecimalField(max_digits=12, 
-		decimal_places=2, blank=False, null=False)
-	sale_in_current_year = models.DecimalField(max_digits=12, 
-		decimal_places=2, blank=False, null=False)
-	commission_paid_date = models.DateTimeField(null=True)
-	commission_paid_reference =models.CharField(max_length = 600, 
+	order = models.ForeignKey('Order', 
+		on_delete=models.CASCADE, null=False)
+	ord_value_ytd = models.DecimalField(max_digits=12, 
+		decimal_places=2, blank=False, null=False, default=0)
+	fee_amount = models.DecimalField(max_digits=12, 
+		decimal_places=2, blank=False, null=False, default=0)
+	fee_paid_date = models.DateTimeField(null=True)
+	fee_paid_reference =models.CharField(max_length = 600, 
 		default = '', blank = True)
 	created_date = models.DateTimeField(auto_now_add=True, null=False)	
 	updated_date = models.DateTimeField(auto_now=True, null=False)	
 
-	
 ############################
 #  END:  Business User
 ############################
@@ -1214,10 +1262,25 @@ class Order (models.Model):
 	invoice_number = models.CharField(max_length = 15, blank = True, default = '')
 	invoice_date = models.DateTimeField(null=True)
 	channel = models.ForeignKey('Order_channel', on_delete=models.PROTECT, null = False, default = 'ART')
+	deferred_payment = models.BooleanField(null=False, default=False)
 	
 	def __str__(self):
 		return str(self.order_id) + ' - ' + str(self.user)
 
+class Order_deferred_payment(models.Model):
+	PAYMENT_MODE = (
+		('CS', 'Cash'),
+		('ON', 'Online'),
+		('CH', 'Cheque'),
+		('DD', 'Demand Draft'),
+		('BK', 'BANK TRANSFER - NEFT/IMPS/RTGS'),
+	)
+	order = models.ForeignKey(Order, on_delete=models.CASCADE, null=False)
+	payment_date = models.DateTimeField(null=False)
+	amount = models.DecimalField(max_digits=12, decimal_places=2, null=False, default=0)
+	mode_of_payment = models.CharField(max_length = 2, choices=PAYMENT_MODE, blank = False, null=False)
+	payment_reference = models.CharField(max_length = 200, blank = True, default = '')
+	
 
 class Order_sms_email(models.Model):
 	order = models.OneToOneField(Order, on_delete=models.CASCADE, null=False)

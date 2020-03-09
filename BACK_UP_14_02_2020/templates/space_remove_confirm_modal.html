@@ -1,0 +1,49 @@
+<!-- Message Modal -->
+<div id="space_remove_confirm" tabindex="-1" role="dialog" aria-labelledby="Collection-Space" aria-hidden="true" class="modal fade">
+	<div class="modal-dialog modal-md">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h3 id = "s_modal-title" class="modal-title">Remove Space?</h3>
+				<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
+			</div>
+			<div class="modal-body">
+				<div class = "row">
+					<div class = "col-1">
+						<i class = "fa fa-warning fa-2x"></i>
+					</div>
+					<div class = "col-11">
+						<span class = "text-muted" style = "font-size:1rem; text-align:left;">
+							This space will be removed and all the items
+							tagged to this will be removed from the space as well as the collection.
+							These items will still be available as your favourites and can be tagged
+							to other collections/spaces as you wish.
+						</span>
+						<br />
+						<br />
+						<span style = "font-size:1rem; color:#007bff;text-align:left">
+							<strong>Are you sure you want to proceed?</strong>
+						</span/>
+					</div>
+					
+					<div class = "col-12 mt-3">
+						<button id = "space_move_btn" type = "button" 
+								class = "btn btn-primary pull-left"
+								onclick = "$('#space_remove_confirm').modal('hide');">
+							<i class = "fa fa-times-circle">
+								Cancel
+							</i>
+						</button>
+						<input hidden id = "space_id">
+						<button id = "collection_move_btn" type = "button" 
+								class = "btn btn-primary pull-right"
+								onclick = "removeSpace('{{user_collection.user_collection_id}}', $('#space_id').val());">
+							<i class = "fa fa-check">
+								Yes, Remove Space
+							</i>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

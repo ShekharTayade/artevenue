@@ -1,0 +1,119 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+        <div class="container">
+			<div class="row">
+				<!-- breadcrumb-->
+				<div class="col-sm-12">
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+							<li aria-current="page" class="breadcrumb-item active">Image by Image Code</li>
+						</ol>
+					</nav>
+				</div>
+			</div>
+			<div class="row">
+				<div class = "col-sm-12">
+					<div class="box">
+						<div class = "row">
+							<div class = "col-sm-12">
+								<h1>Images by Code, Item Number</h1>
+								<p>Get images by using the image codes or Item Numbers</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class = "col-sm-12">
+					<div class = "box">
+						<form method = "post">
+							<div class = "row">
+								<div class = "col-md-6">
+									<div class="form-group">
+										<label for="img_code">Enter Image Codes <small>(separated by comma)</small></label>
+										<input class = "form-control" id ="img_code" required max='20'> 
+									</div>
+									<div class = "text-center">
+											<button onclick = "getImage('code');" class = "btn btn-primary " type="button">
+												Get Images by Code
+											</button>
+									</div>
+								</div>
+								<div class = "col-md-6">
+									<div class="form-group">
+										<label for="img_code">Enter Item Numbers <small>(separated by comma)</small></label>
+										<input class = "form-control" id ="item_number" required max='20'> 
+									</div>
+									<div class = "text-center">
+											<button onclick = "getImage('number');" class = "btn btn-primary " type="button">
+												Get Images By Number
+											</button>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+				<div class="col-sm-12" style="overflow: auto;">
+					<div class="card">									  
+						<div id = "img-display">
+							{% include 'artevenue/prod_display_include.html' %}
+						</div> <!-- END:  img-display -->
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	{% include 'artevenue/message-modal_ok.html' %}
+	
+	{% endblock sitecontent %}
+
+	
+	{% block jscripts %}
+		<script>
+		$( document ).ready(function() {
+			
+		});
+		</script>
+		
+		<script>
+		function getImage(txt){
+			if (txt == 'code'){
+				var code = $("#img_code").val();
+			} else {
+				var code = '';
+			}
+			if (txt == 'number'){
+				var number = $("#item_number").val();
+			} else {
+				var number = '';
+			}
+
+			if ((code.length > 0) || (number.length > 0) ){
+				$.ajax({url: '{% url "image_by_image_code" %}', 
+					data: {'code':code, 'number':number}, 
+					dataType: 'text', 
+					type: 'POST',
+					success: function (data) {
+						$("#img-display").html(data);
+					},
+					error: function(xhr){
+						alert("An error occured: " + xhr.status + " " + xhr.statusText + " Apologies for the inconvenience!! Please let us know the details and we will be happy to help sort it out."); 
+						return;
+					}
+				});			
+				
+			
+			} else {
+				// Please enter image code
+				
+			}
+		}		
+		</script>
+	{% endblock jscripts %}
+			
+	

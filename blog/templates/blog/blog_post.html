@@ -1,0 +1,216 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block page-title %}
+<title>Create Artist profile | Create Artist profile on Arte'Venue</title>
+{% endblock page-title %}
+
+{% block page-description %}
+<meta name="description" content="Blog post at artevenue.com">
+{% endblock page-description %}
+
+{% block page-keywords %}  
+<meta name="keywords" content="Artevenue blog, art blog, fine art blog, blog post">
+{% endblock page-keywords %}  
+
+{% block page-author %}  
+<meta name="author" content="Arte'venue">
+{% endblock page-author %}  
+
+{% block add_to_head %}
+	<script src="https://cdn.tiny.cloud/1/pbyon7r4xrnxdsyq37zt1eygjhjl36cegcftf2qoco4ocmju/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+
+   <!-- <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+   <script>tinymce.init({ selector:'textarea' });</script>-->
+{% endblock add_to_head %}
+
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+    <div id="" class = "container-fluid">
+		<h1 class = "text-center mt-3" style = "color: #11b6bd;">Welcome to Arte'Venue Blog</h1>
+		<div class = "blog mb-3">
+			<div class = "row">
+				<div class = "col-12 blog_title">
+					<a href = "{% url 'blog' %}">
+					<span class = "pull-left">
+						<i class="fa fa-arrow-circle-left" aria-hidden="true"></i>
+					</span>
+					</a>
+					<h2>{{blog.title}}</h2>
+				</div>
+			</div>
+			<div class = "row mb-2">
+				{% if blog.author.profile_pic %} 
+				<div class = "col-8 text-center">
+					By {{blog.author.user.first_name}} {{ blog.author.user.last_name }}
+				</div>
+				<div class = "col-4">
+					<img class="thumbnail float-right" src="{{blog.author.profile_pic.url}}" style = "width:100px; height:120px;" alt="">
+				</div>
+				{% else %}
+				<div class = "col-12 text-center">
+					By {{blog.author.user.first_name}} {{ blog.author.user.last_name }}
+				</div>				
+				{% endif %}
+			</div>
+			<div class = "row mt-3">
+				<div class = "col-12 blog_content">
+					{{blog.post|safe}}
+				</div>
+			</div>
+			<div class = "row mt-5">
+				<div class = "col-12 blog_content">
+					<a href = "{% url 'blog' %}">
+					<span class = "pull-left">
+						<i class="fa fa-arrow-circle-left" aria-hidden="true"> Return to Blog Home</i>
+					</span>
+					</a>
+				</div>
+			</div>
+			<hr>
+			{% if user.is_authenticated %}
+			<div class = "row mt-3">
+				<div class = "col-12 blog_content">
+					<form >
+						<div class="form-group">
+							<label class="control-label">{{user.username}}: Post your comments on this blog</label>
+							<textarea class = "form-control" name="message" rows="1">
+							</textarea>
+							<button class = "btn btn-primary" type="">
+								Post
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+			{% else %}
+			<div class = "row mt-3">
+				<div class = "col-12 blog_content">
+					<form >
+						<div class="form-group">
+							<label class="control-label">Please login if you wish to post your comments on this blog</label>
+						</div>
+					</form>
+				</div>
+			</div>				
+			{% endif %}
+			<hr>
+			{% if blog_post_comment %}
+				<ul>
+				{% for bpc in blog_post_comment %}
+					{% if bpc.blog_post_id == blog.post_id %}
+					<li>
+					<div class = "row mt-3">
+						<div class = "col-12 blog_content">
+							<div class="form-group">
+								<label class="control-label"><strong>{{bpc.user.username}}</strong> commented on {{bpc.updated_date|date:'d M Y'}}:<br />
+								{{bpc.comment}}</label>
+							</div>
+							{% for bpcr in blog_post_comment_reply %}
+								<ul>
+								{% if bpcr.blog_post_comment_id == bpc.comment_id %}
+									<li>
+										<div class="form-group">
+											<label class="control-label"><strong>{{bpcr.user.username}}</strong> replied on {{bpcr.updated_date|date:'d M Y'}}:<br /> {{bpcr.reply}}</label>
+										</div>
+									</li>
+								{% endif %}
+								</ul>
+							{% endfor %}
+						</div>
+					</div>
+					</li>
+					{% endif %}
+					<hr>
+					
+					{% if user.is_authenticated %}
+					<div class = "row mt-3">
+						<div class = "col-12 blog_content">
+							<form >
+								<div class="form-group">
+									<label class="control-label">{{user.username}}: Reply to this comment</label>
+									<textarea class = "form-control" name="message" rows="1">
+									</textarea>
+									<button class = "btn btn-primary" type="">
+										Post
+									</button>
+								</div>
+							</form>
+						</div>
+					</div>
+					{% else %}
+					<div class = "row mt-3">
+						<div class = "col-12 blog_content">
+							<form >
+								<div class="form-group">
+									<label class="control-label">Please login if you wish to reply to this comment</label>
+								</div>
+							</form>
+						</div>
+					</div>				
+					{% endif %}
+					
+					
+				{% endfor %}
+				</ul>
+			{% endif %}						
+ 		</div>
+		<img src="{% static 'golden_blue%20unf.jpg' %}">
+	</div>
+	{% endblock sitecontent %}
+
+	
+	{% block jscripts %}
+	<script>
+		tinymce.init({
+		  selector: 'textarea',
+		  plugins: 'print preview paste importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount imagetools textpattern noneditable help charmap quickbars emoticons',
+		  imagetools_cors_hosts: ['picsum.photos'],
+		  menubar: 'file edit view insert format tools table help',
+		  toolbar: 'undo redo | bold italic underline strikethrough | fontselect fontsizeselect formatselect | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist | forecolor backcolor removeformat | pagebreak | charmap emoticons | fullscreen  preview save print | insertfile image media template link anchor codesample | ltr rtl',
+		  toolbar_sticky: true,
+		  autosave_ask_before_unload: true,
+		  autosave_interval: "30s",
+		  autosave_prefix: "{path}{query}-{id}-",
+		  autosave_restore_when_empty: false,
+		  autosave_retention: "2m",
+		  image_advtab: true,
+		  content_css: [
+			'//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
+			'//www.tiny.cloud/css/codepen.min.css'
+		  ],
+		  link_list: [
+			{ title: 'My page 1', value: 'http://www.tinymce.com' },
+			{ title: 'My page 2', value: 'http://www.moxiecode.com' }
+		  ],
+		  image_list: [
+			{ title: 'My page 1', value: 'http://www.tinymce.com' },
+			{ title: 'My page 2', value: 'http://www.moxiecode.com' }
+		  ],
+		  image_class_list: [
+			{ title: 'None', value: '' },
+			{ title: 'Some class', value: 'class-name' }
+		  ],
+		  importcss_append: true,
+		  height: 400,
+		  file_picker_callback: function (callback, value, meta) {
+		  },
+		  templates: [
+				{ title: 'New Table', description: 'creates a new table', content: '<div class="mceTmpl"><table width="98%%"  border="0" cellspacing="0" cellpadding="0"><tr><th scope="col"> </th><th scope="col"> </th></tr><tr><td> </td><td> </td></tr></table></div>' },
+			{ title: 'Starting my story', description: 'A cure for writers block', content: 'Once upon a time...' },
+			{ title: 'New list with dates', description: 'New List with dates', content: '<div class="mceTmpl"><span class="cdate">cdate</span><br /><span class="mdate">mdate</span><h2>My List</h2><ul><li></li><li></li></ul></div>' }
+		  ],
+		  template_cdate_format: '[Date Created (CDATE): %m/%d/%Y : %H:%M:%S]',
+		  template_mdate_format: '[Date Modified (MDATE): %m/%d/%Y : %H:%M:%S]',
+		  height: 600,
+		  image_caption: true,
+		  quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote quickimage quicktable',
+		  noneditable_noneditable_class: "mceNonEditable",
+		  toolbar_drawer: 'sliding',
+		  contextmenu: "link image imagetools table",
+		 });
+
+
+	</script>		
+	{% endblock jscripts %}

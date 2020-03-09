@@ -1,0 +1,30 @@
+				{% load static %}
+				{% load utils %}
+				<div class = "row">					
+					{% for key, value in ready_prod_data_paper.items %}
+						<div id= "paper-{{value.PAPER_WIDTH_UNFRAMED}}" class="image-c col-4" >
+							<a onclick = "set_ready_product('PAPER', '{{key}}', '{{value.PAPER_WIDTH_UNFRAMED}}');"> 
+								<img id = "prod-width-{{key}}-paper" src = '' alt = "Prod-Img" class="img-fluid">
+								<span class="text text-center">
+									<h5 id = "size-{{key}}-paper"  class = "mt-1">
+										{{ value.PAPER_WIDTH|floatformat }} X {{ value.PAPER_HEIGHT|floatformat}} inch
+									</h5>
+									<h5 style = "margin:0rem;">
+										<i id = "price-{{key}}-paper" class = "fa fa-inr"> {{ value.PAPER_PRICE|floatformat }} </i>
+									</h5>
+								</span>
+							</a>
+						</div>
+					{% endfor %}
+				</div>
+				<div class = "row" style = "display:none;">
+					<div class = "col-12" style = "font-size:9px;">
+						UNFRAMED PRINT SIZE:<br />
+						{% for key, value in ready_prod_data_paper.items %}
+							<span id= "paper-size-{{value.PAPER_WIDTH_UNFRAMED}}" class ="p_size pull-left"
+								onclick = "">
+									{{ value.PAPER_WIDTH_UNFRAMED|floatformat }} X {{ value.PAPER_HEIGHT_UNFRAMED|floatformat}}
+							</span>
+						{% endfor %}
+					</div>
+				</div>

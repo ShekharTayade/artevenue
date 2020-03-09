@@ -1,0 +1,250 @@
+{% load static %}	
+{% load utils %}
+	
+			<div class="row">
+
+				<div class="col-lg-12">
+				  <!-- breadcrumb-->
+				  <nav aria-label="breadcrumb">
+					<ol class="breadcrumb">
+						<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+						<li aria-current="page" class="breadcrumb-item active">My Favourites</li>
+					</ol>
+				  </nav>
+				</div>
+
+
+				<div id="wishlist" class="col-lg-8">
+					<div class="box">
+						<form method="post" id = "checkoutform" onsubmit = "return validate_checkout();" action="">
+							{% csrf_token %}
+							<!-- Invisible field to hold the wishlist id -->
+							<input hidden id = "wishlist_id" name = "wishlist_id" value = "{{userwishlist.wishlist_id }}">
+							<!-- Hidden fields for sub_total and tax -->
+							<input hidden id = "sub_total" name = "sub_total" value = "{{userwishlist.wishlist_sub_total|floatformat}}">
+							<input hidden id = "tax" name = "tax" value = "{{userwishlist.wishlist_tax|floatformat}}">
+							<input hidden id = "disc_amt_nv" name = "disc_amt_nv" value = "{{userwishlist.wishlist_disc_amt|floatformat}}">
+							<input hidden id = "wishlist_total_nv" name = "wishlist_total_nv" value = "{{userwishlist.wishlist_total|floatformat}}">
+							<div class ="row">
+								<div class = "col-12">
+									<h1 class = "pull-left">Favourites</h1>
+								</div>
+							</div>
+							<div class ="row">
+								<div class = "col-12">
+									<p class="text-muted pull-left">You currently have {% if userwishlist %} {{userwishlist.quantity}} {% else %} 0 {% endif %} item(s) as Favourites.</p>
+								</div>
+							</div>
+							<div class="table table-responsive">
+								<table id = "wishlistTbl" class="table table-responsive">
+									<thead>
+										<tr>
+											<th width="10%">Name</th>
+											<th width="35%">Details</th>
+											<th width="5%">Price</th>
+											<th width="25%"></th>
+										</tr>
+									</thead>
+									<tbody>
+										{% for i in userwishlistitems %}
+										<tr>											
+											<td>												
+												<img src = "{% if i.product_type == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product__image_to_frame}} {% else %} {% static i.product__thumbnail_url %} {% endif %}" style = "width:75px; height:75px; object-fit:contain;">
+												<!--
+												{% if i.product__publisher == '1001' %}
+													<img src = "{% if i.product_type == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product__image_to_frame}} {% else %} {% static i.product__thumbnail_url %} {% endif %}" style = "width:75px; height:75px; object-fit:contain;">
+												{% else %}
+													<img src = "{% if i.product_type == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product__image_to_frame}} {% else %} {{i.product__thumbnail_url}} {% endif %}" style = "width:75px; height:75px; object-fit:contain;">
+												{% endif %}
+												-->
+												<br />
+												<div class = "pull-left">
+													<button style="padding-left:0px;" type ="button" class = "btn btn-link pull-left" onclick = "getFramedImg('{{i.product_id}}', '{{i.image_width}}', '{{i.moulding_id | default_if_none:0}}', '{{i.mount__color | default_if_none:0}}','{{i.mount_size | default_if_none:0}}', '{{i.product__product_image__url | default_if_none:""}}');">
+														<small>{{i.product__name|truncatechars:15 }}</small>
+													</button>
+												</div>
+											</td>
+											<td>
+												{% with width=i.moulding__width_inner_inches|add_width_frame_mount:i.mount_size %}
+												<small>
+												{% if i.product_type == 'ORIGINAL-ART' %}
+													<li>{{i.product__description}}</li>
+												{% else %}													
+													<li>Print on {{i.print_medium_id|title}}</li>
+												{% endif %}
+												{% if i.moulding_id %}
+													<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+													<li>Frame: {{i.moulding__name }} ({{i.moulding__width_inches}} inch, Polystyrene)</li>
+													{% if i.mount_id %}
+														<li>Mount: {{i.mount_size }}", Color: {{i.mount__name|title }} </li>
+													{% endif %}
+													<li>Total Size: 
+														{{ i.image_width|add_width:width|add_width:width }}" X {{i.image_height|add_width:width|add_width:width }}"</li>
+												{% else %}
+													<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+												{% endif %}
+												
+												{% if i.acrylic_id %}
+													<li>Acrylic covered</li>
+												{% endif %}
+												{% if i.stretch_id %}
+													<li>Canvas Stretched</li>
+												{% endif %}
+												</small>
+												{% endwith %}
+
+												
+												{% if i.user_collection_id %}
+													{% if i.user_collection__name %}
+														<span class="badge badge-secondary">{{i.user_collection__name}}</span>
+													{% endif %}
+													{% if i.user_space__name %}
+														<span class="badge badge-secondary" style = "margin-left:1rem;">
+															{{i.user_space__name}}
+														</span>
+													{% endif %}
+												{% endif %}
+											</td>
+											<td style = "text-align:right">{{i.item_total|floatformat}}</td>
+											<td>
+												<ul style="list-style-type:none; padding:0px;">
+												<li>
+												<a><i style = "cursor: pointer;" 
+													data-toggle="tooltip" title="Edit!" 
+													class="fa fa-edit"
+													onclick = "edit_item('{{i.wishlist_item_id}}', '{{i.product_id}}');">
+													<small>Edit</small>
+													</i>
+												</a>
+												</li>
+												<li>
+												<a>
+													<i class="fa fa-trash-o"
+														data-toggle="tooltip" title="Remove!" 
+														style = "cursor: pointer;"
+														onclick="deleteItem('{{i.wishlist_item_id}}', '{{sub_total|floatformat}}', '{{total_tax|floatformat}}', '{{userwishlist.wishlist_total|floatformat}}', '{{i.item_total|floatformat}}');">
+														<small>Delete</small>
+													</i>
+												</a>
+												</li>
+												<li>
+												<a> 
+													<i data-toggle="tooltip" title="Move to Cart!" 
+													onclick ="moveitem({{i.wishlist_item_id}});" 
+													style = "cursor: pointer;"
+													class= "fa fa-cart-plus">
+													<small>Move to Cart</small>
+													</i>
+												</a>
+												</li>
+												<li>
+												<!--<a>
+													<i data-toggle="tooltip" title="Move to a Collection!" onclick ="" 
+														style = "cursor: pointer;"
+														class= "fa fa-arrow-circle-o-right">
+														<small>Add to Collection</small>
+													</i>
+												</a>-->
+												</li>
+											</td>
+										</tr>
+										{% endfor userwishlistitems %}
+																				
+									</tbody>
+									<tfoot>
+										<tr>
+											<th colspan="1">Total</th>
+											<th colspan="2" style = "text-align:right">{{total_bare|floatformat}}</th>
+											<th></th>
+										</tr>
+									</tfoot>
+								</table>
+							</div>
+
+							<!--convert python data to json -->
+							{% for j in userwishlistitems %}
+								{{ j|json_script:j.wishlist_item_id }}			
+							{% endfor userwishlistitems %}
+
+							<!-- /.table-responsive-->
+							<div class="box-footer d-flex justify-content-between flex-column flex-lg-row">
+								<div class="left"><a href="{% url 'index' %}" class="btn btn-outline-secondary">
+									<i class="fa fa-chevron-left"></i> Continue shopping</a>
+								</div>
+								<div class="right">
+									<button 
+										id = "checkout_btn"
+										type="button" 
+										class="btn btn-primary" 
+										form = "checkoutform" 
+										value="submit"
+										onclick = "move_all_to_cart();">
+											Move All to Cart <i class="fa fa-cart-plus"></i>
+									</button>
+								</div>
+							</div>
+						</form>
+					</div>
+					<!-- /.box-->
+
+				</div> 
+				<!-- /.col-lg-8-->
+
+					
+				<div class="col-lg-4">
+					<div id="order-summary" class="box">
+						<div class="box-header">
+							<h3 class="mb-0">Collections</h3>
+							<button class = "btn btn-link pull-right text-muted" 
+								style =  "color: #007bff !important; font-size:.75rem; padding:0px;"
+								onclick = "$('#collection-modal').modal('show');">
+								<i class = "fa fa-plus-square-o"></i> 
+								New Collection
+							</button>
+						</div>
+						<div id="collection-list">
+						{% for c in user_collection %}
+							<div class="col-xs-12 col-md-12 mb-2">
+								<div class = "text-center"
+									style="border:1px solid #fff; background-color:#f7f7f7;">
+									<a class = "btn btn-link text-muted" 
+										style = "text-decoration:underline;"
+										href="{% url 'user_collection' c.user_collection_id %}">
+										{{c.name}}
+									</a>						
+								</div>
+							</div>
+						{% empty %}
+						<div class="col-12">
+							<div class = "row">
+								<div class = "col-12 mb-2">
+									<small class = "text-muted">You can organize your favorites into collections and spaces. 
+									For an example, you may create a collection called 'Sharma Residence' 
+									and then create spaces within it such as 'Living Room', 'Master Bedroom' etc.
+									You can then organize the favourites by tagging those to these collections and spaces.</small>
+								</div>
+							</div>
+							<div class = "row text-center">
+								<div class = "col-12">
+									<button class = "btn btn-link pull-right text-muted" 
+										onclick = "$('#collection-modal').modal('show');">
+											<i class = "fa fa-plus-square-o"></i> Create New Collection
+									</button>
+								</div>
+							</div>
+						</div>
+						{% endfor %}
+						</div>
+					</div>
+				</div>
+				<!-- /.col-md-4-->
+				<form id = "edit_form" hidden action = "{% url 'stock_image_detail' %}" method = 'GET'>
+					<input hidden id="wishlist_item_id" name = "wishlist_item_id" value = ''>
+					<input hidden id="product_id" name = "product_id" value = ''>
+				</form>
+
+			</div>
+			<script>
+				updateCartItemsNum("{{cart_quantity}}");
+			</script>
+		

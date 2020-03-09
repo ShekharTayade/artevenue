@@ -1,0 +1,74 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block page-title %} 
+<title>Arte'Venue News Letter Subscription Confirmation</title>
+{% endblock page-title %} 
+ 
+{% block page-description %} 
+<meta name="description" content="New Letter susbcription done. Sign up on Arte'Venue today and get access to 2,50,000+ unique art prints and free delivery across India. Get started now.">
+{% endblock page-description %} 
+  
+{% block page-keywords %} 
+<meta name="keywords" content="art for sale, buy art online, art for sale online, art prints, canvas prints">
+{% endblock page-keywords %} 
+
+{% block page-author %}   
+<meta name="author" content="Arte'Venue">
+{% endblock page-author %} 
+
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+    <div id="highlighted-slider" class="container ccontainer">
+		<div class = "row">
+			<div class = "col-6 sign-up-left-box text-center mb-5 mt-5">
+				<div class = "sign-up-left-text p-5">
+					{% if msg == 'SUCCESS' %}
+						<h2>Hi there, <br />Welcome to Arte'Venue News Letter Subscription!</h2>
+						<br />
+						<br />
+						<h3>You are now subscribed to receive the newsletter from Arte'Venue at {{email}}. We publish the newsletter periodically. You will receive it as it gets published.</h3>
+						<h3> Happy reading!!! </h3>
+						<br />
+						<br />
+						<h4> Arte’Venue is a one of a kind platform where 
+									you get to choose from a range of more than 2,50,000
+									art prints of various artists and genres worldwide. 
+									You even have the option of customizing the size of 
+									your print and adding a mount and a frame of your 
+									choice. You will then see how your finished product 
+									will look and you will have it delivered to your 
+									doorstep just as you see it. </h4>
+					{% elif msg == 'EXISTS' %}
+						<h2>Hi there, <br />Thank you for your interest. You are already susbcribed to Arte'Venue news letter!</h2>
+						<h3> Your email id: {{email}}</h3>
+						<br />
+						<br />
+						<h3> Happy reading!!! </h3>
+						<br />
+						<br />
+						<h4> Arte’Venue is a one of a kind platform where 
+									you get to choose from a range of more than 2,50,000
+									art prints of various artists and genres worldwide. 
+									You even have the option of customizing the size of 
+									your print and adding a mount and a frame of your 
+									choice. You will then see how your finished product 
+									will look and you will have it delivered to your 
+									doorstep just as you see it. </h4>
+					{% endif %}
+					
+						<br />
+						<br />
+					<h6> You can unsubscribe anytime. There will be a link in the news letter email for unsubscribing.</h6>
+				</div>
+			</div>
+		</div>
+    </div>
+	{% endblock sitecontent %}
+	
+	
+	{% block jscripts %}
+	
+	{% endblock jscripts %}
+	

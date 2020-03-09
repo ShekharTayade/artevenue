@@ -1,0 +1,157 @@
+{% load static %}
+<div class="container-fluid" id="footer" style="background-color:#000; color:#fff;">
+	<div class="row">
+		<div class="col-lg-3 col-md-6">
+			<img src="{% static 'img/layer_2_0.png' %}" alt="{{ecvom_site.store_name}}" style="width:164px; height:29px; display:block;">
+			<p class="mt-3 about-us" style="font-size:0.85rem;">
+			One stop shop to discover, buy and get your favorite art prints in India.
+			Over 2,50,000 designs, 4500+ artists, and 70+ categories to pick from.
+			</p>
+		</div>
+		<div class="col-lg-3 col-md-6">
+			<p class="footer-heading" style="font-size:0.85rem; font-weight:700;">
+				POPULAR CATEGORIES
+			</p>
+			<div class = "row mt-3" style = "font-size:0.75rem; padding-left:0px;">
+				{% for main in level0_menuitems %}
+					{% if main.name|upper == 'ART PRINTS' %}
+						{% for level1 in level1_menuitems %}
+							{% if level1.name != '' %} 
+								{% if forloop.counter < 7 %}
+								<div class="col-md-6">
+									<a style = "color:#fff !important; display:inline-block;" href="{% url 'art_by_category' level1.category_id %}">
+										<li>
+											> {{level1.name|title}}
+										</li>
+									</a>
+								</div>
+								{% endif %}
+							{% endif %}
+						{% endfor level1_menu %}
+						<div class="col-md-6">
+							<a style = "color:#696868 !important; text-decoration:underline; display:inline-block;" href="{% url 'show_all_categories' %}">
+								<li>
+									> Show All
+								</li>
+							</a>
+						</div>
+					{% endif %}
+				{% endfor %}				
+			</div>
+		</div>
+		<div class="col-lg-3 col-md-6" style = "color:#fff;">
+			<p class="footer-heading" style="font-size:0.85rem; font-weight:700;">IMPORTANT LINKS</p>
+			<div class = "row mt-3">
+				<div class="col-md-6">
+					<ul class="list-unstyled" style = "font-size:0.75rem; color:fff !important;">
+						<li><a href="{% url 'faq' %}">FAQ</a></li>
+						<li><a href="{% url 'contact_us' %}">Contact Us</a></li>
+						<li><a href="{% url 'about_us' %}">About Us</a></li>
+						<li><a class = "" data-toggle="modal" data-target="#phone-help">Support</a></li>
+						
+						{% if user.is_authenticated %}
+							<li><a href="{% url 'my_account' %}">My Account</a></li>
+							<li><a href="{% url 'my_orders' %}">My Orders</a></li>
+						{% else %}
+							<li><a href="{% url 'find_orders' %}">Find My Orders</a></li>
+						{% endif %}
+					</ul>
+				</div>
+					
+				<div class="col-md-6">
+					<ul class="list-unstyled"  style = "font-size:0.75rem; color:fff !important;">
+						<!--<li><a href="shipping">Shipping</a></li>-->
+						<li><button class = "btn btn-link" onclick="$('#refund-modal').modal('show');"  style = "padding:0px; margin:0px; font-size:0.75rem;">
+						Return/Refund</button></li>
+						<!--<li><a href="">How It Works</a></li>-->
+						<li><a href="{% url 'business_registration' %}">Business</a></li>
+						<li><a href="{% url 'terms_conditions' %}">Terms of Use</a></li>
+						<li><a href="{% url 'privacy_policy' %}">Privacy Policy</a></li>
+						<li><button class = "btn btn-link" onclick="$('#cancellation-modal').modal('show');" style = "padding:0px; margin:0px;  font-size:0.75rem;">
+						Cancellation</button></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-3 col-md-6" style = "font-size:0.75rem; background-color: #000; color:#fff;">
+			<div class="newsletter">
+				<h5 style="font-size:0.85rem; font-weight:700;">
+					NEWS LETTER
+				</h5>
+				<div class = "mt-3" style = "font-size:0.75rem; color:fff !important;">
+					<form action = "{% url 'newsletter_subscription' %}">
+						<div class="input-group">
+							 <input type="email" class="form-control" placeholder="Your email" 
+							 style = "border-radius:0px;  border:none;" name = "email">
+							 <span class="input-group-btn">
+							 <button class="btn btn-primary" type="submit"  style = "border-radius:0px; background-color:#777; border:none;">
+								Sign Up
+							 </button>
+							 </span>
+						</div>
+						
+					</form>
+					<p class="social mt-3">
+						<a href="https://www.facebook.com/Artevenueofficial/" class="facebook external"><i class="fa fa-facebook"></i></a>
+						<!--<a href="#" class="twitter external"><i class="fa fa-twitter"></i></a>-->
+						<a href="https://www.instagram.com/artevenue/" class="instagram external"><i class="fa fa-instagram"></i></a>
+						<!--<a href="#" class="gplus external"><i class="fa fa-google-plus"></i></a>-->
+						<!--<a href="#" class="email external"><i class="fa fa-envelope"></i></a>-->
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<div id="cancellation-modal" tabindex="-1" role="dialog" aria-labelledby="Login" aria-hidden="true" class="modal fade">
+	<div class="modal-dialog modal-md">
+		<div class="modal-content">
+			<div class="modal-header" style = "background-color:#11b6bd;color:#fff">
+				<h3 class="modal-title" >Order Cancellation Policy</h3>
+				<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
+			</div>
+			<div class="modal-body">
+				<div class = "col-12"  style = "color:#000 !important;" >
+					Our products are customized as per your order. The production process 
+					starts as soon as you place the order. We are unable to cancel your order
+					after the payment is made and you receive the confirmation.<br />
+					However, we are happy to cancel the order for you before our production process
+					begins, which is typically within an hour of you placing an order. 
+					In case you wish to cancel please call/write back to us as soon as possible, and 
+					we can let you know if the order can be cancelled.<br />
+					If the order is cancelled, we will ask you for your bank details and it will take
+					up to 7 business days to make process the refund.
+				</div>				
+			</div>
+		</div>
+	</div>		
+</div>
+
+
+<div id="refund-modal" tabindex="-1" role="dialog" aria-labelledby="Login" aria-hidden="true" class="modal fade">
+	<div class="modal-dialog modal-md">
+		<div class="modal-content">
+			<div class="modal-header" style = "background-color:#11b6bd;color:#fff">
+				<h3 class="modal-title" >Refund Policy</h3>
+				<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
+			</div>
+			<div class="modal-body">
+				<div class = "col-12"  style = "background-color:#11b6bd;color:#fff">
+					Arte'Venue shall refund the money or replace the artwork or products 
+					only in the event the artwork or product was delivered in damaged condition 
+					or not as per order specifications, subject to small variations as described in
+					terms and conditions. <br />
+					The User shall
+					inform Arte'Venue about the damaged product/Artwork within 24 hours of delivery.
+					Arte'Venue shall not be liable to replace the Artwork/product or refund the
+					money if Arte'Venue is informed after completion of 24 hours from time of
+					delivery.
+				</div>				
+			</div>
+		</div>
+	</div>		
+
+</div>
+ 

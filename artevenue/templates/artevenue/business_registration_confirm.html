@@ -71,6 +71,12 @@
 												{% render_field businessprofile_form.business_code|append_attr:"readonly:readonly" class="form-control" %}
 											</div>
 										</div>
+										<div class = "col-sm-6 ">
+											<div class="form-group">
+												{{ businessprofile_form.channel_partner.label_tag }}
+												<input class = "form-control" readonly value = {{channel_partner}}>
+											</div>
+										</div>
 									</div>
 									<div class = "row">
 										<div class = "col-sm-6 ">

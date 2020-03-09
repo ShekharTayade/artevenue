@@ -1,9 +1,126 @@
 {% load static %}
-<div class = "container">
+<div class = "container-fluid">
+	<div class = "mt-5">
+		<div class="row">
+			<div class="col-4 col-md-2 mb-3 why-artevenue-div">
+				<div onclick = "show_modal('GUARANTEE');">
+					<img src="{% static 'img/why_artevenue/guarantee.png' %}"
+						alt="100% Guranteed" class = "why_artevenue">
+					<div class = "why-artevenue-head">
+						Free Returns
+					</div>
+					<div class = "why-artevenue-text">
+						Don't like it? Return it in 5 days and get the refund
+					</div>
+				</div>
+			</div>
+			<div class="col-4 col-md-2 mb-3 why-artevenue-div">
+				<div onclick = "show_modal('FREE_SHIPPING');">
+					<img src="{% static 'img/why_artevenue/truck.png' %}" 
+					alt = "Free Shipping" class = "why_artevenue">
+					<div class = "why-artevenue-head">
+						Free Shipping
+					</div>
+					<div class = "why-artevenue-text">
+						Don't pay to bring it home, ships in 1-2 days
+					</div>
+				</div>
+			</div>
+			<div class="col-4 col-md-2 mb-3 why-artevenue-div" >
+				<div onclick = "show_modal('CUSTOMIZATION');">
+					<img src="{% static 'img/why_artevenue/customize.png' %}" 
+					alt= "Customize The Artwork" class = "why_artevenue">
+					<div class = "why-artevenue-head">
+						Customize it
+					</div>
+					<div class = "why-artevenue-text">
+						Every art print can be customized - surface, size, frame and more
+					</div>
+				</div>
+			</div>
+			<div class="col-4 col-md-2 mb-3 why-artevenue-div">
+				<div onclick = "show_modal('LICENSED');">
+					<img src="{% static 'img/why_artevenue/licensed.png' %}" 
+					alt="Licensed Artworks" class = "why_artevenue">
+					<div class = "why-artevenue-head">
+						Licensed Art prints
+					</div>
+					<div class = "why-artevenue-text">
+						Piece of mind - every art you buy is licensed
+					</div>
+				</div>
+			</div>
+			<div class="col-4 col-md-2 mb-3 why-artevenue-div">
+				<div onclick = "show_modal('QUALITY');">
+					<img src="{% static 'img/why_artevenue/quality.png' %}" 
+					alt="Quality and Affordability" class = "why_artevenue">
+					<div class = "why-artevenue-head">
+						Affordable Quality
+					</div>
+					<div class = "why-artevenue-text">
+						We promise high quality at afforable prices
+					</div>
+				</div>
+			</div>
+			<div class="col-4 col-md-2 mb-3 why-artevenue-div">
+				<div onclick = "show_modal('LARGEST');">
+					<img src="{% static 'img/why_artevenue/largest.png' %}" 
+					alt="Largest Collection of Licensed Artworks" class = "why_artevenue">
+					<div class = "why-artevenue-head">
+						Largest Collection
+					</div>
+					<div class = "why-artevenue-text">
+						Look no further, collection of over 2.7 lakhs art prints
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	{% include 'artevenue/message-modal_ok.html' %}
+	
+</div>
+
+<script>
+	function show_modal(param){
+		switch(param) {
+		  case 'FREE_SHIPPING':
+			$("#modal-hedline").html('FREE DELIVERY ANYWHERE IN INDIA');
+			$("#msg").html('<p>We produce the art print and ship it within 1-2 days on receipt of an order.</p><p> Ususally courier delivers to most parts of India in 3-7 days.</p>');
+			break;
+		  case 'CUSTOMIZATION':
+			$("#modal-hedline").html('CUSTOMIZE THE ART PRINT AS YOU LIKE');
+			$("#msg").html("<p><strong>A FIRST IN INDIA:</strong> Customize every art print the way you would like it. You are not bound by those 'standard sizes' & frames, create it exactly as your space needs.</p> <p>Click on the 'CUSTOMIZE' tab and you can choose print size from minimum 4 inch wide to maximum allowed by the artist. Choose the frame and also choose the mount color, size.</p> <p>Before you finalize, see how it looks.</p>");
+			break;
+		  case 'GUARANTEE':
+			$("#modal-hedline").html('YOUR SATISFACTION IS GUARANTEED');	  
+			$("#msg").html("<p><strong>RETURNS</strong>: If you are not satisfied, we accept the returns, no questions asked. We make arrangements to get art print returned to us and give you the refund.</p> <p><strong>REPLACEMENT:</strong> If you receive the art print with damages, or having quality issues, we will replace it without any additional cost to you.</p><p><small>You may go through our returns, refund policy in footer of this webpage.</small></p>");
+			break;
+		  case 'LICENSED':
+			$("#modal-hedline").html('LICENSED ARTWORKS');			  
+			$("#msg").html("<p><strong>All our art prints are licensed from  artists.</strong></p> <p>We don't use unauthorized or fake images.</p> <p>No copyright issues and you can enjoy the art to the fullest.</p>");
+			break;
+		  case 'SECURED':
+			$("#modal-hedline").html('SECURED CHECKOUT PROCESS');
+			$("#msg").html("The checkout process and payments are completely secured. We will not save your payment details. You will receive all the details on your order and payment.");
+			break;				
+		  case 'QUALITY':
+			$("#modal-hedline").html('HIGH QUALITY AT AFFORDABLE PRICES');
+			$("#msg").html("<p><strong>QUALITY:</strong> You won't be disapponted. We use professional printer, high quality frames with classy finish and materials used for fine art reproductions. We craft each art print carefully and with state-of-the-art machines.</p> <p><strong>PRICE:</strong> Our prices are highly competitive for the quality we provide. If you don't like the price you paid, we accept returns without any questions.</p>");
+			break;				
+		  case 'LARGEST':
+			$("#modal-hedline").html('LARGEST COLLECTION');
+			$("#msg").html("<p><strong>DID YOU KNOW THAT WE HAVE THE LARGEST COLLECTION OF LICENSED ARTWORKS IN INDIA?</strong></p> <p>Over 2.7 lakh art prints licensed from over 4500 artists across the world.</p> <p>Arte'Venue saves you the pain of looking around for that exact piece of art you want for your wall.");
+			break;
+			
+		}
+		$('#msg-modal').modal('show');
+	}
+		
+</script>
+
+<!--
 <div class="row free_shipping">
 	<div class="col-md-4">
-		<!--<div class = "text-center"
-			style = "font-family:Cormorant Garamond; font-weight:500; font-size: 0.85rem;">-->
 		<div>
 			<img src="{% static 'img/why_artevenue_text/shipping.png' %}" alt="" style="float: left;">
 			<div class="details">
@@ -32,3 +149,4 @@
 	</div>
 </div>
 </div>
+-->

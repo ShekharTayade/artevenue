@@ -170,6 +170,9 @@
 		}
 		
 		function applyVoucher(cart_id, v_code, cart_total) {
+			if ( v_code == null || v_code == ''){
+				return;
+			}
 			// Let's update the cart view
 			$.ajax({
 				url: '{% url "apply_voucher" %}', 
@@ -205,6 +208,12 @@
 							break;
 					  case "INVALID-CODE":
 							$("#voucher-msg").html("Entered Code is invalid (You need to be logged in and using correct code)");
+							$('#msg').html("Entered Code is invalid (You need to be logged in and using correct code)");
+							$('#msg-modal').modal('show');
+							setTimeout(function() {
+								$('#msg-modal').modal('hide');
+							}, 2500);
+							break;
 							break;
 					  case "NO-USER":
 							$("#voucher-msg").html("You need to be logged in to use coupan/voucher.");
@@ -271,6 +280,12 @@
 							$("#disc_amt_nv").val(disc_amt);
 							$("#cart_total_nv").val(cart_total); */
 							$("#vouch_text").html( "(You have used coupan " + v_code + ". Discount of <i class = 'fa fa-inr'></i> " +  response.disc_amount + " is applied).");
+							$('#msg').html("(You have used coupan " + v_code + ". Discount of <i class = 'fa fa-inr'></i> " +  response.disc_amount + " is applied).");
+							$('#msg-modal').modal('show');
+							setTimeout(function() {
+								$('#msg-modal').modal('hide');
+							}, 2500);
+
 							break;
 							
 					   case	'NO-MORE':
@@ -341,6 +356,10 @@
 					$('#msg-modal').modal('hide');
 				}, 6000);			
 			}
+
+			{% if v_code %}
+				applyVoucher( '{{usercart.cart_id}}', '{{v_code}}','{{usercart.cart_total}}');
+			{% endif %}
 
 		});
 		</script>

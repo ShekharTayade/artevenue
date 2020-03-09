@@ -1,0 +1,207 @@
+{% load static %}	
+{% load utils %}
+	
+	<div class="row">
+
+		<div class="col-12">
+		  <!-- breadcrumb-->
+		  <nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+				<li class="breadcrumb-item"><a href="{% url 'show_wishlist' %}">Favourites</a></li>
+				<li aria-current="page" class="breadcrumb-item active">Collection</li>
+			</ol>
+		  </nav>
+		</div>
+	</div>
+	<div class="row">	
+		<div class = "col-12">
+		<span class = "text-muted">Use arrow keys to move  your favouties to 
+			a collection, space</span>
+		</div>
+	</div>
+	<div class="row">	
+		<div class="col-5">
+			<div class="box">				
+				<form method="post" id = "checkoutform" onsubmit = "return validate_checkout();" action="">
+					{% csrf_token %}
+					<!-- Invisible field to hold the wishlist id -->
+					<input hidden id = "wishlist_id" name = "wishlist_id" value = "{{userwishlist.wishlist_id }}">
+					<input hidden id = "wishlist_item_id" name = "wishlist_total_nv" value = "">
+					<div class ="row">
+						<div class = "col-12">
+							<h1 class = "pull-left">Favourites</h1>
+						</div>
+					</div>
+					<div class ="row">
+						<div class = "col-12">
+							<p class="text-muted pull-left">You currently have {% if userwishlist %} {{userwishlist.quantity}} {% else %} 0 {% endif %} item(s) as Favourites.</p>
+						</div>
+					</div>
+					<div class="table table-responsive">
+						<table id = "wishlistTbl" class="table table-responsive">
+							<thead>
+								<tr>
+									<th width="40%">Item</th>
+									<th width="50%">Details</th>
+									<th width="10%"></th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for i in userwishlistitems %}
+								<tr>											
+									<td>												
+										<img src = "{% if i.product_type == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product.image_to_frame}} {% else %} {% static i.product.thumbnail_url %} {% endif %}" style = "width:75px; height:75px; object-fit:contain;">
+										<br />
+										<div class = "pull-left">
+											<button style="padding-left:0px;" type ="button" class = "btn btn-link pull-left" onclick = "getFramedImg('{{i.product_id}}', '{{i.image_width}}', '{{i.moulding_id | default_if_none:0}}', '{{i.mount.color | default_if_none:0}}','{{i.mount_size | default_if_none:0}}', '{{i.product.product_image.url | default_if_none:""}}');">
+												<small>{{i.product.name|truncatechars:15 }}</small>
+											</button>
+										</div>
+									</td>
+									<td>
+										{% with width=i.moulding.width_inner_inches|add_width_frame_mount:i.mount_size %}
+										<small>
+										<li>Print on {{i.print_medium_id|title}}</li>
+										{% if i.moulding_id %}
+											<li>Image Print Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+											<li>Frame: {{i.moulding.name }} ({{i.moulding.width_inches}} inch)</li>
+											{% if i.mount_id %}
+												<li>Mount: {{i.mount_size }}", Color: {{i.mount.name|title }} </li>
+											{% endif %}
+											<li>Total Size: 
+												{{ i.image_width|add_width:width|add_width:width }}" X {{i.image_height|add_width:width|add_width:width }}"</li>
+										{% else %}
+											<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+										{% endif %}
+										
+										{% if i.acrylic_id %}
+											<li>Acrylic covered</li>
+										{% endif %}
+										{% if i.stretch_id %}
+											<li>Canvas Stretched</li>
+										{% endif %}
+										</small>
+										{% endwith %}
+										<div id = "badges_{{i.wishlist_item_id}}">
+											{% if i.user_collection_id %}
+												{% if i.user_collection.name %}
+													<span class="badge badge-secondary">{{i.user_collection.name}}</span>
+												{% endif %}
+												{% if i.user_space.name %}
+													<span class="badge badge-secondary" style = "margin-left:1rem;">
+														{{i.user_space.name}}
+													</span>
+												{% endif %}
+											{% endif %}
+																					
+										</div>
+									</td>
+									<td>
+										<div id = "m_{{i.wishlist_item_id}}">
+										{% if i.user_collection_id == None %}
+											<i class = "fa fa-arrow-circle-right fa-lg"
+												title = "Move to Collection"
+												onclick = "$('#wl_item').val('{{i.wishlist_item_id}}'); $('#cs-modal').modal('show');">
+											</i>
+										{% endif %}
+										</div>
+									</td>
+								</tr>
+								{% endfor userwishlistitems %}
+																		
+							</tbody>
+						</table>
+					</div>
+				</form>
+			</div>
+		</div>
+		
+		<div class="col-7">
+			<div id = "collection_box" class="box">
+				<div class="box-header">
+					<h3 class="mb-0">Collection: {{user_collection.name}}</h3>
+					<div class = "row mt-2">
+							<div class = "col-6 pull-left">
+							<button class = "btn btn-link" 
+								style =  "color: #007bff !important;"
+								onclick = "$('#modal-title').html('Remove Collection {{user_collection.name}}?');$('#collection_id').val('{{user_collection.user_collection_id}}');$('#collection_remove_confirm').modal('show');">
+								<i class = "fa fa-trash-o"></i> 
+								Remove Collection
+							</button>
+							</div>
+							<div class = "col-6 ">
+							<button class = "btn btn-link pull-right" 
+								style =  "color: #007bff !important;"
+								onclick = "$('#space-modal').modal('show');">
+								<i class = "fa fa-plus-square-o"></i> 
+								Create New Space
+							</button>
+							</div>
+					</div>
+				</div>
+				<div class = "row" id = "collection_{{user_collection.user_collection_id}}">
+				{% for i in userwishlistitems %}
+					{% if i.user_collection_id == user_collection.user_collection_id %}
+						{% if not i.user_space %} 
+						<div id = "uc_{{user_collection.user_collection_id}}" class="col-6 mb-2">
+							<div class = "prod-details">
+								<div class = "img-container">
+									<a id = "alink_{{i.product_id}}">
+										<img src = "{% if i.product_type == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product.image_to_frame}} {% else %} {% static i.product.thumbnail_url %} {% endif %}" alt="" 
+											class="img-fluid image-display" 
+											style = ""
+											onclick="">
+									</a>
+								</div>
+								<div class="text text-center" style = "margin-top: 5px;">
+									<i class = "fa fa-times-circle fa-2x" 
+										title="Remove from this space"
+										onclick="removeFromCollection('{{user_collection.user_collection_id}}', '{{i.wishlist_item_id}}');">
+										</i>
+								</div>
+							</div>
+						</div>
+						{% endif %}
+					{% endif %}
+				{% endfor %}
+				</div>
+				{% for s in user_space %}
+				<div id = "spacebox_{{s.user_space_id}}" class = "size-box">
+					<div id = "space_box_{{s.user_space_id}}">
+						<div style = "background-color:#f7f7f7; padding:5px;" class="mb-2">
+							<span class = "text-muted">{{s.name}}</span>
+							<i class = "fa fa-trash pull-right" onclick = "$('#s_modal-title').html('Remove Space {{s.name}}?');$('#space_id').val('{{s.user_space_id}}');$('#space_remove_confirm').modal('show');">
+								<span class = "text-muted"> Remove</span>
+							</i>
+						</div>
+						<div class = "row" id = "space_{{s.user_space_id}}" >
+						{% for i in userwishlistitems %}
+							{%if i.user_space_id == s.user_space_id %}
+								<div id = 'us_{{s.user_space_id}}' class="col-6 mb-2">
+									<div class = "prod-details">
+										<div class = "img-container">
+											<a id = "alink_{{i.product_id}}">
+												<img src = "{% if i.product_type == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product.image_to_frame}} {% else %} {% static i.product.thumbnail_url %} {% endif %}" alt="" 
+													class="img-fluid image-display" 
+													style = ""
+													onclick="">
+											</a>
+										</div>
+										<div class="text text-center" style = "margin-top: 5px;">
+											<i class = "fa fa-times-circle fa-2x" 
+												title="Remove from this space"
+												onclick="removeFromSpace('{{i.user_space_id}}', '{{i.wishlist_item_id}}');"> 
+											</i>
+										</div>
+									</div>
+								</div>
+							{% endif %}
+						{% endfor %}
+						</div>
+					</div>
+				</div>
+				{% endfor %}
+			</div>
+		</div>
+	</div>

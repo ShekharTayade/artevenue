@@ -62,8 +62,9 @@ def user_image(request):
 	if not user_instance:
 		user_instance = User_image.objects.filter(status = "DEF").first()		
 
+
 	return render(request, "artevenue/user_image.html", {'mounts':mounts,
-			'mouldings_appply':paper_mouldings_apply, 
+			'mouldings_apply':paper_mouldings_apply, 
 			'mouldings_show':paper_mouldings_show, 'mounts':mounts,
 			'printmedium':printmedium, 'user_instance':user_instance,
 			'acrylics':acrylics, 'boards':boards, 'stretches':stretches,			

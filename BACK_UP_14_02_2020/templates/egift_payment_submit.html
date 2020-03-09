@@ -1,0 +1,207 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+        <div class="container">
+			<div class="row">
+				<!-- breadcrumb-->
+				<div class="col-lg-12">
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+							<li aria-current="page" class="breadcrumb-item active">eGift Payment Submit</li>
+						</ol>
+					</nav>
+				</div>
+
+				<div class="col-lg-12">
+					<div class = "row">
+						<div class="box">
+							<h1>eGift Payment Submit</h1>
+						</div>
+					</div>
+					<div class = "row">
+						<div class="item img-magnifier-container">
+							<p>Connecting to gateway. Please Wait....</p>
+							<img src ="{% static 'img/ajax-loader.gif' %}" alt="Processing...Please wait.">
+						</div>
+					</div>
+					<div class="row" style = "display:none;">
+						{% if error %}
+							<span style="color:red">Please fill all mandatory fields.</span>
+							<br/>
+							<br/>
+						{% endif %}
+						<form class="form-horizontal" id = "payuForm" action="{{ action|safe }}" method="post" name="payuForm">
+							{% csrf_token %}
+							<input name="key" value="{{ MERCHANT_KEY }}" />
+							<input id = "hash_string" name="hash_string" value="{{ hash_string }}" />
+							<input id ="hash"  name="hash" value="{{ hashh }}"/>
+							<input name="posted" value="{{ posted }}"/>
+							<input name="txnid" value="{{ txnid }}" />
+
+							<div class = "row">
+								<div class = "col-sm-8">
+									<div class="panelbox-no-min">
+										<div class="panelbox-no-min-content">
+											<h4 class="tag-title">You will pay: <i class="fa fa-inr" aria-hidden="true">&nbsp;</i>{{ posted.amount|default:'' }}</h4>
+					
+											<div class="form-group row">
+											  <div class="col-xs-4">
+												<label for="amt">Amount <i class="fa fa-inr" aria-hidden="true">&nbsp;</i></label>
+												<input id="amt" class="form-control" name="amount" value="{{ posted.amount|default:'' }}" required />
+											  </div>
+											</div>
+											<h4>Bill To:</h4>
+											<div class="form-group">
+												<span class="col-md-2">Name</span>
+												<div class="col-md-10">
+													<div class="form-group row">
+														<div class="col-md-6">
+															<input class="form-control" name="firstname" id="firstname" value="{{ posted.firstname|default:'' }}" required placeholder="First Name"/>
+														</div>
+														<div class="col-md-6">
+															<input class="form-control" name="lastname" id="lastname" value="{{ posted.lastname }}" placeholder="Last Name"/>
+														</div>
+													</div>
+												</div>
+											</div>
+																	
+											<div class="form-group">
+												<span class="col-md-2">Contact Info</span>
+												<div class="col-md-10">
+													<div class="form-group row">
+														<div class="col-md-6">
+															<input class="form-control" name="email" id="email" value="{{ posted.email }}" required placeholder="Email"/>
+														</div>
+														<div class="col-md-6">
+															<input class="form-control" name="phone" value="{{ posted.phone|default:'' }}" required placeholder="Phone" />
+														</div>
+													</div>
+												</div>
+											</div>
+															
+
+											<div class="form-group">
+												<span class="col-md-2">Address</span>
+												<div class="col-md-10">
+													<div class="form-group row">
+														<div class="col-md-6">
+															<input class="form-control" name="address1" value="{{ posted.address1 }}" placeholder="Address1"/>
+														</div>
+														<div class="col-md-6">
+															<input class="form-control" name="address2" value="{{ posted.address2 }}" placeholder="Adress2" />
+														</div>
+													</div>
+												</div>
+											</div>
+
+															
+											<div class="form-group">
+												<span class="col-md-2"></span>
+												<div class="col-md-10">
+													<div class="form-group row">
+														<div class="col-md-6">
+															<input class="form-control" name="city" value="{{ posted.city }}" placeholder="City"/>
+														</div>
+														<div class="col-md-6">
+															<input class="form-control" name="state" value="{{ posted.state }}" placeholder="State" />
+														</div>
+													</div>
+												</div>
+											</div>
+
+											<div class="form-group">
+												<span class="col-md-2">Country</span>
+												<div class="col-md-5">
+													<input class="form-control" name="country" value="{{ posted.country }}" placeholder="Country" />
+												</div>
+												<span class="col-md-3">
+													<span class = "pull-right">
+													Post/Zip Code
+													</span>
+												</span>
+												<div class="col-md-2">
+													<input class="form-control" name="zipcode" value="{{ posted.zipcode }}"  placeholder="Pin/Zip Code" />
+												</div>
+											</div>
+										</div>
+										
+										<div class = "text-center">
+											<h5 class="text-fancy">For the payment, you will now be redirected to the website outside of ArteVenue</h5>
+											<button class="btn btn-primary text-center" type='submit' formmethod='post' value='submit' onclick="">Pay</button>
+										</div>                
+										
+									</div>
+								</div>
+							</div>
+									
+									
+
+							<table>
+								<tr>
+									<td>Product Info: </td>
+									<td colspan="3"><input name="productinfo" required value="{{ posted.productinfo|default:'' }}" /></td>
+								</tr>
+								<tr >
+									<td>Success URI: </td>
+									<td colspan="3"><input name="surl" value="{{ posted.surl }}" size="64" required/></td>
+								</tr>
+								<tr >
+									<td>Failure URI: </td>
+									<td colspan="3"><input name="furl" value="{{ posted.furl }}" size="64" requied/></td>
+								</tr>
+						
+								<tr >
+									<td colspan="3"><input type="hidden" name="service_provider" value="payu_paisa" size="64" required/></td>
+								</tr >
+									<tr >
+									<td><b>Optional Parameters</b></td>
+								</tr>
+								<tr >
+									<td>Cancel URI: </td>
+									<td><input name="curl" value="" /></td>
+								</tr>
+								<tr >
+									<td>UDF1: </td>
+									<td><input name="udf1" value="{{ posted.udf1 }}" /></td>
+									<td>UDF2: </td>
+									<td><input name="udf2" value="{{ posted.udf2 }}" /></td>
+								</tr>
+								<tr >
+									<td>UDF3: </td>
+									<td><input name="udf3" value="{{ posted.udf3 }}" /></td>
+									<td>UDF4: </td>
+									<td><input name="udf4" value="{{ posted.udf4 }}" /></td>
+								</tr>
+								<tr >
+									<td>UDF5: </td>
+									<td><input name="udf5" value="{{ posted.udf5 }}" /></td>
+									<td>PG: </td>
+									<td><input name="pg" value="{{ posted.PG }}" /></td>
+								</tr>
+								
+							</table>
+						</form>
+					
+					
+					
+					</div>
+				
+				</div>
+			</div>
+		</div>
+				
+	{% endblock sitecontent %}
+
+	
+	{% block jscripts %}
+		<script type="text/javascript">
+			$(document).ready(function(){
+		
+			   $("#payuForm").submit();
+			})
+		</script>
+	{% endblock jscripts %}
+			
+	

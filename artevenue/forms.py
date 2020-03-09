@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from artevenue.models import Business_profile, Contact_us, User_image
-from artevenue.models import Pin_code, Referral, Order, UserProfile
+from artevenue.models import Pin_code, Referral, Order, UserProfile, Channel_partner
 from artevenue.models import User_shipping_address, User_billing_address
 from artevenue.models import Profile_group, Egift, Channel_order_amz
 from artevenue.validators import validate_artevenue_email, validate_contact_name
@@ -50,6 +50,12 @@ class businessprofile_Form(forms.ModelForm):
 		error_messages={'unique':"This code has already been used. Please choose another code."},
 		help_text = "This is the code that you can give to your clients to earn the referral fee. It is unique to you and must be quoted by clients when they sign up with Arte'Venue."
 	) 
+	channel_partner = forms.CharField(
+		widget=forms.TextInput(attrs={'placeholder': 'Channel partner code (8 char max)'}),
+		required=False,
+		max_length=8,
+		help_text = "If you are working with Arte'Venue Channel Partner, please enter their code here."
+	) 
 
 	company = forms.CharField(
 		widget=forms.TextInput(),
@@ -94,10 +100,19 @@ class businessprofile_Form(forms.ModelForm):
  
 	def clean_business_code(self):
 		return self.cleaned_data['business_code'] or None 
+
+	def clean_channel_partner(self):
+		cp = self.cleaned_data['channel_partner']
+		try:
+			cp_obj = Channel_partner.objects.get(partner_code=cp)
+		except Channel_partner.DoesNotExist:
+			cp_obj = None
+		return  cp_obj
 		
 	class Meta:
 		model = Business_profile
-		fields = ('business_code', 'contact_name', 'phone_number', 'company', 'address_1', 'address_2',
+		fields = ('business_code', 'channel_partner', 'contact_name', 'phone_number', 
+			'company', 'address_1', 'address_2',
 			'city', 'state', 'pin_code', 'country','gst_number',
 			'bank_name', 'bank_branch', 'bank_acc_no', 'ifsc_code')
 
@@ -134,6 +149,11 @@ class businessprof_Form(forms.ModelForm):
 		widget=forms.TextInput(attrs={'placeholder': 'Enter your business code (8 char max)'}),
 		required=False,
 		help_text = "This is the code that you can give to your clients to earn the referral fee. It is unique to you and must be quoted by clients when they sign up with Arte'Venue."
+	) 
+	channel_partner = forms.CharField(
+		widget=forms.TextInput(attrs={'placeholder': 'Enter your channel partner code.'}),
+		required=False,
+		help_text = "Arte'Venue Channel Partner Code."
 	) 
 	address_1 = forms.CharField(
 		widget=forms.TextInput(attrs={'placeholder': 'Suit / Floor / Building'}),

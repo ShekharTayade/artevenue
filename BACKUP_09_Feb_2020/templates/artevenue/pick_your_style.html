@@ -1,0 +1,23 @@
+{% load static %}
+
+	<div class="col-md-12 text-center mt-5 py-3">
+		<h2 class="text-center">PICK YOUR STYLE STATEMENT
+		</h2>
+	
+		<div class="row" style="margin:5px;">
+			<div class = "col-lg-6 mt-5" >			
+				<div class="curated-container">
+					<img src="{% static 'img/pick_style/minimalist.jpg' %}" alt="Minimalist" style="width:100%">
+					<a class="btn" href="{% url 'curated_collections' 12 %}">
+					MINIMALISTIC</a>
+				</div>
+			</div>
+			<div class = "col-lg-6 mt-5" >			
+				<div class="curated-container">
+					<img src="{% static 'img/pick_style/contemporary.jpg' %}" alt="Contemporary" style="width:100%">
+					<a class="btn" href = "{% url 'curated_collections' 13 %}">
+					CONTEMPORARY</a>
+				</div>
+			</div>
+		</div>
+	</div>	

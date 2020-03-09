@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="robots" content="all,follow">
+		<!-- Bootstrap CSS-->
+		<link rel="stylesheet" href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}">
+				
+		<!-- Font Awesome CSS-->
+		<link rel="stylesheet" href="{% static 'vendor/font-awesome/css/font-awesome.min.css' %}">
+		<!-- Google fonts - Roboto -->
+		<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:400,500,700,300,100">
+		<!-- Custom stylesheet -->
+		<link rel="stylesheet" href="{% static  'css/custom.css' %}">
+		<!-- theme stylesheet-->
+		<link rel="stylesheet" href="{% static 'css/style.default.css' %}" id="theme-stylesheet">
+		<!-- theme stylesheet-->
+		<link rel="stylesheet" href="{% static 'css/home-page-style.css' %}" id="theme-stylesheet">
+
+	</head>
+
+	<body>
+        <table>
+			<tr>
+				<th></th>
+				<th></th>
+			<tr>
+			<tr>
+				<td>
+					<h3>Hi {{voucher_user.user.first_name}},</h3>
+					{{egift.giver.first_name}} <small>({{egift.giver.email}})</small> has sent you a gift card.	 			
+				</td>
+				<td>
+				</td>
+			</tr>
+			<tr>
+				<td >
+					<!-- <img id = "ecard" src = "https://www.artevenue.com/{{card_folder}}{{egift.egift_card_design.url}}" class="f_images img-fluid"  style = "width:8rem; height:5rem;"> -->
+					<img id = "ecard" src = "{{img_url}}" class="f_images img-fluid"  style = "width:8rem; height:5rem;">
+					<!--<img id = "ecard" src = "data:image/jpeg;base64,{{img_str}}" class="f_images img-fluid">-->
+					<br />
+					Message from {{egift.giver.first_name}} <small>({{egift.giver.email}}:</small><br />
+					{{egift.message|linebreaks}}
+					<hr>
+					Your coupan Code: <span style="font-size:1.2rem; font-weight:600">{{voucher.voucher_code}}</span> <span class="pull-right">Amount: Rs. {{egift.gift_amount|floatformat}}</span>
+					<br />
+					How to claim:<br />
+					<ul>
+						<li>Please logon to <a href = "www.artevenue.com">Arte'Venue.com</a></li>
+						<li>If not signed up already, please sign up (it takes just a min)</li>
+						<li>Log in using your username or email and password</li>
+						<li>Shop and add the art you like to shopping cart</li>
+						<li>Click on cart icon on top right corner to view your cart</li>
+						<li>Enter the coupan code, shown above, in the 'Coupan/eGift code' section</li>
+						<li>In case your cart total is greater than gift amount, then you will need to pay the balance amount</li>
+						<li>In case your cart total is less than gift amount, then you can claim the balance gift amount in next order</li>
+					</ul>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2"><hr></td>
+			</tr>
+			<tr>
+				<td colspan="2">
+				Arte’Venue is a one of a kind platform where you get to choose from an unlimited 
+				range art prints of various artists and genres over the centuries.
+				You even have the option of customizing the size of your art and 
+				adding a mount and a frame of your choice. You will then see how 
+				your finished product will look and shall have it delivered to 
+				your doorstep just as you see it. <br />
+				So go ahead and log on to <a href = "www.artevenue.com">Arte'Venue</a><br />
+				<small> (Please make sure that you sign up and login before you can claim the gift)</small>
+				</td>
+			</tr>
+			<tr>				
+				<td colspan="2"> 
+					<br/>
+					<br/>
+					With warm regards,<br />
+					Team Arte'Venue<br/>
+					<br />
+					<img src = "http://artevenue.com/static/img/logo_mobile.png" alt="Arte'venue Logo">				
+					www.artevenue.com
+				</td>
+			</tr>
+		</table>
+		<hr>
+		<p>
+			With warm regards,<br />
+			Team Arte'Venue<br/>
+			<img src = "https://artevenue.com/static/img/artevenue_logo_new.png" alt="Arte'venue Logo"  height="25" width="110"> <br />
+			<a href = "https://www.artevenue.com">www.artevenue.com</a>
+		</p>
+
+	</body>
+</html>

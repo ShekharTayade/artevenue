@@ -28,14 +28,17 @@
 					<li class="list-inline-item clickable pull-right">
 						<a href="#" data-toggle="dropdown">
 							<i class="fa fa-user-circle nfa-2x"></i>
-							{{user.username}}
+							{{user.username}}<i class = "fa fa-chevron-down"></i>
 						</a>
 						<ul class="dropdown-menu dropdown-menu-login" >
-							<li><a href="{% url 'logout' %}">Logout</a></li>
-							<li> <a href="{% url 'password_change' %}">Change Password</a></li>   
-							<li class="dropdown-divider"></li>
-							<li><a href="{% url 'my_account' %}">My Account</a></li>
-							<li><a href="{% url 'my_orders' %}">My Orders</a></li>
+							<li style = "margin-top:8px;"><a href="{% url 'logout' %}">Logout</a></li>
+							<li style = "margin-top:8px;"> <a href="{% url 'password_change' %}">Change Password</a></li>   
+							<li class="dropdown-divider" style = "margin-top:5px;"></li>
+							<li style = "margin-top:8px;"><a href="{% url 'my_account' %}">My Account</a></li>
+							<li style = "margin-top:8px;"><a href="{% url 'my_orders' %}">My Orders</a> {{business_user}} </li>
+							{% if business_user %}
+								<li style = "margin-top:8px;"><a href="{% url 'my_business_report_wrap' %}">My Business Report</a></li>
+							{% endif %}
 						</ul>
 
 					</li>
@@ -46,8 +49,8 @@
 						Sign Up
 						</a>
 						<ul class="dropdown-menu dropdown-menu-login" >
-							<li><a href="{% url 'register' %}">As Buyer</a></li>
-							<li> <a href="{% url 'artist_signup' %}">As Artist</a></li>   
+							<li style = "margin-top:8px;"><a href="{% url 'register' %}">As Buyer</a></li>
+							<li style = "margin-top:8px;"> <a href="{% url 'artist_signup' %}">As Artist</a></li>   
 						</ul>
 					</li>
 					<li class="list-inline-item clickable on-hover-underline"><a data-toggle="modal" data-target="#login-modal">Login</a></li>
@@ -87,7 +90,9 @@
 						{% load socialaccount %}	
 						{% providers_media_js %}
 						<div class="form-group">
-							<h5>Please Enter Your User Name or Email and password</h5>
+							<div style = "font-size:0.75rem;" >
+								Please Enter Your User Name or Email and password
+							</div>
 							<div class = "row">
 								<div class ="col-12 col-md-5">
 									<input name = "username" type="text" class="form-control" placeholder="Username">
@@ -110,48 +115,43 @@
 							<div class="text-center">
 								<button id="submit-btn" type = "submit" class="btn btn-primary"><i class="fa fa-sign-in"></i> Log in</button>
 							</div>
-
-							<h6 class="text-center mt-2">
+							<div style = "font-size:0.65rem;" class= "text-center mt-2">
 								<a class = " text-secondary" style = "text-decoration:underline;" href="{% url 'password_reset' %}">Forgot Username/Password</a>
-							</h6>
+							</div>
 						</p>
 						<div id = "show-loginerror">
 						</div>
 					</form>
 					<hr>
-					<h5>
+					<div style = "font-size:0.75rem;" >
 						Login Using Your Social Media Account
-					</h5>
+					</div>
 					<div class = "well">
 						<div class = "row">
-							<div class="col-3 text-center">
-								<a class="btn auth-provider-button hover-on" href="{% provider_login_url 'facebook' method='js_sdk' %}">
-								  <img src="{% static 'img/facebook_logo.svg' %}" alt="Facebook Login" style="height:38px;border:0;">
+							<div class="col-12 text-center">
+								<a class="btn auth-provider-button" href="{% provider_login_url 'facebook' method='js_sdk' %}">
+								  <img src="{% static 'img/fb_login.png' %}" alt="Facebook Login" style="height:38px;border:0; width:200px;">
 								</a>
 							</div>
-							<div class="col-3 text-center">
-								<a class="btn auth-provider-button hover-on" href="">
-								  <img src="{% static 'img/google_logo.svg' %}" alt="Google Login" style="height:38px;border:0;">
+							<div class="col-12 text-center">
+								<a class="btn auth-provider-button" href="{% provider_login_url 'instagram' %}">
+								  <img src="{% static 'img/instagram_login.png' %}" alt="Instagram Login" style="height:38px;border:0; width:200px;">
 								</a>
 							</div>
-							<div class="col-3 text-center">
-								<a class="btn auth-provider-button hover-on" href="">
-								  <img src="{% static 'img/twitter_Logo.svg' %}" alt="Twitter Login" style="height:38px;border:0;">
-								</a>
-							</div>
-							<div class="col-3 text-center">
-								<a class="btn auth-provider-button hover-on" href="">
-								  <img src="{% static 'img/instagram_logo.jpg' %}" alt="Instagram Login" style="height:38px;border:0;">
+							<div class="col-12 text-center">
+								<a class="btn auth-provider-button" href="{% provider_login_url 'google' %}">
+								  <img src="{% static 'img/google_login.png' %}" alt="Google Login" style="height:38px;border:0; width:200px;">
 								</a>
 							</div>
 						</div>
 					</div>
 					<hr>
 				
-					
-					<p class="text-center text-muted">Not registered yet?</p>
-					<p class="text-center text-muted"><a href="{% url 'register' %}"><strong  class = "text-primary">Register now</strong></a>
+					<small>
+					<p class="text-center text-muted">Not signed up yet?</p>
+					<p class="text-center text-muted"><a href="{% url 'register' %}"><strong  class = "text-primary">Sign Up now</strong></a>
 					! It is easy, done in a minute and gives you access to special offers, discounts!</p>
+					</small>
 				</div>
 			</div>
 		</div>

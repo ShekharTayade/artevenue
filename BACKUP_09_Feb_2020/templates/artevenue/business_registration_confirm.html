@@ -1,0 +1,197 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+	
+    <div class="container-fluid">
+		<div class="row">
+			<div class="col-12">
+				<h1>Thank you for signing up with us!</h1>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-12">
+				<h2>Next Step:</h2>
+				<p>You will soon hear from us at <strong>{{businessprofile_form.phone_number.value}} / {{form.email.value}}</strong> with details on the benefits you will receive as our business associate.</p>
+				<div class = "mt-2 mb-2">
+					{% if businessprofile_form.business_code.value %}
+					<h3>Your business code is <span style = "background-color: #11b6bd; color:#fff; padding:5px;font-weight:700;">{{businessprofile_form.business_code.value}}</span>.
+					Please make sure that
+					your clients use this code when they sign up with Arte'Venue. In addition to orders through your own login, 
+					your referral fees will be applicable for the orders from clients 
+					who use this code when they sign up.</h3>
+					{% else %}
+					<h3>Please note that you can use the business code to give to your clients when they
+					sign up so that you get the referral benefits for their orders too. Incase you want to add
+					the business code, please go to 'My Account' menu option.</h3>
+					{% endif %}
+				</div>
+				<h3> You/your clients can continue shopping by logging into Arte'venue. After you hear confirmation from us, the referral fees will apply from the date you/client signed up.</h3>
+				Your Details: 
+				<form method="post" novalidate>
+					{% csrf_token %}
+					<input hidden name="curr_pg" value="{{request.path}}" >		
+					<div class="row">						
+						<div class="col-sm-4" style="border: 1px solid lightgrey; border-radius: 10px; padding: 5px 10px 10px 10px;">
+							<div class="panel panel-default cpanel cpanel-default">
+								<div class="w3-container pref-head">
+									<h4>
+										Arte'venue Business Account
+									</h4>
+								</div>
+								<div class="w3-container">
+									<div class = "col-sm-12">
+										<div class="form-group">
+											{{ form.username.label_tag }}
+											{% render_field form.username|append_attr:"readonly:readonly" class="form-control" %}
+										</div>
+									</div>
+									<div class = "col-sm-12">
+										<div class="form-group">
+											{{ form.email.label_tag }}
+											{% render_field form.email|append_attr:"readonly:readonly" class="form-control" %}
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						
+						<div class="col-sm-8" style="border: 1px solid lightgrey; border-radius: 10px; padding: 5px 10px 10px 10px;;">
+							<div class="panel panel-default cpanel cpanel-default">
+								<div class="w3-container pref-head">
+									<h4>Business Profile</h4>
+								</div>
+								<div class="w3-container">
+									<div class = "row">
+										<div class = "col-sm-6 ">
+											<div class="form-group">
+												{{ businessprofile_form.business_code.label_tag }}
+												{% render_field businessprofile_form.business_code|append_attr:"readonly:readonly" class="form-control" %}
+											</div>
+										</div>
+									</div>
+									<div class = "row">
+										<div class = "col-sm-6 ">
+											<div class="form-group">
+												{{ businessprofile_form.contact_name.label_tag }}
+												{% render_field businessprofile_form.contact_name|append_attr:"readonly:readonly" class="form-control" %}
+											</div>
+										</div>
+										<div class = "col-sm-6">
+											<div class="form-group">
+												{{ businessprofile_form.phone_number.label_tag }}
+												{% render_field businessprofile_form.phone_number|append_attr:"readonly:readonly" class="form-control" %}
+											</div>
+										</div>
+
+									</div>
+
+									<div class = "row">
+										<div class = "col-sm-6">
+											<div class="form-group">
+												{{ businessprofile_form.company.label_tag }}
+												{% render_field businessprofile_form.company|append_attr:"readonly:readonly" class="form-control" %}
+											</div>
+										</div>
+										<div class = "col-sm-6">
+											<div class="form-group">
+												{{ businessprofile_form.gst_number.label_tag }}
+												{% render_field businessprofile_form.gst_number|append_attr:"readonly:readonly" class="form-control" %}
+											</div>
+										</div>
+									</div>
+
+
+									
+									<div class = "row">
+
+										<div class = "col-sm-12">
+											<label> Company Address</label>
+										</div>
+										<div class = "col-sm-6">
+											<div class="form-group">
+											{% render_field businessprofile_form.address_1|append_attr:"readonly:readonly" class="form-control" %}
+											</div>
+										</div>	
+										<div class = "col-sm-6">
+											<div class="form-group">
+											{% render_field businessprofile_form.address_2|append_attr:"readonly:readonly"    class="form-control" %}
+											</div>														
+
+										</div>
+									</div>
+									<div class = "row">
+										<div class="form-group col-md-3">
+											<!--<label for="inputZip">Zip</label>
+											<input type="text" class="form-control" id="inputZip">-->
+											<div class="form-group">
+												Pin Code
+												{% render_field businessprofile_form.pin_code|append_attr:"readonly:readonly" class="form-control"  %}
+											</div>						
+										</div>
+										<div class = "col-sm-5 pull-left">
+											<!--<label> inputCity:</label>
+											<div class="form-group">
+												<input class="form-control" type="text" class="form-control" id="paddress" placeholder = "inputCity">
+											</div>-->
+											<div class="form-group">
+												City
+												{% render_field businessprofile_form.city|append_attr:"readonly:readonly"  class="form-control"  %}
+											</div>													
+											
+										</div>
+										<div class="form-group col-md-4">
+											<div class="form-group">
+												State
+												{% render_field businessprofile_form.state|append_attr:"readonly:readonly" class="form-control" %}
+											</div>													  
+										  
+										</div>
+									</div>
+								
+									<div class = "row">
+										<div class="form-group col-md-3">
+											<div class="form-group">
+												Country
+												{% render_field businessprofile_form.country|append_attr:"readonly:readonly" class="form-control"  %}
+											</div>						
+										</div>
+										<div class = "col-sm-7">
+										</div>											
+									</div>
+
+								</div>
+							</div>
+						</div>
+					</div>
+
+				</form>        
+			</div>
+		</div>
+
+    </div>
+
+	
+	{% endblock sitecontent %}
+
+	
+	{% block jscripts %}
+	<script>
+    $(document).ready( function(){
+
+        $( "#id_date_of_birth" ).datepicker({
+                dateFormat: "yy-mm-dd",
+                defaultDate: "-17y",
+                changeMonth: true,
+                changeYear: true,
+                onClose: function( selectedDate ) {
+                    $( "#id_birth_date" ).datepicker( "option", "minDate", selectedDate );
+                    }
+        });
+    });
+	</script>
+	{% endblock jscripts %}
+			
+	

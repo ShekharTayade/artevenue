@@ -1,0 +1,208 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% block page-title %} 
+	Gift great art work.
+{% endblock page-title %} 
+{% block page-description %}
+<meta name="description" content="Buy gift card at ArteVenue.com for some special. Great way to gift 
+	art work.">
+{% endblock page-description %}
+{% block page-keywords %}
+<meta name="keywords" content="Gift Card, Online Gift Card, Gift Art, Gift Art Online, Art, Art prints, Wall Art, Buy Art, Buy Art Prints, Print Photos Online, Print Art online,
+	Custom Framing, Online Framing, Online Photo Framing, Online Art, Online Art prints">
+{% endblock page-keywords %}
+{% load widget_tweaks %}
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+        <div class="container">
+			<div class="row">
+
+				<!-- breadcrumb-->
+				<div class="col-lg-12">
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+							<li aria-current="page" class="breadcrumb-item active">eGift Card</li>
+						</ol>
+					</nav>
+				</div>
+
+				<div class="col-lg-3">
+
+					<button type="button" data-toggle="collapse" data-target="#cat_navigation" class="btn btn-outline-secondary navbar-toggler full-width-btn" style="width:100% !important;">
+						<span class="sr-only">Toggle navigation</span>
+						<i class="fa fa-align-justify"></i>eGift Card
+					</button>
+
+				
+					 <!--
+					 *** CATEGORIES AND FILTERS ***
+					_________________________________________________________
+					-->
+					<div id = "cat_navigation" class="collapse show navbar-collapse">
+						<div class="card sidebar-menu mb-4">
+							<div class="card-body">
+								<ul class="nav nav-pills flex-column">
+									<li><a href="#" class="nav-link">How it works</a></li>
+									<li><a href="#referform" class="nav-link">eGift Card Form</a></li>
+									<li><a href="#refer_tc" class="nav-link"> T&Cs </a></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-9">
+					<div id="contact" class="box">
+						<h1>How it works</h1>
+						<div class = "row">
+							<div class = "col-sm-4">
+								<img id = "prod-img" src="{% static 'img/egift_cards/egift_main.jpg' %}" 
+									class="img-fluid" />
+							</div>
+							<div class = "col-sm-8">
+								<p class="lead">Feel like gifting an exclusive artwork?</p>
+								<ul>
+									<li>Let us know who you want to gift</li>
+									<li>Choose the gift card amount and the card design</li>
+									<li>Let us know the delivery date</li>
+									<li>Include a message</li>
+									<li>We send an email with your eGift card and a voucher code to the receiver</li>
+									<li>Receiver logs on to ArteVenue.com and claims a the voucher</li>
+									<li> The eGift card is valid for 1 year from the date of receipt of the email</li>
+								</ul>
+								Let's start...
+							</div>
+						</div>
+						<hr>
+						<h2>eGift Card Form</h2>
+						<div class = "row">
+						
+							<div id = 'referform' class="row justify-content-center">
+								<div class="col-8">
+									{% if msg %}
+										<p style="font-size:1.2rem; color:red">{{msg}}</p>
+									{% endif %}
+									<form method="post">
+										{% csrf_token %}
+										<input hidden name="curr_pg" value="{{request.path}}" >						
+										<input hidden id = "g-recaptcha-response" name="g-recaptcha-response" value="" >						
+										<div class="panel panel-default cpanel cpanel-default">
+											<div class="w3-container">
+											{% for hidden in form.hidden_fields %}
+											  {{ hidden }}
+											{% endfor %}												
+											{% for field in form.visible_fields %}
+												{% if field.html_name == 'egift_card_design' %}
+													<div class="form-group cform-group row crow">
+														<label>Choose the gift card design:</label>
+														<div class = "row">
+														{% for d in designs %}
+															{% with 'img/'|add:d.url as image_static %}
+															<div class = "col-4 text-center" style = "padding:0px 5px !important;">
+																<img src = "{% static image_static %}" class="f_images img-fluid"
+																	onclick = "document.getElementById('{{d.design_id}}').checked = true;">
+																<input type = "radio" id = "{{d.design_id}}" name = "egift_card_design" 
+																	value = "{{d.design_id}}" 
+																	{% if field.value == d.design_id %} checked="checked" {% endif %}>
+															</div>
+															{% endwith %}
+														{% endfor %}													
+														{% if field.errors %}
+															<div class="invalid-feedback" style="color:#ff5821">
+																{{ error }}
+															</div>
+														{% endif %}
+														</div>													
+													</div>
+												{% else %}
+													{% if  field.html_name == 'delivery_date' %}
+														<div class = "form-group cform-group row crow">
+															{{ field.label_tag }}
+															<input class = "form-control" type = "date" id = "id_delivery_date" name = "delivery_date" 
+																value = "{{form.delivery_date.value|date:'Y-m-d'}}">
+															{% if field.errors %}
+																<div class="invalid-feedback" style="color:#ff5821">
+																	{{ error }}
+																</div>
+															{% endif %}
+														</div>
+													{% else %}
+														<div class="form-group cform-group row crow">
+															{{ field.label_tag }}
+															{% load widget_tweaks %}
+															{% if form.is_bound %}
+																{% if field.errors %}
+																	{% render_field field class="form-control is-invalid" %}
+																	{% for error in field.errors %}
+																	<div class="invalid-feedback" style="color:#ff5821">
+																		{{ error }}
+																	</div>
+																	{% endfor %}
+																{% else %}
+																	{% render_field field class="form-control is-valid" %}
+																{% endif %}
+															{% else %}
+																{% render_field field class="form-control" %}
+															{% endif %}
+														
+															{% if field.help_text %}
+															<small class="form-text text-muted">
+																{{ field.help_text | safe }}
+															</small>
+															{% endif %}
+														</div>
+													{% endif %}
+												{% endif %}
+											{% endfor %}            
+
+											</div>
+											<!-- <button type="submit" class="btn btn-primary">Sign Me Up</button> -->
+										</div>
+
+										<div class="text-center" style="margin-top: 0px;margin-bottom: 3px;">
+											<button type="submit" class="btn btn-primary" style="border-radius: 0;width: 150px">Proceed</button>
+										</div>
+										
+									</form>
+								</div>
+							</div>
+						</div>
+						<hr>
+						<div id = 'refer_tc' class="row justify-content-center mt-3">
+							<div class = "col-sm-12">
+								<p class="lead">Terms and conditions:</p>
+								<ul>
+									<li>You must be signed up customer to be able to send an eGift</li>
+									<li>Providing name and valid email id of the person you want to gift to is mandatory</li>
+									<li>The eGift voucher code will be sent to the  receiver email id  shared by you  </li>
+									<li>IMPORTANT: Responsibility lies with the customer to ensure that valid and active email id of the receiver is provided to us</li>
+									<li>We use the name and email provided only to send the email to the receiver</li>
+									<li>Receiver gets an email with your gift card for value you choose, your message and a coupan code to claim the gift</li>
+									<li>Receiver logs on to Artevenue.com and puts the art work of his/her liking in the cart</li>
+									<li>Receiver uses the coupan code from email and received the discount for the amount you chose</li>
+									<li>Receiver can use the gift amount in parts in multiple orders.</li>
+									<li> The eGift card is valid for 1 year from the date of receipt of the email</li>
+								</ul>
+							</div>
+						</div>	
+						
+					</div>
+				</div>
+				<!-- /.col-md-9-->
+
+			</div>
+		</div>
+	{% endblock sitecontent %}
+
+	
+	{% block jscripts %}
+	<script>
+	  grecaptcha.ready(function() {
+		  grecaptcha.execute('6Le2ZqAUAAAAAIAvZ7dRPJkj5zLI2IYAxfPktXqE', {action: 'egift'}).then(function(token) {
+			$("#g-recaptcha-response").val(token);
+		  });
+	  });
+	</script>	
+	{% endblock jscripts %}
+			
+	

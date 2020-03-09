@@ -1,0 +1,117 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% block page-title %} 
+	<title>Arte'Venue - My Bussiness Report</title>
+{% endblock page-title %} 
+{% block page-description %}
+<meta name="description" content="View my arte'venue business account report">
+{% endblock page-description %}
+{% block page-keywords %}
+<meta name="keywords" content="Art, arvenue, account, business, sales report">
+{% endblock page-keywords %}
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+	<div class="container-fluid">
+		<div class="row">
+			<!-- breadcrumb-->
+			<div class="col-12">
+				<nav aria-label="breadcrumb">
+					<ol class="breadcrumb">
+						<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+						<li aria-current="page" class="breadcrumb-item active">My Business Report</li>
+					</ol>
+				</nav>
+			</div>
+		</div>
+		<h1>My Business Report</h1>
+		<div class="row">
+			<table class = "table table-borderless table-responsive">
+				<thead>
+					<tr>
+						<th>No. of Clients</th>
+						<th>No. of Clients with Orders</th>
+						<th>Order Value</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td class = "text-center">
+							<span style = "background-color:#11b6bd; color:#fff; font-weight:600; padding:5px;">
+								{{client_total}}
+							</span>
+						</td>
+						<td class = "text-center">
+							<span style = "background-color:#11b6bd; color:#fff; font-weight:600; padding:5px;">
+								{{clients_with_orders}}
+							</span>
+						</td>
+						<td class = "text-center">
+							<span style = "background-color:#11b6bd; color:#fff; font-weight:600; padding:5px;">
+								{{total_order_value|default_if_none:'0'}}
+							</span>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<!--
+			<div class = "col-4">
+				No. of Clients: 
+				<span style = "background-color:#11b6bd; color:#fff; font-weight:600; padding:5px;">
+					{{client_total}}
+				</span>
+			</div>
+			<div class = "col-4">
+				No. of Clients with Orders: 
+				<span style = "background-color:#11b6bd; color:#fff; font-weight:600; padding:5px;">
+					{{clients_with_orders}}
+				</span>
+			</div>
+			<div class = "col-4">
+				Order Value: 
+				<span style = "background-color:#11b6bd; color:#fff; font-weight:600; padding:5px;">
+					{{total_order_value|default_if_none:'0'}}
+				</span>
+			</div>
+			-->
+		</div>
+		<div class = "row mt-3 mb-5">
+			<div class = "col-12">
+				<table class = "table table-bordered table-responsive">
+					<thead>
+						<tr>
+							<th>Client</th>
+							<th>No. of Orders</th>
+							<th>Total Order Amount</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for c in clients %}
+						<tr>
+							<td>
+								<a href = "{% url 'my_client_order_report' c.id %}" style="text-decoration:underline;">
+								{{c.first_name}} {{c.last_name}}{% if c.first_name %}, {{c.email}} {%else %} {{c.email}} {% endif %} 
+								</a>
+							</td>
+							<td>{{c.ord_num}}</td>
+							<td>{{c.ord_amt|floatformat}}</td>
+						</tr>
+						{% empty %}
+						<tr>
+							<td colspan = '3'>
+								{{msg}}
+							</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	{% endblock sitecontent %}
+
+	
+	{% block jscripts %}
+	
+	{% endblock jscripts %}
+			
+	

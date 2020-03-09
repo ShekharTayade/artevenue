@@ -2,6 +2,7 @@ from django.contrib.auth import authenticate, login, get_user
 from django.contrib.auth import login as auth_login
 from django.shortcuts import get_object_or_404, render, redirect
 from django.conf import settings
+from django.db.models import Count, Q, Max, Sum
 
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -12,18 +13,21 @@ from django.contrib.admin.views.decorators import staff_member_required
 
 from django.urls import resolve
 from django.contrib import messages
-import datetime 
+import datetime
+from dateutil.relativedelta import relativedelta 
+import calendar
 
 from artevenue.forms import registerForm, businessprofile_Form, businessuserForm
 from artevenue.forms import businessprof_Form, userProfileForm
 from artevenue.forms import userForm, shipping_addressForm, billing_addressForm
 from artevenue.forms import OrderStatusUpdate
 from artevenue.models import Pin_code, Business_profile, User_shipping_address, Promotion_voucher
-from artevenue.models import Promotion_voucher, Voucher_user, UserProfile
+from artevenue.models import Promotion_voucher, Voucher_user, UserProfile, Business_referral_fee
 from artevenue.models import User_billing_address, Order, Order_items_view, Cart_item_view
+from artevenue.models import Channel_partner
 
-from artevenue.models import Egift, Egift_redemption, User_sms_email
-from artevenue.models import Country, State, City, Pin_code
+from artevenue.models import Egift, Egift_redemption, User_sms_email, Business_referral_fee
+from artevenue.models import Country, State, City, Pin_code, Order_deferred_payment
 
 from django.core.files.storage import FileSystemStorage
 from django.http import HttpResponse
@@ -76,7 +80,7 @@ def artevenuelogin(request):
 		return render(request, 'artevenue/estore_base.html')
 
 	
-def register(request, email=None):
+def register(request, email=None, signup_popup = 0):
 
 	## Get any sign up promotion
 	try:
@@ -159,7 +163,11 @@ def register(request, email=None):
 					
 				u_profile.save()
 			# After successful sign up redirect to cuurent page
-			return redirect('index')
+			if signup_popup == 1:
+				next = request.POST['curr_pg']
+				return redirect(next)
+			else:
+				return redirect('index')
 	else:
 		email = request.GET.get('email', '')
 		if email:
@@ -178,9 +186,18 @@ def business_registration(request):
 
 		form = businessuserForm(request.POST)
 		businessprofile_form = businessprofile_Form(request.POST)
+		channel_partner = request.POST.get('channel_partner', None)
 
 		if form.is_valid():
 			if businessprofile_form.is_valid():
+				if channel_partner:
+					try:
+						chn = Channel_partner.objects.get(partner_code = channel_partner)
+					except Channel_partner.DoesNotExist:
+						msg = "The channel partner code you entered does not exist. Please check the code and try again."
+						bus_profile = None
+						return render(request, 'artevenue/business_registration.html', {'form': form, 
+							'businessprofile_form': businessprofile_form, 'msg':msg})
 
 				user = form.save()
 				auth_login(request, user, backend='django.contrib.auth.backends.ModelBackend')
@@ -199,10 +216,11 @@ def business_registration(request):
 				userprofile.save()
 			
 				# After successful sign up redirect to payment page
-				return render(request, 'artevenue/business_registration_confirm.html', {'form': form, 'businessprofile_form': businessprofile_form})
+				return render(request, 'artevenue/business_registration_confirm.html', {'form': form, 
+					'businessprofile_form': businessprofile_form, 'channel_partner':channel_partner})
 	else:
 		form = businessuserForm()
-		businessprofile_form = businessprofile_Form()        
+		businessprofile_form = businessprofile_Form()		
 	return render(request, 'artevenue/business_registration.html', {'form': form, 'businessprofile_form': businessprofile_form})
 
 	
@@ -215,10 +233,24 @@ def my_account(request):
 	billing_form ={}
 	user_ProfileForm = {}
 	business_code = ''
-	curruser = get_object_or_404(User, username = request.user)	
+	curruser = get_object_or_404(User, username = request.user)
+	
+	try:
+		chn = Channel_partner.objects.get(user = curruser)
+		channel_partner = chn.partner_code
+	except Channel_partner.DoesNotExist:
+		channel_partner = ''
+	
 	try:
 		curruser_profile = UserProfile.objects.get(user = curruser)
-		business_code = curruser_profile.business_profile.business_code
+		if curruser_profile:
+			if curruser_profile.business_profile :
+				business_code = curruser_profile.business_profile.business_code
+			else:
+				business_code = None
+		else:
+			business_code = None
+		
 	except UserProfile.DoesNotExist:
 		curruser_profile = None
 
@@ -229,13 +261,26 @@ def my_account(request):
 				u = user_form.save()
 				msg = "Changes to your Arte'Venue account saved."
 
+		if request.POST.get('b_form', 'NONE') != 'NONE':
+			businessprofile_form = businessprof_Form( request.POST )
+			if businessprofile_form.is_valid():
+				profile = Business_profile.objects.get( user = curruser )
+				b = businessprofile_form.save(commit=False)
+				b.user = curruser
+				b.created_date = profile.created_date
+				b.id = profile.id
+				b.profile_group = profile.profile_group
+				b.approval_date = profile.approval_date
+				b.save()
+				msg = "Changes to your business account profile saved."
+
 		if request.POST.get('prof_form', 'NONE') != 'NONE':			
 			user_ProfileForm = userProfileForm( request.POST, prefix = 'prof' )
 			if user_ProfileForm.is_valid():
 				u = user_ProfileForm.save(commit=False)
 				id = user_ProfileForm['id'].data
 				if id:
-					u.id = id
+					u.id = id					
 				bus_code = user_ProfileForm['business_referral_code'].data
 				if bus_code:
 					try:
@@ -251,21 +296,7 @@ def my_account(request):
 					msg = "Changes to your profile saved."
 					u.user = curruser
 					u.save()
-
-		if request.POST.get('b_form', 'NONE') != 'NONE':
-			businessprofile_form = businessprof_Form( request.POST )
-			if businessprofile_form.is_valid():
-				profile = Business_profile.objects.get( user = curruser )
-				b = businessprofile_form.save(commit=False)
-				b.user = curruser
-				b.created_date = profile.created_date
-				b.id = profile.id
-				b.profile_group = profile.profile_group
-				b.approval_date = profile.approval_date
-				b.save()
-				msg = "Changes to your business account profile saved."
-
-
+		
 		if request.POST.get('ship_form', 'NONE') != 'NONE':
 			shipping_form = shipping_addressForm( request.POST, prefix = 'ship' )
 			if shipping_form.is_valid():
@@ -282,14 +313,6 @@ def my_account(request):
 	# Get user id
 	user_form = userForm( instance = curruser )
 
-	if not user_ProfileForm:
-		if curruser_profile:
-			user_ProfileForm = userProfileForm( instance = curruser_profile, prefix = 'prof',
-			initial={'user_id':curruser.id, 'business_profile': curruser_profile.business_profile_id,
-				'business_referral_code':curruser_profile.business_profile.business_code})
-		else:
-			user_ProfileForm = userProfileForm(prefix = 'prof', initial={'user_id':curruser.id})
-		
 	if not businessprofile_form:
 		try:
 			profile = Business_profile.objects.get( user = curruser )
@@ -297,6 +320,31 @@ def my_account(request):
 		except Business_profile.DoesNotExist:
 			profile = {}
 			businessprofile_form = {}
+
+	if not user_ProfileForm:
+		if curruser_profile:
+			if businessprofile_form:
+				user_ProfileForm = userProfileForm( instance = curruser_profile, prefix = 'prof',
+				initial={'user_id':curruser.id, 'business_profile': curruser_profile.business_profile_id,
+					'business_referral_code':profile.business_code})
+			else:
+				if curruser_profile:
+					if curruser_profile.business_profile:
+						b_code = curruser_profile.business_profile.business_code
+					else:
+						b_code = None
+				else: 	
+						b_code = None
+				user_ProfileForm = userProfileForm( instance = curruser_profile, prefix = 'prof',
+				initial={'user_id':curruser.id, 'business_profile': curruser_profile.business_profile_id,
+					'business_referral_code':b_code})
+		else:
+			if businessprofile_form:
+				user_ProfileForm = userProfileForm(prefix = 'prof', initial={'user_id':curruser.id,
+					'business_referral_code':profile.business_code})
+			else:
+				user_ProfileForm = userProfileForm(prefix = 'prof', initial={'user_id':curruser.id})
+		
 		
 	if not shipping_form:
 		shipping_addr = User_shipping_address.objects.filter( user = curruser ).first()
@@ -356,7 +404,8 @@ def my_account(request):
 		'egift_giver':egift_giver, 'egift_receiver':egift_receiver,
 		'egift_redemption':egift_redemption, 'redemptions':redemptions,
 		'country_arr':country_arr, 'state_arr':state_arr,
-		'city_arr':city_arr, 'pin_code_arr':pin_code_arr} )
+		'city_arr':city_arr, 'pin_code_arr':pin_code_arr,
+		'channel_partner':channel_partner} )
 
 
 @login_required
@@ -770,3 +819,112 @@ def get_carts(request, printpdf=''):
 		return render(request, 'artevenue/carts_table.html', {'count':count, 
 			'carts': carts, 'cart_items':cart_items_list,  'orders':orders, 
 			'startDt':startDt, 'endDt':endDt, 'ecom_site':ecom})		
+
+
+def referral_fee_month_process(yrmonth=''):
+
+	#########################################
+	## Move all orders to referral fee table
+	## For current  month
+	#########################################
+	today = datetime.datetime.today()
+	
+	if yrmonth == '':
+		last_mth_yr = datetime.datetime.now() - relativedelta(months=1)
+		mth = str(last_mth_yr.month)
+		year = str(last_mth_yr.year)
+		yrmonth = year + '-' + mth
+	else:
+		last_mth_yr = datetime.datetime.strptime(yrmonth + '-01', "%Y-%m-%d").date()	
+	
+	process_start_date = datetime.datetime.strptime(yrmonth + '-01', "%Y-%m-%d").date()	
+	month_days = calendar.monthrange(last_mth_yr.year, last_mth_yr.month)[1]
+	process_end_date = datetime.datetime.strptime(yrmonth + '-' + str(month_days), "%Y-%m-%d").date()
+
+	business_profiles = Business_profile.objects.all().order_by('id')
+	for b in business_profiles:
+	
+		if b.created_date.year > process_end_date.year:
+			continue
+		###########################################
+		## Get total sale in last one user year  ##
+		###########################################
+		year_start_date = None
+		## Get start date of last 1 user year
+		if b.created_date.year == process_end_date.year:
+			year_start_date = b.created_date
+		else:
+			day = str(b.created_date.day)
+			mth = str(b.created_date.month)
+			yr = str(process_end_date - relativedelta(years=1).year)
+			year_start_date = datetime.datetime.strptime(yr + '-' + mth + '-' + day, "%Y-%m-%d").date()
+
+		ord_value = Order.objects.filter(order_date__gte = year_start_date,
+				order_date__lte = process_end_date,
+				user_id = b.user_id).aggregate(sum = Sum('sub_total'))
+		total_order_value =0
+		if ord_value :
+			if ord_value['sum']:
+				total_order_value = ord_value['sum']
+
+		###########################################
+		##   Determine applicble fee percetnage  ##
+		###########################################
+		fee_amt = 0
+		if total_order_value < 200000:
+			perc = 10
+		elif total_order_value < 500000:
+			perc = 15
+		else :
+			perc = 20
+
+		total_fee_amt = total_order_value * perc / 100
+
+		#### Orders in last 1 user year for which referral fee is not processed
+		orders = Order.objects.filter( order_date__gte = year_start_date,
+			order_date__lte = process_end_date,
+			user_id = b.user_id )
+		
+		for o in orders:
+		
+			##### Skip orders that have payment outstanding
+			def_pay = Order_deferred_payment,objects.filter(order = o)
+			if not def_pay:
+				continue
+
+			##################################################
+			## Update referral fee for the order.    		##
+			## If order already has a referral fee record	##
+			## then update it, else enter new record 		##
+			##################################################
+			b_ref = Business_referral_fee.objects.filter(order = o).first()
+			if b_ref:
+				
+				bus_ref = Business_referral_fee (
+					id = b_ref.id,
+					month_year = yrmonth,
+					business_profile = b,
+					order = o,
+					ord_value_ytd = total_order_value,
+					fee_amount = o.sub_total * perc / 100,
+					fee_paid_date = today,
+					fee_paid_reference = '',
+					created_date = today,
+					updated_date = today
+				)
+			else:
+				bus_ref = Business_referral_fee (
+					month_year = yrmonth,
+					business_profile = b,
+					order = o,
+					ord_value_ytd = total_order_value,
+					fee_amount = o.sub_total * perc / 100,
+					fee_paid_date = today,
+					fee_paid_reference = '',
+					created_date = today,
+					updated_date = today
+				)
+			
+			bus_ref.save()
+
+	return

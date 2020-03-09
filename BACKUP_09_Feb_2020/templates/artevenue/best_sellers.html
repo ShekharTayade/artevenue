@@ -1,0 +1,72 @@
+{% load static %}
+<div class = "container-fluid mb-4">
+	<div class="col-md-12 text-center mt-5 py-3">
+			<h2 class="text-center">BEST SELLERS
+			</h2>
+	</div>
+
+	<div class="row"  style = "margin:5px;">
+		<div class = "col-lg-4 mt-3">
+			<div style="background-color:#f0f0f0 !important;">
+				<!--<div class="curatedHeading2 curatedHeading2-1 mb-1">
+					Buds and Blooms
+				</div>-->
+				<div class="curated-container">
+					<img src="{% static 'img/best_sellers/floral.jpg' %}" class="img-fluid">
+					<a class="btn" href="{% url 'curated_collections' 5 %}">
+					FLORAL</a>
+				</div>
+			</div>
+		</div>
+		<div class = "col-lg-4 mt-3">
+			<div class="" style = "background-color:#f0f0f0 !important;">
+				<!--<div class="curatedHeading2 curatedHeading2-1 mb-1">
+					Playful and More
+				</div>-->
+				<div class="curated-container">
+					<img src="{% static 'img/best_sellers/kids.jpg' %}" class="img-fluid">
+					<a class="btn" href="{% url 'curated_collections' 4 %}">
+					KIDS</a>
+				</div>
+			</div>
+		</div>	
+		<div class = "col-lg-4 mt-3">
+			<div class="" style = "background-color:#f0f0f0 !important;">
+				<!--<div class="curatedHeading2 curatedHeading2-1 mb-1">
+					The Tales Of Time
+				</div>-->
+				<div class="curated-container">
+					<img src="{% static 'img/best_sellers/vintage.jpg' %}" class="img-fluid">
+					<a class="btn" href="{% url 'curated_collections' 9 %}">
+					VINTAGE</a>
+				</div>
+			</div>
+		</div>	
+	</div>
+	<div class="row mb-4"  style = "margin:5px;">
+		<div class = "col-lg-6 mt-3">
+			<div class="" style = "background-color:#f0f0f0 !important;">
+				<!--<div class="curatedHeading2 curatedHeading2-1 mb-1">
+					The Horizon, Yonder
+				</div>-->
+				<div class="curated-container">
+					<img src="{% static 'img/best_sellers/coastal.jpg' %}" class="img-fluid">
+					<a class="btn" href="{% url 'curated_collections' 8 %}">
+					COASTAL</a>
+				</div>
+			</div>
+		</div>
+		<div class = "col-lg-6 mt-3">
+			<div class="" style = "background-color:#f0f0f0 !important;">
+				<!-- <div class="curatedHeading2 curatedHeading2-1 mb-1">
+					The Ways of Nature
+				</div> -->
+				<div class="curated-container">
+					<img src="{% static 'img/best_sellers/landscape.jpg' %}" class="img-fluid">
+					<a class="btn" href="{% url 'curated_collections' 7 %}">
+					LANDSCAPE</a>
+				</div>
+			</div>
+		</div>	
+	</div>
+</div>

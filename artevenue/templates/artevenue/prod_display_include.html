@@ -59,7 +59,9 @@
 									<div class="products-number">
 										<strong>Show</strong>
 										<!--<a href="?page={{prods.number}}&sort={{sortOrder}}&show=50" class="btn btn-sm {% if show == '50' or show == None %} btn-primary {% else %} btn-outline-secondary {% endif %}">50</a><a href="?page={{prods.number}}&sort={{sortOrder}}&show=100" class="btn btn-sm {% if show == '100' %} btn-primary {% else %} btn-outline-secondary {% endif %}">100</a><a href="?page={{prods.number}}&sort={{sortOrder}}&show=ALL" class="btn btn-sm {% if show == 'ALL' %} btn-primary {% else %} btn-outline-secondary {% endif %}">All</a><span>results/page</span>-->
-										<button type = 'button' onclick="getAllFilters(page='{{prods.number}}', sort='{{sortOrder}}',show='50', keywords='{{ikeywords}}');" class="btn btn-sm {% if show == '50' or show == 'None' %} btn-primary {% else %} btn-outline-secondary {% endif %}">50</button><button onclick="getAllFilters(page='{{prods.number}}', sort='{{sortOrder}}', show='100', keywords='{{ikeywords}}');" class="btn btn-sm {% if show == '100' %} btn-primary {% else %} btn-outline-secondary {% endif %}">100</button><button onclick="getAllFilters(page='{{prods.number}}', sort='{{sortOrder}}', show='1000', keywords='{{ikeywords}}');" class="btn btn-sm {% if show == '1000' %} btn-primary {% else %} btn-outline-secondary {% endif %}">1000</button><span>results/page</span>
+										<button type = 'button' onclick="getAllFilters(page='{{prods.number}}', sort='{{sortOrder}}',show='100', keywords='{{ikeywords}}');" class="btn btn-sm {% if show == '100' or show == 'None' %} btn-primary {% else %} btn-outline-secondary {% endif %}">100</button>
+										<button onclick="getAllFilters(page='{{prods.number}}', sort='{{sortOrder}}', show='500', keywords='{{ikeywords}}');" class="btn btn-sm {% if show == '500' %} btn-primary {% else %} btn-outline-secondary {% endif %}">500</button>
+										<button onclick="getAllFilters(page='{{prods.number}}', sort='{{sortOrder}}', show='1000', keywords='{{ikeywords}}');" class="btn btn-sm {% if show == '1000' %} btn-primary {% else %} btn-outline-secondary {% endif %}">1000</button><span>results/page</span>
 									</div>
 
 								<!-- </form>-->
@@ -76,10 +78,10 @@
 								<div class="img-container">
 									<a id = "alink_{{prod.product_id}}" href="{% url 'stock_image_detail' prod.product_id %}">
 										{% if env == 'DEV' or env == 'TESTING' %}
-											<img src="{{ prod.url }}" alt="" class="img-fluid image-display" 
+											<img src="{{ prod.url }}" alt="Art Print: {{prod.name}}" class="img-fluid image-display" 
 													style = "filter: drop-shadow(0.25rem 0.25rem 0.25rem grey);" onclick="$('#img-form_{{prod.product_id}}').submit();">
 										{% else %}
-											<img src="{% static prod.url %}" alt="" class="img-fluid image-display" 
+											<img src="{% static prod.url %}" alt="Art Print: {{prod.name}}" class="img-fluid image-display"
 													style = "filter: drop-shadow(0.25rem 0.25rem 0.25rem grey);" onclick="$('#img-form_{{prod.product_id}}').submit();">
 										{% endif %}		
 									</a>

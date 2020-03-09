@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+{% load utils %}
+{% load static %}
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="robots" content="all,follow">
+		<!-- Bootstrap CSS-->
+		<link rel="stylesheet" href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}">
+				
+		<!-- Font Awesome CSS-->
+		<link rel="stylesheet" href="{% static 'vendor/font-awesome/css/font-awesome.min.css' %}">
+		<!-- Google fonts - Roboto -->
+		<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:400,500,700,300,100">
+		<!-- Custom stylesheet -->
+		<link rel="stylesheet" href="{% static  'css/custom.css' %}">
+		<!-- theme stylesheet-->
+		<link rel="stylesheet" href="{% static 'css/style.default.css' %}" id="theme-stylesheet">
+		<!-- theme stylesheet-->
+		<link rel="stylesheet" href="{% static 'css/home-page-style.css' %}" id="theme-stylesheet">
+
+	</head>
+
+	<body>
+		<p>
+			Dear {% if user.first_name %} 
+					{{user.first_name}}&nbsp;{{user.last_name}} 
+				{% else %}
+					{{user.username}}
+				{% endif %},
+		</p>
+		<p>Arte’Venue welcomes you on board as our privileged customer!!</p>
+			
+		<p>	We greatly look forward to catering to all your art and framing 
+			requirements as well as your gifting needs.
+		</p>
+		<p> Your absolute satisfaction is our priority and you can expect a 
+			seamless experience with us for each of your orders from Arte’Venue.
+		</p>
+		<hr>
+		<p>
+			You can begin to browse through our collection of over 2,50,000 
+			art prints and framing options by clicking the link below:
+			<a href = "https://www.artevenue.com/login">Artevenue.com/login</a>
+		</p>
+
+		<br />
+		<hr>
+		<p>
+			With warm regards,<br />
+			Team Arte'Venue<br/>
+			<img src = "https://artevenue.com/static/img/artevenue_logo_new.png" alt="Arte'venue Logo"  height="25" width="110"> <br />
+			<a href = "https://www.artevenue.com">www.artevenue.com</a>
+		</p>
+	</body>
+</html>

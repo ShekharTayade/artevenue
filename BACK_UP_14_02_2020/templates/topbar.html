@@ -1,0 +1,177 @@
+{% load static %}
+<div id="top">
+	<div class="row" style = "padding:5px 0;">
+		<div class="col-6 mb-0 text-white">
+			<ul class="menu list-inline mb-0">
+				{% if ecom_site.phone_support_available %}
+				<li class="list-inline-item clickable pull-left">					
+					<a class = "text-white" data-toggle="modal" data-target="#phone-help">
+						<i class="fa fa-phone"></i>{{ecom_site.support_phonenumber }}
+					</a>
+				</li>
+				{% endif %}
+			</ul>
+		</div>
+		<div class="col-6 mb-0 text-white text-right">
+			<ul class="menu list-inline mb-0">
+					<!-- <li class="list-inline-item clickable show_on_large_only">
+						<a href="">How it works</a>
+					</li>-->
+					<li class="list-inline-item clickable show_on_large_only">						
+						<a href="{% url 'about_us' %}">About Us</a>
+					</li>
+					<li class="list-inline-item clickable show_on_large_only">
+						<a href="{% url 'contact_us' %}">Contact Us</a>
+					</li>
+				
+				{% if user.is_authenticated %}
+					<li class="list-inline-item clickable pull-right">
+						<a href="#" data-toggle="dropdown">
+							<i class="fa fa-user-circle nfa-2x"></i>
+							{{user.username}}<i class = "fa fa-chevron-down"></i>
+						</a>
+						<ul class="dropdown-menu dropdown-menu-login" >
+							<li style = "margin-top: 8px;"><a href="{% url 'logout' %}">Logout</a></li>
+							<li style = "margin-top: 8px;"> <a href="{% url 'password_change' %}">Change Password</a></li>   
+							<li class="dropdown-divider"></li>
+							<li style = "margin-top: 8px;"><a href="{% url 'my_account' %}">My Account</a></li>
+							<li style = "margin-top: 8px;"><a href="{% url 'my_orders' %}">My Orders</a></li>
+							{% if business_user %}
+								<li style = "margin-top: 8px;"><a href="{% url 'my_business_report_wrap' %}">My Business Report</a></li>
+							{% endif %}
+						</ul>
+
+					</li>
+				{% else %}
+					<li class="list-inline-item clickable"><a href="{% url 'register' %}">Sign Up</a></li>
+					<li class="list-inline-item clickable on-hover-underline"><a data-toggle="modal" data-target="#login-modal">Login</a></li>
+				{% endif %}
+			</ul>
+		</div>
+	</div>
+	
+	<div id="phone-help" tabindex="-1" role="dialog" aria-labelledby="Login" aria-hidden="true" class="modal fade">
+		<div class="modal-dialog modal-sm">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Support</h5>
+					<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
+				</div>
+				<div class="modal-body">	
+					We are here to help!<br />
+					Please call: {{ecom_site.support_phonenumber }}<br />
+					<small>Timing: {{ecom_site.phone_support_start_time}} to {{ecom_site.phone_support_end_time}}</small>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+</div>
+	
+	<div id="login-modal" tabindex="-1" role="dialog" aria-labelledby="Login" aria-hidden="true" class="modal fade">
+		<div class="modal-dialog modal-md">
+			<div class="modal-content">
+				<div class="modal-header" style = "background-color:#11b6bd;color:#fff">
+					<h3 class="modal-title" >Customer login</h3>
+					<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
+				</div>
+				<div class="modal-body">
+					<form action = "{% url 'login'%}" method="post" accept-charset="UTF-8" role="form" method="POST">
+						{% csrf_token %}
+						{% load socialaccount %}
+						{% providers_media_js %}
+						<div class="form-group">
+							<p>Please Enter Your User Name or Email and password</p>
+							<div class = "row">
+								<div class ="col-sm-5">
+									<input name = "username" type="text" class="form-control" placeholder="Username">
+								</div>
+								<div class ="col-sm-1 text-center">
+									OR
+								</div>
+								<div class ="col-sm-6">
+									<input id="email-modal" name = "email" type="text" placeholder="email" class="form-control">
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<input id="password-modal" name = "password" type="password" placeholder="password" class="form-control">
+						</div>
+						<input name="remember" type="checkbox" value="Remember Me" checked> Remember Me						
+						<input hidden id="curr_pg" name="curr_pg" value="{{request.path}}" >						
+						<br />
+						<p>
+							<div class="text-center">
+								<button id="submit-btn" type = "submit" class="btn btn-primary"><i class="fa fa-sign-in"></i> Log in</button>
+							</div>
+							<h6 class="text-center mt-2">
+								<a class = " text-secondary" href="{% url 'password_reset' %}">Forgot Username/Password</a>
+							</h6>
+						</p>
+						<div id = "show-loginerror">
+						</div>
+					</form>
+					<hr>
+					<p>
+						Login Using Your Social Media Account
+					</p>
+					<div class = "well">
+						<div class = "row">
+							<div class="col-12 text-center">
+								<a class="btn auth-provider-button" href="{% provider_login_url 'facebook' method='js_sdk' %}">
+								  <img src="{% static 'img/fb_login.png' %}" alt="Facebook Login" style="height:38px;border:0; width:200px;">
+								</a>
+							</div>
+							<div class="col-12 text-center">
+								<a class="btn auth-provider-button" href="{% provider_login_url 'instagram' %}">
+								  <img src="{% static 'img/instagram_login.png' %}" alt="Instagram Login" style="height:38px;border:0; width:200px;">
+								</a>
+							</div>
+							<div class="col-12 text-center">
+								<a class="btn auth-provider-button" href="{% provider_login_url 'google' %}">
+								  <img src="{% static 'img/google_login.png' %}" alt="Google Login" style="height:38px;border:0; width:200px;">
+								</a>
+							</div>
+						</div>
+					</div>
+					<hr>
+				
+					<small>
+						<p class="text-center text-muted">Not signed up yet?</p>
+						<p class="text-center text-muted"><a href="{% url 'register' %}"><strong  class = "text-primary">Sign Up now</strong></a>
+						! It is easy, done in a minute and gives you access to special offers, discounts!</p>
+					</small>
+				</div>
+			</div>
+		</div>
+		
+	</div>
+	
+	
+	<div id="changepassword-modal" tabindex="-1" role="dialog" aria-labelledby="Login" aria-hidden="true" class="modal fade">
+		<div class="modal-dialog modal-sm">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title"></h5>
+					<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
+				</div>
+				<div class="modal-body">	
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h3 class="panel-title">
+							Change Password
+							</h3>
+						</div>
+						<div class="panel-body">
+							<form method="post" novalidate action = "{% url 'password_change' %}">
+								{% csrf_token %}
+								{% include 'includes/form.html' %}
+								<input class="btn btn-lg btn-primary btn-block" type="submit" value="Change">
+							</form>
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>

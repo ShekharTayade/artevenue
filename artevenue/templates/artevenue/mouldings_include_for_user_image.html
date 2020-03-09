@@ -1,7 +1,7 @@
 				{% load static %}
 				{% load utils %}
 				<div class = "row">
-					{% for f in mouldings_show %}
+					{% for f in mouldings_apply %}
 						<div class="frame-image" >
 							<a onclick = "set_moulding('{{f.moulding_id}}');"> 
 								{% with 'img/'|add:f.url as image_static %}

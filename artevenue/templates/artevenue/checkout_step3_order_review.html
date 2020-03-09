@@ -85,21 +85,24 @@
 											</div>
 										</td>
 										<td>
-											{% with width=i.moulding__width_inches|add_width_frame_mount:i.mount_size %}
-
+											{% with width=i.moulding__width_inner_inches|add_width_frame_mount:i.mount_size %}
 											<small>
-											<li>Print on {{i.print_medium_id|title}}</li>
+											{% if i.product_type == 'ORIGINAL-ART' %}
+												<li>{{i.product__description}}</li>
+											{% else %}													
+												<li>Print surface {{i.print_medium_id|title}}</li>
+											{% endif %}
 											{% if i.moulding_id %}
-											<li>Image Print Size : {{ i.image_width }}" X {{i.image_height }}"</li>
-											<li>Frame {{i.moulding__name }} </li>
-											<li>Total Size: 
-												{{ i.image_width|add_width:width }}" X {{i.image_height|add_width:width }}"</li>
+												<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+												<li>Frame: {{i.moulding__name }} ({{i.moulding__width_inches}} inch, Polystyrene)</li>
+												{% if i.mount_id %}
+													<li>Mount: {{i.mount_size }}", Color: {{i.mount__name|title }} </li>
+												{% endif %}
+												<li>Total Size: 
+													{{ i.image_width|add_width:width|add_width:width }}" X {{i.image_height|add_width:width|add_width:width }}"</li>
+													
 											{% else %}
 												<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
-											{% endif %}
-											
-											{% if i.mount_id %}
-												<li>Mount: {{i.mount_size }}", Color: {{i.mount__name|title }} </li>
 											{% endif %}
 											{% if i.acrylic_id %}
 												<li>Acrylic covered</li>

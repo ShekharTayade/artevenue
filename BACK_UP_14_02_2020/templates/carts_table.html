@@ -1,0 +1,239 @@
+{% load static %}
+{% load utils %}
+							<div class="row">
+
+								<p class="text-muted">
+									{% if count > 0 %} 
+										{{ count }} carts(s) found {% if startDt != '' %} between {{startDt|date:'d-M-Y'}} and {{endDt|date:'d-M-Y'}} {% endif %} 
+									{% else %} 
+										No carts found {% if startDt %} between {{startDt|date:'d-M-Y'}} and {{endDt|date:'d-M-Y'}} {% endif %}
+									{% endif %}
+								</p>
+							</div>	
+							{% regroup carts by created_date|date:"Y-m-d" as cartlist %}
+							{% for crt in cartlist %}
+							<h3 style="padding:5px; font-weight:700; color:white; background-color:black;">{{ crt.grouper }}</h3>
+							{% for c in crt.list %}
+							<div class = "row">
+								<div class = "col-sm-12 col-md-6">
+									{% if c.user %}										
+										<h3 style = "color:blue;">Name: {{c.user.first_name}} {{c.user.last_name}}</h3> 
+										<h4>Login Username: {{c.user.username}}</h4> 
+										<h4> Email: {{c.user.email}}
+											{% for o in orders|filter_by_cart_id:c.cart_id %}											
+												{% if o.cart_id == c.cart_id %}
+													{% if o.order_billing.phone_number %}
+														Phone: {{o.order_billing.phone_number}}
+													{% elif o.order_shipping.phone_number %}
+														Phone: {{o.order_shipping.phone_number}}													
+													{% endif %}
+												{% endif %}
+											{% endfor %}
+										</h4>
+									{% else %}
+										<h3 style = "color:blue;">Anonymous User (not logged in)</h3>
+									{% endif %}
+									<h4>Cart Number : {{c.cart_id}}; 
+									Created on: {{c.created_date|date:"d M Y P"}}  | Status: {{ c.get_cart_status_display }}</h4>
+								</div>
+								<div class = "col-sm-12 col-md-6">	
+									<div class = "row">
+										{% if orders %}
+											{% for o in orders|filter_by_cart_id:c.cart_id %}											
+												{% if o.cart_id == c.cart_id %}
+													<div class = "col-6">
+														<h4>Order No: {{ o.order_number }}</h4>
+														<h4> Date: {{ o.order_date|date:'d M Y' }}</h4>
+													</div>
+													<div class = "col-6">														
+														<h4> 
+															{% if o.order_status == 'PP' %}
+																<span style = "color:blue;">Check-out done. Payment not Done.</span>
+															{% else %}
+																<span style = "color:green;">Payment Done. Order Status: {{o.get_order_status_display}}</span>
+															{% endif %}
+														</h4>
+													</div>
+												{% endif %}
+											{% empty %}
+												<div class = "col-6">
+													<h4  style = "color:blue;">Check-out Not Done</h4>
+												</div>											
+											{% endfor %}
+										{% else %}
+											<div class = "col-6">
+												<h4  style = "color:blue;">Check-out Not Done</h4>
+											</div>
+										{% endif %}
+									</div>
+								</div>
+							</div>
+							<div class = "row">
+								<div class = "col-xs-12 col-md-3">
+									<div class = "col-xs-7 col-md-12">		
+										<strong>Sub Total</strong>
+									</div>
+									<div class = "col-xs-5 col-md-12">		
+										<span class = "ord-row">{{c.cart_sub_total|floatformat}}</span>
+									</div>
+								</div>
+								<div class = "col-xs-12 col-md-2">
+									<div class = "col-xs-7 col-md-12">		
+										<strong>Tax</strong>
+									</div>
+									<div class = "col-xs-5 col-md-12">		
+										<span class = "ord-row">{{c.cart_tax|floatformat}}</span>
+									</div>
+								</div>
+								{% if c.cart_disc_amt %}
+								<div class = "col-xs-12 col-md-2">
+									<div class = "col-xs-7 col-md-12">		
+										<strong>Discount</strong>
+									</div>
+									<div class = "col-xs-5 col-md-12">		
+										<span class = "ord-row">{{c.cart_disc_amt|floatformat}}</span>
+									</div>
+								</div>
+								{% endif %}
+								<div class = "col-xs-12 col-md-2">
+									<div class = "col-xs-7 col-md-12">		
+										<strong>Cart Total</strong>
+									</div>
+									<div class = "col-xs-5 col-md-12">		
+										<span class = "ord-row"><strong>{{c.cart_total|floatformat}}</strong></span>
+									</div>
+								</div>
+							</div>
+							
+							<div class = "row">
+								<div class="table table-responsive">
+									<table id = "cartTbl" class="table table-responsive">
+										<thead>
+											<tr>
+												<th width="10%">Item</th>
+												<th width="35%">Details</th>
+												<th width="10%" style = "text-align:right;">Qty</th>
+												<th width="10%" style = "text-align:right;">Unit Price</th>
+												<th width="10%" style = "text-align:right;">Disc</th>
+												<th width="10%" style = "text-align:right;"> Tax</th>
+												<th width="10%" style = "text-align:right;">Total</th>
+											</tr>
+										</thead>
+										<tbody>
+											{% for i in cart_items %}
+											{% if c.cart_id == i.cart_id %}
+											<tr>
+												<td>
+													<img src = "{% if i.product_type_id == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product.image_to_frame}} {% else %} {% static i.product.thumbnail_url %} {% endif %}" style = "width:50px; height:50px; object-fit:contain;">
+													<br />
+
+													<div class = "pull-left">
+														<button style="padding-left:0px;" type ="button" class = "btn btn-link pull-left" onclick = "getFramedImg('{{i.product_id}}', '{{i.image_width}}', '{{i.moulding_id | default_if_none:0}}', '{{i.mount.color | default_if_none:0}}','{{i.mount_size | default_if_none:0}}', '{{i.product.url | default_if_none:""}}');">
+															<small>{{i.product.name|truncatechars:10 }}<br />
+															({{i.product.part_number}})
+															</small>
+														</button>
+													</div>
+												</td>
+												<td>
+														{% with width=i.moulding.width_inner_inches|add_width_frame_mount:i.mount_size %}
+														<small>
+														<li>Print on {{i.print_medium_id|title}}</li>
+														{% if i.moulding_id %}
+															<li>Image Print Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+															<li>Frame: {{i.moulding.name }} ({{i.moulding.width_inches}} inch, Polystyrene)</li>
+															{% if i.mount_id %}
+																<li>Mount: {{i.mount_size }}", Color: {{i.mount.name|title }} </li>
+															{% endif %}
+															<li>Total Size: 
+																{{ i.image_width|add_width:width|add_width:width }}" X {{i.image_height|add_width:width|add_width:width }}"</li>
+														{% else %}
+															<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+														{% endif %}
+														
+														{% if i.acrylic_id %}
+															<li>Acrylic covered</li>
+														{% endif %}
+														{% if i.stretch_id %}
+															<li>Canvas Stretched</li>
+														{% endif %}
+														</small>
+														{% endwith %}
+												</td>
+												<td style = "text-align:right;">
+													{{i.quantity|floatformat}}
+												</td>
+												<td style = "text-align:right;">{{i.item_unit_price|floatformat}}</td>
+												<td style = "text-align:right;">											
+													<!-- {% if i.promotion__discount_type == "PERCENTAGE" %}
+														{{i.promotion__discount_value|floatformat}}%
+													{% else %}
+														{{i.promotion__discount_value|floatformat}}
+													{% endif %} -->
+													{{i.item_disc_amt|floatformat}}
+												</td>
+												<td style = "text-align:right;">
+													{{i.item_tax|floatformat}}
+												</td>
+												<td style = "text-align:right">{{i.item_total|floatformat}}</td>
+											</tr>
+											{% endif %}
+											{% endfor cart_items %}
+											
+										</tbody>
+										<tfoot>
+											<tr>
+												<th colspan="2">Total</th>
+												<!--<th colspan="1" style = "text-align:right">{{total_bare|floatformat}}</th>-->
+												<th colspan="1" style = "text-align:right">{{usercart.quantity|floatformat}}</th>
+												<th colspan="1" style = "text-align:right">{{usercart.cart_unit_price|floatformat}}</th>
+												<!--<th colspan="1" style = "text-align:right">{{usercart.cart_disc_amt|floatformat}}</th> -->
+												<th colspan="1" style = "text-align:right">{{usercart.cart_disc_amt|floatformat}}</th>
+												<th colspan="1" style = "text-align:right">{{usercart.cart_tax|floatformat}}</th>
+												<th colspan="1" style = "text-align:right">{{usercart.cart_total|floatformat}}</th>
+												<th></th>
+											</tr>
+										</tfoot>
+									</table>
+								</div>
+							
+							</div>
+							{% endfor carts %}		
+							{% endfor %}
+							
+							<div class="box-cat info-bar">
+								<div class="row">
+									<div class="col-md-12 col-lg-12">
+										<ul class = "pagination justify-content-center"style="margin-bottom:0px !important">
+											{% if carts.has_previous %}
+											<li class="page-item">
+											  <button class="page-link" onclick="get_carts('1');" aria-label="Previous">
+												<span aria-hidden="true">&laquo; First</span>
+												<span class="sr-only">begin</span>
+											  </button>
+											</li>   
+											{% endif %}
+
+											{% for n in carts.paginator.page_range %}
+											  {% if carts.number == n %}
+												<li class="page-item active">
+												  <span class="page-link">{{ n }}<span class="sr-only">(current)</span></span>
+												</li>
+											  {% elif n > carts.number|add:'-5' and n < carts.number|add:'5' %}
+												<li class="page-item">
+												<button class="page-link" onclick="get_carts('{{n}}');">{{ n }}</li>
+											  {% endif %}
+											{% endfor %}
+
+											{% if carts.has_next %}
+											  <li class="page-item">
+												<button class="page-link" onclick="get_carts('{{carts.paginator.num_pages}}');" aria-label="Next">
+												  <span aria-hidden="true">Last &raquo;</span>
+												  <span class="sr-only">end</span>
+												</button>
+											  </li>
+											  {% endif %}   
+										</ul> 
+									</div>
+								</div>
+							</div>							

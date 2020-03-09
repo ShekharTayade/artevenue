@@ -43,8 +43,8 @@ def get_price(width, aspect_ratio, sqin_price, user_width):
 	if user_width > 0:
 		width = user_width
 	else:
-		if width > 12:
-			width = 12
+		if width > 10:
+			width = 10
 	height = round(width / aspect_ratio)
 	
 	return Decimal(round( float(width * height * sqin_price ) , -1))
@@ -123,4 +123,11 @@ def get_frame_name_innerwidth(frame_id, nameorwidth):
 		return name
 	else:
 		return inner_width
-		
+
+@register.filter
+def replace(str, args):
+	old, new = args.split(',')
+	if str:
+		return str.replace(old, new)
+	else:
+		return ''

@@ -120,8 +120,6 @@ def get_FramedImage(request):
 
 	return HttpResponse(img_str)
 	
-	
-
 def addMount( img_source, mount_color, border_top, border_right, border_bottom, border_left):
 
 	img = Image.new( "RGB", (img_source.width + border_left + border_right, img_source.height + border_top + border_bottom), mount_color)  
@@ -262,7 +260,6 @@ def applyBorder(request, img_source, ref_url, border_top, border_right, border_b
 	
 	return new_img
 	
-
 ''' Apply all mouldings to the given product image ''' 
 def get_ImagesWithAllFrames(request, prod_id, user_width):
 	# Get image
@@ -308,7 +305,6 @@ def get_ImagesWithAllFrames(request, prod_id, user_width):
 			print(traceback.format_exc())
 			
 	return frames_array
-	
 	
 def get_FramedUserImage(request):
 
@@ -393,8 +389,6 @@ def get_FramedUserImage(request):
 
 
 	return HttpResponse(img_str)
-	
-	
 	
 def get_FramedUserImage_by_id(request):
 
@@ -481,8 +475,6 @@ def get_FramedUserImage_by_id(request):
 
 	return HttpResponse(img_str)
 
-
-	
 def dropShadow( image, offset=(8,8), background=0xffffff, shadow=0x444444, 
                 border=10, iterations=3):
 	"""
@@ -524,8 +516,7 @@ def dropShadow( image, offset=(8,8), background=0xffffff, shadow=0x444444,
 	back.paste(image, (imageLeft, imageTop))
 
 	return back
-  
-  
+    
 def dropInnerShadow(image, offset=(2,2), background=0x666666, shadow=0x444444, 
                 border=3, iterations=3):
 				
@@ -576,3 +567,182 @@ def dropFrameShadowIn(image, shadowWidth=6, color=0x444444, shadow=0x999999):
 	#img.paste(shadow_black, (image.size[0], 0))
 	return img
 	
+
+def get_FramedImage_by_id(request, prod_id, m_id, mount_color='', 
+		mount_size=0, user_width=0, prod_type='STOCK-IMAGE' ):	
+	if not prod_id:
+		if prod_id == '':
+			return HttpResponse('')	
+	if not m_id:
+		if m_id == '':
+			return HttpResponse('')							
+	if prod_id == '':
+		return HttpResponse('')
+	# Get image
+	if prod_type == '':
+		prod_type = 'STOCK-IMAGE'
+
+	prod_img = Product_view.objects.filter( product_id = prod_id,
+			product_type_id = prod_type).first()
+	
+	env = settings.EXEC_ENV
+	if env == 'DEV' or env == 'TESTING':
+		if prod_type == 'STOCK-IMAGE':
+			response = requests.get(prod_img.url)
+			img_source = Image.open(BytesIO(response.content))
+		else :
+			img_source = Image.open(settings.BASE_DIR + "/artevenue" + settings.STATIC_URL + prod_img.url)
+	else:
+		img_source = Image.open(settings.PROJECT_DIR + '/' + settings.STATIC_URL + prod_img.url)
+		
+	# Get moulding
+	moulding = Moulding_image.objects.filter(moulding_id = m_id, image_type = "APPLY").values(
+				'url', 'moulding__width_inches', 'border_slice').first()
+	
+	if moulding:	
+		m_width_inch = float(moulding['moulding__width_inches'])
+		
+		# Image width displayed in browser in inches
+		disp_inch = 450//96
+		
+		ratio = disp_inch / user_width
+		
+		border = int(m_width_inch * ratio* 96)		
+		#border = int(m_width_inch * 96/ user_width)
+		
+		m_size = int(mount_size * 96 * ratio)
+		#m_size = int(mount_size * 960 / user_width)
+		
+		if m_size > 0 and mount_color != '' and mount_color != '0' and mount_color != 'None':
+
+			img_with_mount = addMount(img_source, mount_color, m_size, m_size, m_size, m_size)
+			
+			framed_img = applyBorder( request, img_with_mount, moulding['url'], border, border, border, border,
+							float(moulding['border_slice']), float(moulding['border_slice']), 
+							float(moulding['border_slice']), float(moulding['border_slice']) )
+		else:
+			framed_img = applyBorder( request, img_source, moulding['url'], border, border, border, border,
+							float(moulding['border_slice']), float(moulding['border_slice']), 
+							float(moulding['border_slice']), float(moulding['border_slice']) )
+	else :
+		# No moulding, returing the image as it is.
+		framed_img = Image.new("RGB", (img_source.width, img_source.height), 0)
+		framed_img.paste(img_source, (0,0))		
+	
+	##framed_img = dropShadow(framed_img)
+	'''
+	buffered = BytesIO()
+	framed_img.save(buffered, format='JPEG')
+	img_data = buffered.getvalue()
+	img_str = base64.b64encode(img_data)
+
+	return HttpResponse(img_str)
+	'''
+	return framed_img
+
+def get_catalog(request, prod_id, m_id, mount_color='', 
+		mount_size=0, user_width=0, prod_type='STOCK-IMAGE'):
+	
+	img = get_FramedImage_by_id(request, prod_id, m_id, mount_color, 
+		mount_size, user_width, prod_type)
+
+	######################
+	## 315, 50, 330, 295 #
+	######################	
+	max_w = 330
+	max_h = 294
+	x, y = 315, 50
+	###########################################
+	## Resize image width, height of the image
+	## as per available space
+	###########################################
+	ratio = img.width / img.height
+	if img.width > max_w:
+		w = max_w
+		h = int(max_w / ratio)
+	if img.height > max_h:
+		h = max_h
+		w = int(max_h * ratio)
+
+	img = img.resize((w, h))
+
+	env = settings.EXEC_ENV
+	if env == 'DEV' or env == 'TESTING':	
+		catalog_img = Image.open(settings.BASE_DIR + "/artevenue" + settings.STATIC_URL + "/img/catalog/catalog_1.jpg")
+	else:
+		catalog_img = Image.open(settings.PROJECT_DIR + '/' + settings.STATIC_URL  + "/img/catalog/catalog_1.jpg")
+
+	img = dropShadow_transparent_background(img,shadow=(0x00,0x00,0x00,0xff))
+
+	'''
+	if img.width < max_w:
+		gap_w = max_w - img.width 
+		x = x + round(gap_w / 2)
+	if img.height < max_h:
+		gap_h = max_h - img.height 
+		y = y + round(gap_y / 2)
+	'''
+	catalog_img.paste(img, (x, y))
+	catalog_img.show()
+	buffered = BytesIO()
+	catalog_img.save(buffered, format='JPEG')
+	catalog_img = buffered.getvalue()
+	img_str = base64.b64encode(catalog_img)
+
+	return HttpResponse(img_str)
+	
+	
+def dropShadow_transparent_background(image, offset=(8,8), background=0xffffff, shadow=0x444444, 
+                border=10, iterations=3):
+	"""
+	Add a gaussian blur drop shadow to an image.  
+
+	image       - The image to overlay on top of the shadow.
+	offset      - Offset of the shadow from the image as an (x,y) tuple.  Can be
+				positive or negative.
+	background  - Background colour behind the image.
+	shadow      - Shadow colour (darkness).
+	border      - Width of the border around the image.  This must be wide
+				enough to account for the blurring of the shadow.
+	iterations  - Number of times to apply the filter.  More iterations 
+				produce a more blurred shadow, but increase processing time.
+	"""
+
+	# Create the backdrop image -- a box in the background colour with a 
+	# shadow on it.
+	totalWidth = image.size[0] + abs(offset[0]) + 2*border
+	totalHeight = image.size[1] + abs(offset[1]) + 2*border
+	back = Image.new(image.mode, (totalWidth, totalHeight), background)
+	
+	# Place the shadow, taking into account the offset from the image
+	shadowLeft = border + max(offset[0], 0)
+	shadowTop = border + max(offset[1], 0)
+	back.paste(shadow, [shadowLeft, shadowTop, shadowLeft + image.size[0], 
+	shadowTop + image.size[1]] )
+  
+	# Apply the filter to blur the edges of the shadow.  Since a small kernel
+	# is used, the filter must be applied repeatedly to get a decent blur.
+	n = 0
+	while n < iterations:
+		back = back.filter(ImageFilter.BLUR)
+		n += 1
+    
+	# Paste the input image onto the shadow backdrop  
+	imageLeft = border - min(offset[0], 0)
+	imageTop = border - min(offset[1], 0)
+	#back.paste(image, (imageLeft, imageTop))
+	back.paste(image, (0, 0))
+
+	back = back.convert("RGBA")
+	datas = back.getdata()
+	newData = []
+	for item in datas:
+		if item[0] == 255 and item[1] == 255 and item[2] == 255:
+			newData.append((255, 255, 255, 0))
+		else:
+			newData.append(item)
+	back.putdata(newData)
+	
+	back.show()
+	back.save('test_save.png', "PNG")
+	return back

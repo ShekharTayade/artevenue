@@ -1,0 +1,158 @@
+{% load static %}					
+{% load utils %}
+{% load indian_numbers_tags %}
+{% load l10n %}	
+				
+					<!-- Category header -->
+					<h5>
+						{% if total_count > 50000 %}
+							<div class = "text-center form-group form-inline" >
+								Total {{total_count|floatformat:"0"|intcomma_indian}} results found, showing results
+								{% if result_limit == '0-50' %}
+									up to 50 thousand.
+								{% endif %}
+								{% if result_limit == '50-100' %}
+									from 50 thousand to 1 lakh.
+								{% endif %}
+								{% if result_limit == '100-150' %}
+									from 1 lakh to 1.5 lakh.
+								{% endif %}
+								{% if result_limit == '150-200' %}
+									from 1.5 lakh to 2 lakh.
+								{% endif %}
+								{% if result_limit == '200+' %}
+									over 2 lakh.
+								{% endif %}
+								<div class="dropdown">
+								  <button class="btn btn-secondary btn-sm dropdown-toggle form-control" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+										style = "padding:5px !important; margin-left:15px; font-size:0.75rem;">
+									Show more...
+								  </button>
+								  <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+										{% if slab_0_50 == "YES" %}
+											<button class="dropdown-item" style = "padding:5px !important; font-size:0.65rem;" type="button" onclick="getAllFilters(page='1', sort='{{sortOrder}}', show='{{show}}', keywords='{{ikeywords}}', result_limit='0-50');">up to 50 thousand</button>
+										{% endif %}
+										{% if slab_50_100 == "YES" %}
+											<button class="dropdown-item" style = "padding:5px !important; font-size:0.65rem;" type="button" onclick="getAllFilters(page='1', sort='{{sortOrder}}', show='{{show}}', keywords='{{ikeywords}}', result_limit='50-100');">from 50 thousand to 1 lakh</button>
+										{% endif %}
+										{% if slab_100_150 == "YES" %}
+												<button class="dropdown-item" style = "padding:5px !important; font-size:0.65rem;" type="button" onclick="getAllFilters(page='1', sort='{{sortOrder}}', show='{{show}}', keywords='{{ikeywords}}', result_limit='100-150');">from 1 lakh to 1.5 lakh</button>
+										{% endif %}
+										{% if slab_150_200 == "YES" %}
+												<button class="dropdown-item" style = "padding:5px !important; font-size:0.65rem;" type="button" onclick="getAllFilters(page='1', sort='{{sortOrder}}', show='{{show}}', keywords='{{ikeywords}}', result_limit='150-200');">from 1.5 lakh to 2 lakh</button>
+										{% endif %}
+										{% if slab_200_plus == "YES" %}
+												<button class="dropdown-item" style = "padding:5px !important; font-size:0.65rem;" type="button" onclick="getAllFilters(page='1', sort='{{sortOrder}}', show='{{show}}', keywords='{{ikeywords}}', result_limit='200+');">over 2 lakh</button>
+										{% endif %}
+								  </div>
+								</div>
+
+							</div>
+						{% else %}
+							{{prods.paginator.count|intcomma_indian}} results found
+						{% endif %}
+					</h5>
+					<div class="box-cat info-bar">
+						<div class="row">
+							<div class="col-sm-12 col-md-12 col-lg-12 products-number-sort">
+								<!-- <form class="form-inline d-block d-lg-flex justify-content-between flex-column flex-md-row"> -->
+									<div class="products-number">
+										<strong>Show</strong>
+										<!--<a href="?page={{prods.number}}&sort={{sortOrder}}&show=50" class="btn btn-sm {% if show == '50' or show == None %} btn-primary {% else %} btn-outline-secondary {% endif %}">50</a><a href="?page={{prods.number}}&sort={{sortOrder}}&show=100" class="btn btn-sm {% if show == '100' %} btn-primary {% else %} btn-outline-secondary {% endif %}">100</a><a href="?page={{prods.number}}&sort={{sortOrder}}&show=ALL" class="btn btn-sm {% if show == 'ALL' %} btn-primary {% else %} btn-outline-secondary {% endif %}">All</a><span>results/page</span>-->
+										<button type = 'button' onclick="getAllFilters(page='{{prods.number}}', sort='{{sortOrder}}',show='50', keywords='{{ikeywords}}');" class="btn btn-sm {% if show == '50' or show == 'None' %} btn-primary {% else %} btn-outline-secondary {% endif %}">50</button><button onclick="getAllFilters(page='{{prods.number}}', sort='{{sortOrder}}', show='100', keywords='{{ikeywords}}');" class="btn btn-sm {% if show == '100' %} btn-primary {% else %} btn-outline-secondary {% endif %}">100</button><button onclick="getAllFilters(page='{{prods.number}}', sort='{{sortOrder}}', show='1000', keywords='{{ikeywords}}');" class="btn btn-sm {% if show == '1000' %} btn-primary {% else %} btn-outline-secondary {% endif %}">1000</button><span>results/page</span>
+									</div>
+
+								<!-- </form>-->
+							</div>
+						</div>
+					</div>
+
+					
+					<div class="row">
+						{% for prod in prods %}
+						{% if prod.publisher %}
+						<div class="col-6 col-md-6 col-lg-3 mb-3">
+							<div class = "prod-details">
+								<div class="img-container">
+									<a id = "alink_{{prod.product_id}}" href="{% url 'stock_image_detail' prod.product_id %}">
+										{% if env == 'DEV' or env == 'TESTING' %}
+											<img src="{{ prod.url }}" alt="" class="img-fluid image-display" 
+													style = "filter: drop-shadow(0.25rem 0.25rem 0.25rem grey);" onclick="$('#img-form_{{prod.product_id}}').submit();">
+										{% else %}
+											<img src="{% static prod.url %}" alt="" class="img-fluid image-display" 
+													style = "filter: drop-shadow(0.25rem 0.25rem 0.25rem grey);" onclick="$('#img-form_{{prod.product_id}}').submit();">
+										{% endif %}		
+									</a>
+								</div>
+
+								<div class="text " style = "margin-top: 5px;">
+									<div class = "row">
+									<div class = "col-12">
+									<span class = "text-center" style="color: #11b6bd !important; font-size:0.8rem;">{{prod.name}}</span>
+									{% if prod.product_id in wishlist_prods %}
+										<span id = "fav_{{prod.product_id}}" class = "pull-right">
+											<i class = "fa fa-heart"  
+												onclick = "deleteItem('{{prod.product_id}}')" 
+												style="color:red; padding-right:5px;cursor:alias;" data-toggle="tooltip" title="Added to Favorites!"></i>
+										</span>
+									{% else %}
+										<span  id = "fav_{{prod.product_id}}" class = "pull-right">
+											<i class = "fa fa-heart-o"  
+												onclick = "addToFav({{prod.product_id}}, {% if prod.max_width > 16 %} 16 {%else%} {{prod.max_width}} {%endif%}, {{prod.aspect_ratio}}, 0, '', 0, 0, 0);"
+												style="color:red; padding-right:5px;cursor:alias;" data-toggle="tooltip" title="Add to Favourites!"></i>
+										</span>
+									{% endif %}			
+									</div>
+									</div>
+									<div style = "color:#888 !important;">{{prod.artist}}</div>
+									<div style = "margin-top:2px;">
+										{% for p in price %} {% if p.publisher_id == prod.publisher %} <i class = "fa fa-inr"></i> <span class="price"> {% get_price prod.max_width prod.aspect_ratio p.price 0 %} </span>{% endif %}{% endfor %} <span style="color:#888;">(12"X{{12|get_height:prod.aspect_ratio}}")</span>
+										<span class="price text-center">
+											<a style="color:#888 !important;" href="{% url 'stock_image_detail' prod.product_id %}">, Multiple Sizes</a>
+										</span>
+									</div>
+									</p>
+								</div>
+							</div>
+						</div>
+						<!-- END of Products -->
+						{% endif %}
+						{% endfor prods %}
+
+					</div>
+
+					<div class="box-cat info-bar">
+						<div class="row">
+							<div class="col-md-12 col-lg-12">
+								<ul class = "pagination justify-content-center"style="margin-bottom:0px !important">
+									{% if prods.has_previous %}
+									<li class="page-item">
+									  <button class="page-link" onclick="getAllFilters(page='1', sort='{{sortOrder}}', show='{{show}}', keywords='{{ikeywords}}');" aria-label="Previous">
+										<span aria-hidden="true">&laquo; First</span>
+										<span class="sr-only">begin</span>
+									  </button>
+									</li>   {% endif %}
+
+									{% for n in prods.paginator.page_range %}
+									  {% if prods.number == n %}
+										<li class="page-item active">
+										  <span class="page-link">{{ n }}<span class="sr-only">(current)</span></span>
+										</li>
+									  {% elif n > prods.number|add:'-5' and n < prods.number|add:'5' %}
+										<li class="page-item">
+										<button class="page-link" onclick="getAllFilters(page='{{n}}', sort='{{sortOrder}}', show='{{show}}', keywords='{{ikeywords}}');">{{ n }}</li>
+									  {% endif %}
+									{% endfor %}
+
+									{% if prods.has_next %}
+									  <li class="page-item">
+										<button class="page-link" onclick="getAllFilters(page='{{prods.paginator.num_pages}}', sort='{{sortOrder}}', show='{{show}}', keywords='{{ikeywords}}');" aria-label="Next">
+										  <span aria-hidden="true">Last &raquo;</span>
+										  <span class="sr-only">end</span>
+										</button>
+									  </li>
+									  {% endif %}   
+								</ul> 
+							</div>
+						</div>
+					</div>

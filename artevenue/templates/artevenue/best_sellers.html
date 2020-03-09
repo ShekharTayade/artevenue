@@ -1,8 +1,8 @@
 {% load static %}
-<div class = "container-fluid mb-4">
-	<div class="col-md-12 text-center mt-5 py-3">
-			<h2 class="text-center">BEST SELLERS
-			</h2>
+<div class = "container-fluid mt-5">
+	<div class="col-md-12 text-center">
+		<h2 class="text-center">BEST SELLERS
+		</h2>
 	</div>
 
 	<div class="row"  style = "margin:5px;">
@@ -11,11 +11,12 @@
 				<!--<div class="curatedHeading2 curatedHeading2-1 mb-1">
 					Buds and Blooms
 				</div>-->
+				<a class="btn-link" href="{% url 'curated_collections' cat_nm='Floral' %}">
 				<div class="curated-container">
 					<img src="{% static 'img/best_sellers/floral.jpg' %}" class="img-fluid">
-					<a class="btn" href="{% url 'curated_collections' 5 %}">
-					FLORAL</a>
+					<div class = "btn">FLORAL</div>
 				</div>
+				</a>
 			</div>
 		</div>
 		<div class = "col-lg-4 mt-3">
@@ -23,11 +24,12 @@
 				<!--<div class="curatedHeading2 curatedHeading2-1 mb-1">
 					Playful and More
 				</div>-->
+				<a class="btn-link" href="{% url 'curated_collections' cat_nm='Kids' %}">
 				<div class="curated-container">
 					<img src="{% static 'img/best_sellers/kids.jpg' %}" class="img-fluid">
-					<a class="btn" href="{% url 'curated_collections' 4 %}">
-					KIDS</a>
+					<div class = "btn">KIDS</div>
 				</div>
+				</a>
 			</div>
 		</div>	
 		<div class = "col-lg-4 mt-3">
@@ -35,11 +37,12 @@
 				<!--<div class="curatedHeading2 curatedHeading2-1 mb-1">
 					The Tales Of Time
 				</div>-->
+				<a class="btn-link" href="{% url 'curated_collections' cat_nm='Vintage' %}">
 				<div class="curated-container">
 					<img src="{% static 'img/best_sellers/vintage.jpg' %}" class="img-fluid">
-					<a class="btn" href="{% url 'curated_collections' 9 %}">
-					VINTAGE</a>
+					<div class = "btn">VINTAGE</div>
 				</div>
+				</a>
 			</div>
 		</div>	
 	</div>
@@ -49,11 +52,12 @@
 				<!--<div class="curatedHeading2 curatedHeading2-1 mb-1">
 					The Horizon, Yonder
 				</div>-->
+				<a class="btn-link" href="{% url 'curated_collections' cat_nm='Coastal' %}">
 				<div class="curated-container">
 					<img src="{% static 'img/best_sellers/coastal.jpg' %}" class="img-fluid">
-					<a class="btn" href="{% url 'curated_collections' 8 %}">
-					COASTAL</a>
+					<div class = "btn">COASTAL</div>
 				</div>
+				</a>
 			</div>
 		</div>
 		<div class = "col-lg-6 mt-3">
@@ -61,11 +65,12 @@
 				<!-- <div class="curatedHeading2 curatedHeading2-1 mb-1">
 					The Ways of Nature
 				</div> -->
+				<a class="btn-link" href="{% url 'curated_collections' cat_nm='Landscape' %}">
 				<div class="curated-container">
 					<img src="{% static 'img/best_sellers/landscape.jpg' %}" class="img-fluid">
-					<a class="btn" href="{% url 'curated_collections' 7 %}">
-					LANDSCAPE</a>
+					<div class = "btn">LANDSCAPE</div>
 				</div>
+				</a>
 			</div>
 		</div>	
 	</div>

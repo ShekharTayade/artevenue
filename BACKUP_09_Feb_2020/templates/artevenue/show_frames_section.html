@@ -1,0 +1,44 @@
+{% load static %}
+{% if ecom_site.show_frame_my_art_section %}
+
+<div class="main_banner">
+	<div class="row">			
+		<div class="say_pic mt-5" style = "padding:0px !important;">
+			<div id = "wrapper">
+				<!--<img src="{% static 'img/frame_my_photos_new.jpg' %}" class="img-responsive" usemap="#frame-map">-->
+				<img class = "d-none d-sm-block" src="{% static 'img/artevenue-my-frame.gif' %}" class="img-responsive" usemap="#frame-map">			
+				<a id = "anchor-frame" href="{% url 'user_image' %}"></a>				
+				<!--<img src="{% static 'img/frame_my_photos_new.jpg' %}" class="img-responsive mobile" usemap="#frame-map">-->
+				<img class = "d-block d-sm-none" src="{% static 'img/artevenue-my-frame_mobile.gif' %}" class="img-responsive mobile" usemap="#frame-map">
+				<a id = "anchor-frame-mobile" href="{% url 'user_image' %}" class = "mobile"></a>
+			</div>
+			<!-- <map name="frame-map">
+				<area shape="rect" coords="30,200,475,435" href="{% url 'user_image' %}" alt="Start Framing">
+			</map> -->
+		</div>
+	</div>
+	<!--
+	<div class = "row">
+		<div class = "col-12 text-center page_section_heading">
+			How it works
+		</div>
+	</div>
+	<div class = "row">
+		<div class = "col-4 text-center">
+			<span class = "frame_num">1</span>
+			<span class = "frame_text" >Upload photos/art from your smartphone, tablet, or computer.</span>
+		</div>
+		<div class = "col-4 text-center">
+			<span class = "frame_num">2</span>
+			<span class = "frame_text" >Choose print medium, size, frame and mount. Customize it the way you like.</span>			
+		</div>
+		<div class = "col-4 text-center">
+			<span class = "frame_num">3</span>
+			<span class = "frame_text" >We craft it to your liking and deliver to your door steps in a few days.</span>
+		</div>
+	</div> -->
+		
+</div>
+
+
+{% endif %}

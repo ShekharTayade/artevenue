@@ -6,7 +6,7 @@ from django.db.models import Count
 from django.contrib.auth.models import User
 
 from artevenue.models import Ecom_site, Main_slider, New_arrival, Promotion, Menu, Stock_image_category
-from artevenue.models import New_arrival_images, Promotion_images, Cart
+from artevenue.models import New_arrival_images, Promotion_images, Cart, Business_profile
 from django.http import HttpResponse
 from django.conf import settings
 
@@ -20,7 +20,17 @@ def topbar(request , auth_user):
 	ecom = get_object_or_404 (Ecom_site, store_id=settings.STORE_ID )
 	if request:
 		if request.user:
-			return {'ecom_site':ecom, 'request':request, 'user': request.user, 'auth_user' : auth_user}
+			business_user = False
+			try:
+				usr = User.objects.get(username = request.user)
+				bus_prof = Business_profile.objects.get(user = usr)
+				business_user = True
+			except Business_profile.DoesNotExist:
+				business_user = False		
+			except User.DoesNotExist:
+				usr = None
+			return {'ecom_site':ecom, 'request':request, 'user': request.user, 'auth_user' : auth_user,
+					'business_user':business_user}
 		else:
 			return {'ecom_site':ecom, 'request':request, }
 		

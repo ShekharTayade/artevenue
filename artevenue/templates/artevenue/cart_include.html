@@ -70,7 +70,6 @@
 													{% else %}
 														<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
 													{% endif %}
-													
 													{% if i.acrylic_id %}
 														<li>Acrylic covered</li>
 													{% endif %}
@@ -123,27 +122,42 @@
 									</tfoot>
 								</table>
 							</div>
-
+							<div class = "row">
+							<div class = "col-12 col-md-6">
+								<div class = "text-muted" style = "font-size:0.85rem; font-weight:500;">Apply Discount Coupon or eGift code:</div>
+								<form>
+									<div class="input-group">
+										<input id = "v_code" type="text" class="form-control"><span class="input-group-append">
+										<button onclick = "applyVoucher( '{{usercart.cart_id}}', $('#v_code').val(),'{{usercart.cart_total}}');" type="button" class="btn btn-primary"><i class="fa fa-gift"></i></button></span>
+									</div>
+									<div id="coupan-text"></div>
+									<!-- /input-group-->
+								</form>
+								<div style = "color:red" id="voucher-msg"></div>
+							</div>
+							</div>
 							<!--convert python data to json -->
 							{% for j in usercartitems %}
 								{{ j|json_script:j.cart_item_id }}			
 							{% endfor usercartitems %}
 							
-
-							<!-- /.table-responsive-->
-							<div class="box-footer d-flex justify-content-between flex-column flex-lg-row">
-								<div class="left"><a href="{% url 'index' %}" class="btn btn-outline-secondary">
-									<i class="fa fa-chevron-left"></i> Continue shopping</a>
-								</div>
-								<div class="right">
-									<button 
-										id = "checkout_btn"
-										type="submit" 
-										class="btn btn-primary" 
-										form = "checkoutform" 
-										value="submit">
-											Proceed to checkout <i class="fa fa-chevron-right"></i>
-									</button>
+							<div class="box-footer">
+								<div class = "row">
+									<div class = "col-12">
+										<div class="pull-left"><a href="{% url 'index' %}" class="btn btn-outline-secondary">
+											<i class="fa fa-home"></i> Continue shopping</a>
+										</div>
+										<div class="pull-right">
+											<button 
+												id = "checkout_btn"
+												type="submit" 
+												class="btn btn-primary" 
+												form = "checkoutform" 
+												value="submit">
+													Checkout <i class="fa fa-chevron-right"></i>
+											</button>
+										</div>
+									</div>
 								</div>
 							</div>
 						</form>
@@ -210,21 +224,6 @@
 						</div>
 					</div>
 										
-					<div class="box">
-						<div class="box-header">
-							<h4 class="mb-0">Coupan/eGift code</h4>
-						</div>
-						<p class="text-muted">If you have a coupon/eGift code, please enter it in the box below.</p>
-						<form>
-							<div class="input-group">
-								<input id = "v_code" type="text" class="form-control"><span class="input-group-append">
-								<button onclick = "applyVoucher( '{{usercart.cart_id}}', $('#v_code').val(),'{{usercart.cart_total}}');" type="button" class="btn btn-primary"><i class="fa fa-gift"></i></button></span>
-							</div>
-							<div id="coupan-text"></div>
-							<!-- /input-group-->
-						</form>
-						<div style = "color:red" id="voucher-msg"></div>
-					</div>
 				</div>
 				<!-- /.col-md-4-->
 

@@ -27,57 +27,80 @@
 	<body>
 		<div  style = "border:1px solid ##d4d4d4;">
 		<h5>
-			<strong>Dear {{user.first_name|title}} {{user.last_name|title}}</strong>
+			{% if user.first_name %}
+				<strong>Dear {{user.first_name|title}} {{user.last_name|title}}</strong>
+			{% else %}
+				<strong>Hi there</strong>			
+			{% endif %}
 		</h5>
 	
-		<!--
-		<h3 style = "color:#fff; background-color:#11b6bd; padding:10px; text-align:center;">WISH YOU A VERY HAPPY NEW YEAR!!</h3>
-		
-		<p><span style = "font-size:12px;">Thank you for being associated with Arte'Venue.</span></p>
-		
-		<p>
-			<span style = "font-size:12px;">While the currently running "FIRST15" (flat 15% off) offer on sign up is on,
-				we want to make the start of the new year sweet for you. Nevermind 15%, We are offering you a
-				25% off on your next purchase. </span>
-			<span style = "font-size:12px;">Please use the coupan code<span>
-			<span style = "color:#fff; background-color:#11b6bd; font-size:16px; padding:5px;">25FORYOU</span>.				
-		</p>
-		<p> 
-			<span style = "font-size:12px;">
-			This is an exlusive offer for you. So what are you waiting for? Log on to <a href="https://www.artevenue.com">Arte'Venue</a>
-			and save big on the favorite art you always wanted.
-			</span>
-		</p>
-		-->
-		
 		<div class = "row">
 			<div class = "col-sm-12">
 				<a href = "https://www.artevenue.com">
-					<img src = "https://www.artevenue.com/{% static 'img/offers/25_offer.jpg'%}" alt="25% off; Coupon Code: '25FORU'" >
+					<img src = "https://www.artevenue.com/{% static 'img/offers/25_offer_26Feb_2020.jpg'%}" alt="25% off; Coupon Code: 'ZR6oB8'" >
 				</a>
 			</div>
 		</div>
-		
-		<p><span style = "font-size:10px;">Hurry up, this offer expires on 31-Jan-2020!</span></p>
+		<p>Flat 25% off, Coupon Code: <strong>ZR6oB8</strong></p>
+		<p>If not already signed up, please sign up, login, add the artworks you like into the cart and then apply this coupon
+		in the cart. </p>
+		<p><span style = "font-size:10px;">Hurry up, this offer expires on 31-Mar-2020!</span></p>
 
-		<hr>
-		<span style = "font-size:10px;">
-			What Arte'Venue offers:
-			<ul>
-				<li>Collection of over 2.6 lakh paintings, from over 4500 artists across 
-				the world, that you can choose from. </li>
-				<li>All licensed art prints.
-				<li>A first in India, you can customize the print medium(paper or canvas), size, frame, mount
-				exactly the way you want.</li>
-				<li>We use professional quality, technova or epson paper used for fine art.</li>
-				<li>Free shipping anywhere in India, ships in 1-2 days by FedEx.</li>
-			</ul>
-		</span>
-		<hr>
+		<br>
+		<br>
+		<div class = "mt-5 mb-5">
+			<strong>ARTE'VENUE ADVANTAGE</strong>
+			<br>
+			<br>
+			<table>
+				<tbody>
+					<tr>
+						<td>
+							<img src="https://www.artevenue.com/{% static 'img/guarantee.jpg' %}" 
+								alt="100% Guranteed" class = "artevenue_offers" width = "150"
+								onclick = "show_modal('GUARANTEE');">
+						</td>
+						<td style = "margin-left:50px;">
+							<img src="https://www.artevenue.com/{% static 'img/free_fast_shipping.jpg' %}" 
+							alt = "Free Shipping" class = "artevenue_offers"  width = "150"
+							onclick = "show_modal('FREE_SHIPPING');">
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<img src="https://www.artevenue.com/{% static 'img/customization.jpg' %}" 
+							alt= "Customize This Artprint" class = "artevenue_offers"  width = "150"
+							onclick = "show_modal('CUSTOMIZATION');">						
+						</td>
+						<td style = "margin-left:50px;">
+							<img src="https://www.artevenue.com/{% static 'img/licensed.jpg' %}" 
+							alt="Licensed Artprints" class = "artevenue_offers"  width = "150"
+							onclick = "show_modal('LICENSED');">
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<img src="https://www.artevenue.com/{% static 'img/affordable.jpg' %}" 
+							alt="Quality and Affordability" class = "artevenue_offers"  width = "150"
+							onclick = "show_modal('QUALITY');">
+						</td>
+						<td style = "margin-left:50px;">
+							<img src="https://www.artevenue.com/{% static 'img/frames_collection.jpg' %}" 
+							alt="Largest Collection of Licensed Artworks" class = "artevenue_offers"  width = "150"
+							onclick = "show_modal('LARGEST');">
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<br>
+		<br>
+		<br>
 		<span style = "font-size:10px;">
 			If you need any assistance, please feel free to reply to this email, or call us at +91 996112 03626.
 		</span>
-		<hr>
+		<br>
+		<br>
 		{% if cart_items %}
 		<span style = "font-size:10px;">
 			<p> Just to remind you of the items you had in your cart -<p>			
@@ -109,13 +132,12 @@
 				<span style = "font-size:12px;">
 				With warm regards,<br />
 				Team Arte'Venue<br/>
-				<img src = "https://artevenue.com/static/img/artevenue_logo_new.png" alt="Arte'venue Logo"  height="25" width="110"> <br />
+				<img src = "https://artevenue.com/static/img/artevenue_logo_new.png" alt="Arte'Venue Logo"  height="25" width="110"> <br />
 				<a href = "https://www.artevenue.com">www.artevenue.com</a>
 				</span>
 			</p>
 		</span>
-		
-		
+
 		</div>
 	</body>
 </html>

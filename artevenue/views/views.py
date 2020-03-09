@@ -30,6 +30,7 @@ today = datetime.date.today()
 ecom = get_object_or_404 (Ecom_site, store_id=settings.STORE_ID )
 
 def index(request):
+	'''
 	session_id = request.session.session_key
 	dt = datetime.datetime.today()
 	if session_id:
@@ -64,8 +65,7 @@ def index(request):
 				ip_address = ip_addr
 			)
 			ip_rec.save()
-		
-			
+	'''	
 	return render(request, "artevenue/estore_base.html",{})
 
 
@@ -282,6 +282,8 @@ def validate_address(request):
 		q = q.filter(state_id = icstate)
 	if icity:
 		cnt = Country.objects.filter(country_name = icountry).first()
+		if not cnt :
+			cnt = Country.objects.filter(country_code = icountry).first()
 		q = q.filter(country = cnt)
 	
 	if q is None or q.count() == 0:

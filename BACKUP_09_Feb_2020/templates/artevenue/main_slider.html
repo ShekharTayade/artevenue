@@ -1,0 +1,70 @@
+{% load static %}
+<div id = "headln">
+	
+</div>
+
+{% if ecom_site.show_promotion_section %}
+			
+	<section class="main_banner">
+			<div class="row">						
+				<div class="col-md-12 col-sm-12 col-12 align-self-center"  style = "padding:0px; !important;">
+					<!-- <div class="say_pic">
+						<div id = "wrapper">
+							<img src = "{% static 'img/main-image/entry_banner.jpg' %}" class="img-responsive">
+							<a id = "anchor-main-banner" href="{% url 'all_art_images' %}"></a>
+							<img src="{% static 'img/main-image/entry_banner_mobile.jpg' %}" class="img-responsive mobile" usemap="#mainbannermap">
+							<a id = "anchor-main-banner-mobile" href="{% url 'all_art_images' %}" class = "mobile"></a>
+							<map name="mainbannermap">
+							  <area shape="rect" coords="50,100,350,324" href="{% url 'all_art_images' %}" alt="Start Shopping">
+							</map>
+						</div>
+					</div> -->
+
+					<div id="main-slider" class="owl-carousel owl-theme">
+						<div class="item">
+							<!--<a href = "{% url 'register' %}"> 
+								<img src="{% static 'img/banner1.png' %}" alt="" class="img-fluid">
+							</a> -->
+
+							<a href = "{% url 'register' %}" class="d-none d-sm-block">
+								<img src="{% static 'img/banner1_1.jpg' %}" alt="logo" class="img-fluid">
+							</a>
+							<a href = "{% url 'register' %}"  class="d-block d-sm-none">
+								<img src="{% static 'img/banner1_mobile_1.jpg' %}" alt="{{ecom_site.store_name}}" class="img-fluid">
+							</a>
+						</div>
+						<div class="item">
+							<!-- <a href = "{% url 'curated_collections' 1 %}">
+								<img src="{% static 'img/banner2.png' %}" alt="" class="img-fluid">
+							</a> -->
+							
+							<a href = "{% url 'curated_collections' 1 %}" class="d-none d-sm-block">
+								<img src="{% static 'img/banner2.jpg' %}" alt="logo" class="img-fluid">
+							</a>
+							<a href = "{% url 'curated_collections' 1 %}"  class="d-block d-sm-none">
+								<img src="{% static 'img/banner2_mobile.jpg' %}" alt="{{ecom_site.store_name}}" class="img-fluid">
+							</a>
+													
+						</div>
+						<div class="item">
+							<!-- <a href = "{% url 'all_art_images' %}">
+								<img src="{% static 'img/banner3.png' %}" alt="" class="img-fluid">
+							</a> -->
+							
+							<a href = "{% url 'all_art_images' %}" class="d-none d-sm-block">
+								<img src="{% static 'img/banner3.jpg' %}" alt="logo" class="img-fluid">
+							</a>
+							<a href = "{% url 'all_art_images' %}"  class="d-block d-sm-none">
+								<img src="{% static 'img/banner3_mobile.jpg' %}" alt="{{ecom_site.store_name}}" class="img-fluid">
+							</a>
+							
+						</div>
+						
+						
+					</div>
+										
+				</div>
+			</div>
+	</section>			
+			
+{% endif %}

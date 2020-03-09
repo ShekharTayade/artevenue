@@ -1,0 +1,110 @@
+{% load static %}
+		<h1><small>Ref Code: {{business_code}}</small></h1>
+		
+		{% if results.count == 0 %}
+		<div class = "row mt-3 mb-5">
+			<div class = "col-12">
+				<h3>You are yet to get off the mark!</h3>
+				Please start using the business referral code and have your 
+				clients place the orders. Great benefits await you.
+			</div>
+		</div>
+		{% endif %}
+		<div class = "row mt-3 mb-5">
+			<div class = "col-12">
+				<table class = "table table-bordered table-responsive">
+					<thead>
+						<tr>
+							<th>No. of Signed Up Clients</th>
+							<th>No. of Clients with Orders</th>
+							<th>Order Value</th>
+							<th>Referral Fee Earned</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td class = "text-center">
+								<span style = "font-weight:600;">
+									{{client_total|default_if_none:'0'}}
+								</span>
+							</td>
+							<td class = "text-center">
+								<span style = "font-weight:600;">
+									{{clients_with_orders|default_if_none:'0'}}
+								</span>
+							</td>
+							<td class = "text-center">
+								<span style = "font-weight:600;">
+									{{total_order_value|default_if_none:'0'|floatformat}}
+								</span>
+							</td>
+							<td class = "text-center">
+								<span style = "font-weight:600;">
+									{{total_ref_fee|default_if_none:'0'|floatformat}}
+								</span>
+							</td>
+							
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div class = "row mt-3 mb-5">
+			<div class = "col-12">
+				<table class = "table table-bordered table-responsive">
+					<thead>
+						<tr>
+							<th>Client</th>
+							<th>Ord #</th>
+							<th>Ord Dt</th>
+							<th>Ord Amt</th>
+							<th>Referral Fee</th>
+							<th>Paid Date</th>
+							<th>Reference</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for r in results %}
+						<tr>
+							<td>								
+								{{r.client}}
+							</td>
+							<td><a href = "{% url 'my_client_order_report' r.id %}" style="text-decoration:underline;">
+								{{r.order_number}}
+								</a>
+							</td>
+							<td>{{r.order_date|date:'d M Y'}}</td>
+							<td>{{r.ord_val|floatformat}}</td>
+							<td>{{r.ref_fee|floatformat}}</td>
+							<td>{{r.fee_paid_dt|date:'d M Y'}}</td>
+							<td>{{r.fee_paid_ref}}</td>
+							<td>{% if r.deferred_payment %} Your payment for this order is outstanding. Referral fee will be processed after this due payment is cleared. {% endif %}</td>
+						</tr>
+						{% empty %}
+						<tr>
+							<td colspan = '3'>
+								{{msg}}
+							</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>
+		
+		<div class = "row mt-3 mb-5">
+			<div class = "col-12">
+				<form action = "{% url 'my_business_report' %}">
+				<input hidden name='printpdf' value = 'TRUE'>
+				<input hidden name = "fromdate" id = "fromdate_pdf" value = "$('#fromdate').val();">
+				<input hidden name = "todate" id = "todate_pdf" value = "$('#todate').val();">
+				<button class = "btn btn-primary"
+					type = "submit">
+					<i class = "fa fa-download">
+						Download PDF
+					</i>
+				</button>
+				</form>
+			</div>
+		</div>

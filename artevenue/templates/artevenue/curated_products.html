@@ -216,8 +216,19 @@ art works from artists across the world. We deliver customized art prints at you
 
 				<div class="col-lg-9">
 					<div class="box-cat">
-						<h1>{% if product_category %} {{ product_category.name }} {% else %} All Art {% endif %}</h1>
-						<p>{% if product_category.description %} {{product_category.description}} {% else %} Please use filters on left to narrow your search{% endif %}</p>
+						<h1 style="text-decoration: underline;">Hand-picked {% if product_category %} {{ product_category.name }} Art Prints{% else %} All Art Prints{% endif %}</h1>
+						<!-- <h4>Brinnig You This Hand-picked Range of {% if product_category.name%}{{product_category.name}}{% endif %} Art Prints of Impressive Paintings, Artworks from Artists Across the World.<br />
+							Breathe Life Into Your Room Walls with these Amazing Artworks.</h4>
+						</h4>-->
+						{% if product_category.description %} 
+							<h4>
+								{{product_category.description}}
+							<h4>
+							<h5>Select from finished sizes or customize each artwork to suit your rooms, whether it's your living room, bedroom room, kitchen, Dining, Study or any other space.
+								Bring it home as framed art print by choosing the size, frame, print surface, mount. You may even choose to get it as stretched on canvas art print. Or get it just as a wall poster without the frame.
+							</h5>
+						{% endif %}
+
 					 </div>
 
 					<div id = "img-display">
@@ -372,7 +383,7 @@ art works from artists across the world. We deliver customized art prints at you
 			document.documentElement.scrollTop = 0; 
 						
 			{% if product_category.category_id %}								
-				$.ajax({url: '{% url "curated_collections" product_category.category_id %}', 
+				$.ajax({url: '{% url "curated_collections" product_category.name %}', 
 					data: filter, 
 					dataType: 'text', 
 					type: 'POST',

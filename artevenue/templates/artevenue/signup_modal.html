@@ -1,0 +1,205 @@
+{% load static %}
+	<div id="signup_popup-modal" tabindex="-1" role="dialog" aria-labelledby="Login" aria-hidden="true" class="modal fade">
+		<div class="modal-dialog modal-md">
+			<div class="modal-content">
+				<div class="modal-header" style = "background-color:#11b6bd;color:#fff">
+					<h3 class="modal-title" >Sign Up</h3>
+					<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
+				</div>
+				<div class = "modal-body">
+					<form method="post" action = "{% url 'register' signup_popup=1%}" novalidate>
+						{% csrf_token %}
+						{% load socialaccount %}	
+						{% providers_media_js %}
+						<input hidden name="curr_pg" value="{{request.path}}" >						
+						<input hidden id="signup-recaptcha" name="signup-recaptcha">	
+						
+						<div class = "row">
+							<div class ="col-12">
+															
+								{% if msg %}
+									<p style="color:red">{{msg}}</p>
+								{% endif %}
+								{% for hidden in form.hidden_fields %}
+								  {{ hidden }}
+								{% endfor %}
+							</div>
+						</div>
+
+						{% if form.errors or validation_msg%}
+						<div id="errors" class="alert alert-warning alert-dismissable">
+							<button type="button" class="close" data-dismiss="alert">&times;</button>
+							<div class="inner">
+								{{ form.non_field_errors }}
+								<ul>
+									<!-- Forms -->
+									{% for field in form %}
+										{% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+									{% endfor %}
+									<!-- Validations -->
+									{% for v in validation_msg %}
+										<li>{{v}}</li>
+									{% endfor %}									
+								</ul>
+							</div>
+						</div>
+						{% endif %} 
+
+
+						<div class ="row">
+							<div class ="col-12">
+								<div class="form-group" style = "display:flex;">
+									<input placeholder="Username" type="text" name="username" 
+									maxlength="254" autofocus="" class="form-control"
+									required="" id="id_username"
+									value = "{{form.username.value|default_if_none:''}}"
+									>
+								</div>							
+							</div>
+						</div>
+						<div class ="row">
+							<div class ="col-6">
+								<div class="form-group">
+									<input placeholder="(Optional) First Name" type="text" name="first_name" 
+									maxlength="30" class="form-control" id="id_first_name"
+									value = "{{form.first_name.value|default_if_none:''}}">
+								</div>
+							</div>
+							<div class ="col-6">
+								<div class="form-group">
+									<input placeholder="(Optional) Last Name" type="text" name="last_name" 
+									maxlength="30" class="form-control" id="id_last_name"
+									value = "{{form.last_name.value|default_if_none:''}}">
+								</div>
+							</div>
+						</div>
+						<div class = "row">
+							<div class ="col-12">
+								<div class="form-group" style = "display:flex;">
+									<input placeholder="Email Id" type="email" name="email" maxlength="254" 
+										class="form-control" required="" id="id_email" 
+										value = "{{form.email.value|default_if_none:''}}">
+								</div>						
+							</div>
+						</div>
+						
+						<div class = "row">
+							<div class ="col-6">
+								<div class="form-group">
+									<input placeholder="Password" type="password" name="password1" class="form-control" required="" id="id_password1">
+								</div>
+							</div>
+							<div class ="col-6">
+								<div class="form-group">
+									<input placeholder="Password Confirmation" type="password" name="password2" class="form-control" required="" id="id_password2">
+								</div>
+							</div>
+						</div>
+						<div class = "row">
+							<div class ="col-12">
+								<div class="form-group">
+									<input placeholder="(Optional) Business Referral Code" type="text" 
+									name="business_code" class="form-control"
+									id="business_code"
+									maxlength=8
+									value = "{{business_code}}">
+									<small class = "text-muted">If you have a business referral code, please enter it here.</small>
+								</div>
+							</div>
+						</div>
+						<hr>
+						<div class="row text-center">
+							<div class = "col-12">
+								<h3>
+									We do not share your information with third parties without your consent.
+								</h3>
+							</div>
+						</div>
+						<hr>						<div class="row text-center">
+							<div class = "col-12">
+								<small><input id = "tnc" name="tnc" type="checkbox" value="" checked onchange="activateButton(this);"> I have read and understood the Arte'Venue <a href="{% url 'terms_conditions' %}">terms of usage</a> and <a href="{% url 'privacy_policy' %}">privacy policy</a></small>
+								<div id="tnc_err" style="display:none;" class="alert alert-danger">
+									<button type="button" class="close float:left" data-dismiss="">×</button>
+										To sign up please read and accept terms and conditions!
+								</div>
+								<div class="text-center" style="margin-top: 0px;margin-bottom: 3px;">
+									<button id = "submit-btn" type="submit" class="btn btn-primary" style="border-radius: 0;width: 150px">Sign Me Up</button>
+								</div>
+							</div>
+						</div>
+						<hr>
+						<h5>
+							Sign Up Using Your Social Media Account
+						</h5>
+						<div class = "well">
+							<div class = "row">
+								<div class="col-12 text-center">
+									<a class="btn auth-provider-button" href="{% provider_login_url 'facebook' method='js_sdk' %}">
+									  <img src="{% static 'img/fb_login.png' %}" alt="Facebook Login" style="height:38px;border:0; width:200px;">
+									</a>
+								</div>
+								<div class="col-12 text-center">
+									<a class="btn auth-provider-button" href="{% provider_login_url 'instagram' %}">
+									  <img src="{% static 'img/instagram_login.png' %}" alt="Instagram Login" style="height:38px;border:0; width:200px;">
+									</a>
+								</div>
+								<div class="col-12 text-center">
+									<a class="btn auth-provider-button" href="{% provider_login_url 'google' %}">
+									  <img src="{% static 'img/google_login.png' %}" alt="Google Login" style="height:38px;border:0; width:200px;">
+									</a>
+								</div>
+							</div>
+						</div>
+						<hr>
+					</form>				
+				</div>
+			</div>
+		</div>
+	</div>
+	<script>
+	  grecaptcha.ready(function() {
+		  grecaptcha.execute('6Le2ZqAUAAAAAIAvZ7dRPJkj5zLI2IYAxfPktXqE', {action: 'signup'}).then(function(token) {
+			$("#signup-recaptcha").val(token);
+		  });
+	  });
+	</script>
+
+	<script> 
+		function displayTnC() {
+			$('#terms').modal('show');
+		}
+	</script>
+	
+	<script>
+		function checkTnC() {
+			var chkbox = document.getElementById("tnc");
+			var sts = chkbox.checked
+			var msg = document.getElementById("tnc_err");
+			if (sts) {
+				msg.style.display = "none";
+			} else {
+				msg.style.display = "block";
+			}
+		}
+	</script>
+	<script>
+		function activateButton(element) {
+
+			checkTnC();
+			sts = element.checked;
+			if(sts) {        
+				document.getElementById("submit-btn").disabled = false;
+				
+			}
+			else  {
+				document.getElementById("submit-btn").disabled = true;
+			}
+		}   
+	</script>
+
+	<script>
+	   $(document).ready(function () {
+			activateButton($("#tnc"));
+		});
+	</script>		
+	

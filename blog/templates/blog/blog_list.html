@@ -1,0 +1,68 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block page-title %}
+<title>Create Artist profile | Create Artist profile on Arte'Venue</title>
+{% endblock page-title %}
+
+{% block page-description %}
+<meta name="description" content="Blog at artevenue.com.">
+{% endblock page-description %}
+
+{% block page-keywords %}  
+<meta name="keywords" content="Artevenue blog, art blog, fine art blog">
+{% endblock page-keywords %}  
+
+{% block page-author %}  
+<meta name="author" content="Arte'venue">
+{% endblock page-author %}  
+
+{% block add_to_head %}
+   <script src="//cdn.tinymce.com/4/tinymce.min.js"></script>
+   <script>tinymce.init({ selector:'textarea' });</script>
+{% endblock add_to_head %}
+
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+    <div id="" class = "container-fluid">
+		<h1 class = "text-center mt-3" style = "color: #11b6bd;">Welcome to Arte'Venue Blog</h1>
+		<h3 class = "text-center">Check out the latest blogs...</h3>
+		<div class = "mb-3 blog">
+			<article class="blog_list">
+				{% for b in blogs %}
+				<a href = "{% url 'get_blog' b.post_id %}">
+				<div class="blog_list_blog">
+					<div class = "row">
+						<div class = "col-12 blog_title">
+							<h3>{{b.title}}</h3>
+						</div>
+					</div>
+					<div class = "row mt-3">
+						<div class = "col-12 blog_content">
+							{{b.post|safe|truncatechars:300}}
+						</div>
+					</div>
+					<div class = "row mt-2">
+						<div class = "col-12 text-center">
+							By
+						</div>
+					</div>
+					<div class = "row">
+						<div class = "col-12 text-center">
+							{{b.author.user.first_name}} {{ b.author.user.last_name }}
+							<span class = "pull-right"><i class="fa fa-play-circle fa-2x" style="color: #11b6bd;"></i></span>
+						</div>
+					</div>
+				</div>
+				</a>
+				{% endfor %}
+			</article>
+		</div>
+	</div>
+	{% endblock sitecontent %}
+
+	
+	{% block jscripts %}
+		
+	{% endblock jscripts %}

@@ -2,22 +2,25 @@
 				{% load utils %}
 				<div class = "row">					
 					{% for key, value in ready_prod_data_canvas.items %}
-						<div class="image-c col-4" >
+						<div id= "canvas-{{value.CANVAS_WIDTH_UNFRAMED}}" class="image-c col-4" >
 							<a onclick = "set_ready_product('CANVAS', '{{key}}', '{{value.CANVAS_WIDTH_UNFRAMED}}');"> 
 								<img id = "prod-width-{{key}}-canvas" src = '' alt = "Prod-Img" class="img-fluid">
 								<span class="text text-center">
 									<h5 id = "size-{{key}}-canvas" class = "mt-1">
 										{{ value.CANVAS_WIDTH|floatformat }} X {{ value.CANVAS_HEIGHT|floatformat}} inch
  									</h5>
-									<h5>										
+									<h5 style = "margin:0rem;">										
 										<i id = "price-{{key}}-paper" class = "fa fa-inr"> {{ value.CANVAS_PRICE|floatformat }} </i>
 									</h5>
 								</span>
 							</a>
+							<div id = "canvas-select-{{key}}" style = "display:none; position: absolute; bottom: 8px; left: 5px;">
+								<i class = "fa fa-check-square-o" style = "color:#11b6bd;"></i>
+							</div>
 						</div>
 					{% endfor %}					
 				</div>
-				<div class = "row">
+				<div class = "row" style = "display:none;">
 					<div class = "col-12" style = "font-size:9px;">
 						PRINT SIZE:<br />
 						{% for key, value in ready_prod_data_canvas.items %}

@@ -1,0 +1,655 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% block page-title %} 
+<title>Arte'Venue - My Account</title>
+{% endblock page-title %} 
+{% block page-description %}
+<meta name="description" content="View my arte'venue account details">
+{% endblock page-description %}
+{% block page-keywords %}
+<meta name="keywords" content="Art, arvenue, account, orders">
+{% endblock page-keywords %}
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+        <div class="container-fluid">
+			<div class="row">
+				<!-- breadcrumb-->
+				<div class="col-sm-12">
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+							<li aria-current="page" class="breadcrumb-item active">My Account</li>
+						</ol>
+					</nav>
+				</div>
+			</div>
+			<h6 class="section-title h1">My Account</h6>
+			<div class="row">
+				{% if user_form.errors or businessprofile_form.errors or shipping_form.errors or billing_form.errors or msg %}
+				<div class="col-12">
+					<div id="errors" class="alert alert-warning alert-dismissable">
+						<button type="button" class="close" data-dismiss="alert">&times;</button>
+						<div class="inner">
+							{% if user_form.errors or businessprofile_form.errors or user_ProfileForm.errors%}
+								<p>There were issues in the information you entered. Please correct following:</p>
+							{% endif %}
+							<!-- Error messaging -->
+							{{ user_form.non_field_errors }}
+							{{ businessprofile_form.non_field_errors }}
+							{{ user_ProfileForm.non_field_errors }}
+							{% if user_form.errors %}
+								Arte'Venue Account:<br/>
+								<ul>
+									<!-- Forms -->
+									{% for field in user_form %}
+										{% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+									{% endfor %}
+								</ul>
+							{% endif %}
+							{% if user_ProfileForm.errors %}
+								Your Profile:<br/>
+								<ul>
+									<!-- Forms -->
+									{% for field in user_ProfileForm %}
+										{% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+									{% endfor %}
+								</ul>
+							{% endif %}
+							{% if businessprofile_form.errors %}
+								Business Profile:<br/>
+								<ul>
+									{% for field in businessprofile_form %}
+										{% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+									{% endfor %}
+								</ul>
+							{% endif %}
+							{% if shipping_form.errors %}
+								Shipping Address:<br/>
+								<ul>
+									{% for field in billing_form %}
+										{% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+									{% endfor %}
+								</ul>
+							{% endif %}
+							{% if billing_form.errors %}
+								Billing Address:<br/>
+								<ul>
+									{% for field in billing_form %}
+										{% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+									{% endfor %}
+								</ul>
+							{% endif %}
+																	
+							{% if msg %}
+							<ul>
+								<!-- Validations -->
+								<li>{{msg}}</li>
+							</ul>
+							{% endif %}							
+						</div>
+					</div>
+				</div>
+				{% endif %} 
+			</div>
+			<!-- /Error messaging -->
+			<div class="row">
+				<div class="col-12 col-md-6 mt-3">
+					<div class="card">
+						<form id = "accnt" method = "post">
+							{% csrf_token %}
+							<h3> <strong>My Arte'Venue Account</strong></h3>
+							{% for hidden in user_form.hidden_fields %}
+							  {{ hidden }}
+							{% endfor %}
+
+							{% for field in user_form.visible_fields %}
+							  <div class="form-group">
+								<label for="{{ field.id_for_label }}">{{ field.label }}</label>
+								{{ field|add_class:'form-control' }}
+								{% for error in field.errors %}
+								  <span class="error_text">{{ error }}</span>
+								{% endfor %}
+							  </div>
+							{% endfor %}
+							<!--<input class = "btn btn-primary" name = "u_form" type="submit" value="Save Changes"></button>-->
+							<div class = "col-12 mt-3">
+								<div class = "text-center">
+									<input class = "btn btn-primary" name = "u_form" type="submit" value = "Save Changes"></button>
+								</div>			
+							</div>										
+						</form>
+					</div>
+				</div>
+				{% if user_ProfileForm %}
+				<div class = "col-12 col-md-6 mt-3">
+					<div class="card">
+						<form id = "prof" method = "post">
+							{% csrf_token %}
+							<h3> <strong>My Profile</strong></h3>
+							{% for hidden in user_ProfileForm.hidden_fields %}
+							  {{ hidden }}
+							{% endfor %}
+
+							{% for field in user_ProfileForm.visible_fields %}
+								{%if  field.label != 'Date of birth' %}
+								<div class="form-group">
+									<label for="{{ field.id_for_label }}">{{ field.label }}</label>
+									{{ field|add_class:'form-control' }}
+									{% for error in field.errors %}
+									  <span class="error_text">{{ error }}</span>
+									{% endfor %}
+								</div>
+								{% else %}
+								<div class="form-group">
+									<label for="{{ field.id_for_label }}">{{ field.label }}</label>
+									<input type="date" name="prof-date_of_birth" value="{{user_ProfileForm.date_of_birth.value|date:'Y-m-d'}}" placeholder="May be you will get lucky on your birthday :)" class="form-control" id="id_prof-date_of_birth">
+									{% for error in field.errors %}
+									  <span class="error_text">{{ error }}</span>
+									{% endfor %}
+								</div>
+								{% endif %}
+							{% endfor %}
+							<div class = "col-12 mt-3">
+								<div class = "text-center">
+									<input class = "btn btn-primary" name = "prof_form" type="submit" value = "Save Profile"></button>
+								</div>			
+							</div>										
+						</form>				
+					</div>
+				</div>
+				{% endif %}
+			</div>
+			{% if businessprofile_form %}
+			<div class = "row mt-3">
+				<div class="col-12">
+					<div class="card">
+						<form id = "bus_form" method = "post">
+							{% csrf_token %}
+							<h3><strong>My Business Profile</strong></h3>
+							{% include 'artevenue/business_profile_form_include.html' %}
+							<div class = "col-12 mt-3">
+								<div class = "text-center">
+									<!-- <button class = "btn btn-primary" form = "bus_form" type="submit">Save Changes</button> -->
+									<input class = "btn btn-primary" name = "b_form" type="submit" value="Save Business Profile"></button>
+								</div>			
+							</div>										
+						</form>
+					</div>
+				</div>
+			</div>
+			{% endif %}
+			<div class = "row">
+				{% if shipping_form %}
+				<div class="col-12 col-md-6 mt-3">
+					<div class="card">
+						<form id = "ship_addr_form" method = "post">
+							{% csrf_token %}
+							<h3><strong>My Shipping Address</strong></h3>
+
+							{% for hidden in shipping_form.hidden_fields %}
+							  {{ hidden }}
+							{% endfor %}
+
+							{% for field in shipping_form.visible_fields %}
+							  <div class="form-group">
+								<label for="{{ field.id_for_label }}">{{ field.label }}</label>
+								{{ field|add_class:'form-control' }}
+								{% for error in field.errors %}
+								  <span class="error_text">{{ error }}</span>
+								{% endfor %}
+							  </div>
+							{% endfor %}
+							<div class="row">
+								<div id = "ship_err_div" class="col-12" style ="display:none;">
+									<div id = "shipping_addr_error" style =" margin: 10px; color:#dc3545; padding:5px; border: 1px solid #dc3545">
+									</div>
+								</div>
+							</div>
+							<div class = "col-12 mt-3">
+								<div class = "text-center">
+									<input class = "btn btn-primary" name = "ship_form" type="submit" value = "Save Shipping Address"></button>
+								</div>			
+							</div>										
+						</form>
+					</div>
+				</div>
+				{% endif %}
+				{% if billing_form %}
+				<div class="col-12 col-md-6 mt-3">
+					<div class="card">
+						<form id = "bill_addr_form" method = "post">
+							{% csrf_token %}
+							<h3><strong>My Billing Address</strong></h3>
+
+							{% for hidden in billing_form.hidden_fields %}
+							  {{ hidden }}
+							{% endfor %}
+
+							{% for field in billing_form.visible_fields %}
+							  <div class="form-group">
+								<label for="{{ field.id_for_label }}">{{ field.label }}</label>
+								{{ field|add_class:'form-control' }}
+								{% for error in field.errors %}
+								  <span class="error_text">{{ error }}</span>
+								{% endfor %}
+								</div>
+							{% endfor %}
+							<div class="row">
+								<div id = "bill_err_div" class="col-12" style ="display:none;">
+									<div id = "billing_addr_error" style =" margin: 10px; color:#dc3545; padding:5px; border: 1px solid #dc3545">
+									</div>
+								</div>
+							</div>
+							<div class = "col-12 mt-3">
+								<div class = "text-center">
+									<input class = "btn btn-primary" name = "bill_form" type="submit" value = "Save Biling Address"></button>
+								</div>			
+							</div>										
+						</form>
+					</div>
+				</div>
+				{% endif %}
+			</div>
+			{% if egift_giver %}
+			<div class = "row mt-3">
+				<div class="col-12 col-md-6" style="overflow: auto;">
+					<div class="card">
+						<h3> <strong>You have bought following eGifts</strong></h3>
+						{% for eg in egift_giver %}
+						<div class="form-group">
+							<label for="">
+								Order No. {{eg.gift_rec_id}}, dated {{eg.gift_date}}, bought for {{eg.receiver_name}} 
+								<a class = "btn btn-link" href = "{% url 'egift_card_review' eg.gift_rec_id %}">
+									<i class = "fa fa-ellipsis-h"></i>
+								</a>
+							</label>
+						</div>
+						{% endfor %}
+					</div>
+				</div>
+			</div>
+			{% endif %}
+			{% if egift_receiver %}
+			<div class = "row mt-3">
+				<div class="col-12 col-md-6" style="overflow: auto;">
+					<div class="card">
+						<h3> <strong>You have received following eGifts</strong></h3>
+						{% for eg in egift_receiver %}
+						<div class="form-group">
+							<label for="">
+								Voucher Code: <strong>{{eg.voucher.voucher_code}}</strong>, Gift Amount: {{eg.gift_amount}}
+								{% if egift_redemption %}
+									<br/>Redemptions:<br/>
+									{% for er in egift_redemption %}
+										{% if eg.gift_rec_id == er.egift_id %}
+											Amount: {{er.redemption_amount|floatformat}}, {{er.redemption_date}}<br />
+										{% endif %}
+									{% endfor %}
+								{% endif %}
+								
+							</label>
+						</div>
+						{% endfor %}									
+					</div>
+				</div>
+			</div>
+			{% endif %}
+		</div>
+		{% include "artevenue/fix-error-message.html" %}
+
+	{% endblock sitecontent %}
+
+	
+	{% block jscripts %}
+	
+	<script>
+		$( document ).ready(function() {
+			{% if businessprofile_form %}
+				$('#id_prof-business_referral_code').prop('readonly','readonly');
+			{% endif %}
+		});	
+	</script>
+	<script>
+		$('#id_ship-pin_code').on("change", function(){
+			getCities(this.value, 'SHIPPING');
+		});
+		$('#id_bill-pin_code').on("change", function(){
+			getCities(this.value, 'BILLING');
+		});
+	</script>
+	
+	<script>
+		function autocomplete(inp, arr) {
+		  /*the autocomplete function takes two arguments,
+		  the text field element and an array of possible autocompleted values:*/
+		  var currentFocus;
+		  /*execute a function when someone writes in the text field:*/
+		  inp.addEventListener("input", function(e) {
+			  var a, b, i, val = this.value;
+			  /*close any already open lists of autocompleted values*/
+			  closeAllLists();
+			  if (!val) { return false;}
+			  currentFocus = -1;
+			  /*create a DIV element that will contain the items (values):*/
+			  a = document.createElement("DIV");
+			  a.setAttribute("id", this.id + "autocomplete-list");
+			  a.setAttribute("class", "autocomplete-items");
+			  /*append the DIV element as a child of the autocomplete container:*/
+			  this.parentNode.appendChild(a);
+			  /*for each item in the array...*/
+			  for (i = 0; i < arr.length; i++) {
+				/*check if the item starts with the same letters as the text field value:*/
+				if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+				  /*create a DIV element for each matching element:*/
+				  b = document.createElement("DIV");
+				  /*make the matching letters bold:*/
+				  b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+				  b.innerHTML += arr[i].substr(val.length);
+				  /*insert a input field that will hold the current array item's value:*/
+				  b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+				  /*execute a function when someone clicks on the item value (DIV element):*/
+				  b.addEventListener("click", function(e) {
+					  /*insert the value for the autocomplete text field:*/
+					  inp.value = this.getElementsByTagName("input")[0].value;
+					  /*close the list of autocompleted values,
+					  (or any other open lists of autocompleted values:*/
+					  closeAllLists();
+				  });
+				  a.appendChild(b);
+				}
+			  }
+		  });
+		  /*execute a function presses a key on the keyboard:*/
+		  inp.addEventListener("keydown", function(e) {
+			  var x = document.getElementById(this.id + "autocomplete-list");
+			  if (x) x = x.getElementsByTagName("div");
+			  if (e.keyCode == 40) {
+				/*If the arrow DOWN key is pressed,
+				increase the currentFocus variable:*/
+				currentFocus++;
+				/*and and make the current item more visible:*/
+				addActive(x);
+			  } else if (e.keyCode == 38) { //up
+				/*If the arrow UP key is pressed,
+				decrease the currentFocus variable:*/
+				currentFocus--;
+				/*and and make the current item more visible:*/
+				addActive(x);
+			  } else if (e.keyCode == 13) {
+				/*If the ENTER key is pressed, prevent the form from being submitted,*/
+				e.preventDefault();
+				if (currentFocus > -1) {
+				  /*and simulate a click on the "active" item:*/
+				  if (x) x[currentFocus].click();
+				}
+			  }
+		  });
+		  function addActive(x) {
+			/*a function to classify an item as "active":*/
+			if (!x) return false;
+			/*start by removing the "active" class on all items:*/
+			removeActive(x);
+			if (currentFocus >= x.length) currentFocus = 0;
+			if (currentFocus < 0) currentFocus = (x.length - 1);
+			/*add class "autocomplete-active":*/
+			x[currentFocus].classList.add("autocomplete-active");
+		  }
+		  function removeActive(x) {
+			/*a function to remove the "active" class from all autocomplete items:*/
+			for (var i = 0; i < x.length; i++) {
+			  x[i].classList.remove("autocomplete-active");
+			}
+		  }
+		  function closeAllLists(elmnt) {
+			/*close all autocomplete lists in the document,
+			except the one passed as an argument:*/
+			var x = document.getElementsByClassName("autocomplete-items");
+			for (var i = 0; i < x.length; i++) {
+			  if (elmnt != x[i] && elmnt != inp) {
+				x[i].parentNode.removeChild(x[i]);
+			  }
+			}
+		  }
+		  /*execute a function when someone clicks in the document:*/
+		  document.addEventListener("click", function (e) {
+			  closeAllLists(e.target);
+		  });
+		}
+
+		/*An array containing all the country names in the world:*/
+		var countries = ["Afghanistan","Albania","Algeria","Andorra","Angola","Anguilla","Antigua & Barbuda","Argentina","Armenia","Aruba","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bermuda","Bhutan","Bolivia","Bosnia & Herzegovina","Botswana","Brazil","British Virgin Islands","Brunei","Bulgaria","Burkina Faso","Burundi","Cambodia","Cameroon","Canada","Cape Verde","Cayman Islands","Central Arfrican Republic","Chad","Chile","China","Colombia","Congo","Cook Islands","Costa Rica","Cote D Ivoire","Croatia","Cuba","Curacao","Cyprus","Czech Republic","Denmark","Djibouti","Dominica","Dominican Republic","Ecuador","Egypt","El Salvador","Equatorial Guinea","Eritrea","Estonia","Ethiopia","Falkland Islands","Faroe Islands","Fiji","Finland","France","French Polynesia","French West Indies","Gabon","Gambia","Georgia","Germany","Ghana","Gibraltar","Greece","Greenland","Grenada","Guam","Guatemala","Guernsey","Guinea","Guinea Bissau","Guyana","Haiti","Honduras","Hong Kong","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Isle of Man","Israel","Italy","Jamaica","Japan","Jersey","Jordan","Kazakhstan","Kenya","Kiribati","Kosovo","Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania","Luxembourg","Macau","Macedonia","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Marshall Islands","Mauritania","Mauritius","Mexico","Micronesia","Moldova","Monaco","Mongolia","Montenegro","Montserrat","Morocco","Mozambique","Myanmar","Namibia","Nauro","Nepal","Netherlands","Netherlands Antilles","New Caledonia","New Zealand","Nicaragua","Niger","Nigeria","North Korea","Norway","Oman","Pakistan","Palau","Palestine","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Poland","Portugal","Puerto Rico","Qatar","Reunion","Romania","Russia","Rwanda","Saint Pierre & Miquelon","Samoa","San Marino","Sao Tome and Principe","Saudi Arabia","Senegal","Serbia","Seychelles","Sierra Leone","Singapore","Slovakia","Slovenia","Solomon Islands","Somalia","South Africa","South Korea","South Sudan","Spain","Sri Lanka","St Kitts & Nevis","St Lucia","St Vincent","Sudan","Suriname","Swaziland","Sweden","Switzerland","Syria","Taiwan","Tajikistan","Tanzania","Thailand","Timor L'Este","Togo","Tonga","Trinidad & Tobago","Tunisia","Turkey","Turkmenistan","Turks & Caicos","Tuvalu","Uganda","Ukraine","United Arab Emirates","United Kingdom","United States of America","Uruguay","Uzbekistan","Vanuatu","Vatican City","Venezuela","Vietnam","Virgin Islands (US)","Yemen","Zambia","Zimbabwe"];
+		var cities = []
+			
+		/*initiate the autocomplete function on the "myInput" element, and pass along the countries array as possible autocomplete values:*/
+		autocomplete(document.getElementById("id_ship-pin_code"), {{pin_code_arr|safe}});	
+		autocomplete(document.getElementById("id_ship-city"), {{city_arr|safe}});	
+
+		
+		var pin_code_arr = [];
+		var city_arr = [];
+		var cstate_arr = [];
+		var country_arr = [];		
+		
+		function getCities(ipin_code, source) {
+		
+			$.ajax({
+				url: '{% url "get_addr_pin_city_state" %}', 
+				data: { 'pin_code':ipin_code},
+				dataType: 'text', 
+				type: 'POST',
+				success: function (data) {
+					data = JSON.parse(data);
+					pin_code = data.pin_code;
+					city = data.city;
+					cstate = data.cstate;
+					country = data.country;
+
+					pin_code_arr = [];
+					city_arr = [];
+					cstate_arr = [];
+					country_arr = [];
+
+					pp = Object.keys(pin_code).map(function(key) {
+					  return pin_code_arr.push(pin_code[key].pin_code);
+					});
+					
+					cc = Object.keys(city).map(function(key) {
+					  return city_arr.push(city[key].city);
+					});
+					
+					ss = Object.keys(cstate).map(function(key) {
+					  return cstate_arr.push(cstate[key].state);
+					});
+
+					cn = Object.keys(country).map(function(key) {
+					  return country_arr.push(country[key].country__country_name);
+					});
+
+					
+					if (source == 'SHIPPING') {
+						autocomplete(document.getElementById("id_ship-city"), city_arr);	
+
+						cc_sh = document.getElementById("id_ship-city").value;
+						if (cc_sh == '' || cc_sh == null){
+							document.getElementById("id_ship-city").value = city_arr[0];
+						} else {
+							if (city_arr.indexOf(cc_sh) == -1 ){
+								document.getElementById("id_ship-city").value = city_arr[0];
+							}
+						}
+						cs_sh = document.getElementById("id_ship-state").value;
+						if (cs_sh == '' || cs_sh == null){
+							document.getElementById("id_ship-state").value = cstate_arr[0];
+						} else {
+							if (cstate_arr.indexOf(cc_sh) == -1 ){
+								document.getElementById("id_ship-state").value = cstate_arr[0];
+							}
+						}
+						cnt_sh = document.getElementById("id_ship-country").value;
+						if (cnt_sh == '' || cnt_sh == null){
+							document.getElementById("id_ship-country").value = country_arr[0];
+						} else {
+							if (country_arr.indexOf(cnt_sh) == -1 ){
+								document.getElementById("id_ship-country").value = country_arr[0];
+							}
+						}					
+					}
+					if (source == 'BILLING') {
+						autocomplete(document.getElementById("id_bill-city"), city_arr);	
+
+						cc_ba = document.getElementById("id_bill-city").value;
+						if (cc_ba == '' || cc_ba == null){
+							document.getElementById("id_bill-city").value = city_arr[0];
+						} else {
+							if (city_arr.indexOf(cc_ba) == -1 ){
+								document.getElementById("id_bill-city").value = city_arr[0];
+							}
+						}
+						cs_ba = document.getElementById("id_bill-state").value;
+						if (cs_ba == '' || cs_ba == null){
+							document.getElementById("id_bill-state").value = cstate_arr[0];
+						} else {
+							if (cstate_arr.indexOf(cc_ba) == -1 ){
+								document.getElementById("id_bill-state").value = cstate_arr[0];
+							}
+						}
+
+						cnt_ba = document.getElementById("id_bill-country").value;
+						if (cnt_ba == '' || cnt_ba == null){
+							document.getElementById("id_bill-country").value = country_arr[0];
+						} else {
+							if (country_arr.indexOf(cnt_ba) == -1 ){
+								document.getElementById("id_bill-country").value = country_arr[0];
+							}
+						}					
+					}
+					
+				},
+				error: function(xhr){
+					alert("An error occured: " + xhr.status + " " + xhr.statusText + " Apologies for the inconvenience!! Please let us know the details and we will be happy to help sort it out."); 
+					return;
+				}
+			});							
+		}
+			
+			
+		// Validate the addresses
+		$( '#ship_addr_form' ).submit( function ( event ) {
+		
+			event.preventDefault();
+			
+			var err_displyed = false;
+			// **********  Validate Shippng adress
+			var pin = document.getElementById("id_ship-pin_code").value;
+			var city = document.getElementById("id_ship-city").value;
+			var cstate = document.getElementById("id_ship-state").value;
+			var country = document.getElementById("id_ship-country").value;
+			$.ajax({
+				url: '{% url "validate_address" %}', 
+				data: { 'pin_code':pin, 'city':city, 'cstate':cstate, 'country':country},
+				dataType: 'text', 
+				type: 'POST',
+				success: function (data) {
+					data = JSON.parse(data);
+					msg = data.msg;
+					var str = '';
+					if (msg[0] != "SUCCESS"){
+						var i;
+						var html = '';
+						$("#ship_err_div").show();
+						html = "<ul> " ;
+						for (i = 0; i < msg.length; i++) { 
+					
+							html = html + " <li> " + msg[i]  + " </li> ";
+						}	
+						html = html + " </ul>";
+						$("#shipping_addr_error").html(html);
+						err_displyed = true;
+						$("#fix-err-modal").modal('show');
+					} else {
+						$("#shipping_addr_error").html('');
+						$("#ship_err_div").hide();
+						//$("#addr_form").unbind('submit').submit();  -- Will be submitted after billing addr validation
+					}
+				},
+				error: function(xhr){
+					alert("An error occured: " + xhr.status + " " + xhr.statusText + " Apologies for the inconvenience!! Please let us know the details and we will be happy to help sort it out."); 
+					return;
+				}
+			});
+		});
+
+		$( '#bill_addr_form' ).submit( function ( event ) {
+			// **********  Validate Billing adress
+			pin = document.getElementById("id_bill-pin_code").value;
+			city = document.getElementById("id_bill-city").value;
+			cstate = document.getElementById("id_bill-state").value;
+			country = document.getElementById("id_bill-country").value;
+			$.ajax({
+				url: '{% url "validate_address" %}', 
+				data: { 'pin_code':pin, 'city':city, 'cstate':cstate, 'country':country},
+				dataType: 'text', 
+				type: 'POST',
+				success: function (data) {
+					data = JSON.parse(data);
+					msg = data.msg;
+					var str = '';
+					if (msg[0] != "SUCCESS"){
+						var i;
+						var html = '';
+						$("#bill_err_div").show();
+						html = "<ul> " ;
+						for (i = 0; i < msg.length; i++) { 
+					
+							html = html + " <li> " + msg[i]  + " </li> ";
+						}	
+						html = html + " </ul>";
+						$("#billing_addr_error").html(html);
+						if (err_displyed == false) {
+							$("#fix-err-modal").modal('show');
+						}
+					} else {
+						$("#bill_err_div").hide();
+						$("#billing_addr_error").html('');
+						if (err_displyed == false) {
+							$("#addr_form").unbind('submit').submit();
+						}
+					}
+				},
+				error: function(xhr){
+					alert("An error occured: " + xhr.status + " " + xhr.statusText + " Apologies for the inconvenience!! Please let us know the details and we will be happy to help sort it out."); 
+					return;
+				}
+			});							
+
+		});
+	</script>
+	
+	<script>
+		function sameAddr(){
+			checkBox = document.getElementById("sameaddr").checked;
+			if (checkBox) {
+				copyAddr();
+				$("#bill-addr").hide();				
+			} else {
+				$("#bill-addr").show();
+			}
+		}
+		
+		function copyAddr(){
+			$("#billing_full_name").val( $("#shipping_full_name").val() );
+			$("#billing_phone_number").val( $("#shipping_phone_number").val() );
+			$("#billing_email_id").val( $("#shipping_email_id").val() );
+			$("#billing_company").val( $("#shipping_company").val() );
+			$("#billing_address_1").val( $("#shipping_address_1").val() );
+			$("#billing_address_2").val( $("#shipping_address_2").val() );
+			$("#id_bill-pin_code").val( $("#id_ship-pin_code").val() );
+			$("#id_bill-city").val( $("#id_ship-city").val() );
+			$("#id_bill-state").val( $("#id_ship-state").val() );
+			$("#id_bill-country").val( $("#id_ship-country").val() );	
+		}
+	</script>
+	{% endblock jscripts %}
+			
+	

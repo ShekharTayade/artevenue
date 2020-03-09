@@ -18,7 +18,9 @@ def get_prod_price(prod_id,**kwargs):
 	stretch_id = kwargs['stretch_id']
 	msg = "SUCCESS"
 
-	
+	prod = Product_view.objects.filter(product_id = prod_id, 
+			product_type_id = prod_type).first()
+
 	if prod_type == 'STOCK-IMAGE' or prod_type == 'USER-IMAGE':
 		# Get image price on paper and canvas
 		per_sqinch_price = get_per_sqinch_price(prod_id, prod_type)
@@ -48,7 +50,10 @@ def get_prod_price(prod_id,**kwargs):
 				item_price = Decimal(item_price + image_price)
 				'''
 				item_price = get_price_reduction_by_size(per_sqinch_paper, image_width * image_height)
-			
+	
+			## Apply any special prices
+			item_price = apply_special_price(prod, item_price)
+	
 			# Acrylic Price	
 			if acrylic_id:
 				acrylic_price = image_width * image_height * get_acrylic_price_by_id(acrylic_id)
@@ -88,6 +93,8 @@ def get_prod_price(prod_id,**kwargs):
 					'''
 					item_price = get_price_reduction_by_size(per_sqinch_canvas, image_width * image_height)
 
+			## Apply any special prices
+			item_price = apply_special_price(prod, item_price)
 
 			# Moulding price
 			if moulding_id:
@@ -98,11 +105,9 @@ def get_prod_price(prod_id,**kwargs):
 			if stretch_id:			
 				stretch_price = image_width * image_height * get_stretch_price_by_id(stretch_id)
 				item_price = Decimal(item_price + stretch_price)
-	
+			
+	## Not STOCK-IMAGE or USER-IMAGE
 	else:
-		prod = Product_view.objects.filter(product_id = prod_id, 
-				product_type_id = prod_type).first()
-
 		per_sqinch_price = get_per_sqinch_price(prod_id, prod_type)
 		per_sqinch_paper = per_sqinch_price['per_sqin_paper']
 		per_sqinch_canvas = per_sqinch_price['per_sqin_canvas']	
@@ -113,6 +118,9 @@ def get_prod_price(prod_id,**kwargs):
 			image_price = image_width * image_height * per_sqinch_canvas
 		
 		item_price = Decimal(item_price + image_price)
+		
+		## Apply any special pricing
+		item_price = apply_special_price(prod, item_price)
 		
 		#item_price = prod.price
 		#image_width = prod.art_width
@@ -127,11 +135,9 @@ def get_prod_price(prod_id,**kwargs):
 		if mount_size and mount_id:
 			mount_price = ((image_width + image_height) * 2 * Decimal(mount_size))  * get_mount_price_by_id(mount_id)
 			item_price = Decimal(item_price + mount_price)
-			
-		
-	
+
 	item_price = Decimal(round(float(item_price),-1))
-	
+	item_price_without_disc = item_price
 	##item_price_withoutdisc = Decimal( "{:.0f}".format( round(item_price, -1) ) )
 	#item_price_withoutdisc = Decimal( round(float(item_price), -1) )
 	
@@ -181,9 +187,8 @@ def get_prod_price(prod_id,**kwargs):
 
 	return ({"msg":msg, "item_price" : item_price, 'cash_disc':cash_disc,
 				'percent_disc':percent_disc, 'item_unit_price':item_unit_price,
-				'disc_amt':disc_amt, 'disc_applied':disc_applied, 'promotion_id':promotion_id})	
-
-	
+				'disc_amt':disc_amt, 'disc_applied':disc_applied, 'promotion_id':promotion_id,
+				'item_price_without_disc':item_price_without_disc})		
 		
 def get_per_sqinch_price(prod_id, prod_type):
 	per_sqin_paper = 0
@@ -249,8 +254,8 @@ def get_price_reduction_by_size(price, size):
 
 def get_price_for_6_prods(prod_id, aspect_ratio, prod_type='STOCK-IMAGE'):
 	
-	STANDARD_PROD_WIDTHS = [12, 18, 24, 30, 36, 42]
-	
+	##STANDARD_PROD_WIDTHS = [12, 18, 24, 30, 36, 42]
+	STANDARD_PROD_WIDTHS = [10, 14, 18, 24, 30, 36]
 	# Get image price on paper and canvas
 	per_sqinch_price = get_per_sqinch_price(prod_id, prod_type)
 	per_sqinch_paper = per_sqinch_price['per_sqin_paper']
@@ -284,11 +289,14 @@ def get_price_for_6_prods(prod_id, aspect_ratio, prod_type='STOCK-IMAGE'):
 		image_height = round(image_width / aspect_ratio)
 
 		mount_size = 1 if i <= 24 else 2 if i <= 42 else 3
-		
+		moulding_id = 18 if i <= 24 else 24 
 		############################
 		## PAPER
 		############################
 		item_price = get_price_reduction_by_size(per_sqinch_paper, image_width * image_height)
+
+		## Apply any special prices
+		item_price = apply_special_price(product, item_price)
 
 		p_data_paper['PAPER_WIDTH_UNFRAMED'] = image_width
 		p_data_paper['PAPER_HEIGHT_UNFRAMED'] = image_height
@@ -317,6 +325,7 @@ def get_price_for_6_prods(prod_id, aspect_ratio, prod_type='STOCK-IMAGE'):
 		moulding = Moulding.objects.get(pk = moulding_id)
 		i_width = image_width + moulding.width_inner_inches * 2 + mount_size * 2
 		i_height = image_height + moulding.width_inner_inches * 2 + mount_size * 2
+
 		p_data_paper['PAPER_WIDTH'] = i_width
 		p_data_paper['PAPER_HEIGHT'] = i_height
 		p_data_paper['PAPER_PRICE'] = Decimal(round(float(item_price),-1))
@@ -327,6 +336,9 @@ def get_price_for_6_prods(prod_id, aspect_ratio, prod_type='STOCK-IMAGE'):
 		############################
 		if image_width > 0 and image_height > 0:
 			item_price = get_price_reduction_by_size(per_sqinch_canvas, image_width * image_height)
+
+		## Apply any special prices
+		item_price = apply_special_price(product, item_price)
 
 		p_data_canvas['CANVAS_WIDTH_UNFRAMED'] = image_width
 		p_data_canvas['CANVAS_HEIGHT_UNFRAMED'] = image_height
@@ -350,3 +362,15 @@ def get_price_for_6_prods(prod_id, aspect_ratio, prod_type='STOCK-IMAGE'):
 		size_price_canvas[str(i)] = p_data_canvas
 		
 	return ({'size_price_paper':size_price_paper, 'size_price_canvas':size_price_canvas})
+
+
+def apply_special_price(prod, item_price):
+
+	## Increasing product price by 20% if it's work Art Group(47) publusher
+	## and image code ends with "GG" or "FN"
+	if prod.publisher == "47" and (prod.part_number[-2:] == "GG" or prod.part_number[-2:] == "FN"):
+		item_price = Decimal(item_price  + ( item_price * 20 / 100))
+	
+	return item_price
+	
+	

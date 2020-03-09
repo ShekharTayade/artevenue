@@ -1,0 +1,55 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load indian_numbers_tags %}
+{% load show_trending_categories from prod_template_tags %}
+
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+        <div class="container-fluid">
+			<div class="row">
+				<div class="col-12">
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+							<li aria-current="page" class="breadcrumb-item active">All Categories</li>
+						</ol>
+					</nav>
+				</div>
+
+
+				<div class="col-12">
+					<div class="box-cat">
+						<h1>ALL CATEGORIES</h1>
+					</div>
+					{% show_trending_categories %}
+					
+					<div class = "row mt-2">
+						<div class="col-12">
+							<span class = "ml-4" style="font-size:0.7rem;">{{cnt}} categories, containing {{all_cnt|intcomma_indian}} artwork</span>
+						</div>
+					</div>
+					<hr style="margin:0.3rem 0;">
+					<div class = "row">
+						{% for c in categories %}
+						<div class="col-lg-2 col-md-3 col-6">
+							<div class="cat-card">
+
+								<a href="{% url 'art_by_category' c.category_id %}">
+									<p style="color:#000 !important; margin-bottom: 0.1rem;">{{c.name|title|default:'Unspecified'|default_if_none:'Unspecified'}}</p>
+									<p><span style="font-size:0.6rem; color:#272e38;" data-counter-up >({{c.stock_image_stock_image_category__count}})</span></p>
+								</a>
+							</div>
+						</div>
+						
+						{% endfor categories %}
+					</div>				
+			</div>
+		</div>
+	{% endblock sitecontent %}
+
+	
+	{% block jscripts %}
+
+	{% endblock jscripts %}
+			
+	

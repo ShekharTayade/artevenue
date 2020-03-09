@@ -19,20 +19,19 @@ from django.contrib.auth.models import User
 
 from artevenue.models import Order, Order_items_view, Publisher, Egift_card_design
 from artevenue.models import Voucher, eGift_sms_email, Egift, Voucher_user, Cart
-from artevenue.models import Order_sms_email, Order_shipping, Order_billing
+from artevenue.models import Order_sms_email, Order_shipping, Order_billing, Newsletter_subscription
 from artevenue.models import Business_profile, User_sms_email, Contact_us, Cart_item_view
 
 today = datetime.datetime.today()
 cc = "support@artevenue.com"
 
 def send_customer_emails():
-	# Select orders where customer emails not sent	
+	# Select orders where customer emails not sent
 	err_flag = False
 	mail_cnt = 0
 
 	cust_orders = Order_sms_email.objects.filter(
 		customer_email_sent = False).values('order_id')
-	
 	
 	orders = Order.objects.filter(order_id__in = cust_orders)
 	order_ids = Order.objects.filter(order_id__in = cust_orders).values('order_id')
@@ -374,12 +373,13 @@ def send_contact_us_emails():
 	
 	for c in contacts:
 		name = c.first_name + ' ' + c.last_name
-		subject = "Message from user from Website-Contact Us form"
+		subject = "Message from user a through Website-Contact Us form"
 		html_message = render_to_string('artevenue/contact_us_form_email_to_artevenue.html', 
 				{'contact_form': c, 'name':name})
 		plain_message = strip_tags(html_message)
 		from_email = 'support@artevenue.com'
 		to = 'support@artevenue.com'
+		cc = ''
 	
 		emsg = EmailMultiAlternatives(subject, plain_message, from_email, [to], [cc])
 		emsg.attach_alternative(html_message, "text/html")
@@ -487,7 +487,7 @@ def offer_25():
 							cart_id = cart.cart_id, product__product_type_id = F('product_type_id'))
 		else:
 			cart_items = {}
-		subject = "Hello " + u.first_name + " " + u.last_name + ", A New Year offer for you from Arte'Venue, a flat 25% off"
+		subject = "Hello " + u.first_name + " " + u.last_name + ", An exclusive offer from Arte'Venue: FLAT 25% OFF"
 		html_message = render_to_string('artevenue/offer_25.html', 
 				{'user':u, 'cart_items':cart_items})
 		plain_message = strip_tags(html_message)
@@ -498,5 +498,20 @@ def offer_25():
 		emsg = EmailMultiAlternatives(subject, plain_message, from_email, to, cc)
 		emsg.attach_alternative(html_message, "text/html")
 		emsg.send()	
+		
+	nl = Newsletter_subscription.objects.filter(subscription_active = True)
+	for u in nl:
+		subject = "Hello " + u.email + ",  An exclusive offer from Arte'Venue: FLAT 25% OFF"
+		html_message = render_to_string('artevenue/offer_25.html', 
+				{'user':u})
+		plain_message = strip_tags(html_message)
+		from_email = 'support@artevenue.com'
+		to = [nl.email]
+		cc = ['shekhar@artevenue.com']
+
+		emsg = EmailMultiAlternatives(subject, plain_message, from_email, to, cc)
+		emsg.attach_alternative(html_message, "text/html")
+		emsg.send()	
+	
 	
 	

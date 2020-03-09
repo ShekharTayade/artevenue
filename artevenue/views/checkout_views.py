@@ -540,7 +540,8 @@ def checkout_step1_address(request):
 					'disc_amt':disc_amt, 'country_arr':country_arr, 'state_arr':state_arr,  'shipping_cost':shipping_cost,
 					'city_arr':city_arr, 'pin_code_arr':pin_code_arr, 'order_number':order_number,
 					'order_id':order_id})
-					
+
+'''					
 @csrf_exempt					
 def get_addr_pin_city_state(request):
 
@@ -611,7 +612,7 @@ def validate_address(request):
 		msg.append("SUCCESS")
 	
 	return JsonResponse({'msg':msg})
-	
+'''	
 	
 def checkout_saveAddr_shippingMethod(request):
 
@@ -1193,7 +1194,7 @@ def checkout_step3_order_review(request):
 			'acrylic_id', 'mount_size', 'product__name', 'image_width', 'image_height', 'stretch_id', 
 			'product__thumbnail_url', 'cart_id', 'promotion__discount_value', 'promotion__discount_type', 'mount__color',
 			'item_unit_price', 'item_sub_total', 'item_disc_amt', 'item_tax', 'item_total', 'product_type',
-			'product__image_to_frame'
+			'product__image_to_frame', 'moulding__width_inner_inches'
 			).order_by('product_type')	
 			
 		# Update the order, for shipping

@@ -3,11 +3,18 @@
 
                                     <div class="w3-container">
 									
+										<div class = "row">
+											<div class ="col-12">																			
+												{% if msg %}
+													<p style="color:red">{{msg}}</p>
+												{% endif %}
+											</div>
+										</div>
 										{% for hidden in businessprofile_form.hidden_fields %}
 										  {{ hidden }}
 										{% endfor %}									
 										<div class = "row">
-											<div class = "col-12">
+											<div class = "col-12 col-md-6">
 												<div class="form-group">
 													{{ businessprofile_form.business_code.label_tag }}
 													{% if businessprofile_form.is_bound %}
@@ -30,6 +37,33 @@
 													{% if businessprofile_form.business_code.help_text %}
 														<small class="form-text text-muted">
 															{{ businessprofile_form.business_code.help_text }}
+														</small>
+													{% endif %}
+												</div>
+											</div>
+											<div class = "col-12 col-md-6">
+												<div class="form-group">
+													{{ businessprofile_form.channel_partner.label_tag }}
+													{% if businessprofile_form.is_bound %}
+														{% if businessprofile_form.channel_partner.errors %}
+												
+															{% render_field businessprofile_form.channel_partner class="form-control is-invalid" %}
+															{% for error in businessprofile_form.channel_partner.errors %}
+																<div class="invalid-feedback">
+																  {{ error }}
+																</div>
+															{% endfor %}
+												
+														{% else %}
+															{% render_field businessprofile_form.channel_partner class="form-control is-valid" %}
+														{% endif %}
+													{% else %}
+														{% render_field businessprofile_form.channel_partner class="form-control" %}
+													{% endif %}
+												
+													{% if businessprofile_form.channel_partner.help_text %}
+														<small class="form-text text-muted">
+															{{ businessprofile_form.channel_partner.help_text }}
 														</small>
 													{% endif %}
 												</div>

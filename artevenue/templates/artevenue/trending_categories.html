@@ -1,17 +1,15 @@
 {% load static %}
 <!-- Featured Products  Header -->
 {% if ecom_site.show_featured_section %}
-<div id="collections">
-	<div class="mt-4 mb-4 py-2">
-		<div class="container">
-			<div class="row">
-				<div class="col-md-12">
-					<h2 class="mb-2 text-center">{{ecom_site.featured_header|upper}}
-				</div>
-				<div class = "text-center">
-					<span class = "section-text">
-					</span>
-				</div>
+<div class="mt-5 py-2">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<h2 class="mb-2 text-center">{{ecom_site.featured_header|upper}}
+			</div>
+			<div class = "text-center">
+				<span class = "section-text">
+				</span>
 			</div>
 		</div>
 	</div>
@@ -23,14 +21,14 @@
 		<div class="item">  
 				{% with 'img/'|add:c.url as image_static %}
 				<div class="front"  style="margin:0px 2px 0px 2px !important;">
-					<a href="{% url 'art_by_category' c.category_id %}"> 
+					<a href="{% url 'art_by_category' cat_nm=c.name %}"> 
 						<img src="{% static image_static %}" alt="{{c.name}}" class="img-fluid img-container-cat">
 					</a>
 				</div>
 				{% endwith %}
 				<div class="mt-2 trending-cat text text-center">
 					<p>
-						<a href="{% url 'art_by_category' c.category_id %}">{{ c.name|title }}</a>
+						<a href="{% url 'art_by_category' cat_nm=c.name %}">{{ c.name|title }}</a>
 					</p>
 				</div>
 				

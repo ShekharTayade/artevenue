@@ -31,7 +31,7 @@ def category_stock_images(request, cat_id = '', page = 1):
 	keywords = ikeywords.split()
 	keyword_filter = False # Turned on only if a keyword filter is present (through the AJAX call)
 	sortOrder = request.GET.get("sort")
-	show = request.GET.get("show", '50')
+	show = request.GET.get("show", '100')
 	
 	if page is None or page == 0:
 		page = 1 # default
@@ -132,13 +132,13 @@ def category_stock_images(request, cat_id = '', page = 1):
 		
 	dt =  today.day
 	if dt >= 1 and dt <= 5:
-		products = products.order_by('?')
+		products = products.order_by('category_disp_priority', '?')
 	elif dt > 5 and dt <= 10:
-		products = products.order_by('product_id')
+		products = products.order_by('category_disp_priority', 'product_id')
 	elif dt > 10 and dt <= 20:
-		products = products.order_by('name')
+		products = products.order_by('category_disp_priority', 'name')
 	else:
-		products = products.order_by('part_number')
+		products = products.order_by('category_disp_priority', 'part_number')
 
 
 	prod_filters = ['ORIENTATION', 'ARTIST', 'IMAGE-TYPE', 'COLORS']	
@@ -173,22 +173,22 @@ def category_stock_images(request, cat_id = '', page = 1):
 	price = Publisher_price.objects.filter(print_medium_id = 'PAPER') 
 
 	if show == None :
-		show = 50
+		show = 100
 	
-	if show == '50':
-		perpage = 50 #default
-		show = '50'
+	if show == '100':
+		perpage = 100 #default
+		show = '100'
 	else:
-		if show == '100':
-			perpage = 100
-			show = '100'
+		if show == '500':
+			perpage = 500
+			show = '500'
 		else:
 			if show == '1000':
 				perpage = 1000
 				show = '1000'
 			else:
-				show = '50' # default
-				perpage = 50
+				show = '100' # default
+				perpage = 100
 				
 	paginator = Paginator(products, perpage) 
 	if not page:
@@ -222,11 +222,11 @@ def show_categories(request):
 
 	sortOrder = request.GET.get("sort")
 	show = request.GET.get("show")
-
 	# Get all the categories along with count of images in each
 	categories_list = Stock_image_category.objects.annotate(Count(
 		'stock_image_stock_image_category')).filter(
-		stock_image_stock_image_category__count__gt = 0).order_by('name')
+		stock_image_stock_image_category__count__gt = 0).exclude(name = '').exclude(
+		name = '#N/A').order_by('name')
 
 	all_cnt = Stock_image.objects.filter(is_published = True).count()
 
@@ -256,9 +256,7 @@ def show_categories(request):
 
 	return render(request, "artevenue/show_all_categories.html", {'categories':categories_list,
 	'cnt': categories_list.count(), 'all_cnt':all_cnt})
-		
-		
-
+				
 @csrf_exempt	
 def search_products_by_keywords(request):
 		
@@ -532,8 +530,6 @@ def stock_image_detail(request, prod_id = '', iuser_width='', iuser_height=''):
 		'ready_prod_data_paper':ready_prod_data_paper, 'ready_prod_data_canvas':ready_prod_data_canvas,
 		'wishlist_item':wishlist_item_view } )
 
-
-
 @csrf_exempt	
 def get_item_price (request):
 
@@ -624,9 +620,7 @@ def get_item_price (request):
 			if majorkey.upper().strip() == "PRODUCT_TYPE":
 				if subkey == "ID":
 					prod_type = value
-
-
-					
+	
 	#####################################
 	#         Get the item price
 	#####################################
@@ -646,10 +640,12 @@ def get_item_price (request):
 	msg = price['msg']
 	cash_disc = price['cash_disc']
 	percent_disc = price['percent_disc']
-	item_price_withoutdisc = price['item_unit_price']
+	#item_price_withoutdisc = price['item_unit_price']
+	item_price_withoutdisc = price['item_price_without_disc']
 	disc_amt = price['disc_amt']
 	disc_applied = price['disc_applied']
 	promotion_id = price['promotion_id']
+	
 	
 	'''
 	# Get image price on paper and canvas
@@ -765,7 +761,6 @@ def get_item_price (request):
 				'percent_disc':percent_disc, 'item_unit_price':item_price_withoutdisc,
 				'disc_amt':disc_amt, 'disc_applied':disc_applied, 'promotion_id':promotion_id})
 	
-
 @csrf_exempt	
 def get_item_price_by_cart_item (cart_item_id):
 
@@ -820,8 +815,7 @@ def get_item_price_by_cart_item (cart_item_id):
 	return ({"msg":msg, "item_price" : item_price, 'cash_disc':cash_disc,
 				'percent_disc':percent_disc, 'item_unit_price':item_unit_price,
 				'disc_amt':disc_amt, 'disc_applied':disc_applied, 'promotion_id':promotion_id})
-
-			
+		
 def get_product_promotion(prod_id, prod_type = None):
 	cash_disc = 0
 	percent_disc = 0
@@ -857,8 +851,6 @@ def get_product_promotion(prod_id, prod_type = None):
 		
 	return ({'promotion_id':promo_id, 'cash_disc':cash_disc, 'percent_disc':percent_disc})
 
-
-
 def show_mouldings(request):
 
 	print_medium = request.GET.get('print_medium', '')
@@ -891,7 +883,7 @@ def all_stock_images(request):
 	keywords = ikeywords.split()
 	keyword_filter = False # Turned on only if a keyword filter is present (through the AJAX call)
 	sortOrder = request.GET.get("sort")
-	show = request.GET.get("show", '50')
+	show = request.GET.get("show", '100')
 	result_limit = request.GET.get("result_limit", '0-50')
 	
 	page = 1 # default
@@ -1068,22 +1060,22 @@ def all_stock_images(request):
 
 
 	if show == None :
-		show = 50
+		show = 100
 	
-	if show == '50':
-		perpage = 50 #default
-		show = '50'
+	if show == '100':
+		perpage = 100 #default
+		show = '100'
 	else:
-		if show == '100':
-			perpage = 100
-			show = '100'
+		if show == '500':
+			perpage = 500
+			show = '500'
 		else:
 			if show == '1000':
 				perpage = 1000
 				show = '1000'
 			else:
-				show = '50' # default
-				perpage = 50
+				show = '100' # default
+				perpage = 100
 				
 	paginator = Paginator(products, perpage) 
 	if not page:
@@ -1112,11 +1104,25 @@ def all_stock_images(request):
 		'sliced_count':sliced_count, 'result_limit':result_limit, 'slab_0_50':slab_0_50,
 		'slab_50_100':slab_50_100, 'slab_100_150':slab_100_150, 'slab_150_200':slab_150_200,
 		'slab_200_plus':slab_200_plus} )
-
-		
 		
 @csrf_exempt		
-def curated_collections(request, cat_id=None):
+def curated_collections(request, cat_nm=None, prod_id=None):
+	cat_nm = cat_nm.replace("-", " ")
+	if cat_nm:
+		try:
+			product_cate = Curated_category.objects.get(name = cat_nm);
+			cat_id = product_cate.category_id
+		except Curated_category.DoesNotExist:
+			product_cate = {}
+			cat_id = 0
+		except Curated_category.MultipleObjectsReturned:
+			product_cate = {}
+			cat_id = 0
+		
+	else:
+		cat_id = 0
+		product_cate = None
+
 	if cat_id == None:
 		return
 	ikeywords = request.GET.get('keywords', '')
@@ -1126,21 +1132,19 @@ def curated_collections(request, cat_id=None):
 
 	sortOrder = request.GET.get("sort")
 	show = request.GET.get("show")
+
+	if prod_id:
+		prod_ups = Stock_image.objects.filter(product_id = prod_id).update(
+			category_disp_priority = -1)
 	
 	prod_categories = Stock_image_category.objects.filter(store_id=settings.STORE_ID, trending = True )
 	
-	#category_prods = Stock_image_stock_image_category.objects.filter(
-	#		stock_image_category_id = cat_id).values('stock_image_id')
-				
-	dt =  today.day
 	curated_coll = Curated_collection.objects.filter(curated_category_id = cat_id,
 			product_type_id = 'STOCK-IMAGE', product__is_published = True).values('product_id')
-	try:
-		product_cate = Curated_category.objects.get(category_id = cat_id);
-	except Curated_category.DoesNotExist:
-		product_cate = {}
 	products = Stock_image.objects.filter(product_id__in = curated_coll)
-	
+			
+		
+	dt =  today.day
 	if dt >= 1 and dt <= 5:
 		products = products.order_by('category_disp_priority', 'key_words')
 	elif dt > 5 and dt <= 10:
@@ -1192,7 +1196,7 @@ def curated_collections(request, cat_id=None):
 					keywords = ikeywords.split()
 					#f = f | Q(key_words__icontains = keywords)
 					keyword_filter = True
-				if majorkey == 'PAGE':									
+				if majorkey == 'PAGE':
 					page = s_keys[s]
 				if majorkey == 'SORT':
 					sortOrder =  s_keys[s]
@@ -1243,22 +1247,22 @@ def curated_collections(request, cat_id=None):
 	price = Publisher_price.objects.filter(print_medium_id = 'PAPER') 
 
 	if show == None :
-		show = 50
+		show = 100
 	
-	if show == '50':
-		perpage = 50 #default
-		show = '50'
+	if show == '100':
+		perpage = 100 #default
+		show = '100'
 	else:
-		if show == '100':
-			perpage = 100
-			show = '100'
+		if show == '500':
+			perpage = 500
+			show = '500'
 		else:
 			if show == '1000':
 				perpage = 1000
 				show = '1000'
 			else:
-				show = '50' # default
-				perpage = 50
+				show = '100' # default
+				perpage = 100
 				
 	paginator = Paginator(products, perpage) 
 	if not page:
@@ -1280,11 +1284,12 @@ def curated_collections(request, cat_id=None):
 	else :
 		template = "artevenue/curated_products.html"
 
+	env = settings.EXEC_ENV
 	return render(request, template, {'prod_categories':prod_categories, 
 		'product_category':product_cate, 
 		'products':products, 'prods':prods, 'sortOrder':sortOrder, 'show':show,'prod_filters':prod_filters,
 		'prod_filter_values':prod_filter_values, 'price':price, 'show_artist':True,
-		'width':width, 'height':height, 'page_range':page_range} )		
+		'width':width, 'height':height, 'page_range':page_range, 'env':env} )		
 
 @staff_member_required
 @csrf_exempt
@@ -1357,14 +1362,27 @@ def image_by_image_code(request):
 			{'prods':prods, 'show':show, 'perpage':perpage, 'width':16,
 			'page_range':page_range})
 
-
-def get_stock_images(request, cat_id = None, page = None, curated_coll_id = None):
-
+def get_stock_images(request, cat_nm = None, page = None, curated_coll_id = None):
+	if cat_nm:
+		cat_nm = cat_nm.replace("-", " ")
+		try:
+			product_cate = Stock_image_category.objects.get(name = cat_nm)
+			cat_id = product_cate.category_id
+		except Stock_image_category.DoesNotExist:
+			cat_id = 0
+			product_cate = None
+		except Stock_image_category.MultipleObjectsReturned:
+			cat_id = 0
+			product_cate = None		
+	else:
+		cat_id = 0
+		product_cate = None
+		
 	if page is None:
 		page = request.GET.get("page_num", 1)
 
 	sortOrder = request.GET.get("sort")
-	show = request.GET.get("show", "50")
+	show = request.GET.get("show", "100")
 	result_limit = request.GET.get("result_limit", "0-50")
 	filt_colors = request.GET.get("filt_colors", "")
 	colors = filt_colors.split('|')
@@ -1392,8 +1410,7 @@ def get_stock_images(request, cat_id = None, page = None, curated_coll_id = None
 
 	if cat_id:
 		category_prods = Stock_image_stock_image_category.objects.filter(
-				stock_image_category_id = cat_id).values('stock_image_id')		
-		product_cate = get_object_or_404 (Stock_image_category, category_id = cat_id)
+				stock_image_category_id = cat_id).values('stock_image_id')
 		products = Stock_image.objects.filter(product_id__in = category_prods, 
 				is_published = True)
 	elif curated_coll_id:
@@ -1490,13 +1507,13 @@ def get_stock_images(request, cat_id = None, page = None, curated_coll_id = None
 		
 	dt =  today.day
 	if dt >= 1 and dt <= 5:
-		products = products.order_by('?')
+		products = products.order_by('category_disp_priority', '?')
 	elif dt > 5 and dt <= 10:
-		products = products.order_by('product_id')
+		products = products.order_by('category_disp_priority', 'product_id')
 	elif dt > 10 and dt <= 20:
-		products = products.order_by('name')
+		products = products.order_by('category_disp_priority', 'name')
 	else:
-		products = products.order_by('part_number')
+		products = products.order_by('category_disp_priority', 'part_number')
 
 	
 	price = Publisher_price.objects.filter(print_medium_id = 'PAPER') 
@@ -1573,22 +1590,22 @@ def get_stock_images(request, cat_id = None, page = None, curated_coll_id = None
 
 
 	if show == None :
-		show = 50
+		show = 100
 	
-	if show == '50':
-		perpage = 50 #default
-		show = '50'
+	if show == '100':
+		perpage = 100 #default
+		show = '100'
 	else:
-		if show == '100':
-			perpage = 100
-			show = '100'
+		if show == '500':
+			perpage = 500
+			show = '500'
 		else:
 			if show == '1000':
 				perpage = 1000
 				show = '1000'
 			else:
-				show = '50' # default
-				perpage = 50
+				show = '100' # default
+				perpage = 100
 				
 	paginator = Paginator(products, perpage) 
 	if not page:
@@ -1619,9 +1636,6 @@ def get_stock_images(request, cat_id = None, page = None, curated_coll_id = None
 		'total_count':total_count, 'sliced_count':sliced_count, 'result_limit':result_limit,
 		'slab_0_50':slab_0_50, 'slab_50_100':slab_50_100, 'slab_100_150':slab_100_150, 
 		'slab_150_200':slab_150_200, 'slab_200_plus':slab_200_plus, 'env':env} )
-
-
-
 
 @csrf_exempt		
 def original_art_by_category(request, cat_id = '', page = 1):
@@ -1811,7 +1825,6 @@ def original_art_by_category(request, cat_id = '', page = 1):
 		'page':page, 'wishlistitems':wishlistitems, 'wishlist_prods':wishlist_prods,
 		'width':width, 'height':height, 'page_range':page_range} )
 
-
 def original_art_detail(request, prod_id = ''):
 	cart_item_id = request.GET.get("cart_item_id", "")
 	wishlist_item_id = request.GET.get("wishlist_item_id", "")
@@ -1947,7 +1960,6 @@ def original_art_detail(request, prod_id = ''):
 		'cart_item':cart_item_view, 'art_width':art_width, 'art_height':art_height,
 		'prods':similar_products, 'price':price, 'wishlist_prods':wishlist_prods} )
 
-
 @csrf_exempt
 def get_ready_products(request, prod_id=None, prod_width=None, print_medium=None):
 	
@@ -1968,6 +1980,7 @@ def get_ready_products(request, prod_id=None, prod_width=None, print_medium=None
 		mount_id = 3 # Offwhite
 		mount_color = '#fffff0'  # Offwhite
 		mount_size = 1 if prod_width <= 24 else 2 if prod_width <= 42 else 3
+		moulding_id = 18 if prod_width <= 24 else 24 
 		board_id = 1
 	else:
 		mount_id = 0

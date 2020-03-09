@@ -169,20 +169,7 @@
 
 	
 	{% block jscripts %}
-	<script>
-    $(document).ready( function(){
 
-        $( "#id_date_of_birth" ).datepicker({
-                dateFormat: "yy-mm-dd",
-                defaultDate: "-17y",
-                changeMonth: true,
-                changeYear: true,
-                onClose: function( selectedDate ) {
-                    $( "#id_birth_date" ).datepicker( "option", "minDate", selectedDate );
-                    }
-        });
-    });
-	</script>
 	{% endblock jscripts %}
 			
 	
