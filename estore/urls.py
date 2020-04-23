@@ -28,6 +28,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url('^', include('artevenue.urls')),
     url('^', include('artist.urls')),
+	url('^', include('review.urls')),
 	url(r'', include('webmaster_verification.urls')),
     path('', include(router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),

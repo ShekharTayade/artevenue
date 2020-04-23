@@ -76,7 +76,6 @@ h1 {
 .menu-large a.nav-link {
  /*  padding: 7px !important; */
   padding: 0px !important;
-  padding-left: 0 !important;
   color: #000 !important;
 }
 
@@ -167,23 +166,25 @@ h1 {
 *
 */
 .navbar {
-  border-bottom: 1px solid #e6e6e6;
+  /*border-bottom: 1px solid #e6e6e6;*/
   background-color: #fff;
   /** #fff;  **/
 }
 
 .navbar .navbar-nav > .nav-item > .nav-link {
   /*text-transform: uppercase;*/
+  font-family: CalibreFamily, Helvetica Neue, HelveticaNeue, Helvetica, Arial, sans-serif;
   letter-spacing: 0.1em;
   font-weight: 500;
   /* padding: 15px 15px !important; */
-  color: #252525 !important;
+  color: #082a4c !important;
   /** #555; **/
+  font-size: 14px;
 }
 
 @media (max-width: 991.98px) {
   .navbar .navbar-nav > .nav-item > .nav-link {
-    padding: 10px 15px !important;
+    padding: 10px 10px !important;
   }
 }
 
@@ -208,7 +209,7 @@ h1 {
   padding: 30px !important;
   -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
-  background-color:#f7f7f7;
+  background-color:#f0f0f0;
 }
 
 @media (max-width: 991.98px) {
@@ -1196,7 +1197,7 @@ h1 {
 }
 
 .owl-carousel .owl-dots .owl-dot.active span {
-  background: #007bff;
+  background: #11b6bd;
 }
 
 .owl-thumbs button {
@@ -2961,7 +2962,7 @@ code {
 .card-title {
   margin-bottom: 0.75rem;
   font-weight:400;
-  font-size: 0.8rem;
+  font-size: 1.1rem;
 }
 
 .card-subtitle {
@@ -3058,11 +3059,29 @@ code {
   background-color: #fff;
   border: 1px solid rgba(0, 0, 0, 0.15);
   border-radius: 0.25rem;
+  left:80%;
 }
+
+@media (max-width: 768px) {
+	.dropdown-menu {
+	  min-width: 10rem;
+	  max-width: 400px;
+	  padding: 0.5rem 0;
+	  margin: 0.125rem 0 0;
+	  font-size: 0.9rem;
+	  color: #212529;
+	  background-color: #fff;
+	  border: 1px solid rgba(0, 0, 0, 0.15);
+	  border-radius: 0.25rem;
+	  top: 15%;
+	  left:0%;
+	}
+}
+
 
 .dropdown-menu-login {
   padding: 0.5rem 1rem !important;
-  background-color: RGB(80,80,80) !important;
+  /*background-color: RGB(80,80,80) !important;*/
 }	
 
 
@@ -3084,4 +3103,7 @@ code {
 
 .dropdown-item.disabled, .dropdown-item:disabled {
   color: #6c757d;
+}
+.dropdown-toggle::after{
+	margin-left:0px !important;"
 }

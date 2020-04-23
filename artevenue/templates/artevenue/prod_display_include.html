@@ -78,10 +78,10 @@
 								<div class="img-container">
 									<a id = "alink_{{prod.product_id}}" href="{% url 'stock_image_detail' prod.product_id %}">
 										{% if env == 'DEV' or env == 'TESTING' %}
-											<img src="{{ prod.url }}" alt="Art Print: {{prod.name}}" class="img-fluid image-display" 
+											<img data-src="{{ prod.url }}" alt="Art Print: {{prod.name}}" class="img-fluid image-display lazyload" 
 													style = "filter: drop-shadow(0.25rem 0.25rem 0.25rem grey);" onclick="$('#img-form_{{prod.product_id}}').submit();">
 										{% else %}
-											<img src="{% static prod.url %}" alt="Art Print: {{prod.name}}" class="img-fluid image-display"
+											<img data-src="{% static prod.url %}" alt="Art Print: {{prod.name}}" class="img-fluid image-display lazyload"
 													style = "filter: drop-shadow(0.25rem 0.25rem 0.25rem grey);" onclick="$('#img-form_{{prod.product_id}}').submit();">
 										{% endif %}		
 									</a>
@@ -108,7 +108,7 @@
 									</div>
 									<div style = "color:#888 !important;">{{prod.artist}}</div>
 									<div style = "margin-top:2px;">
-										{% for p in price %} {% if p.publisher_id == prod.publisher %} <i class = "fa fa-inr"></i> <span class="price"> {% get_price prod.max_width prod.aspect_ratio p.price 0 %} </span>{% endif %}{% endfor %} <span style="color:#888;">(12"X{{12|get_height:prod.aspect_ratio}}")</span>
+										{% for p in price %} {% if p.publisher_id == prod.publisher %} <i class = "fa fa-inr"></i> <span class="price"> {% get_price prod.max_width prod.aspect_ratio p.price 0 %} </span>{% endif %}{% endfor %} <span style="color:#888;">(10"X{{10|get_height:prod.aspect_ratio}}")</span>
 										<span class="price text-center">
 											<a style="color:#888 !important;" href="{% url 'stock_image_detail' prod.product_id %}">, Multiple Sizes</a>
 										</span>

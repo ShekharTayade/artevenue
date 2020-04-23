@@ -36,6 +36,7 @@ from django.template.loader import render_to_string
 from weasyprint import HTML, CSS
 
 from .views import *
+from artevenue.views import email_sms_views
 
 ecom = get_object_or_404 (Ecom_site, store_id=settings.STORE_ID )
 today = datetime.datetime.today()
@@ -651,7 +652,33 @@ def update_order_status(request, order_id = None, order_status =  None):
 	if request.method == 'POST':
 		order_id = int(request.POST.get('order_id', '0'))
 		order_status = request.POST.get('order_status', '')
+		shipper = request.POST.get('shipper', '')
+		shipping_method = request.POST.get('shipping_method', '')
+		tracking_number = request.POST.get('tracking_number', '')
+		shipment_date = request.POST.get('shipment_date', '')
+		tracking_url = request.POST.get('tracking_url', '')
+
+		print("#############################################")
+		print(shipment_date)
+
+		if shipment_date != '':
+			ship_date = datetime.datetime.strptime(shipment_date, "%Y-%m-%d")		
+		else:
+			ship_date = None
+
 		order = Order.objects.get(order_id = order_id)
+		## validate uniue tracking number
+		if order.tracking_number != tracking_number:	# check only if it's not the same tracking number on this order
+			if tracking_number != '':
+				tr = Order.objects.filter(tracking_number = tracking_number).first()
+				if tr :
+					return JsonResponse({'status': 'FAILURE',
+						'msg':'Order update not done. Tracking number ' + tracking_number + ' already exists for order number ' + str(tr.order_number)}, 
+						safe=False)			
+
+		if order_status == 'SH' :
+			email_sms_views.send_ord_update_sh(order_id)
+
 		if order_status == 'SH' and order.invoice_number == '':		# If ready for shipping, generate the invoice number
 			from artevenue.views.invoice_views import get_next_invoice_number
 			inv_num = get_next_invoice_number()
@@ -660,16 +687,25 @@ def update_order_status(request, order_id = None, order_status =  None):
 				invoice_number = inv_num, invoice_date = today)
 		else:	
 			ord = Order.objects.filter(order_id = order_id).update(
-				order_status = order_status, updated_date = today )
-		msg = "Order Status Updated"
+				order_status = order_status, updated_date = today,
+				shipper_id = shipper, shipping_method_id = shipping_method,
+				tracking_number = tracking_number, shipment_date = ship_date,
+				tracking_url = tracking_url)
+				
+			## Email to customer, in case tracking number is updated
+			if tracking_number != '' and tracking_number != order.tracking_number:
+				email_sms_views.send_tracking_no_to_cust(order_id)
 			
+		msg = "Order Status Updated"			
 		
-		return JsonResponse({'msg':'Order Status Updated.'}, safe=False)
+		return JsonResponse({'status': 'SUCCESS', 
+			'msg':'Order Status Updated.'}, safe=False)
 	else:
 		order_id = int(request.GET.get('order_id', '0'))
 		order = Order.objects.get(order_id = order_id)
 		form = OrderStatusUpdate(instance = order)
-		return  render(request, 'artevenue/order_status_update_modal.html', {'form':form})
+		return  render(request, 'artevenue/order_status_update_modal.html', 
+			{'form':form, 'order':order})
 		
 
 

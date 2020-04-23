@@ -19,37 +19,127 @@
 		<link rel="stylesheet" href="{% static  'css/custom.css' %}">
 		<!-- theme stylesheet-->
 		<link rel="stylesheet" href="{% static 'css/style.default.css' %}" id="theme-stylesheet">
-		<!-- theme stylesheet-->
-		<link rel="stylesheet" href="{% static 'css/home-page-style.css' %}" id="theme-stylesheet">
-
 	</head>
 
 	<body>
-		<p>		
-			Message from : {% contact_form.first_name + " +  contact_form.last_name %}
-		</p>
-		<p>Received: {{ contact_form.msg_datetime|date:"D d M Y" }} at {{contact_form.msg_datetime|date:"P" }}</p>
-			
-		<p>	We greatly look forward to catering to all your art and framing 
-			requirements as well as your gifting needs.
-		</p>
-		<p> Your absolute satisfaction is our priority and you can expect a 
-			seamless experience with us for each of your orders from Arte’Venue.
-		</p>
-		<hr>
-		<p>
-			You can begin to browse through our collection of over 2,50,000 
-			art prints and framing options by clicking the link below:
-			<a href = "https://www.artevenue.com/login">Artevenue.com/login</a>
-		</p>
+		<div class = "row"  style = "border:1px solid #d4d4d4; padding:10px; margin:0px;">
+			<table style = "width: 100%; maring-bottom: 15px; ">
+				<tbody>
+					<tr>
+						<td>
+							<img src = "https://artevenue.com/static/img/av_logo_circle2_m1.png" %}" alt="Arte'venue" style = "left:0, margin:0px; padding:0px;" width=150>
+						</td>
+						<td style = "text-align: right;">
+							<span style = "font-size: 10px; right:0px;">www.artevenue.com</span><br>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<div style = "margin-top:10px; border-top: 1px solid #dddddd;">
+				<h3></h3>	<!-- Heading/Headline -->
+				<h5 style = "margin-top:20px;" >
+					Dear {% if user.first_name %} 
+							{{user.first_name}}&nbsp;{{user.last_name}} 
+						{% else %}
+							{{user.username}}
+						{% endif %},
+				</h5>
+				<h5>Arte’Venue welcomes you on board as our privileged customer!
+				</h5>
+				
+				<h5>
+					Arte'Venue brings together 4500+ artists in 70+ categories, 
+					over 2,75,00 pieces of unique art collection and customized framing
+					solutions. We are India's largest and most trusted platform.
+				</h5>
 
-		<br />
-		<hr>
-		<p>
-			With warm regards,<br />
-			Team Arte'Venue<br/>
-			<img src = "https://artevenue.com/static/img/artevenue_logo_new.png" alt="Arte'venue Logo"  height="25" width="110"> <br />
-			<a href = "https://www.artevenue.com">www.artevenue.com</a>
-		</p>
+				<h5>We have some exciting offers and value additions for you:</h5>
+				<table style = "font-size: 12px;">
+					<tbody>
+						<tr>
+							<td>
+								<strong>Flat 15% Off</strong>
+							</td>
+							<td>
+								Your first order carries flat 15% off. No min or max order value.
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<strong>Free Shipping</strong>
+							</td>
+							<td>
+								Don't pay to bring it home, ships in 1-2 days.
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<strong>Free Returns</strong>
+							</td>
+							<td>
+								Don't like it? Return it in 5 days and get the refund.
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<strong>Fully Customizable</strong>
+							</td>
+							<td>
+								A first in India. Every art print can be fully customized - surface, size, frame and more.
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<strong>Licensed Art Print</strong>
+							</td>
+							<td>
+								Piece of mind - every art you buy is licensed
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<strong>High Quality, Afforable Prices</strong>
+							</td>
+							<td>
+								We promise high quality at afforable prices
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<strong>and more...</strong>
+							</td>
+							<td>
+								
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<h5>
+					You can begin to browse through our collection of over 2,75,000 
+					artworks and framing options by clicking the link below:
+					<a href = "https://www.artevenue.com/login">artevenue.com/login</a>
+				</h5>
+				<h5>We greatly look forward to catering to all your art and framing 
+					requirements.
+				</h5>
+				<hr>
+
+				<h6>If you need any assitance, please feel free to write to us at 
+					support@artevenue.com, chat with us online at www.artevenue.com,
+					or call us at +91 96115 03626. We will be happy help.
+				</h6>
+			</div>
+
+			<!--  Signature -->
+			<div style = " margin-top: 20px;">
+				<h5>
+					With warm regards,<br />
+					Team Arte'Venue
+					<br />
+					<img src = "https://artevenue.com/static/img/artevenue_logo_new.png" alt="Arte'Venue Logo"  height="25" width="110"> <br />
+					<a href = "https://www.artevenue.com">www.artevenue.com</a>
+				</h5>
+			</div>
+		</div>
 	</body>
 </html>

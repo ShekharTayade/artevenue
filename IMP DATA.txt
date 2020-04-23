@@ -82,26 +82,27 @@ Pwd: nsj21071976
 
 GoDaddy:
 ~~~~~~~~~~~~~~~~~~~~~
-Customer ID: 186164730 (NO ARTEVENUE.COM: 186165241) 
+Customer ID: 186164730 (NO "ARTEVENUE.COM": 186165241) 
 	     Pin: 2107
 login-
 	username: dugarneeraj1976
 	email: shekhart@hotmail.com
-	pwd: Nsj211001
+	pwd: Jpn78@54vm  (Old: Nsj211001)
 
+Shekhar: shekhar@artevneue.com / Arch8262~1
 
 rahul@artevenue.com / Rahul@54vm
 	
 
 Support -
-	support@artevenue.com / support@jpn78
+	support@artevenue.com / support@54vm
 	
 Factory:
 	factory@artevenue.com / factory@jpn78 		
 
 Neeraj:
 	username: dugarneeraj@artevenue.com
-	pwd: nsj211001/
+	pwd: Nsj211001/
 
 Media:
 	username: media@artevenue.com
@@ -110,14 +111,14 @@ Media:
 
 SOCIAL:
 ~~~~~~~~~~~~~~~~~~~~~
-FB: media@artevenue.com / Arte_$54vm     (Montage@54)
-Insta:	media@artevenue.com / Arte_ins_$54vm
+FB: media@artevenue.com / av$10M@12m  (Arte_$54vm) (Arte_$54vm)     (Montage@54)
+Insta:	media@artevenue.com / av$10M@12m	(Arte_ins_$54vm)
 
 
 Arte'Venue Google Account:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Email: info.artevenue@gmail.com 
-Pwd: Arte_$54vm (art_venue@321)
+Pwd: av$10M@12m (Arte_$54vm) (art_venue@321)
 
 
 Homelane Order Excel File
@@ -137,13 +138,12 @@ shekhar@artevenue.com / Arch8262$1
 
 Online Chat	->	tawk.to
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-shekharrtayade@gmail.com / Arch8262~1
+shekharrtayade@gmail.com / av$10M@12m (Arch8262~1)
 
 
 Amazon Seller 
 ~~~~~~~~~~~~~~~~~~~~
-shekhar@artevenue.com / Arch8262$1
-
+shekhar@artevenue.com / av$10M@12m (Arch8262$1)
 
 Flipkart Seller
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -154,3 +154,11 @@ AMAZON SELLER (MONTAGE ART & FRAMING)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 rahul@artevenue.com
 Arch8262~1
+
+
+
+TextLocal - SMS service
+~~~~~~~~~~~~~~~~~~~~~~~~~
+log in: Shekhar / Arch8262~1
+API Key: 6ka0OAoLF88-zLQpYYVbjBdSx1uNfps6CvnodVU9o0
+

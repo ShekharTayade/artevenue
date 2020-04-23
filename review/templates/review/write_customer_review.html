@@ -1,0 +1,464 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% block page-title %} 
+<title>Arte'Venue - Write Review</title>
+{% endblock page-title %} 
+{% block page-description %}
+<meta name="description" content="Write customer review">
+{% endblock page-description %}
+{% block page-keywords %}
+<meta name="keywords" content="customer review of artworks, art, artvenue, artwork review, artevenue review">
+{% endblock page-keywords %}
+
+{% block add_to_head %}	
+	<link  href="{% static 'vendor/cropper.js/cropper.css' %}" rel="stylesheet">
+	<script src="{% static 'vendor/cropper.js/cropper.js' %}"></script>
+{% endblock add_to_head %}
+
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+        <div class="container-fluid">
+			<div class="row">
+				<!-- breadcrumb-->
+				<div class="col-sm-12">
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+							<li aria-current="page" class="breadcrumb-item active">Write Review</li>
+						</ol>
+					</nav>
+				</div>
+			</div>
+			<h1 class="section-title h1 text-center">Write a Review</h1>
+			<hr>
+			<div class = "row">
+				<div class="col-12 col-md-4">
+				{% if order_items %}
+					Choose Artworks you are writing review for: 
+					{% for i in order_items %}
+						<div class = "col-6">
+							<img src = "{% static i.product.url %}" class="img-fluid image-display-review">
+							<input type = "checkbox">{{i.order.order_number}}, Dt: {{i.order.order_date|date:'d M Y'}}
+						</div>
+					{% endfor %}
+				{% else %}
+					You haven't made any purchases yet. It would be better if you order an artwork
+					and then write a review. However, you can still write generic review of our products,
+					collections, website and other aspects, what you like and don't like.
+				{% endif %}
+					<hr>
+				</div>
+				<div class = "col-12 col-md-8">
+					<div class="row">
+						{% if customer_review_form.errors or msg %}
+							<div id="errors" class="alert alert-warning alert-dismissable">
+								<button type="button" class="close" data-dismiss="alert">&times;</button>
+								<div class="inner">
+									{% if customer_review_form.errors %}
+										<p>There were issues in the information you entered. Please correct following:</p>
+									{% endif %}
+									<!-- Error messaging -->
+									{{ customer_review_form.non_field_errors }}
+									{% if customer_review_form.errors %}
+										<ul>
+											<!-- Forms -->
+											{% for field in customer_review_form %}
+												{% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+											{% endfor %}
+										</ul>
+									{% endif %}
+									{% if msg %}
+									<ul>
+										<!-- Validations -->
+										<li>{{msg}}</li>
+									</ul>
+									{% endif %}							
+								</div>
+							</div>
+						{% endif %} 
+					
+					</div>
+					<div class = "row">
+						<div class="col-12 text-center">
+							Your Rating: 
+							<span onclick = "click_star(1);" id= "1star" class = "review-star"><i class="fa fa-star-o"></i></span>
+							<span onclick = "click_star(2);" id= "2star" class = "review-star"><i class="fa fa-star-o"></i></span>
+							<span onclick = "click_star(3);" id= "3star" class = "review-star"><i class="fa fa-star-o"></i></span>
+							<span onclick = "click_star(4);" id= "4star" class = "review-star"><i class="fa fa-star-o"></i></span>
+							<span onclick = "click_star(5);" id= "5star" class = "review-star"><i class="fa fa-star-o"></i></span>
+						</div>
+					</div>
+					<hr>
+					<div class = "row mt-3">
+						<div class="col-12 col-md-4">
+							<div class="form-group" >
+								<label>Name: </label>
+								<input placeholder="Your Name" type="text" name="name" 
+								maxlength="500" autofocus="" class="form-control"
+								required="" id="id_name"
+								value = "{{customer_review_form.name.value|default_if_none:''}}"
+								>
+								{% for error in customer_review_form.name.errors %}
+									<div class="invalid-feedback">
+									  {{ error }}
+									</div>
+								{% endfor %}
+							</div>						
+						</div>
+						<div class="col-12 col-md-4">
+							<div class="form-group" >
+								<label>Location: </label>
+								<input placeholder="Your Location(City/State)" type="text" name="location" 
+								maxlength="500" autofocus="" class="form-control"
+								required="" id="id_location"
+								value = "{{customer_review_form.location.value|default_if_none:''}}"
+								>
+								{% for error in customer_review_form.location.errors %}
+									<div class="invalid-feedback">
+									  {{ error }}
+									</div>
+								{% endfor %}
+							</div>							
+						</div>
+						<div class="col-12 col-md-4">
+							<label class = "form-label">Country: </label>
+							<div class="form-group" >
+								<input placeholder="Country" type="text" name="country" 
+								maxlength="500" autofocus="" class="form-control"
+								required="" id="id_country"
+								value = "{{customer_review_form.country.value|default_if_none:''}}"
+								>
+								{% for error in customer_review_form.country.errors %}
+									<div class="invalid-feedback">
+									  {{ error }}
+									</div>
+								{% endfor %}
+							</div>							
+						</div>
+					</div>
+					<div class = "row">
+						<div class="col-12">
+							<div class="form-group" >
+								<label class = "form-label">Headline: </label>
+								<input placeholder="Title/Headline of your review" type="text" name="headline"
+								maxlength="100" autofocus="" class="form-control"
+								required="" id="id_headline"
+								value = "{{customer_review_form.headline.value}}"
+								>
+								{% for error in customer_review_form.headline.errors %}
+									<div class="invalid-feedback">
+									  {{ error }}
+									</div>
+								{% endfor %}
+							</div>							
+						</div>
+						<div class="col-12">
+							<div class="form-group" >
+								<label>Review Comments: </label>
+								<textarea placeholder="What you liked/disliked" type="text" name="comments" 
+									rows="5" cols="100"
+									maxlength="500" autofocus="" class="form-control"
+									required="" id="id_comments"
+									value = "{{customer_review_form.comments.value}}">
+								</textarea>
+								{% for error in customer_review_form.comments.errors %}
+									<div class="invalid-feedback">
+									  {{ error }}
+									</div>
+								{% endfor %}
+							</div>
+						</div>
+					</div>
+					<div class = "row">
+						<div class = "col-12">
+							We would love to see photos of artwork displayed at your place.
+							Want to upload some?<br />
+							<span style="color:#11b6bd;">Drag and drop photos or click arrow to upload</span>
+						</div>
+					</div>
+					<div id = "upload-pics" class = "row">
+						<div class = "col-6 col-md-3  photos-div">
+							<form id = "upload-form1" method = "post" enctype='multipart/form-data'>
+								{% csrf_token %}
+								<!-- <span id = "artist"> Click browse button to select an image</span> -->
+								<div class = "btn btn-default btn-file" style = "display: block !important;">
+									<input name="image_to_frame" class="form-control" id="user_image1" onchange = "$('#upld_btn1').click()" type="file" accept="image/png, image/jpeg, image/gif, image/bmp" required multiple />
+									<img class = "user-photo" id = "upload-photo1" src = "{% static 'img/upload_arrow.png' %}"><input hidden name="user_id"class="form-control" id="user_id" value = "{{request.user}}">
+								</div>
+								<button hidden id= "upld_btn1" class="btn btn-primary" type = "submit" form="upload-form1"> <i class = "fa fa-upload"></i></button>
+							</form>
+							<i title="Rotate Left" class = "fa fa-rotate-left" onclick = "rotateLeft(1);"></i>&nbsp;&nbsp;&nbsp;&nbsp;
+							<i title="Rotate Right" class = "fa fa-rotate-right" onclick = "rotateRight(1);"></i>
+							<i title="Remove Photo" class = "fa fa-trash pull-right" id = "delete-photo1"
+								style = "cursor: pinter;"
+								onclick = "delete_pic(1);"></i> 
+							
+						</div>
+						<div class = "col-6 col-md-3  photos-div">
+							<form id = "upload-form2" method = "post" enctype='multipart/form-data'>
+								{% csrf_token %}
+								<!-- <span id = "artist"> Click browse button to select an image</span> -->
+								<div class = "btn btn-default btn-file" style = "display: block !important;">
+									<input name="image_to_frame" class="form-control" id="user_image2" onchange = "$('#upld_btn2').click()" type="file" accept="image/png, image/jpeg, image/gif, image/bmp" required multiple />
+									<img class = "user-photo" id = "upload-photo2" src = "{% static 'img/upload_arrow.png' %}"><input hidden name="user_id"class="form-control" id="user_id" value = "{{request.user}}">
+								</div>
+								<button hidden id= "upld_btn2" class="btn btn-primary" type = "submit" form="upload-form2"> <i class = "fa fa-upload"></i></button>
+							</form>
+							<i title="Rotate Left" class = "fa fa-rotate-left" onclick = "rotateLeft(2);"></i>&nbsp;&nbsp;&nbsp;&nbsp;
+							<i title="Rotate Right" class = "fa fa-rotate-right" onclick = "rotateRight(2);"></i>
+							<i title="Remove Photo" class = "fa fa-trash pull-right" id = "delete-photo2"
+								style = "cursor: pinter;"
+								onclick = "delete_pic(2);"></i> 
+							
+						</div>
+						<div class = "col-6 col-md-3  photos-div">
+							<form id = "upload-form3" method = "post" enctype='multipart/form-data'>
+								{% csrf_token %}
+								<!-- <span id = "artist"> Click browse button to select an image</span> -->
+								<div class = "btn btn-default btn-file" style = "display: block !important;">
+									<input name="image_to_frame" class="form-control" id="user_image3" onchange = "$('#upld_btn3').click()" type="file" accept="image/png, image/jpeg, image/gif, image/bmp" required multiple />
+									<img class = "user-photo" id = "upload-photo3" src = "{% static 'img/upload_arrow.png' %}"><input hidden name="user_id"class="form-control" id="user_id" value = "{{request.user}}">
+								</div>
+								<button hidden id= "upld_btn3" class="btn btn-primary" type = "submit" form="upload-form3"> <i class = "fa fa-upload"></i></button>
+							</form>
+							<i title="Rotate Left" class = "fa fa-rotate-left" onclick = "rotateLeft(3);"></i>&nbsp;&nbsp;&nbsp;&nbsp;
+							<i title="Rotate Right" class = "fa fa-rotate-right" onclick = "rotateRight(3);"></i>
+							<i title="Remove Photo" class = "fa fa-trash pull-right" id = "delete-photo3"
+								style = "cursor: pinter;"
+								onclick = "delete_pic(3);"></i> 
+						</div>
+						<div class = "col-6 col-md-3  photos-div">
+							<form id = "upload-form4" method = "post" enctype='multipart/form-data'>
+								{% csrf_token %}
+								<!-- <span id = "artist"> Click browse button to select an image</span> -->
+								<div class = "btn btn-default btn-file" style = "display: block !important;">
+									<input name="image_to_frame" class="form-control" id="user_image4" onchange = "$('#upld_btn4').click()" type="file" accept="image/png, image/jpeg, image/gif, image/bmp" required multiple />
+									<img class = "user-photo" id = "upload-photo4" src = "{% static 'img/upload_arrow.png' %}"><input hidden name="user_id"class="form-control" id="user_id" value = "{{request.user}}">
+								</div>
+								<button hidden id= "upld_btn4" class="btn btn-primary" type = "submit" form="upload-form4"> <i class = "fa fa-upload"></i></button>
+							</form>
+							<i title="Rotate Left" class = "fa fa-rotate-left" onclick = "rotateLeft(4);"></i>&nbsp;&nbsp;&nbsp;&nbsp;
+							<i title="Rotate Right" class = "fa fa-rotate-right" onclick = "rotateRight(4);"></i>
+							<i title="Remove Photo" class = "fa fa-trash pull-right" id = "delete-photo4"
+								style = "cursor: pinter;"
+								onclick = "delete_pic(4);"></i> 
+						</div>
+					</div>
+						<div class="col-12 mt-5">
+							<div class="form-group">
+								<button class = "btn btn-primary">Submit Review</button>
+							</div>
+						</div>
+					{% include "artevenue/fix-error-message.html" %}
+				</div>
+			</div>
+		</div>
+	{% endblock sitecontent %}
+
+	
+	{% block jscripts %}
+	
+	<script>
+		$( document ).ready(function() {
+		});	
+	</script>
+	<script>
+		function click_star(number){
+			switch (number) {
+			  case 1:
+				$("#1star").html("<i class='fa fa-star'>");
+				$("#2star").html("<i class='fa fa-star-o'>");
+				$("#3star").html("<i class='fa fa-star-o'>");
+				$("#4star").html("<i class='fa fa-star-o'>");
+				$("#5star").html("<i class='fa fa-star-o'>");
+				break;
+			  case 2:
+				$("#1star").html("<i class='fa fa-star'>");
+				$("#2star").html("<i class='fa fa-star'>");
+				$("#3star").html("<i class='fa fa-star-o'>");
+				$("#4star").html("<i class='fa fa-star-o'>");
+				$("#5star").html("<i class='fa fa-star-o'>");
+				break;
+			  case 3:
+				$("#1star").html("<i class='fa fa-star'>");
+				$("#2star").html("<i class='fa fa-star'>");
+				$("#3star").html("<i class='fa fa-star'>");
+				$("#4star").html("<i class='fa fa-star-o'>");
+				$("#5star").html("<i class='fa fa-star-o'>");
+				break;
+			  case 4:
+				$("#1star").html("<i class='fa fa-star'>");
+				$("#2star").html("<i class='fa fa-star'>");
+				$("#3star").html("<i class='fa fa-star'>");
+				$("#4star").html("<i class='fa fa-star'>");
+				$("#5star").html("<i class='fa fa-star-o'>");
+				break;
+			  case 5:
+				$("#1star").html("<i class='fa fa-star'>");
+				$("#2star").html("<i class='fa fa-star'>");
+				$("#3star").html("<i class='fa fa-star'>");
+				$("#4star").html("<i class='fa fa-star'>");
+				$("#5star").html("<i class='fa fa-star'>");
+				break;
+			}
+		}
+	</script>
+	
+	<script>
+		$("#upload-form1").submit(function(e) {
+			e.preventDefault();
+			var fileInput = document.getElementById('user_image1');
+			var file = fileInput.files[0];
+			var formData = new FormData();
+			formData.append('file', file);
+			document.getElementById('upload-photo1').src = URL.createObjectURL(file);
+			getOrientation(fileInput.files[0], function(orientation) {
+				switch	(orientation){
+					case '6':
+						document.getElementById('upload-photo1').style.transform = "rotate(90deg)";
+						break;
+					case '8':
+						document.getElementById('upload-photo1').style.transform = "rotate(270deg)";
+						break;
+					case '3':
+						document.getElementById('upload-photo1').style.transform = "rotate(180deg)";
+						break;
+				}
+			});
+		});
+		$("#upload-form2").submit(function(e) {
+			e.preventDefault();
+			var fileInput = document.getElementById('user_image2');
+			var file = fileInput.files[0];
+			var formData = new FormData();
+			formData.append('file', file);
+			document.getElementById('upload-photo2').src = URL.createObjectURL(file);
+			getOrientation(fileInput.files[0], function(orientation) {
+				switch	(orientation){
+					case '6':
+						document.getElementById('upload-photo2').style.transform = "rotate(90deg)";
+						break;
+					case '8':
+						document.getElementById('upload-photo3').style.transform = "rotate(270deg)";
+						break;
+					case '3':
+						document.getElementById('upload-photo4').style.transform = "rotate(180deg)";
+						break;
+				}
+			});
+		});
+		$("#upload-form3").submit(function(e) {
+			e.preventDefault();
+			var fileInput = document.getElementById('user_image3');
+			var file = fileInput.files[0];
+			var formData = new FormData();
+			formData.append('file', file);
+			document.getElementById('upload-photo3').src = URL.createObjectURL(file);
+			getOrientation(fileInput.files[0], function(orientation) {
+				switch	(orientation){
+					case '6':
+						document.getElementById('upload-photo3').style.transform = "rotate(90deg)";
+						break;
+					case '8':
+						document.getElementById('upload-photo3').style.transform = "rotate(270deg)";
+						break;
+					case '3':
+						document.getElementById('upload-photo3').style.transform = "rotate(180deg)";
+						break;
+				}
+			});
+		});
+		$("#upload-form4").submit(function(e) {
+			e.preventDefault();
+			var fileInput = document.getElementById('user_image4');
+			var file = fileInput.files[0];
+			var formData = new FormData();
+			formData.append('file', file);
+			document.getElementById('upload-photo4').src = URL.createObjectURL(file);
+			getOrientation(fileInput.files[0], function(orientation) {
+				switch	(orientation){
+					case '6':
+						document.getElementById('upload-photo4').style.transform = "rotate(90deg)";
+						break;
+					case '8':
+						document.getElementById('upload-photo4').style.transform = "rotate(270deg)";
+						break;
+					case '3':
+						document.getElementById('upload-photo4').style.transform = "rotate(180deg)";
+						break;
+				}
+			});
+		});
+	</script>
+
+	<script>
+		var cropper;
+		
+		function rotateLeft(img_num){
+			image = document.getElementById('upload-photo' + img_num.toString());
+			cropper = new Cropper(image, {
+			});
+			cropper.rotate(-45);			
+		}
+		function rotateRight(img_num){
+			document.getElementById('upload-photo' + img_num.toString()).style.transform = "rotate(90deg)";
+		}
+	</script>
+
+
+	<script>
+		function getOrientation(file, callback) {
+			var reader = new FileReader();
+			reader.onload = function(e) {
+
+				var view = new DataView(e.target.result);
+				if (view.getUint16(0, false) != 0xFFD8)
+				{
+					return callback(-2);
+				}
+				var length = view.byteLength, offset = 2;
+				while (offset < length) 
+				{
+					if (view.getUint16(offset+2, false) <= 8) return callback(-1);
+					var marker = view.getUint16(offset, false);
+					offset += 2;
+					if (marker == 0xFFE1) 
+					{
+						if (view.getUint32(offset += 2, false) != 0x45786966) 
+						{
+							return callback(-1);
+						}
+
+						var little = view.getUint16(offset += 6, false) == 0x4949;
+						offset += view.getUint32(offset + 4, little);
+						var tags = view.getUint16(offset, little);
+						offset += 2;
+						for (var i = 0; i < tags; i++)
+						{
+							if (view.getUint16(offset + (i * 12), little) == 0x0112)
+							{
+								return callback(view.getUint16(offset + (i * 12) + 8, little));
+							}
+						}
+					}
+					else if ((marker & 0xFF00) != 0xFF00)
+					{
+						break;
+					}
+					else
+					{ 
+						offset += view.getUint16(offset, false);
+					}
+				}
+				return callback(-1);
+			};
+			reader.readAsArrayBuffer(file);
+		}
+
+		// usage:
+	</script>
+	
+	{% endblock jscripts %}
+			
+	

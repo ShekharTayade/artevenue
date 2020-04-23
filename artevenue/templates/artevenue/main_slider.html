@@ -5,66 +5,50 @@
 
 {% if ecom_site.show_promotion_section %}
 			
-	<section class="main_banner">
-			<div class="row">						
-				<div class="col-md-12 col-sm-12 col-12 align-self-center"  style = "padding:0px; !important;">
-					<!-- <div class="say_pic">
-						<div id = "wrapper">
-							<img src = "{% static 'img/main-image/entry_banner.jpg' %}" class="img-responsive">
-							<a id = "anchor-main-banner" href="{% url 'all_art_images' %}"></a>
-							<img src="{% static 'img/main-image/entry_banner_mobile.jpg' %}" class="img-responsive mobile" usemap="#mainbannermap">
-							<a id = "anchor-main-banner-mobile" href="{% url 'all_art_images' %}" class = "mobile"></a>
-							<map name="mainbannermap">
-							  <area shape="rect" coords="50,100,350,324" href="{% url 'all_art_images' %}" alt="Start Shopping">
-							</map>
-						</div>
-					</div> -->
+<div style="">						
+	<div class="col-12">
+		<div class="d-none d-md-block">
+			<img src="{% static 'img/main-image/banner1_apr2020.jpg' %}" alt="Banner 1" class="img-fluid" usemap="#bannermap">
+			<map name="bannermap">
+			  <area shape="rect" coords="0,0,505,922" href="{% url 'register' %}" alt="Sign Up">
 
-					<div id="main-slider" class="owl-carousel owl-theme">
-						<div class="item">
-							<!--<a href = "{% url 'register' %}"> 
-								<img src="{% static 'img/banner1.png' %}" alt="" class="img-fluid">
-							</a> -->
+			  <area shape="rect" coords="915,55,1557,375" href="{% url 'stock_image_detail' 148993  %}" alt="Sign Up">
 
-							<a href = "{% url 'register' %}" class="d-none d-sm-block">
-								<img src="{% static 'img/banner1_1.jpg' %}" alt="logo" class="img-fluid">
-							</a>
-							<a href = "{% url 'register' %}"  class="d-block d-sm-none">
-								<img src="{% static 'img/banner1_mobile_1.jpg' %}" alt="{{ecom_site.store_name}}" class="img-fluid">
-							</a>
-						</div>
-						<div class="item">
-							<!-- <a href = "{% url 'curated_collections' 1 %}">
-								<img src="{% static 'img/banner2.png' %}" alt="" class="img-fluid">
-							</a> -->
-							
-							<a href = "{% url 'curated_collections' 1 %}" class="d-none d-sm-block">
-								<img src="{% static 'img/banner2.jpg' %}" alt="logo" class="img-fluid">
-							</a>
-							<a href = "{% url 'curated_collections' 1 %}"  class="d-block d-sm-none">
-								<img src="{% static 'img/banner2_mobile.jpg' %}" alt="{{ecom_site.store_name}}" class="img-fluid">
-							</a>
-													
-						</div>
-						<div class="item">
-							<!-- <a href = "{% url 'all_art_images' %}">
-								<img src="{% static 'img/banner3.png' %}" alt="" class="img-fluid">
-							</a> -->
-							
-							<a href = "{% url 'all_art_images' %}" class="d-none d-sm-block">
-								<img src="{% static 'img/banner3.jpg' %}" alt="logo" class="img-fluid">
-							</a>
-							<a href = "{% url 'all_art_images' %}"  class="d-block d-sm-none">
-								<img src="{% static 'img/banner3_mobile.jpg' %}" alt="{{ecom_site.store_name}}" class="img-fluid">
-							</a>
-							
-						</div>
-						
-						
-					</div>
-										
-				</div>
+			  <area shape="rect" coords="555,600,760,910" href="{% url 'stock_image_detail' 220224 %}" alt="Show Product">
+			  <area shape="rect" coords="790,600,1012,915" href="{% url 'stock_image_detail' 23309 %}" alt="Show Product">
+			  <area shape="rect" coords="1028,600,1269,915" href="{% url 'stock_image_detail' 23309 %}" alt="Show Product">
+			  <area shape="rect" coords="1284,600,1496,915" href="{% url 'stock_image_detail' 155726 %}" alt="Show Product">
+			  <area shape="rect" coords="1515,600,1752,915" href="{% url 'stock_image_detail' 164403 %}" alt="Show Product">
+			  <area shape="rect" coords="1772,600,1979,915" href="{% url 'stock_image_detail' 198778 %}" alt="Show Product">
+			</map>		
+		</div>
+		<div class="d-block d-md-none">
+			<img src="{% static 'img/main-image/banner1_mobile_apr2020.jpg' %}" alt="Banner 1" class="img-fluid" usemap="#bannermap_m">
+			<map name="bannermap_m">
+			  <area shape="rect" coords="540,0,768,477" href="{% url 'register' %}" alt="Sign Up">
+			  
+			  <area shape="rect" coords="71,81,401,246" href="{% url 'stock_image_detail' 148993  %}" alt="Sign Up">
+			  
+			  <area shape="rect" coords="11,577,119,741" href="{% url 'stock_image_detail' 220224 %}" alt="Show Product">
+			  <area shape="rect" coords="134,577,250,741" href="{% url 'stock_image_detail' 23309 %}" alt="Show Product">
+			  <area shape="rect" coords="259,577,380,741" href="{% url 'stock_image_detail' 23309 %}" alt="Show Product">
+			  <area shape="rect" coords="393,577,504,741" href="{% url 'stock_image_detail' 155726 %}" alt="Show Product">
+			  <area shape="rect" coords="514,577,639,741" href="{% url 'stock_image_detail' 164403 %}" alt="Show Product">
+			  <area shape="rect" coords="648,577,758,741" href="{% url 'stock_image_detail' 198778 %}" alt="Show Product">
+			</map>		
+		</div>
+		
+		<!--<div id="main-slider" class="owl-carousel owl-theme">
+			<div class="item">
+				<a href = "{% url 'register' %}" class="d-none d-sm-block">
+					<img src="{% static 'img/main-image/banner1_apr2020.jpg' %}" alt="logo" class="img-fluid">
+				</a>
+				<a href = "{% url 'register' %}"  class="d-block d-sm-none">
+					<img src="{% static 'img//main-image/banner1_mobile_apr2020.jpg' %}" alt="{{ecom_site.store_name}}" class="img-fluid">
+				</a>
 			</div>
-	</section>			
-			
+		</div> -->
+							
+	</div>
+</div>
 {% endif %}

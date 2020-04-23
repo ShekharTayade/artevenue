@@ -22,6 +22,7 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=False, cast=bool)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 EXEC_ENV = config('EXEC_ENV', default='DEV')
+SMS_API_KEY = config('SMS_API_KEY', default='')
 
 DATABASES = {
     'default': dj_database_url.config(
@@ -52,6 +53,7 @@ INSTALLED_APPS = [
 	'artist.apps.ArtistConfig',
 	'blog.apps.BlogConfig',
 	'channelsales.apps.ChannelsalesConfig',
+	'review.apps.ReviewConfig',	
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

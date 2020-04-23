@@ -1,0 +1,21 @@
+{% load static %}
+{% load utils %}
+{% load indian_numbers_tags %}
+	<div class = "row justify-content-center">
+		{% for key, value in ready_prod_data_paper.items %}
+			<div style = "padding: 0px 5px 10px;">
+			<p class ="text-center" style = "margin:0px; cursor:pointer;"
+				onclick = "set_ready_product('PAPER', {{ value.PAPER_WIDTH_UNFRAMED}}, {{value.PAPER_WIDTH_UNFRAMED}}, true)">
+				<span id= "paper-size-{{value.PAPER_WIDTH_UNFRAMED}}"  style = "margin:0px; border:1px solid #ddd; cursor:pointer; padding:7px;">
+					{{ value.PAPER_WIDTH|floatformat }}" X {{ value.PAPER_HEIGHT|floatformat}}"
+				</span>
+			</p>
+			<h4 style = "margin-top:5px;" class = "text-center">										
+				<i id = "price-{{key}}-paper" class = "fa fa-inr"> {{ value.PAPER_PRICE|floatformat|intcomma_indian }} </i>
+			</h4>
+			</div>
+		{% endfor %}
+		<div class = "col-12 text-center">
+			(All sizes in inches)
+		</div>
+	</div>

@@ -1,7 +1,36 @@
 {% extends 'artevenue/estore_base.html' %}
 {% load static %}
 {% load widget_tweaks %}
-	<!-- Only Override the site content block -->
+
+
+{% block page-title %} 
+<title>Arte'Venue - My Orders</title>
+{% endblock page-title %} 
+{% block page-description %}
+<meta name="description" content="View your orders at artevenue.com">
+{% endblock page-description %}
+{% block page-keywords %}
+<meta name="keywords" content="Art, arvenue, orders">
+{% endblock page-keywords %}
+
+
+{% block coursel-stylesheet %}
+{% endblock coursel-stylesheet %}
+
+{% block jqueryui-script %}
+{% endblock jqueryui-script %}
+
+{% block coursel-script %}
+{% endblock coursel-script %}
+
+{% block front.js %}
+{% endblock front.js %}
+
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+
 	{% block sitecontent %}
 
     <div id="all">

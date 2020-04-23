@@ -8,6 +8,8 @@ from django.contrib.auth.models import User
 from django.db.models import F
 from django.db.models import Count, Q, Max, Sum
 from decimal import Decimal
+import statistics
+from PIL import Image
 
 from datetime import datetime
 import datetime
@@ -21,7 +23,7 @@ from artevenue.models import Product_view, Promotion, Order, Voucher, Voucher_us
 from artevenue.models import Cart_user_image, Cart_stock_image, Cart_stock_collage, Cart_original_art
 from artevenue.models import Order_stock_image, Order_stock_collage, Order_original_art, Order_user_image
 from artevenue.models import Referral, Egift_redemption, Egift, Order_items_view, Voucher_used
-from artevenue.models import Order_shipping, Order_billing
+from artevenue.models import Order_shipping, Order_billing, Collage_stock_image
 from .product_views import *
 from .user_image_views import *
 from .tax_views import *
@@ -29,6 +31,7 @@ from .price_views import *
 
 today = datetime.date.today()
 ecom = get_object_or_404 (Ecom_site, store_id=settings.STORE_ID )
+env = settings.EXEC_ENV
 
 @csrf_exempt
 def show_cart(request):
@@ -160,7 +163,7 @@ def show_cart(request):
 		if not usercart.voucher_id:
 			orders = Order.objects.filter(user = usr).exclude(order_status = 'PP')
 			if not orders:
-				voucher = Voucher.objects.get(voucher_id = 12, effective_from__lte = today, 
+				voucher = Voucher.objects.get(voucher_id = 8, effective_from__lte = today, 
 						effective_to__gte = today, store_id = settings.STORE_ID)
 				if voucher:
 					v_code = voucher.voucher_code
@@ -173,7 +176,7 @@ def show_cart(request):
 		'ref_msg':ref_msg, 'ref_status':ref_status, 'referral_disc_amount':referral_disc_amount,
 		'MEDIA_ROOT':settings.MEDIA_ROOT, 'MEDIA_URL':settings.MEDIA_URL, 
 		'cart_without_disc':cart_without_disc, 'promo_removed':promo_removed,
-		'v_code': v_code })
+		'v_code': v_code,'env': env })
 	
 def show_wishlist(request):
 
@@ -1413,6 +1416,7 @@ def apply_voucher(request):
 				'cart_disc_amt':cart_disc_amt})	
 
 def apply_voucher_py(request, cart_id, voucher_code, cart_total):
+
 	status = "SUCCESS"	
 	if voucher_code == '':
 		return JsonResponse({"status":"INVALID-CODE"})
@@ -1728,34 +1732,87 @@ def add_to_cart_new(request):
 	# END: Get details for item to be added
 	#####################################
 
-
 	ip_address = get_ip_addr(request)
 
+	if prod_type == "STOCK-COLLAGE":	
 
-	#####################################
-	#         Get the item price
-	#####################################
-	price = get_prod_price(prod_id, 
-			prod_type=prod_type,
-			image_width=image_width, image_height=image_height,
-			print_medium_id = print_medium_id,
-			acrylic_id = acrylic_id,
-			moulding_id = moulding_id,
-			mount_size = mount_size,
-			mount_id = mount_id,
-			board_id = board_id,
-			stretch_id = stretch_id)
-	item_price = price['item_price']
-	msg = price['msg']
-	cash_disc = price['cash_disc']
-	percent_disc = price['percent_disc']
-	item_unit_price = price['item_unit_price']
-	item_disc_amt = price['disc_amt']
-	disc_applied = price['disc_applied']
-	promotion_id = price['promotion_id']
-	#####################################
-	# END::::    Get the item price
-	#####################################	
+		collages = Collage_stock_image.objects.filter(stock_collage_id = prod_id)
+		total_price = 0
+		total_cash_disc = 0
+		total_percent_disc = 0
+		total_item_unit_price = 0
+		total_item_price_withoutdisc = 0
+		total_disc_amt = 0
+		disc_applied = False
+		promotion_id = None
+		#####################################
+		#    Get the item price for each
+		#####################################
+		for c in collages:
+			price = get_prod_price(c.stock_image_id, 
+					prod_type='STOCK-IMAGE',
+					image_width=image_width, 
+					image_height=image_height,
+					print_medium_id = print_medium_id,
+					acrylic_id = acrylic_id,
+					moulding_id = moulding_id,
+					mount_size = mount_size,
+					mount_id = mount_id,
+					board_id = board_id,
+					stretch_id = stretch_id)					
+
+			item_price = price['item_price']
+			msg = price['msg']
+			cash_disc = price['cash_disc']
+			percent_disc = price['percent_disc']
+			item_unit_price = price['item_unit_price']
+			item_price_withoutdisc = price['item_price_without_disc']
+			disc_amt = price['disc_amt']
+			disc_applied = price['disc_applied']
+			promotion_id = price['promotion_id']
+			
+			total_price = total_price + item_price
+			total_cash_disc = total_cash_disc + cash_disc
+			total_percent_disc = statistics.mean([total_percent_disc, percent_disc])
+			total_item_unit_price = item_unit_price + item_unit_price
+			total_item_price_withoutdisc = total_item_price_withoutdisc + item_price_withoutdisc
+			total_disc_amt = total_disc_amt + disc_amt
+
+		item_price = total_price
+		cash_disc = total_cash_disc
+		percent_disc = total_percent_disc
+		item_unit_price = total_item_unit_price
+		item_disc_amt = total_disc_amt
+		disc_applied = price['disc_applied']
+		promotion_id = price['promotion_id']
+
+
+	else:
+		#####################################
+		#         Get the item price
+		#####################################
+		price = get_prod_price(prod_id, 
+				prod_type=prod_type,
+				image_width=image_width,
+				image_height=image_height,
+				print_medium_id = print_medium_id,
+				acrylic_id = acrylic_id,
+				moulding_id = moulding_id,
+				mount_size = mount_size,
+				mount_id = mount_id,
+				board_id = board_id,
+				stretch_id = stretch_id)
+		item_price = price['item_price']
+		msg = price['msg']
+		cash_disc = price['cash_disc']
+		percent_disc = price['percent_disc']
+		item_unit_price = price['item_unit_price']
+		item_disc_amt = price['disc_amt']
+		disc_applied = price['disc_applied']
+		promotion_id = price['promotion_id']
+		#####################################
+		# END::::    Get the item price
+		#####################################	
 	
 	#####################################
 	# 	if item price not found, return
@@ -2047,6 +2104,7 @@ def add_to_cart_new(request):
 				ip_address = ip_address
 			)
 			newusercart.save()	
+
 	except IntegrityError as e:
 		err_flg = True
 		msg = 'Apologies!! Could not save your cart. Please use the "Contact Us" link at the bottom of this page and let us know. We will be glad to help you.'
@@ -2068,6 +2126,8 @@ def add_to_cart_new(request):
 			cart = usercart
 		else:
 			cart = newusercart	## This one is created new
+
+		cart_qty = cart.quantity
 
 		if prod.product_type_id == 'STOCK-IMAGE':
 			usercartitems = Cart_stock_image()
@@ -2115,6 +2175,37 @@ def add_to_cart_new(request):
 
 		usercartitems.save()		
 	
+	
+	
+		###### Create and save art set image and thumbnail
+		if prod.product_type_id == 'STOCK-COLLAGE':
+			if env == 'DEV' or env == 'TESTING':				
+				img_file = settings.STATIC_URL + 'img/collage/cart_img/' + str(usercartitems.cart_item_id) + '.jpg'
+				img_thumbnail_file = settings.STATIC_URL + 'img/collage/cart_img/' + str(usercartitems.cart_item_id) + '_thumbnail.jpg'
+				img_file_s = settings.BASE_DIR + '/artevenue'  + settings.STATIC_URL + 'img/collage/cart_img/' + str(usercartitems.cart_item_id) + '.jpg'
+				img_thumbnail_file_s = settings.BASE_DIR + '/artevenue' + settings.STATIC_URL + 'img/collage/cart_img/' + str(usercartitems.cart_item_id) + '_thumbnail.jpg'
+				
+			else:
+				img_file = settings.PROJECT_DIR + '/' + settings.STATIC_URL  + '/img/collage/cart_img/'  + str(usercartitems.cart_item_id) + '.jpg'
+				img_file_s = img_file
+				img_thumbnail_file = settings.PROJECT_DIR + '/' + settings.STATIC_URL  + '/img/collage/cart_img/'  + str(usercartitems.cart_item_id) + '_thumbnail.jpg'
+				img_thumbnail_file_s = img_thumbnail_file
+
+			i = request.POST.get('image', '')
+			image = decode_base64_file(i)
+			img = Image.open(image)
+			ratio = img.width / img.height
+			img.save(img_file_s, "JPEG")
+			img.thumbnail((200, round(200/ratio)) )
+			img.save(img_thumbnail_file_s, "JPEG")
+			
+			#####Update the urls in Stock_collage
+			stk = Cart_item.objects.filter(cart_item_id = usercartitems.cart_item_id).update(
+				url = img_file, thumbnail_url = img_thumbnail_file)
+			
+		#####
+		
+		
 		## Update for any existing voucher already applied to cart
 		if cart.voucher_id:
 			voucher = Voucher.objects.get(voucher_id = cart.voucher_id)
@@ -2131,16 +2222,15 @@ def add_to_cart_new(request):
 			if request.user.is_authenticated:
 				orders = Order.objects.filter(user = userid).exclude(order_status = 'PP')
 				if not orders:
-					v_code = Voucher.objects.get(voucher_id = 12)
-					response = apply_voucher_py_new(request, cart.cart_id, v_code, 
-						cart.cart_total, cart.cart_sub_total, False)
-						
-				res = json.loads(response.content.decode('utf-8'))
-				if res['status'] == 'SUCCESS' or res['status'] == 'SUCCESS-':
-					print('OK')
-				else:
-					msg = "There was an issue while apply your Coupan: " + res['status']
-					err_flg = True
+					v_code = Voucher.objects.get(voucher_id = 8)
+					response = apply_voucher_py_new(request, cart.cart_id, v_code.voucher_code, 
+						cart.cart_total, cart.cart_sub_total, False)						
+					res = json.loads(response.content.decode('utf-8'))
+					if res['status'] == 'SUCCESS' or res['status'] == 'SUCCESS-':
+						print('OK')
+					else:
+						msg = "There was an issue while apply your Coupan: " + res['status']
+						err_flg = True
 
 	except IntegrityError as e:
 		err_flg = True
@@ -2652,30 +2742,88 @@ def update_cart_voucher_amounts(request, cart_id):
 		## amount from item sub total
 		################################################################		
 		for ci in cart_items:
-			#####################################
-			#         Get the item price
-			#####################################
-			price = get_prod_price(ci.product_id, 
-					prod_type=ci.product_type_id,
-					image_width=ci.image_width, image_height=ci.image_height,
-					print_medium_id = ci.print_medium_id,
-					acrylic_id = ci.acrylic_id,
-					moulding_id = ci.moulding_id,
-					mount_size = ci.mount_size,
-					mount_id = ci.mount_id,
-					board_id = ci.board_id,
-					stretch_id = ci.stretch_id)
-			total_price = price['item_price']
-			msg = price['msg']
-			cash_disc = price['cash_disc']
-			percent_disc = price['percent_disc']
-			item_unit_price = price['item_unit_price']
-			disc_amt = price['disc_amt']
-			disc_applied = price['disc_applied']
-			promotion_id = price['promotion_id']
-			#####################################
-			# END::::    Get the item price
-			#####################################	
+
+			### IF STOCK COLLAGE / ART SET
+			if ci.product_type_id == 'STOCK-COLLAGE':
+				collages = Collage_stock_image.objects.filter( stock_collage_id = ci.product_id )
+				total_price = 0
+				total_cash_disc = 0
+				total_percent_disc = 0
+				total_item_price_withoutdisc = 0
+				total_disc_amt = 0
+				disc_applied = False
+				promotion_id = None
+
+				#####################################
+				#    Get the item price for each
+				#####################################
+				for c in collages:
+					price = get_prod_price(ci.product_id, 
+							prod_type='STOCK-IMAGE',
+							image_width=ci.image_width, image_height=ci.image_height,
+							print_medium_id = ci.print_medium_id,
+							acrylic_id = ci.acrylic_id,
+							moulding_id = ci.moulding_id,
+							mount_size = ci.mount_size,
+							mount_id = ci.mount_id,
+							board_id = ci.board_id,
+							stretch_id = ci.stretch_id)
+
+					item_price = price['item_price']
+					msg = price['msg']
+					cash_disc = price['cash_disc']
+					percent_disc = price['percent_disc']
+					#item_price_withoutdisc = price['item_unit_price']
+					if not 'item_price_without_disc' in price:	
+						item_price_withoutdisc = item_price
+					else:
+						item_price_withoutdisc = price['item_price_without_disc']
+					disc_amt = price['disc_amt']
+					disc_applied = price['disc_applied']
+					promotion_id = price['promotion_id']
+					
+					total_price = total_price + item_price
+					total_cash_disc = total_cash_disc + cash_disc
+					total_percent_disc = statistics.mean([total_percent_disc, percent_disc])
+					total_item_price_withoutdisc = total_item_price_withoutdisc + item_price_withoutdisc
+					total_disc_amt = total_disc_amt + disc_amt
+
+				## Set variables as used in the code after getting price
+				total_price = total_price
+				cash_disc = total_cash_disc
+				percent_disc = total_percent_disc
+				item_price_withoutdisc = total_item_price_withoutdisc
+				disc_amt = total_disc_amt
+
+			### IF NOT STOCK COLLAGE, ART SET
+			else :
+				
+				#####################################
+				#         Get the item price
+				#####################################
+				price = get_prod_price(ci.product_id, 
+						prod_type=ci.product_type_id,
+						image_width=ci.image_width, image_height=ci.image_height,
+						print_medium_id = ci.print_medium_id,
+						acrylic_id = ci.acrylic_id,
+						moulding_id = ci.moulding_id,
+						mount_size = ci.mount_size,
+						mount_id = ci.mount_id,
+						board_id = ci.board_id,
+						stretch_id = ci.stretch_id)
+				total_price = price['item_price']
+				msg = price['msg']
+				cash_disc = price['cash_disc']
+				percent_disc = price['percent_disc']
+				item_unit_price = price['item_unit_price']
+				disc_amt = price['disc_amt']
+				disc_applied = price['disc_applied']
+				promotion_id = price['promotion_id']
+				#####################################
+				# END::::    Get the item price
+				#####################################	
+
+
 
 			## Get applicable tax rate
 			if ci.product_type_id == 'STOCK-IMAGE':

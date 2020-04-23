@@ -1,0 +1,581 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% block page-title %} 
+	<title>Sets of art prints</title>
+{% endblock page-title %} 
+{% block page-description %}
+<meta name="description" content="Hand-picked sets of 2 or 3 artworks. Customize size, frame, print surface, mount or buy it just as a wall poster.">
+{% endblock page-description %}
+{% block page-keywords %}
+<meta name="keywords" content="Art sets, set of 2, set of 3, Art prints, Wall Art sets, Buy Art sets, Buy Art print set, Buy set of 2 art prints, Buy set of 3 art prints,
+	Customize art print sets, art print sets with frame, Online Framing, Online Art, Online Art prints">
+{% endblock page-keywords %}
+{% block page-author %}
+<meta name="author" content="Arte'venue">
+{% endblock page-author %}
+
+
+{% block coursel-stylesheet %}
+{% endblock coursel-stylesheet %}
+
+{% block jqueryui-script %}
+{% endblock jqueryui-script %}
+
+{% block coursel-script %}
+{% endblock coursel-script %}
+
+{% block front.js %}
+{% endblock front.js %}
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+{% block gmap-script %}
+{% endblock gmap-script %}
+
+
+
+
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+        <div class="container-fluid">
+			<div class="row mb-5">
+
+				<!-- breadcrumb-->
+				<div class="col-12">
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+							<li aria-current="page" class="breadcrumb-item active">Stock Collage</li>
+						</ol>
+					</nav>
+				</div>
+
+				<div class="col-12 col-md-3 col-lg-3">
+					<!-- Display the filters -->
+					<button type="button" data-toggle="collapse" data-target="#filter_navigation" class="btn btn-outline-secondary navbar-toggler full-width-btn" style="width:100% !important;">
+						<span class="sr-only">Toggle navigation</span>
+						<i class="fa fa-align-justify"></i>Filter
+					</button>
+					<div id = "filter_navigation" class="collapse show navbar-collapse">
+						<div class="card sidebar-menu mb-4">
+							{% for pf in prod_filters %}
+							{% if pf == 'ARTIST' or pf == 'SIZE' %}
+							<div class="card-body" style = "max-height:300px; width:auto; overflow:auto;">
+							{% else %}
+							<div class="card-body" style = "max-height:200px; width:auto; overflow:auto;">
+							{% endif  %}
+								<div> <h3 class="card-title">{{ pf|title }}</h3></div>
+								<form id= "f_{{pf}}" role="form">
+									<div class="form-group" style="margin-bottom:0.25em !important;">
+										<div class="checkbox filter-class {{pf}}">
+											{% for key, value in prod_filter_values.items %}
+											
+												{% if key == pf %}
+													{% if pf == 'COLORS' %}
+														<div id = "colors-div" class = "row" style = "padding:10px;">
+														{% for val in value %}
+															<div class = "col-sm-1 text-center color-col" 
+																style = "background-color:{{val}}; 
+																	{% if val == 'White' %} border:1px solid gainsboro{% endif %}; 
+																	border-radius:50%; width:20px; height:30px; 
+																	margin:3px 3px;
+																	color:{% if val == 'White' or val == 'Yellow'%} black {% else %} white {% endif %};"
+																onclick = "select_color(this);"
+																>
+															</div>
+														{% endfor %}
+														</div>
+														
+													{% else %}
+														{% if pf == 'ARTIST' %}
+															<div class = "apply_f mb-2">
+																<input id="artist_search" name="artist-search" class = "form-control" type="search" placeholder="Search...">
+															</div>
+														{% endif %}
+														<div id = "{{d_pf}}">
+															<ul style="list-style-type:none; padding:0px !important; margin-bottom:0px !important;">
+															{% for val in value %}
+																<li style= "display:inline; margin-right:10px;">
+																<input class = "i_{{pf}}" type="checkbox" />
+																	{% if pf == 'IMAGE-TYPE' %}
+																		<label id = "l_{{val}}" style="display:none">{{val}}</label>{% if val == '1' %} Photo {% elif val == '0' %} Fine Art {% endif %}
+																	{% else %}
+																		<label {% if pf == 'COLORS' %} style = "background-color:{{val}}; border:1px solid gainsboro; border-radius:50%; width:25px; height:25px" {% endif %}>{% if pf == 'COLORS' %} &nbsp; {% else %} {{val}}{% endif %}</label>
+																	{% endif %}
+																</li>
+															{% endfor %}
+															</ul>
+														</div>
+													{% endif %}
+												{% endif %}
+											{% endfor prod_filter_values %}
+										</div>
+									</div>
+								</form>
+							</div>
+							<div class = "apply_f">
+								<button type = "button" class="btn btn-secondary btn-sm pull-left" onclick = "getAllFilters('1', '{{sortOrder}}', '{{show}}', '{{ikeywords}}')"><i class="fa fa-pencil"></i> Apply</button>
+								<button type = "button" class="btn btn-sm btn-outline-secondary pull-right" onclick = "clearFilter('{{pf}}')"><i class="fa fa-times-circle"></i> Clear</button>
+							</div>
+							<br />
+							{% endfor prod_filters %}
+							<div class="card-body" style = "max-height:500px; width:auto; ">
+								<h3 class="card-title">Size</h3>
+								<form id= "f_size" role="form">
+									<div class="form-group" style="margin-bottom:0.25em !important;">
+										<div class="checkbox filter-class mb-2">
+											<select id ="size_select" class = "form-control" name = "size" />
+												<option selected value = "any">Any</option>
+												<option disabled value= "-">PORTRAIT:</option>
+												<option value= "8_12"> 8" X 12"</option>
+												<option value= "9_11"> 9" X 11" </option>
+												<option value= "12_16"> 12" X 16" </option>
+												<option value = "16_20"> 16" X 20"</option>
+												<option value = "18_24"> 18" X 24"</option>
+												<option value = "20_24"> 20" X 24"</option>
+												<option value = "20_30"> 20" X 30"</option>
+												<option value = "24_30"> 24" X 30"</option>
+												<option value = "24_36"> 24" X 36"</option>
+												<option value = "30_36"> 30" X 36"</option>
+												<option value = "30_40"> 30" X 40"</option>
+												<option value = "36_48"> 36" X 48"</option>
+												<option value = "40_60"> 40" X 60"</option>
+												<option value = "48_60"> 48" X 60"</option>
+												<option value = "48_72"> 48" X 72"</option>
+												<option disabled value = "24__">------------</option>
+												<option disabled value= "-">LANDSCAPE:</option>
+												<option value= "12_8"> 12" X 8"</option>
+												<option value= "11_9"> 11" X 9" </option>
+												<option value= "16_12"> 16" X 12" </option>
+												<option value = "20_16"> 20" X 16"</option>
+												<option value = "24_18"> 24" X 18"</option>
+												<option value = "24_20"> 24" X 20"</option>
+												<option value = "30_20"> 30" X 20"</option>
+												<option value = "30_24"> 30" X 24"</option>
+												<option value = "36_24"> 36" X 24"</option>
+												<option value = "36_30"> 36" X 30"</option>
+												<option value = "40_30"> 40" X 30"</option>
+												<option value = "48_36"> 48" X 36"</option>
+												<option value = "60_40"> 60" X 40"</option>
+												<option value = "60_48"> 60" X 48"</option>
+												<option value = "72_48"> 72" X 48"</option>
+												<option disabled value = "24__">------------</option>
+												<option disabled value= "-">SQAURE:</option>
+												<option value= "12_12"> 12" X 12"</option>
+												<option value= "18_18"> 18" X 18" </option>
+												<option value = "24_24"> 24" X 24"</option>
+												<option value = "30_30"> 30" X 30"</option>
+												<option value = "36_36"> 36" X 36"</option>
+												<option value = "40_40"> 40" X 40"</option>
+												<option value = "48_48"> 48" X 48"</option>
+												<option value = "54_54"> 54" X 54"</option>
+												<option value = "60_60"> 60" X 60"</option>
+											</select>	
+										</div>
+										<div class = "row">
+											<div class = "col-5">
+												<label for = "size_width">Width:</label>
+											</div>
+											<div class = "col-7">
+												<input id="size_width" type = "number" min="4" max="60" class = "form-control" onchange="setUserWidth(this);">
+											</div>
+										</div>
+										<div class = "row">
+											<div class = "col-5">
+												<label for = "size_height">Height:</label>
+											</div>
+											<div class = "col-7">
+												<input id="size_height" type = "number" min="4" max="60" class = "form-control" onchange="setUserHeight(this);">
+											</div>
+										</div>
+									</div>
+								</form>
+							</div>																	
+							<div class = "apply_f">
+								<button type = "button" class="btn btn-secondary btn-sm pull-left" onclick = "getAllFilters('1', '{{sortOrder}}', '{{show}}', '{{keywords}}');"><i class="fa fa-pencil"></i> Apply</button>
+								<button type = "button" class="btn btn-sm btn-outline-secondary pull-right" onclick = "clearFilter('SIZE')"><i class="fa fa-times-circle"></i> Clear</button>
+							</div>
+							</div>
+						</div>
+				</div>
+				<!-- /.col-md-3-->	
+				<div class="col-12 col-md-9 col-lg-9">
+					<div class = "row">
+						<div class = "col-12">
+							<div class="box-cat">
+								<h1>Sets of Art Prints</h1>
+								<h4>Hand-picked sets of 2 or 3 artworks. Customize
+									size, frame, print surface, mount or buy it just as a wall poster.
+								</h4>
+							 </div>
+						</div>
+					</div>
+					<div id = "img-display">
+						{% include 'artevenue/collage_display_include.html' %}
+					</div>
+				{% include 'artevenue/wishlist-add-message.html' %}
+				{% include 'artevenue/message-modal_ok.html' %}
+				
+			</div>
+		</div>
+	{% endblock sitecontent %}
+
+	
+	{% block jscripts %}
+
+	<script>
+		// Clear the filers
+		function clearFilter(ele_chx){
+			/*$(":checkbox").each( function() {
+				$(this).prop('checked', false);
+			});*/
+			
+			switch (ele_chx) {
+			  case 'COLORS':
+				eles = document.getElementsByClassName("color-col");
+				for (i = 0; i < eles.length; ++i) {
+					eles[i].innerHTML = "";
+				}
+				break;
+			  case 'SIZE':
+				$('#size_select').val('any');
+				$('#size_width').val('');				
+				$('#size_height').val('');
+				break;
+			  default:
+				$("div." + ele_chx + " input[type=checkbox]").each( function() {
+					$(this).prop('checked', false);
+				});
+			}
+			
+		}
+	</script>
+	
+	<script>
+		function getAllFilters(page, sort, show, keywords){   
+			if (isNaN(page) == false) {
+				page_num = parseInt(page);
+			} else {
+				page_num = 1;  // default
+			}
+			var filter = '{';
+			var fcnt = 0;
+			{% for pf in prod_filters %}
+				{% if pf != "COLORS" %}
+					if (fcnt == 0) {
+						filter = filter + '"{{pf}}": { ';
+					} else {
+						filter = filter + ', "{{pf}}": { ';
+					}
+					valcnt = 0;
+					rec = ''
+					$(".i_{{pf}}").each(function () {
+						var val = $(this).next('label').text();
+						var sts = $(this).is(":checked");
+						if (sts) {
+							if (valcnt == 0){
+								rec = rec + '"' + val.trim() + '": ' + ' " ' + sts + '"';
+							} else {
+								rec = rec + ', "' + val.trim() + '": ' + ' " ' + sts + '"';
+							}
+							valcnt = valcnt + 1;
+						}
+						
+					});
+				filter = filter + rec + ' }';
+				fcnt = fcnt + 1;
+				{% endif %}
+			{% endfor prod_filters %}
+			
+			var size_val = $("#size_select").val();
+			var w = $("#size_width").val();
+			var h = $("#size_height").val();
+			var size_input = w + "_" + h;
+			if ( (w) && (h) ) {
+				if (w < 4 || h < 4) {
+					$("#msg").html ("We can print images with Width and Height between 4 and 60 inches");
+					$("#msg-modal").modal("show");
+					return
+				}
+			}
+			if ( ( parseInt(w) >= 4) && ( parseInt(h) >= 4) ){
+				size_val = size_input;
+			}
+
+			if (size_val != "any") {
+				rec = ', "SIZE": {"' + size_val + '" : ' + ' "true"';
+				filter = filter + rec + ' }';
+			}
+			
+			var chl = document.getElementById("colors-div").childNodes;
+			var len = chl.length;
+			var rec = ', "COLORS": {' ;
+			valcnt = 0;
+			for (i=0; i < len; i++){
+				ele = chl[i];
+				if (ele.innerHTML == "<i class=\"fa fa-check\"></i>") {
+					if (valcnt == 0) {
+						rec = rec + '"' + ele.style.backgroundColor + '"  : ' + ' "true"';
+					} else {
+						rec = rec + ', "' + ele.style.backgroundColor + '"  : ' + ' "true"';					
+					}
+					valcnt = valcnt + 1;
+				}
+			}
+			
+			if (len > 0){
+				filter = filter + rec + ' }';
+			}
+			
+			if (page_num >= 0 ){
+				rec = ', "PAGE": {"page": ' + page_num + '}';
+				filter = filter + rec;
+			}						
+			if (sort != '' && sort != 'None' ){
+				rec = ', "SORT": {"sort":"' + sort + '"}';
+				filter = filter + rec
+			}
+			if (keywords != '' && keywords !== 'None'){
+				rec = ', "KEY-WORDS": {"keywords":"{{ikeywords}}"}';
+				filter = filter + rec
+			}
+			
+			if (isNaN(show) == false) {
+				show_num = show;
+			} else {
+				if (show != 'ALL') {
+					show_num = '50' // default
+				} else {
+					show_num = show;  
+				}
+			}
+			if (show_num != '' ){
+				rec = ', "SHOW": {"show":"' + show_num + '"}';
+				filter = filter + rec
+			}			
+			
+			filter = filter + '}';
+			
+			document.body.scrollTop = 0; // For Safari
+			document.documentElement.scrollTop = 0; 
+						
+			$.ajax({url: '{% url "stock_collage_products" %}', 
+				data: filter, 
+				dataType: 'text', 
+				type: 'POST',
+				success: function (data) {
+					$("#img-display").html(data);
+					get_collages();
+				},
+				error: function(xhr){
+					alert("An error occured: " + xhr.status + " " + xhr.statusText + " Apologies for the inconvenience!! Please let us know the details and we will be happy to help sort it out."); 
+					return;
+				}
+			});			
+		}
+	</script>
+	
+	<script>
+		var isBreakpoint = function(viewport_size){
+		  //return $('.device-' + viewport_size).is(':visible');
+		  if (viewport_size == 'xs'){
+			return window.innerWidth < 768;
+		  }
+		  if (viewport_size == 'sm'){
+			return window.innerWidth < 991;
+		  }
+		  if (viewport_size == 'md'){
+			return window.innerWidth < 1199;
+		  }
+		  if (viewport_size == 'lg'){
+			return window.innerWidth > 1199;
+		  }
+		}	
+	
+		jQuery(document).ready(function(){
+
+			if (isBreakpoint('xs')){
+				$('#cat_navigation').removeClass('show');
+				$('#filter_navigation').removeClass('show');
+			}
+			else {
+				$('#cat_navigation').addClass('show');
+				$('#filter_navigation').addClass('show');
+			}		
+			
+			//get_collages();
+		});
+	</script>
+	
+	<script>
+		function get_collages(){
+			{% for c in coll %}
+				$.ajax({
+					url: "{% url 'get_framed_collage' %}", 
+					data: { 'coll_id': {{c.product_id}}, "m_id": 18, mount_color: '#fff', "mount_size": 1, "user_width":10, "prod_type": 'STOCK-IMAGE'}, 
+					dataType: 'text', 
+						type: 'POST',
+					success: function (data) {
+					var ele = "coll_{{c.product_id}}";
+						document.getElementById(ele).src = "data:image/png;base64," + data;						
+					},
+					error: function(xhr){
+						alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+					}
+				});					
+			{% endfor %}
+		}
+	</script>	
+
+	<script>
+		function select_color(ele){
+			if (ele.innerHTML == "<i class=\"fa fa-check\"></i>"){
+				ele.innerHTML = "";
+			} else {
+				ele.innerHTML = "<i class ='fa fa-check'></i>";
+			}
+		}
+	</script>
+	<script>
+	   $(document).on("input", "#artist_search", function(){
+			input = $("#artist_search");
+			filter = input.val().toUpperCase();				  
+			elem = document.getElementsByClassName("i_ARTIST");		
+			
+			$(".i_ARTIST").each(function () {
+				var label = $(this).next('label');
+				var val = $(this).next('label').text();
+				var sts = $(this).is(":checked");
+				if (val.toUpperCase().indexOf(filter) > -1) {
+				   $(this).show();
+				   label.show();
+				   $(this).prop("checked", sts);
+				   $(this).closest("li").show();
+				} else {
+				   $(this).hide();
+				   label.hide();;
+				   $(this).prop("checked", false);
+				   $(this).closest("li").hide();
+				}				
+			});
+
+		});
+	</script>
+	<script>
+		function addToFav(prod_id, currwidth, aspect_ratio, total_price,
+				discount, promotion_id, disc_amt, item_unit_price){
+			currheight = Math.round(currwidth / aspect_ratio);
+			qty = 1; moulding_id = 0; moulding_size = 0; 
+			print_medium_id = 'PAPER'; print_medium_size = currheight * currwidth;
+			mount_id = 0; mount_size = 0; mount_w_left =0; mount_w_right = 0;
+			mount_w_top =0; mount_w_bottom = 0;acrylic_id = 1;
+			acrylic_size = currheight * currwidth; board_id = 0; board_size = 0;
+			stretch_id = 0; stretch_size = 0; discount = 0;
+		
+			$.ajax({
+				url: "{% url 'add_to_wishlist' %}", 
+				data: { 'prod_id':prod_id,'qty':qty, 
+						'width':currwidth, 'height':currheight, 'moulding_id': moulding_id,
+						'moulding_size' : moulding_size,
+						'print_medium_id':print_medium_id, 'print_medium_size':print_medium_size, 
+						'mount_id':mount_id, 'mount_size':mount_size,
+						'mount_w_left' : mount_w_left, 'mount_w_right':mount_w_right, 
+						'mount_w_top':mount_w_top, 'mount_w_bottom' : mount_w_bottom, 
+						'acrylic_id':acrylic_id, 'acrylic_size':acrylic_size,
+						'board_id':board_id, 'board_size':board_size, 'stretch_id':stretch_id,
+						'stretch_size':stretch_size, 
+						'total_price':total_price, 'image_width':currwidth, 'image_height':currheight,
+						'discount':discount, 'promotion_id':promotion_id, 'disc_amt':disc_amt,
+						'item_unit_price':item_unit_price,  'prod_type':'STOCK-IMAGE'}, 
+				dataType: 'text', 
+					type: 'POST',
+				success: function (data) {
+					data = JSON.parse(data);
+					cart_qty = data.cart_qty;
+					$('#fav_'+prod_id).html('<i class = "fa fa-heart" onclick = "deleteItem(' + prod_id + ')"style="color:red; padding-right:5px;" data-toggle="tooltip" title="Added to Favorites!"></i>');
+					/* $('#msg-wishlist-modal').modal('show');
+					setTimeout(function() {
+						$('#msg-wishlist-modal').modal('hide');
+						}, 1000);
+					*/
+				},
+				error: function(xhr){
+					alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+				}
+			});	
+		}
+	</script>
+
+		<script>
+		
+		function deleteItem(prod_id){
+			wishlist_item_id = 0;
+			sub_total = 0;
+			tax = 0;
+			wishlist_total= 0;
+			item_total = 0;
+			{% for w in wishlistitems %}
+				if ({{w.product_id}} == prod_id){
+					wishlist_item_id = {{w.wishlist_item_id}};
+				}
+			{% endfor %}
+
+			sub_total = '';
+			tax='';
+			wishlist_total='';
+			item_total='';
+			
+			$.ajax({
+				url: "{% url 'delete_wishlist_item' %}", 
+				data: {'wishlist_item_id':wishlist_item_id, 'sub_total':sub_total, 'tax':tax, 
+				'wishlist_total':wishlist_total, 'item_total':item_total}, 
+				dataType: 'text', 
+				type: 'post',
+				success: function (data) {
+					data = JSON.parse(data);
+					wishlist_qty = data.msg;
+					$('#fav_'+prod_id).html('<i class = "fa fa-heart-o"  style="color:red; padding-right:5px;" data-toggle="tooltip" title="Add to Favorites!"></i>')
+					if (data = "SUCCESS") {
+						// Update the display
+						//show_wishlist();
+						$("#w_msg").html('Item removed from favorites');
+						/*$('#msg-wishlist-modal').modal('show');
+						setTimeout(function() {
+							$('#msg-wishlist-modal').modal('hide');
+							}, 1000);*/
+					} else {
+						alert(data);
+					}
+				},
+				error: function(xhr){
+					alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+				}
+			});			
+		}
+	</script>
+	
+	<script>
+	function setUserWidth(ele){
+		var value = ele.value;
+		if( value ) {
+			$(".iuser_width").val(value);
+		} else {
+			value = 0;
+			$(".iuser_width").val(value);
+		}		
+	}
+	function setUserHeight(ele){
+		var value = ele.value;
+		if( value ) {
+			$(".iuser_height").val(value);
+		} else {
+			value = 0;
+			$(".iuser_height").val(value);
+		}		
+	}
+	</script>
+	
+	{% endblock jscripts %}
+			
+	

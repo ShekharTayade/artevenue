@@ -1,0 +1,280 @@
+{% load static %}
+<!-- Message Modal -->
+<div id="wall-color-tool" tabindex="-1" role="dialog" aria-labelledby="Wall Color Tool" aria-hidden="true" class="modal fade">
+	<div class="modal-dialog modal-md">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h3 class="modal-title">Wall Color & Size Tool</h3>
+				<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
+			</div>
+			<div class="modal-body">
+				<div id = "wall_colors" class = "row">
+					<div class = "col-12 text-center"  style = "padding-left: 50px;">
+						Enter artwork size {% if is_set == 'TRUE' %} (applied to each artwork in the set) {% endif %} and tap a color
+					</div>
+					<div class = "row mt-3" style = "padding: 0px 20px 0px 50px;">
+						<div class = "col-1">
+						</div>
+						<form id="s_form" action ='' class="form-inline">
+							<div class = "col-5">
+								<input id="a_width" type = "number" min="4" max="60" class = "form-control" onchange="setUserWidth(this);">
+								Width (inch)
+							</div>
+							<div class = "col-5">
+								<input id="a_height" type = "number" min="4" max="60" class = "form-control" onchange="setUserWidth(this);">
+								Height (inch)
+							</div>
+						</form>
+						<div class = "col-1">
+						</div>
+					</div>
+					<div id = "colors-div" class = "row" style = "padding: 0px 20px;">
+						{% for w in wall_colors %}
+						<div class = "col-1 m-2">
+							<div class = "d-none d-md-block">
+								<button class = "btn mount" 
+									style = "border:1px solid grey; background-color: rgb({{w}});"
+									onclick = "show_wall_tool(document.getElementById('prod-img').src, '{{w}}', '{{is_set}}');">
+								</button>
+							</div>
+							<div class = "d-block d-md-none">
+								<button class = "btn mount" 
+									style = "border:1px solid grey; background-color: rgb({{w}});"
+									onclick = "show_wall_tool(document.getElementById('prod-img-card').src, '{{w}}', '{{is_set}}');">
+								</button>
+							</div>
+						</div>
+						{% endfor %}
+						<div class = "col-12 text-center" style = "font-size: 0.8rem;">
+							<button class = "btn btn-primary" type = "submit" form = "s_form">
+								<i class = "fa fa-chevron-right">Show</i>
+							</button>
+						</div>
+						<div class="img-div mt-2">
+							<img id = "wall-img" src="{% static 'img/catalog/wall-255-255-255.jpg' %}" alt="Art Print: {{product.name}}" class = "img-fluid"
+									style = "max-width: 90%; max-height:400px; margin-left:25px; border:1px solid #eee;">
+						</div>					
+					</div>
+					<div class = "col-12" style = "font-size: 0.8rem;">
+					<div id = 'size_msg' style = 'background-color: #f9d577; display: none;'>
+					</div>
+					</div>
+					<div class = "col-12 text-center" style = "font-size: 0.7rem;">
+						Room space in the view: 7 feet (84 inch) wide
+					</div>
+				</div>
+			</div>
+			
+			<div class="modal-footer">
+				<div style = "font-size: 0.6rem;">
+					*An approximate representation of how the artwork looks
+					with the selected size.
+				</div>
+			</div>			
+		</div>
+	</div>
+</div>
+
+<script>
+function show_wall_tool(img_str, color, is_set='FALSE'){
+
+	var artwidth = parseInt($("#a_width").val());
+	var artheight = parseInt($("#a_height").val());
+	if (Number.isInteger(artwidth) && Number.isInteger(artheight) ){
+		if ( artwidth < 4 || artheight < 4){
+			$("#modal-hedline").html('Invalid Size');
+			$("#msg").html("The size should be a number and width, height should be greater 4 inch.");
+			$('#msg-modal').modal('show');
+			return
+		}
+	} else {
+		$("#modal-hedline").html('Invalid Size');
+		$("#msg").html("The size should be a number and width, height should be greater 4 inch.");
+		$('#msg-modal').modal('show');
+		return
+	}
+	
+	var m_id = get_moulding_id();
+	var mnt_size = get_mount_size();
+	var mnt_color = get_mount_color();
+	var prod_id = get_product_id();
+
+	if (moulding_id != '0' && moulding_id != ''){
+		{% for f in mouldings_show %}
+			if ('{{f.moulding_id}}' == moulding_id) {			
+				f_size = {{f.moulding__width_inner_inches}};
+			}
+		{% endfor %}
+		
+		artwidth = artwidth - f_size*2;
+		if (print_medium_id == 'PAPER'){
+			var mnt_color = '';
+			if (mount_id != '0' && mount_id != '') {
+				mnt_size = parseFloat(mount_size);
+				artwidth = artwidth - mnt_size*2;
+			}
+		}
+	}
+
+
+	var url = "{% url 'show_on_wall' %}"
+	if (is_set == 'TRUE') {
+		var url = "{% url 'show_on_wall_set' %}"
+	}
+	
+	$.ajax({
+			url: url, 
+			data: {'img_str':img_str, 'color': color,
+					'image_width': artwidth, 'moulding_id': m_id,
+					'mount_size': mnt_size, 'prod_id': prod_id,
+					'mount_color': mnt_color
+				},
+			dataType: 'text',
+			type: 'POST',
+		success: function (data) {
+			document.getElementById("wall-img").src = "data:image/png;base64," + data;
+			var size_crossed = getCookie('size_crossed');
+			if (size_crossed == '1'){
+				$("#msg").html("Size you have seleted is to too large for the this roomview. <br />This is only as applied to the display in this view of 7 feet width room space. <strong>You can still go ahead and order the selected size.</strong>");
+				$("#msg-modal").modal('show');
+			}
+		},
+		error: function(xhr){
+			alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+		}
+	});
+
+}
+
+
+$( "#a_width" ).change(function() {
+	var width = parseInt($(this).val());	
+	var img_width = width;
+	if (moulding_id != '0' && moulding_id != ''){
+		var f_size = 0;
+		{% for f in mouldings_show %}
+			if ('{{f.moulding_id}}' == moulding_id) {			
+				f_size = {{f.moulding__width_inner_inches}};
+			}
+		{% endfor %}
+		
+		img_width = img_width - f_size*2;
+		if (print_medium_id == 'PAPER'){
+			if (mount_id != '0' && mount_id != '') {
+				var mnt_size = parseFloat(mount_size);
+				img_width = img_width - mnt_size*2;
+			}
+		}
+	}	
+	var img_height = Math.round(img_width / ratio);
+	var height = img_height;
+	if (moulding_id != '0' && moulding_id != ''){
+		var f_size = 0;
+		{% for f in mouldings_show %}
+			if ('{{f.moulding_id}}' == moulding_id) {			
+				f_size = {{f.moulding__width_inner_inches}};
+			}
+		{% endfor %}
+		
+		height = height + f_size*2;
+		if (print_medium_id == 'PAPER'){
+			if (mount_id != '0' && mount_id != '') {
+				var mnt_size = parseFloat(mount_size);
+				height = height + mnt_size*2;
+			}
+		}
+	}
+	$( "#a_height" ).val(height);
+});
+
+
+$( "#a_height" ).change(function() {
+	var height = $(this).val();
+	
+	var img_height = height;
+	if (moulding_id != '0' && moulding_id != ''){
+		var f_size = 0;
+		{% for f in mouldings_show %}
+			if ('{{f.moulding_id}}' == moulding_id) {			
+				f_size = {{f.moulding__width_inner_inches}};
+			}
+		{% endfor %}
+		
+		img_height = img_height - f_size*2;
+		if (print_medium_id == 'PAPER'){
+			if (mount_id != '0' && mount_id != '') {
+				var mnt_size = parseFloat(mount_size);
+				img_height = img_height - mnt_size*2;
+			}
+		}
+	}		
+	
+	var img_width = Math.round(img_height * ratio);
+	var width = img_width;
+	if (moulding_id != '0' && moulding_id != ''){
+		{% for f in mouldings_show %}
+			if ('{{f.moulding_id}}' == moulding_id) {			
+				var f_size = {{f.moulding__width_inner_inches}};
+			}
+		{% endfor %}
+		
+		width = width + f_size*2;
+		if (print_medium_id == 'PAPER'){
+			if (mount_id != '0' && mount_id != '') {
+				var mnt_size = parseFloat(mount_size);
+				width = width + mnt_size*2;
+			}
+		}
+	}
+	
+	$( "#a_width" ).val(width);
+});
+
+
+$("#wall-color-tool").on("hidden.bs.modal", function () {
+	var artwidth = parseFloat($("#a_width").val());
+	var currwidth = parseFloat($("#size-slider").slider("value"));
+
+	var img_width = artwidth;
+	if (moulding_id != '0' && moulding_id != ''){
+		var f_size = 0;
+		{% for f in mouldings_show %}
+			if ('{{f.moulding_id}}' == moulding_id) {			
+				f_size = {{f.moulding__width_inner_inches}};
+			}
+		{% endfor %}
+		
+		img_width = img_width - f_size*2;
+		if (print_medium_id == 'PAPER'){
+			if (mount_id != '0' && mount_id != '') {
+				var mnt_size = parseFloat(mount_size);
+				img_width = img_width - mnt_size*2;
+			}
+		}
+	}	
+
+	if (img_width != currwidth){
+		set_size_slider(img_width);
+	}
+});
+
+function set_max_size_on_tool(){
+	var ratio = 0;
+	var maxsize_w = parseFloat("{{product.max_width}}");
+	if ("{{product.aspect_ratio}}" != "NA"){
+		ratio = parseFloat("{{product.aspect_ratio}}");
+	}
+	if (parseFloat("{{product.max_width}}") > 40 && parseFloat("{{product.max_height}}") > 40) {
+		if (ratio > 1) {
+			maxsize_w = Math.ceil( 40 * ratio );
+		} else {
+			maxsize_w = 40;
+		}
+	}
+	$("#a_width").prop('min', 4);
+	$("#a_width").prop('max', maxsize_w);
+	var maxsize_h = Math.round(maxsize_w / ratio);
+	$("#a_height").prop('min', 4);
+	$("#a_height").prop('max', maxsize_h);
+}
+</script>

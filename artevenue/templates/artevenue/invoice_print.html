@@ -15,7 +15,7 @@
 		<img src="{% static 'img/artevenue_logo_new.png' %}" alt="{{ecom_site.store_name}}"  style="width:110px; height:25px;">
 		<small style = "color: #665d6f; font-family:Helvetica, sans-serif !important; float:right;">www.ArteVenue.com</small>
 		<hr>
-		<h2 style = "text-align:center;"> Invoice </h2> 
+		<h2 style = "text-align:center;"> Tax Invoice </h2> 
 		<div style = "margin-left:10px; display:block; position: absolute;">
 			<p><strong>{{ ecom_site.store_name }}</strong><br>
 			{{ ecom_site.store_address1 }}<br>
@@ -90,7 +90,7 @@
 		</div>
 		<div id="informations" style = "margin-top:15rem; display:block; position: relative;">
 			<div id="informations">
-			  <dt>Invoice number: <span style = "color:blue">{{order.invoice_number}}</span></dt>
+			  <dt>Invoice number: <span style = "color:#11b6bd;">{{order.invoice_number}}</span></dt>
 			  <dd></dd>
 			  <dt>Date: {{order.invoice_date|date:"d-m-Y"}}</dt>
 			  <dd></dd>

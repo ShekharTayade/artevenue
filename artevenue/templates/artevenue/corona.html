@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+{% load utils %}
+{% load static %}
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="robots" content="all,follow">
+		<!-- Bootstrap CSS-->
+		<link rel="stylesheet" href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}">
+				
+		<!-- Font Awesome CSS-->
+		<link rel="stylesheet" href="{% static 'vendor/font-awesome/css/font-awesome.min.css' %}">
+		<!-- Google fonts - Roboto -->
+		<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:400,500,700,300,100">
+		<!-- Custom stylesheet -->
+		<link rel="stylesheet" href="{% static  'css/custom.css' %}">
+		<!-- theme stylesheet-->
+		<link rel="stylesheet" href="{% static 'css/style.default.css' %}" id="theme-stylesheet">
+		<!-- theme stylesheet-->
+		<link rel="stylesheet" href="{% static 'css/home-page-style.css' %}" id="theme-stylesheet">
+
+	</head>
+
+	<body>
+		<div  style = "border:1px solid #d4d4d4; padding:10px;">
+		<h3>COVID-19 Communication</h3>
+		<h5>
+			{% if user.first_name %}
+				<strong>Dear {{user.first_name|title}} {{user.last_name|title}}</strong>
+			{% else %}
+				<strong>Dear patron</strong>			
+			{% endif %}
+		</h5>
+	
+		<div class = "row">
+			<p>
+			<strong>COVID-19 Impact:</strong> As you are aware, the Codiv-19 situation in the 
+			country has forced central and state governments to implement a lockdown across country.
+			</p>
+			<p>
+			<strong>Safety Measures:</strong> We are following the government directives and 
+			guidelines for our staff and 
+			factory workers and taking all the safety measures. We have asked our staff to 
+			work from home and halted our production temporarily.
+			</p>
+			<p>
+			<strong>Impact to us:</strong>	It has impacted our order processing and production. 
+			Our delivery partner carriers are also unable to deliver currently. 
+			So, kindly be informed that the orders will get delayed.
+			</p>
+			<p>
+			<strong>Can you still order?</strong> You can still go ahead and order as we will resume 
+			our operations as soon as situation nears normal. We will take up orders for processing 
+			in the sequence it was received.
+			
+			<p>
+			<strong>What about orders already places?</strong> 
+			You need not worry about the orders already placed with us. We will do our best 
+			and deliver those as soon as situation nears normal. 
+			</p>
+			<br/>
+			<p>
+			If you need any assistance, quations or clarification please feel free to write to us at <strong>support@artevenue.com</strong>, 
+			or call us at +91 996112 03626.
+			</p>
+			<p>Let's support the lockdown, maintain social distancing and beat the virus.
+				<br />
+				<strong>Stay safe! Stay home!</strong>
+			</p>
+			<p>
+				Team Arte'Venue
+				<br />
+				<img src = "https://artevenue.com/static/img/artevenue_logo_new.png" alt="Arte'Venue Logo"  height="25" width="110"> <br />
+				<a href = "https://www.artevenue.com">www.artevenue.com</a>
+			</p>
+		</div>
+
+		</div>
+	</body>
+</html>

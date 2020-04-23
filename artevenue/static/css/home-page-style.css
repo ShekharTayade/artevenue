@@ -18,7 +18,6 @@ a, button, img {
 }
 .main{
 	display:block;
-	width:100%;	
 }
 /* header start*/
 .header{	
@@ -124,11 +123,11 @@ a, button, img {
 }
 
 .search_form .form-control {
-    border-radius: 40px;
+    border-radius: 0px;
     height: 40px;
     font-size: 13px;
     color: #696868;
-    padding: 10px 50px 10px 20px;
+    padding: 10px 50px 10px 10px;
 	border-color: #cccccc;
 }
 .search_form button.btn.btn-outline-success {
@@ -172,16 +171,19 @@ a, button, img {
 	border: 1px solid rgba(0, 0, 0, 0.07);
 	border-radius: 0rem;
 	margin:0px;
-	padding:0px;
-}
-
-.dropdown-item{
-	border-bottom: 1px solid rgba(0, 0, 0, 0.07);
 	padding: .6rem 1rem;
 	font-size: 15px;
     font-weight: 400;
 	letter-spacing: .6px;
 }
+
+@media screen and (min-width: 769px) {
+	.dropdown-menu{
+		top: 50%;
+	}
+}
+
+
 .dropdown-item:focus, .dropdown-item:hover {
 	background-color: #11b6bd;
     color: #fff;
@@ -212,10 +214,6 @@ a.cart_top span {
 	padding: 4rem 4rem;
 }
 
-.main_banner .row{
-	margin-left:0px;
-	margin-right:0px;
-}
 .say_pic{
 	width:100%;
 	display:block;
@@ -225,14 +223,7 @@ a.cart_top span {
 	width:100%;
 }
 
-.main_banner .col-lg-6.col-md-12.col-sm-12.col-12, .main_banner .container-fluid{
-	padding:0px;
-}
 
-.main_banner {
-    /*background-color: #e8e8e8;*/
-    width: 100%;
-}
 hgroup.hgroup h1 {
     font-size: 35px;
     color: #252525;
@@ -409,10 +400,7 @@ ul.slick-dots li.slick-active button {
 
 
 .curted_pic {
-    /*border: 10px solid #fff;*/
-    /*width: 100%; */
     display: block;
-/*    margin-bottom: 20px; */
 }
 
 .curted_coumn{
@@ -420,15 +408,7 @@ ul.slick-dots li.slick-active button {
 	display:block;
 	margin-bottom:30px;
 }
-.curted_pic:before {
-    /*border: 2px solid #fff;*/
-    /*bottom: 15px;
-    content: "";
-    left: 15px;
-    right: 15px;
-    top: 15px;*/
-/*    z-index: 1; */
-}
+
 .curted_coumn h3 {
     font-size: 22px;
     color: #252525;
@@ -552,7 +532,7 @@ letter-spacing: 2px;
 }
 .newsletter{
     border: 3px solid #777;
-    padding: 30px 15px 20px;
+    padding: 15px 15px 0px;
 }
 
 .newsletter .btn{

@@ -1,6 +1,6 @@
 from artevenue.views import product_views
 from .frame_views import *
-from artevenue.models import Stock_image, Publisher_price, Product_view, Moulding
+from artevenue.models import Stock_image, Publisher_price, Product_view, Moulding, Collage_stock_image
 
 from .tax_views import *
 from decimal import Decimal
@@ -52,7 +52,8 @@ def get_prod_price(prod_id,**kwargs):
 				item_price = get_price_reduction_by_size(per_sqinch_paper, image_width * image_height)
 	
 			## Apply any special prices
-			item_price = apply_special_price(prod, item_price)
+			if prod_type == 'STOCK-IMAGE':
+				item_price = apply_special_price(prod, item_price)
 	
 			# Acrylic Price	
 			if acrylic_id:
@@ -94,7 +95,8 @@ def get_prod_price(prod_id,**kwargs):
 					item_price = get_price_reduction_by_size(per_sqinch_canvas, image_width * image_height)
 
 			## Apply any special prices
-			item_price = apply_special_price(prod, item_price)
+			if prod_type == 'STOCK-IMAGE':
+				item_price = apply_special_price(prod, item_price)
 
 			# Moulding price
 			if moulding_id:
@@ -120,7 +122,8 @@ def get_prod_price(prod_id,**kwargs):
 		item_price = Decimal(item_price + image_price)
 		
 		## Apply any special pricing
-		item_price = apply_special_price(prod, item_price)
+		if prod_type == 'STOCK-IMAGE':
+			item_price = apply_special_price(prod, item_price)
 		
 		#item_price = prod.price
 		#image_width = prod.art_width
@@ -368,9 +371,142 @@ def apply_special_price(prod, item_price):
 
 	## Increasing product price by 20% if it's work Art Group(47) publusher
 	## and image code ends with "GG" or "FN"
-	if prod.publisher == "47" and (prod.part_number[-2:] == "GG" or prod.part_number[-2:] == "FN"):
-		item_price = Decimal(item_price  + ( item_price * 20 / 100))
+	if prod.publisher :
+		if prod.publisher == "47" and (prod.part_number[-2:] == "GG" or prod.part_number[-2:] == "FN"):
+			item_price = Decimal(item_price  + ( item_price * 20 / 100))
 	
 	return item_price
 	
+
+
+def get_artset_price_for_6_prods(prod_id, aspect_ratio, prod_type='STOCK-IMAGE'):
+
+	collages = Collage_stock_image.objects.filter( stock_collage_id = prod_id )
+	
+	STANDARD_PROD_WIDTHS = [10, 14, 18, 24, 30, 36]
+		
+	## Common pricing components
+	acrylic_id = 1
+	moulding_id = 18  # Simple Black
+	mount_id = 3 # Offwhite
+	board_id = 1
+	stretch_id = 1	
+	
+	size_price_paper = {}
+	size_price_canvas = {}
+	
+	## Six prods with PAPER medium
+	for i in STANDARD_PROD_WIDTHS:
+		
+		p_data_paper = {}
+		p_data_canvas = {}
+		image_width = i
+		image_height = round(image_width / aspect_ratio)
+
+		mount_size = 1 if i <= 24 else 2 if i <= 42 else 3
+		moulding_id = 18 if i <= 24 else 24 
+		moulding = Moulding.objects.get(pk = moulding_id)
+		i_width_p = image_width + moulding.width_inner_inches * 2 + mount_size * 2
+		i_height_p = image_height + moulding.width_inner_inches * 2 + mount_size * 2
+		i_width_c = image_width + moulding.width_inner_inches * 2
+		i_height_c = image_height + moulding.width_inner_inches * 2
+
+		total_price_paper = 0
+		total_price_canvas = 0
+		total_unframed_price_paper = 0
+		total_unframed_price_canvas = 0
+		p_data_paper['PAPER_WIDTH'] = i_width_p
+		p_data_paper['PAPER_HEIGHT'] = i_height_p
+		p_data_canvas['CANVAS_WIDTH'] = i_width_c
+		p_data_canvas['CANVAS_HEIGHT'] = i_height_c
+		p_data_paper['PAPER_WIDTH_UNFRAMED'] = image_width
+		p_data_paper['PAPER_HEIGHT_UNFRAMED'] = image_height
+		p_data_canvas['CANVAS_WIDTH_UNFRAMED'] = image_width
+		p_data_canvas['CANVAS_HEIGHT_UNFRAMED'] = image_height
+
+		for c in collages:			
+			p_id = c.stock_image_id
+			try:
+				product = Stock_image.objects.get(product_id = p_id)
+				
+			except Stock_image.DoesNotExists:
+				return ({'size_price_paper':0, 'size_price_canvas':0})
+				
+			if i > product.max_width:
+				continue
+
+			# Get image price on paper and canvas
+			per_sqinch_price = get_per_sqinch_price(p_id, prod_type)
+			per_sqinch_paper = per_sqinch_price['per_sqin_paper']
+			per_sqinch_canvas = per_sqinch_price['per_sqin_canvas']	
+
+			############################
+			## PAPER
+			############################
+			item_price = get_price_reduction_by_size(per_sqinch_paper, image_width * image_height)
+			total_unframed_price_paper = total_unframed_price_paper + Decimal(round(float(item_price),-1))
+			#p_data_paper['PAPER_PRICE_UNFRAMED'] = Decimal(round(float(item_price),-1))
+
+			## Apply any special prices
+			item_price = apply_special_price(product, item_price)
+
+			# Acrylic Price	
+			if acrylic_id:
+				acrylic_price = image_width * image_height * get_acrylic_price_by_id(acrylic_id)
+				item_price = Decimal(item_price + acrylic_price)
+			
+			# Moulding price
+			if moulding_id:
+				moulding_price = (image_width + image_height) * 2 * get_moulding_price_by_id(moulding_id)
+				item_price = Decimal(item_price + moulding_price)
+
+			# Mount price
+			if mount_size and mount_id:
+				mount_price = ((image_width + image_height) * 2 * Decimal(mount_size))  * get_mount_price_by_id(mount_id)
+				item_price = Decimal(item_price + mount_price)
+			
+			# Board price
+			if board_id:
+				board_price = image_width * image_height * Decimal(get_board_price_by_id(board_id))
+				item_price = Decimal(item_price + board_price)			
+			
+			total_price_paper = total_price_paper + Decimal(round(float(item_price),-1))
+			#p_data_paper['PAPER_PRICE'] = Decimal(round(float(item_price),-1))
+						
+			############################
+			## CANVAS
+			############################
+			if image_width > 0 and image_height > 0:
+				item_price = get_price_reduction_by_size(per_sqinch_canvas, image_width * image_height)
+
+			## Apply any special prices
+			item_price = apply_special_price(product, item_price)
+			total_unframed_price_canvas = total_unframed_price_canvas + Decimal(round(float(item_price),-1))
+			#p_data_paper['PAPER_PRICE_UNFRAMED'] = Decimal(round(float(item_price),-1))
+
+			# Moulding price
+			if moulding_id:
+				moulding_price = (image_width + image_height) * 2 * get_moulding_price_by_id(moulding_id)
+				item_price = Decimal(item_price + moulding_price)
+			
+			# Stretch price
+			if stretch_id:			
+				stretch_price = image_width * image_height * get_stretch_price_by_id(stretch_id)
+				item_price = Decimal(item_price + stretch_price)
+
+			i_width = image_width + moulding.width_inner_inches * 2
+			i_height = image_height + moulding.width_inner_inches * 2
+			total_price_canvas = total_price_canvas + Decimal(round(float(item_price),-1))
+			#p_data_canvas['CANVAS_PRICE'] = total_price_canvas + Decimal(round(float(item_price),-1))
+			
+		p_data_paper['PAPER_PRICE'] = total_price_paper
+		p_data_canvas['CANVAS_PRICE'] = total_price_canvas
+		p_data_paper['PAPER_PRICE_UNFRAMED'] = total_unframed_price_paper
+		p_data_canvas['CANVAS_PRICE_UNFRAMED'] = total_unframed_price_canvas
+		
+		size_price_paper[str(i)] = p_data_paper
+		size_price_canvas[str(i)] = p_data_canvas
+
+		
+	return ({'size_price_paper':size_price_paper, 'size_price_canvas':size_price_canvas})
 	

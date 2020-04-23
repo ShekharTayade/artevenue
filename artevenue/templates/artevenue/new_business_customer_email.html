@@ -19,44 +19,219 @@
 		<link rel="stylesheet" href="{% static  'css/custom.css' %}">
 		<!-- theme stylesheet-->
 		<link rel="stylesheet" href="{% static 'css/style.default.css' %}" id="theme-stylesheet">
-		<!-- theme stylesheet-->
-		<link rel="stylesheet" href="{% static 'css/home-page-style.css' %}" id="theme-stylesheet">
-
 	</head>
 
 	<body>
-		<p>
-			Dear {{business_user.contact_name}}, {{business_user.company}},
+		<div class = "row" style = "padding:10px;">
+			<table style = "width: 100%;">
+				<tbody>
+					<tr>
+						<td>
+							<img src = "https://artevenue.com/static/img/av_logo_circle2_m1.png" %}" alt="Arte'venue" width=150>
+						</td>
+						<td style = "text-align: right; top:20%;">
+							<span style = "font-size: 9px;">www.artevenue.com</span>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<hr>
+			<div style = "border-top: 1px solid #dddddd;">
+				<table>
+					<tbody>
+						<tr>
+						<td>
+						Dear {% if business_user.contact_name %} 
+								{{business_user.contact_name}}
+							{% else %}
+								{{user.username}}
+							{% endif %}
+							{% if business_user.company %}
+								<br /> {{business_user.company}}
+							{% endif %}
+							</td>
+						</tr>
+				</table>
+				
+				<h5>Arte’Venue welcomes you onboard as our privileged business partner!
+				</h5>
+				<h5>You will shortly hear from us at {{user.email}} / {{business_user.phone_number}}
+					with details of the benefits you will receive as our business partner.
+				</h5>
+				
+				<h5>
+					Arte'Venue brings together 4500+ artists in 70+ categories, 
+					over 2,75,000 pieces of unique art collection and customized framing
+					solutions. We are India's largest and most trusted platform.
+				</h5>
 
-		</p>
-		<p>Arte’Venue welcomes you on board as our privileged business partner!!</p>
-			
-		<p>	We greatly look forward to catering to all your customer's art and framing 
-			requirements.<br />
-			You will shortly hear from us at {{user.email}} / {{business_user.phone_number}}
-			regarding the benefits you will receive as our business partner.
-		</p>
-		<p> Your absolute satisfaction is our priority and you can expect a 
-			seamless experience with us for each of your orders from Arte’Venue.
-		</p>
+				<h5>We have great value additions for you:</h5>
+				<table style = "font-size: 12px; width: 100%;">
+					<tbody>
+						<tr>
+							<td>
+								<strong>Free Shipping</strong>
+							</td>
+							<td>
+								We ship in 1 or 2 days to any address in India.
+							</td>
+						</tr>
+						<tr>
+							<td>
+							<div  style = "border-top: 1px solid #d4d4d4;">
+								&nbsp;
+							</div>
+							</td>
+							<td>
+							<div  style = "border-top: 1px solid #d4d4d4;">
+								&nbsp;
+							</div>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<strong>Bulk Orders</strong>
+							</td>
+							<td>
+								We have capacity to deliver orders in bulk from our factory in Bangalore.
+								We have 10+ years of experience in supplying artworks
+								to clients and architects in interior design comapanies, corporates, 
+								hotels, residential and commercial spaces.
+							</td>
+						</tr>
+						<tr>
+							<td>
+							<div  style = "border-top: 1px solid #d4d4d4;">
+								&nbsp;
+							</div>
+							</td>
+							<td>
+							<div  style = "border-top: 1px solid #d4d4d4;">
+								&nbsp;
+							</div>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<strong>Artwork Selection</strong>
+							</td>
+							<td>
+								Our designers can help choose artworks and provide mockups as per your requirements.
+							</td>
+						</tr>
+						<tr>
+							<td>
+							<div  style = "border-top: 1px solid #d4d4d4;">
+								&nbsp;
+							</div>
+							</td>
+							<td>
+							<div  style = "border-top: 1px solid #d4d4d4;">
+								&nbsp;
+							</div>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<strong>Fully Customizable</strong>
+							</td>
+							<td>
+								A first in India, exactly what a designer, architect needs. Every art print can be fully customized - surface, size (inch-by-inch), frame and more.
+							</td>
+						</tr>
+						<tr>
+							<td>
+							<div  style = "border-top: 1px solid #d4d4d4;">
+								&nbsp;
+							</div>
+							</td>
+							<td>
+							<div  style = "border-top: 1px solid #d4d4d4;">
+								&nbsp;
+							</div>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<strong>Business Integration</strong>
+							</td>
+							<td>
+								We have capability to integrate with your business systems
+								to provide seemless experience in artwork selection, orders and payments.
+							</td>
+						</tr>
+						<tr>
+							<td>
+							<div  style = "border-top: 1px solid #d4d4d4;">
+								&nbsp;
+							</div>
+							</td>
+							<td>
+							<div  style = "border-top: 1px solid #d4d4d4;">
+								&nbsp;
+							</div>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<strong>High Quality, Afforable Prices</strong>
+							</td>
+							<td>
+								We promise high quality at afforable prices
+							</td>
+						</tr>
+						<tr>
+							<td>
+							<div  style = "border-top: 1px solid #d4d4d4;">
+								&nbsp;
+							</div>
+							</td>
+							<td>
+							<div  style = "border-top: 1px solid #d4d4d4;">
+								&nbsp;
+							</div>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<strong>and more...</strong>
+							</td>
+							<td>								
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<hr>
+				<h5>We greatly look forward to catering to all your art and framing 
+					requirements.
+				</h5>
+				<h5>
+					Please ensure that you login and place orders using the Arte'Venue account 
+					you have created: username: {{user.username}}, email: {{user.email}}. 
+					We can credit your benefits only for the orders received using this account.
+				</h5>
+				<hr>
+
+				<h6>If you need any assitance, please feel free to write to us at 
+					support@artevenue.com, chat with us online at www.artevenue.com,
+					or call us at +91 96115 03626. We will be happy help.
+				</h6>
+				
+				
+			</div>
+
+		</div>
 		<hr>
-		<p>
-			You can begin to browse through our collection of over 2,50,000 
-			art prints and framing options by clicking the link below:
-			<a href = "https://www.artevenue.com/login">Artevenue.com/login</a>
-			
-		</p>
-		<p>
-			Please ensure that you login and place order using the Arte'Venue account 
-			you have created: username: {{user.username}}, email: {{user.email}}. 
-			We can credit your benefits only for the orders received using this account.
-		</p>
-		<hr>
-		<p>
-			With warm regards,<br />
-			Team Arte'Venue<br/>
-			<img src = "https://artevenue.com/static/img/artevenue_logo_new.png" alt="Arte'venue Logo"  height="25" width="110"> <br />
-			<a href = "https://www.artevenue.com">www.artevenue.com</a>
-		</p>
+		<!--  Signature -->
+		<div style = " margin-top: 20px;">
+			<h5>
+				With warm regards,<br />
+				Team Arte'Venue
+				<br />
+				<img src = "https://artevenue.com/static/img/artevenue_logo_new.png" alt="Arte'Venue Logo"  height="25" width="110"> <br />
+				<a href = "https://www.artevenue.com">www.artevenue.com</a>
+			</h5>
+		</div>
 	</body>
-</html>
+</html>	
+	

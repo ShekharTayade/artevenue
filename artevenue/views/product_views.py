@@ -517,18 +517,23 @@ def stock_image_detail(request, prod_id = '', iuser_width='', iuser_height=''):
 		'cart_item':cart_item_view, 'wishlist_item':wishlist_item_view, 'iuser_width':iuser_width, 
 		'iuser_height':iuser_height} )	
 	'''
+	
+	#wall_colors = ['255,255,224', '255,255,204', '152,251,152', '0,100,0', '128,128,0', '255,255,0', '173,216,230',
+	#		'65,182,230', '255,205,72', '244,164,96', '255,99,71', '243,100,162', '255,20,147', '137,46,58']
+	
+	wall_colors = ['255,255,255', '255,255,224', '242,242,242', '230,242,255', '65,182,230', '64,224,208', '204,255,204', '128,128,0', '255,255,179', '255,205,72', '255,215,0', '255,230,230', '137,46,58', '255,0,0']
+	request.session.set_test_cookie()   ## To test if cookie is enabled on the browser. If not display message in Size and Color Tool.
+
 	return render(request, "artevenue/stock_image_detail_new.html", {'product':product,
 		'prod_categories':prod_categories, 'printmedium':printmedium, 'product_category':product_category,
 		'mouldings_apply':paper_mouldings_apply, 'mouldings_show':paper_mouldings_show, 'mounts':mounts,
 		'per_sqinch_paper':per_sqinch_paper, 'per_sqinch_canvas':per_sqinch_canvas, 'acrylics':acrylics,
-		'boards':boards, 
-		#######'img_with_all_mouldings':img_with_all_mouldings, 
-		'stretches':stretches, 'ENV':settings.EXEC_ENV,
+		'boards':boards,'stretches':stretches, 'ENV':settings.EXEC_ENV,
 		'cart_item':cart_item_view, 'iuser_width':iuser_width, 'iuser_height':iuser_height,
 		'prods':similar_products, 'price':price, 'wishlist_prods':wishlist_prods,
 		'paper_mouldings_corner':paper_mouldings_corner, 'canvas_mouldings_corner':canvas_mouldings_corner,
 		'ready_prod_data_paper':ready_prod_data_paper, 'ready_prod_data_canvas':ready_prod_data_canvas,
-		'wishlist_item':wishlist_item_view } )
+		'wishlist_item':wishlist_item_view, 'wall_colors': wall_colors} )
 
 @csrf_exempt	
 def get_item_price (request):
@@ -1106,8 +1111,33 @@ def all_stock_images(request):
 		'slab_200_plus':slab_200_plus} )
 		
 @csrf_exempt		
-def curated_collections(request, cat_nm=None, prod_id=None):
+def curated_collections(request, cat_nm=None, page = None,  prod_id=None, ):
 	cat_nm = cat_nm.replace("-", " ")
+
+	if page is None:
+		page = request.GET.get("page_num", 1)
+
+	if page is None or page == 0:
+		page = 1 # default
+
+	sortOrder = request.GET.get("sort")
+	show = request.GET.get("show", "100")
+	result_limit = request.GET.get("result_limit", "0-50")
+	filt_colors = request.GET.get("filt_colors", "")
+	colors = filt_colors.split('|')
+	
+	filt_size = request.GET.get("filt_size", "")
+	filt_width = request.GET.get("filt_width", "")
+	filt_height = request.GET.get("filt_height", "")
+	filt_artist = request.GET.get("filt_artist", "")
+	artists = filt_artist.split('|')
+	
+	filt_orientation = request.GET.get("filt_orientation", "")
+	orientation = filt_orientation.split('|')
+
+	filt_image_type = request.GET.get("filt_image_type", "")
+	image_type = filt_image_type.split('|')
+
 	if cat_nm:
 		try:
 			product_cate = Curated_category.objects.get(name = cat_nm);
@@ -1118,6 +1148,14 @@ def curated_collections(request, cat_nm=None, prod_id=None):
 		except Curated_category.MultipleObjectsReturned:
 			product_cate = {}
 			cat_id = 0
+
+		try:
+			cat_p = Stock_image_category.objects.get(name = cat_nm);
+			cat_id_p = cat_p.category_id	## Only used for setting category display priority
+		except Stock_image_category.DoesNotExist:
+			cat_id_p = 0
+		except Stock_image_category.MultipleObjectsReturned:
+			cat_id_p = 0
 		
 	else:
 		cat_id = 0
@@ -1128,22 +1166,31 @@ def curated_collections(request, cat_nm=None, prod_id=None):
 	ikeywords = request.GET.get('keywords', '')
 	keywords = ikeywords.split()
 	keyword_filter = False # Turned on only if a keyword filter is present (through the AJAX call)
-	page = 1 # default
 
 	sortOrder = request.GET.get("sort")
 	show = request.GET.get("show")
-
+	
 	if prod_id:
+		## remove earlier priority, if any
+		p_c = Stock_image_stock_image_category.objects.filter(
+			stock_image_category_id = cat_id_p,
+			stock_image__category_disp_priority = -2).values_list('stock_image_id', flat=True)
+			
+		prod_u = Stock_image.objects.filter(category_disp_priority = -2, 
+			product_id__in = p_c).update(category_disp_priority = None)
+
+		## set priority for current product
 		prod_ups = Stock_image.objects.filter(product_id = prod_id).update(
-			category_disp_priority = -1)
+			category_disp_priority = -2)
 	
 	prod_categories = Stock_image_category.objects.filter(store_id=settings.STORE_ID, trending = True )
 	
 	curated_coll = Curated_collection.objects.filter(curated_category_id = cat_id,
 			product_type_id = 'STOCK-IMAGE', product__is_published = True).values('product_id')
-	products = Stock_image.objects.filter(product_id__in = curated_coll)
-			
-		
+
+	products = Stock_image.objects.filter(product_id__in = curated_coll).order_by('category_disp_priority')
+	
+	'''
 	dt =  today.day
 	if dt >= 1 and dt <= 5:
 		products = products.order_by('category_disp_priority', 'key_words')
@@ -1153,6 +1200,8 @@ def curated_collections(request, cat_nm=None, prod_id=None):
 		products = products.order_by('category_disp_priority', 'name')
 	else:
 		products = products.order_by('category_disp_priority', 'part_number')
+	'''
+
 	
 	width = 0
 	height = 0
@@ -1289,7 +1338,12 @@ def curated_collections(request, cat_nm=None, prod_id=None):
 		'product_category':product_cate, 
 		'products':products, 'prods':prods, 'sortOrder':sortOrder, 'show':show,'prod_filters':prod_filters,
 		'prod_filter_values':prod_filter_values, 'price':price, 'show_artist':True,
-		'width':width, 'height':height, 'page_range':page_range, 'env':env} )		
+		'width':width, 'height':height, 'page_range':page_range, 'env':env,
+		'page': page,
+		'filt_width':filt_width, 'filt_height':filt_height, 'page_range':page_range,
+		'filt_colors':filt_colors, 'filt_size':filt_size, 'filt_artist':filt_artist,
+		'filt_orientation':filt_orientation, 'filt_image_type':filt_image_type,
+		} )		
 
 @staff_member_required
 @csrf_exempt
@@ -1366,7 +1420,7 @@ def get_stock_images(request, cat_nm = None, page = None, curated_coll_id = None
 	if cat_nm:
 		cat_nm = cat_nm.replace("-", " ")
 		try:
-			product_cate = Stock_image_category.objects.get(name = cat_nm)
+			product_cate = Stock_image_category.objects.filter(name = cat_nm).first()
 			cat_id = product_cate.category_id
 		except Stock_image_category.DoesNotExist:
 			cat_id = 0
@@ -1505,6 +1559,7 @@ def get_stock_images(request, cat_nm = None, page = None, curated_coll_id = None
 			Q(part_number__icontains = word)
 			)
 		
+	'''
 	dt =  today.day
 	if dt >= 1 and dt <= 5:
 		products = products.order_by('category_disp_priority', '?')
@@ -1514,7 +1569,9 @@ def get_stock_images(request, cat_nm = None, page = None, curated_coll_id = None
 		products = products.order_by('category_disp_priority', 'name')
 	else:
 		products = products.order_by('category_disp_priority', 'part_number')
-
+	'''
+	
+	products = products.order_by('category_disp_priority')
 	
 	price = Publisher_price.objects.filter(print_medium_id = 'PAPER') 
 	

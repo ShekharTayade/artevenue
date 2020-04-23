@@ -1,91 +1,109 @@
 {% load utils %}
 {% load static %}
 
-
 {% for o in orders %}
-<h3 style = "color:blue"}>Order Number : {{o.order_number}}
-	{{ o.get_order_status_display }}
-</h3>
-<h4>Order Date : {{o.order_date|date:"d m Y"}}</h4>
-<hr>
-
-<div class = "row">
-	{% if o.order_shipping %}
-	<div style = "left:10px;">
-		<strong>Shipping Address:</strong><br />
-		{{o.order_shipping.full_name}} 
-		{% if o.order_shipping.Company %}
-			, {{o.order_shipping.Company}}
-		{% endif %}
-		<br />
-		{{o.order_shipping.address_1}}
-		{% if o.order_shipping.address_2 %}
-			{{o.order_shipping.address_2 }}
-		{% endif %}
-		{% if o.order_shipping.address_1 or o.order_shipping.address_2 %}
-			<br />
-		{% endif %}
-		{% if o.order_shipping.land_mark %}
-			{{o.order_shipping.land_mark}}
-			<br />
-		{% endif %}
-		
-		{{o.order_shipping.city}} {{o.order_shipping.state}} {{o.order_shipping.pin_code_id}}
-		<br />
-		Ph: {{o.order_shipping.phone_number}} Email: {{o.order_shipping.email_id}}
+	<table style = "width: 100%;">
+		<tbody>
+			<tr>
+				<td>
+					<img src = "https://artevenue.com/static/img/av_logo_circle2_m1.png" %}" alt="Arte'venue" style = "left:0, margin:0px; padding:0px;" width=150>
+				</td>
+				<td style = "text-align: right;">
+					<span style = "font-size: 10px; right:0px;">www.artevenue.com</span><br>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	<hr>
+	<h4 style = "color:#11b6bd;">
+		Order Number : {{o.order_number}}
+		<small>({{ o.get_order_status_display }})</small>
+	</h4>
+	
+	<div style = "font-size:16px;">Order Date : {{o.order_date|date:"d M Y"}}</div>
+	<table>
+		<thead>
+			<tr width="50%"></tr>
+			<tr width="50%"></tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>
+					{% if o.order_shipping %}
+					<strong>Shipping Address:</strong><br />
+					{{o.order_shipping.full_name}} 
+					{% if o.order_shipping.Company %}
+						, {{o.order_shipping.Company}}
+					{% endif %}
+					<br />
+					{{o.order_shipping.address_1}}
+					{% if o.order_shipping.address_2 %}
+						{{o.order_shipping.address_2 }}
+					{% endif %}
+					{% if o.order_shipping.address_1 or o.order_shipping.address_2 %}
+						<br />
+					{% endif %}
+					{% if o.order_shipping.land_mark %}
+						{{o.order_shipping.land_mark}}
+						<br />
+					{% endif %}
+					
+					{{o.order_shipping.city}} {{o.order_shipping.state}} {{o.order_shipping.pin_code_id}}
+					<br />
+					Ph: {{o.order_shipping.phone_number}} Email: {{o.order_shipping.email_id}}
+					{% endif %}
+				</td>
+				<td>
+					{% if o.order_billing %}
+					<strong>Billing Address:</strong><br />
+					{{o.order_billing.full_name}} 
+					{% if o.order_billing.Company %}
+						, {{o.order_billing.Company}}
+					{% endif %}
+					{% if o.order_billing.gst_number %}
+						, GST No.: {{o.order_billing.gst_number}}
+					{% endif %}
+					
+					<br />
+					{{o.order_billing.address_1}}
+					{% if o.order_billing.address_2 %}
+						{{o.order_billing.address_2 }}
+					{% endif %}
+					{% if o.order_billing.address_1 or o.order_billing.address_2 %}
+						<br />
+					{% endif %}
+					{% if o.order_billing.land_mark %}
+						{{o.order_billing.land_mark}}
+						<br />
+					{% endif %}
+					
+					{{o.order_billing.city}} {{o.order_billing.state}} {{o.order_billing.pin_code_id}}
+					<br />
+					Ph: {{o.order_billing.phone_number}} Email: {{o.order_billing.email_id}}
+					{% endif %}
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	<br />
+	<div style = "border: 1px solid #dddddd;">
 	</div>
-	{% endif %}
-
-	{% if o.order_billing %}
-	<div style = "left:500px; right:0px;">
-		<strong>Billing Address:</strong><br />
-		{{o.order_billing.full_name}} 
-		{% if o.order_billing.Company %}
-			, {{o.order_billing.Company}}
-		{% endif %}
-		{% if o.order_billing.gst_number %}
-			, GST No.: {{o.order_billing.gst_number}}
-		{% endif %}
-		
-		<br />
-		{{o.order_billing.address_1}}
-		{% if o.order_billing.address_2 %}
-			{{o.order_billing.address_2 }}
-		{% endif %}
-		{% if o.order_billing.address_1 or o.order_billing.address_2 %}
-			<br />
-		{% endif %}
-		{% if o.order_billing.land_mark %}
-			{{o.order_billing.land_mark}}
-			<br />
-		{% endif %}
-		
-		{{o.order_billing.city}} {{o.order_billing.state}} {{o.order_billing.pin_code_id}}
-		<br />
-		Ph: {{o.order_billing.phone_number}} Email: {{o.order_billing.email_id}}
-	</div>
-	{% endif %}
-
-</div>
-<hr>
-<div class="table table-responsive">
-	<table id = "ordTbl" class="table table-responsive table-striped">
+	<table>
 		<thead>
 			<tr>
 				<th width="15%">Product</th>
 				<th width="30%">Details</th>
-				<th width="12%" style="text-align:right">Unit Price</th>
-				<th width="12%" style="text-align:right">Quantity</th>
-				<th width="12%" style="text-align:right">Discount</th>
-				<th width="12%" style="text-align:right">Tax</th>
-				<th width="12%" style="text-align:right">Item Total</th>
+				<th width="10%" style="text-align:right">Unit Price</th>
+				<th width="10%" style="text-align:right">Quantity</th>
+				<th width="10%" style="text-align:right">Discount</th>
+				<th width="10%" style="text-align:right">Tax</th>
+				<th width="15%" style="text-align:right">Item Total</th>
 			</tr>
 		</thead>
 		<tbody>
 			{% for i in order_items_list %}
 			{% if i.order_id != o.order_id %}
 				<!-- Nothing -->
-				
 			{% else %}
 			<tr>
 				<td>
@@ -163,8 +181,7 @@
 
 			</tr>
 			{% endif %}
-			{% endfor %}
-			
+			{% endfor %}			
 		</tbody>
 		<tfoot>
 			<tr>
@@ -189,43 +206,27 @@
 				<th></th>
 			</tr>
 			<tr>
-				<th colspan="5">Order Total</th>
+				<th colspan="5"><strong>Order Total</strong></th>
 				<th colspan="2" style = "text-align:right">
-					<i class = "fa fa-inr"> </i> {{o.order_total|floatformat}}
+					<div style = "color:#000; font-size: 14px;"><strong>{{o.order_total|floatformat}}</strong></div>
 				</th>
 				<th></th>
 			</tr>
 		</tfoot>
 	</table>
-</div>
-<div style="padding-bottom:2px; background-color:blue; margin-bottom:20px;" >
-</div>
-<hr>
-{% endfor orders %}
-
-
-{% if orders.number %}
-<div class="box info-bar">
-	<div class="row">
-		<div class="col-md-12 col-lg-12 products-showing">
-			<div class = "text-center">
-				{% if orders.has_previous %}
-					<button type = "button" class="btn btn-sm btn-primary" onclick="get_store_orders('1');"><i class="fa fa-chevron-left"></i> First</button>  
-					<button type = "button" class="btn btn-sm btn-primary"  onclick="get_store_orders('{{ orders.previous_page_number }}');">Prev</button>
-				{% else %}
-					<button type = "button" class="btn btn-sm btn btn-secondary disabled" href="#"><i class = "fa fa-chevron-left"></i> First</button>
-					<button type = "button" class="btn btn-sm btn btn-secondary disabled"  href="#">Prev</button>
-				{% endif %}
-				Showing Page {{ orders.number }} of {{ orders.paginator.num_pages }}
-				{% if orders.has_next %}
-					<button type = "button" class="btn btn-sm btn-primary" onclick="get_store_orders('{{ orders.next_page_number }}');">Next</button>
-					<button type = "button" class="btn btn-sm btn-primary" onclick="get_store_orders('{{ orders.paginator.num_pages }}');">Last <i class = "fa fa-chevron-right"></i></button>
-				{% else %}
-					<button type = "button" class="btn btn-sm btn-secondary disabled" href="#">Next</button>
-					<button type = "button" class="btn btn-sm btn-secondary disabled" href="#">Last <i class = "fa fa-chevron-right"></i></button>
-				{% endif %}				
-			</div>
-		</div>
+	<hr>
+	<div style = "font-size:12px;">
+		If you need any assitance, please feel free to write to us at 
+		support@artevenue.com, chat with us online at www.artevenue.com,
+		or call us at +91 96115 03626. We will be happy help.
+		<br />
+		<br />
+		<br />
+		<br />
+		<br />
+		<img src = "https://artevenue.com/static/img/artevenue_logo_new.png" alt="Arte'Venue Logo"  height="25" width="110"> <br />
+		<a href = "https://www.artevenue.com">www.artevenue.com</a>	
 	</div>
-</div>
-{% endif %}
+	<div style = "border: 1px solid #11b6bd; page-break-after: always;">
+	</div>
+{% endfor orders %}

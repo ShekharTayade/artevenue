@@ -1,0 +1,21 @@
+{% load static %}
+{% load utils %}
+{% load indian_numbers_tags %}
+	<div class = "row justify-content-center">
+		{% for key, value in ready_prod_data_canvas.items %}
+			<div style = "padding: 0px 5px 10px;">
+			<p class ="text-center" style = "margin:0px; cursor:pointer;"
+				onclick = "set_ready_product('CANVAS', {{ value.CANVAS_WIDTH_UNFRAMED}}, {{value.CANVAS_WIDTH_UNFRAMED}}, true)">
+				<span id= "canvas-size-{{value.CANVAS_WIDTH_UNFRAMED}}" style = "margin:0px; border:1px solid #ddd; cursor:pointer; padding:7px;">
+					{{ value.CANVAS_WIDTH|floatformat }}" X {{ value.CANVAS_HEIGHT|floatformat}}"
+				</span>
+			</p>
+			<h4 style = "margin-top:5px;" class = "text-center">
+				<i id = "price-{{key}}-canvas" class = "fa fa-inr"> {{ value.CANVAS_PRICE|floatformat|intcomma_indian }} </i>
+			</h4>
+			</div>
+		{% endfor %}
+		<div class = "col-12 text-center">
+			(All sizes in inches)
+		</div>
+	</div>

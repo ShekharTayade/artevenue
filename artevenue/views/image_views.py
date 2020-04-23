@@ -1,9 +1,13 @@
-from artevenue.models import Stock_image, Moulding_image, User_image, Product_view
+from artevenue.models import Stock_image, Moulding_image, User_image
+from artevenue.models import Product_view, Collage_stock_image, Stock_collage
 from django.contrib.auth.models import User
 from django.conf import settings
+from django.views.decorators.csrf import csrf_protect, csrf_exempt
+from django.contrib import messages
 
 from django.http import HttpResponse
 from decimal import Decimal
+import json
 
 from PIL import Image, ImageFilter
 
@@ -13,7 +17,7 @@ from io import BytesIO
 import base64
 from io import StringIO
 
-
+env = settings.EXEC_ENV
 ''' Passing image to template
 	response = HttpResponse(mimetype="image/png")
 	base_image.save(response, "PNG")
@@ -71,11 +75,11 @@ def get_FramedImage(request):
 	
 	# Get moulding
 	moulding = Moulding_image.objects.filter(moulding_id = m_id, image_type = "APPLY").values(
-				'url', 'moulding__width_inches', 'border_slice').first()
+				'url', 'moulding__width_inner_inches', 'border_slice').first()
 	
 	if moulding:
 	
-		m_width_inch = float(moulding['moulding__width_inches'])
+		m_width_inch = float(moulding['moulding__width_inner_inches'])
 		
 		# Image width displayed in browser in inches
 		disp_inch = 450//96
@@ -275,7 +279,7 @@ def get_ImagesWithAllFrames(request, prod_id, user_width):
 	
 	# Get all mouldings
 	moulding = Moulding_image.objects.filter(image_type = "APPLY").values(
-				'url', 'moulding__width_inches', 'border_slice')
+				'url', 'moulding__width_inner_inches', 'border_slice')
 	
 
 	# Image width displayed in browser in inches
@@ -288,7 +292,7 @@ def get_ImagesWithAllFrames(request, prod_id, user_width):
 	import traceback
 	try:
 		for m in moulding:
-			m_width_inch = float(m['moulding__width_inches'])
+			m_width_inch = float(m['moulding__width_inner_inches'])
 			border = int(m_width_inch * ratio * 96)
 
 			framed_img = applyBorder( request, img_source, m['url'], border, border, border, border,
@@ -343,11 +347,11 @@ def get_FramedUserImage(request):
 
 	# Get moulding
 	moulding = Moulding_image.objects.filter(moulding_id = m_id, image_type = "APPLY").values(
-				'url', 'moulding__width_inches', 'border_slice').first()
+				'url', 'moulding__width_inner_inches', 'border_slice').first()
 	
 	if moulding:
 	
-		m_width_inch = float(moulding['moulding__width_inches'])
+		m_width_inch = float(moulding['moulding__width_inner_inches'])
 		
 		# Image width displayed in browser in inches
 		disp_inch = 450//96
@@ -428,11 +432,11 @@ def get_FramedUserImage_by_id(request):
 
 	# Get moulding
 	moulding = Moulding_image.objects.filter(moulding_id = m_id, image_type = "APPLY").values(
-				'url', 'moulding__width_inches', 'border_slice').first()
+				'url', 'moulding__width_inner_inches', 'border_slice').first()
 	
 	if moulding:
 	
-		m_width_inch = float(moulding['moulding__width_inches'])
+		m_width_inch = float(moulding['moulding__width_inner_inches'])
 		
 		# Image width displayed in browser in inches
 		disp_inch = 450//96
@@ -586,6 +590,7 @@ def get_FramedImage_by_id(request, prod_id, m_id, mount_color='',
 			product_type_id = prod_type).first()
 	
 	env = settings.EXEC_ENV
+	
 	if env == 'DEV' or env == 'TESTING':
 		if prod_type == 'STOCK-IMAGE':
 			response = requests.get(prod_img.url)
@@ -597,10 +602,10 @@ def get_FramedImage_by_id(request, prod_id, m_id, mount_color='',
 		
 	# Get moulding
 	moulding = Moulding_image.objects.filter(moulding_id = m_id, image_type = "APPLY").values(
-				'url', 'moulding__width_inches', 'border_slice').first()
+				'url', 'moulding__width_inner_inches', 'border_slice').first()
 	
 	if moulding:	
-		m_width_inch = float(moulding['moulding__width_inches'])
+		m_width_inch = float(moulding['moulding__width_inner_inches'])
 		
 		# Image width displayed in browser in inches
 		disp_inch = 450//96
@@ -640,109 +645,576 @@ def get_FramedImage_by_id(request, prod_id, m_id, mount_color='',
 	'''
 	return framed_img
 
-def get_catalog(request, prod_id, m_id, mount_color='', 
-		mount_size=0, user_width=0, prod_type='STOCK-IMAGE'):
-	
-	img = get_FramedImage_by_id(request, prod_id, m_id, mount_color, 
-		mount_size, user_width, prod_type)
 
-	######################
-	## 315, 50, 330, 295 #
-	######################	
-	max_w = 330
-	max_h = 294
-	x, y = 315, 50
+@csrf_exempt
+def get_catalog_card(request):
+
+	card_no = request.GET.get('card_no', '')
+	prod_id = request.GET.get('prod_id', '')
+	m_id = request.GET.get('moulding_id', '')
+	mount_color = request.GET.get('mount_color', '0')
+	mount_size = float(request.GET.get('mount_size', '0'))
+	user_width = float(request.GET.get('image_width', '0'))
+	prod_type = request.GET.get('prod_type', '')
+
+	## Fixing this display size to 20 inch for the display on cards.
+	user_width = 15
+	
+	prod = Stock_image.objects.get(product_id = prod_id)
+
+	if card_no == '1':
+	
+		if float(prod.aspect_ratio) >= 0.8:
+			## 165, 125		635,450
+			#card = get_catalog(request, False, 'roomview_1.jpg', 225, 135, 380, 290, prod_id, m_id, mount_color,
+			#		mount_size, user_width, prod_type, card_no, False)
+					
+			## 250, 115, 380, 285
+			card = get_catalog(request, False, 'roomview_4.jpg', 270, 145, 300, 245, prod_id, m_id, mount_color,
+					mount_size, user_width, prod_type, card_no, False)
+			
+		else:
+			## 245, 85	290, 420
+			card = get_catalog(request, False, 'roomview_1_v.jpg', 275, 85, 320, 420, prod_id, m_id, mount_color,
+					mount_size, user_width, prod_type, card_no, False)		
+					
+	if card_no == '2':
+		## 350, 115		480,470
+		card = get_catalog(request, False, 'roomview_2.jpg', 265, 75, 350, 315, prod_id, m_id, mount_color,
+				mount_size, user_width, prod_type, card_no, False)
+
+	if card_no == '3':
+	
+		if float(prod.aspect_ratio) >= 0.8:
+			## 235, 95, 380, 265235, 95, 380, 265
+			card = get_catalog(request, False, 'roomview_3.jpg', 245, 140, 368, 210, prod_id, m_id, mount_color,
+					mount_size, user_width, prod_type, card_no, False)
+		else:
+			## 260, 60, 340, 320
+			card = get_catalog(request, False, 'roomview_3_v.jpg', 260, 60, 340, 320, prod_id, m_id, mount_color,
+					mount_size, user_width, prod_type, card_no, False)
+
+	if card_no == '4':
+		card = get_catalog(request, False, 'feature_2_1.jpg', 357, 349, 609, 579, prod_id, m_id, mount_color, 
+				mount_size, user_width, prod_type, card_no, False)
+
+	if card_no == '5':
+		card = get_catalog(request, True, 'feature_1_1.jpg', 0, 105, 550, 760, prod_id, m_id, mount_color, 
+				mount_size, user_width, prod_type, card_no, False)
+
+
+	'''
+	if card_no == '1':
+		#card = get_catalog(request, True, 'feature_1.jpg', 0, 105, 550, 760, prod_id, m_id, mount_color, 
+		#		mount_size, user_width, prod_type, card_no)
+		card = get_catalog(request, True, 'feature_1_1.jpg', 0, 105, 550, 760, prod_id, m_id, mount_color, 
+				mount_size, user_width, prod_type, card_no)
+				
+	if card_no == '2':
+		card = get_catalog(request, True, 'feature_2.jpg', 500, 165, 500, 625, prod_id, m_id, mount_color, 
+				mount_size, user_width, prod_type, card_no)
+				
+	if card_no == '3':
+		#card = get_catalog(request, False, 'feature_3.jpg', 145, 190, 470, 590, prod_id, m_id, mount_color, 
+		#		mount_size, user_width, prod_type, card_no)		
+		card = get_catalog(request, False, 'feature_2_1.jpg', 357, 349, 609, 579, prod_id, m_id, mount_color, 
+				mount_size, user_width, prod_type, card_no)		
+
+	if card_no == '4':
+		#card = get_catalog(request, False, 'catalog_3_1.jpg', 195, 165, 515, 315, prod_id, m_id, mount_color, 
+		#		mount_size, user_width, prod_type, card_no)
+		card = get_catalog(request, False, 'catalog_3_1.jpg', 165, 7, 579, 519, prod_id, m_id, mount_color, 
+				mount_size, user_width, prod_type, card_no, True)
+
+	if card_no == '5':
+		card = get_catalog(request, False, 'catalog_2.jpg', 220, 85, 300, 160, prod_id, m_id, mount_color, 
+				mount_size, user_width, prod_type, card_no)
+
+	if card_no == '6':
+		#card = get_catalog(request, False, 'catalog_4.jpg', 156, 75, 405, 235, prod_id, m_id, mount_color, 
+		#		mount_size, user_width, prod_type, card_no)
+		card = get_catalog(request, False, 'catalog_4_1.jpg', 36, 17, 678, 341, prod_id, m_id, mount_color, 
+				mount_size, user_width, prod_type, card_no, True)
+
+	'''
+	
+	buffered = BytesIO()
+	card.save(buffered, format='JPEG')
+	card = buffered.getvalue()
+	img_str = base64.b64encode(card)
+	
+	return HttpResponse(img_str)
+
+	
+def get_catalog(request, crop_half, file_nm, x, y, max_w, max_h, prod_id, m_id, mount_color='', 
+		mount_size=0, user_width=0, prod_type='STOCK-IMAGE', card_no=1, size_perps = False):
+		
+	img = get_FramedImage_by_id(request, prod_id, m_id, mount_color, 
+			mount_size, user_width, prod_type)
+
+	ratio = img.width / img.height
+
+	### Resize image proportionate to the room objects in the catalog image
+	'''
+	if card_no == '4':
+		pixel_w = round(500 / 54 * user_width + 4 )
+		pixel_h = int(pixel_w / ratio)
+		img = img.resize( (pixel_w, pixel_h) )
+	'''
+	
+	if crop_half:
+		img_w = img.width
+		img_h = img.height		
+		img = img.crop((0, 0, round(img_w/2), img_h))		
+		
+
 	###########################################
 	## Resize image width, height of the image
 	## as per available space
 	###########################################
+	w = img.width
+	h = img.height
 	ratio = img.width / img.height
-	if img.width > max_w:
+	
+	########################### This code sets the size proportionately on catalog card 
+	if size_perps:
+		moulding = Moulding_image.objects.get(moulding_id = m_id, image_type = "APPLY")
+		## Actual user width
+		u_width = user_width + mount_size * 2 + float(moulding.moulding.width_inner_inches) * 2
+		## For dsplay purpose
+		w = round(u_width * 8.33 )
+		h = round(w / ratio)
+	
+	###########################
+	
+	if w > max_w:
 		w = max_w
 		h = int(max_w / ratio)
-	if img.height > max_h:
+	if h > max_h:
 		h = max_h
 		w = int(max_h * ratio)
-
 	img = img.resize((w, h))
 
 	env = settings.EXEC_ENV
 	if env == 'DEV' or env == 'TESTING':	
-		catalog_img = Image.open(settings.BASE_DIR + "/artevenue" + settings.STATIC_URL + "/img/catalog/catalog_1.jpg")
+		catalog_img = Image.open(settings.BASE_DIR + "/artevenue" + settings.STATIC_URL + 'img/catalog/' + file_nm)
 	else:
-		catalog_img = Image.open(settings.PROJECT_DIR + '/' + settings.STATIC_URL  + "/img/catalog/catalog_1.jpg")
+		catalog_img = Image.open(settings.PROJECT_DIR + '/' + settings.STATIC_URL  + 'img/catalog/' + file_nm)
 
-	img = dropShadow_transparent_background(img,shadow=(0x00,0x00,0x00,0xff))
+	##img = dropShadow_transparent_background(img,shadow=(0x00,0x00,0x00,0xff))
 
-	'''
 	if img.width < max_w:
 		gap_w = max_w - img.width 
 		x = x + round(gap_w / 2)
 	if img.height < max_h:
 		gap_h = max_h - img.height 
-		y = y + round(gap_y / 2)
-	'''
+		y = y + round(gap_h / 2)
+
 	catalog_img.paste(img, (x, y))
-	catalog_img.show()
+
+	return catalog_img
+
+@csrf_exempt
+def get_collage_catalog_card(request):
+	card_no = request.GET.get('card_no', '')
+	prod_id = request.GET.get('prod_id', '')
+	m_id = request.GET.get('moulding_id', '')
+	mount_color = request.GET.get('mount_color', '0')
+	mount_size = float(request.GET.get('mount_size', '0'))
+	user_width = float(request.GET.get('image_width', '0'))
+	prod_type = request.GET.get('prod_type', '')
+
+	## Fixing this display size to 20 inch for the display on cards.
+	user_width = 15
+	
+	if card_no == '1':
+		'''
+		## 15, 125, 815, 285
+		card = get_collage_catalog(request, False, 'roomview_1_set.jpg', 15, 125, 815, 285, prod_id, m_id, mount_color,
+				mount_size, user_width, prod_type, card_no, False)		
+		'''
+		##65, 110, 710, 225
+		card = get_collage_catalog(request, False, 'roomview_1_set1.jpg', 65, 110, 710, 225, prod_id, m_id, mount_color,
+				mount_size, user_width, prod_type, card_no, False)		
+
+	if card_no == '2':
+		## 105, 165, 730, 245
+		card = get_collage_catalog(request, False, 'roomview_2_set.jpg', 105, 165, 730, 245, prod_id, m_id, mount_color,
+				mount_size, user_width, prod_type, card_no, False)
+
+	if card_no == '3':
+		## 195, 170, 510, 160
+		card = get_collage_catalog(request, False, 'roomview_3_set.jpg', 195, 170, 510, 160, prod_id, m_id, mount_color,
+				mount_size, user_width, prod_type, card_no, False)
+
+	if card_no == '4':
+		card = get_collage_catalog(request, False, 'feature_2_1.jpg', 357, 349, 609, 579, prod_id, m_id, mount_color, 
+				mount_size, user_width, prod_type, card_no, False)
+
+	if card_no == '5':
+		card = get_collage_catalog(request, True, 'feature_1_1.jpg', 0, 105, 550, 760, prod_id, m_id, mount_color, 
+				mount_size, user_width, prod_type, card_no, False)
+
+	'''
+	if card_no == '6':
+		card = get_collage_catalog(request, False, 'catalog_4.jpg', 105, 105, 515, 200, prod_id, m_id, mount_color, 
+				mount_size, user_width, prod_type, card_no)
+
+	if card_no == '4':
+		card = get_collage_catalog(request, False, 'catalog_3.jpg', 190, 225, max_h, 235, prod_id, m_id, mount_color, 
+				mount_size, user_width, prod_type, card_no)
+
+	if card_no == '3':
+		#card = get_collage_catalog(request, False, 'feature_3.jpg', 20, 330, 650, 315, prod_id, m_id, mount_color, 
+		#		mount_size, user_width, prod_type, card_no)		
+		card = get_collage_catalog(request, False, 'feature_2_1.jpg', 357, 349, 609, 579, prod_id, m_id, mount_color, 
+				mount_size, user_width, prod_type, card_no)		
+
+	if card_no == '1':
+		#card = get_collage_catalog(request, True, 'feature_1.jpg', 0, 295, 610, 395, prod_id, m_id, mount_color, 
+		#		mount_size, user_width, prod_type, card_no)
+		card = get_collage_catalog(request, True, 'feature_1_1.jpg', 0, 105, 550, 760, prod_id, m_id, mount_color, 
+				mount_size, user_width, prod_type, card_no)
+
+	if card_no == '2':
+		card = get_collage_catalog(request, True, 'feature_2.jpg', 405, 315, 590, 330, prod_id, m_id, mount_color, 
+				mount_size, user_width, prod_type, card_no)
+
+	'''
+	
 	buffered = BytesIO()
-	catalog_img.save(buffered, format='JPEG')
-	catalog_img = buffered.getvalue()
-	img_str = base64.b64encode(catalog_img)
-
+	card.save(buffered, format='JPEG')
+	card = buffered.getvalue()
+	img_str = base64.b64encode(card)
+	
 	return HttpResponse(img_str)
-	
-	
-def dropShadow_transparent_background(image, offset=(8,8), background=0xffffff, shadow=0x444444, 
-                border=10, iterations=3):
-	"""
-	Add a gaussian blur drop shadow to an image.  
 
-	image       - The image to overlay on top of the shadow.
-	offset      - Offset of the shadow from the image as an (x,y) tuple.  Can be
-				positive or negative.
-	background  - Background colour behind the image.
-	shadow      - Shadow colour (darkness).
-	border      - Width of the border around the image.  This must be wide
-				enough to account for the blurring of the shadow.
-	iterations  - Number of times to apply the filter.  More iterations 
-				produce a more blurred shadow, but increase processing time.
-	"""
-
-	# Create the backdrop image -- a box in the background colour with a 
-	# shadow on it.
-	totalWidth = image.size[0] + abs(offset[0]) + 2*border
-	totalHeight = image.size[1] + abs(offset[1]) + 2*border
-	back = Image.new(image.mode, (totalWidth, totalHeight), background)
+def get_collage_catalog(request, crop_half, file_nm, x, y, max_w, max_h, prod_id, m_id, mount_color='', 
+		mount_size=0, user_width=0, prod_type='STOCK-COLLAGE', card_no=1, size_perps = False):
+		
+	env = settings.EXEC_ENV
+	if env == 'DEV' or env == 'TESTING':	
+		catalog_img = Image.open(settings.BASE_DIR + "/artevenue" + settings.STATIC_URL + 'img/catalog/' + file_nm)
+	else:
+		catalog_img = Image.open(settings.PROJECT_DIR + '/' + settings.STATIC_URL  + 'img/catalog/' + file_nm)
 	
-	# Place the shadow, taking into account the offset from the image
-	shadowLeft = border + max(offset[0], 0)
-	shadowTop = border + max(offset[1], 0)
-	back.paste(shadow, [shadowLeft, shadowTop, shadowLeft + image.size[0], 
-	shadowTop + image.size[1]] )
-  
-	# Apply the filter to blur the edges of the shadow.  Since a small kernel
-	# is used, the filter must be applied repeatedly to get a decent blur.
-	n = 0
-	while n < iterations:
-		back = back.filter(ImageFilter.BLUR)
-		n += 1
-    
-	# Paste the input image onto the shadow backdrop  
-	imageLeft = border - min(offset[0], 0)
-	imageTop = border - min(offset[1], 0)
-	#back.paste(image, (imageLeft, imageTop))
-	back.paste(image, (0, 0))
+	coll = Collage_stock_image.objects.filter(stock_collage_id = prod_id)
 
-	back = back.convert("RGBA")
-	datas = back.getdata()
-	newData = []
-	for item in datas:
-		if item[0] == 255 and item[1] == 255 and item[2] == 255:
-			newData.append((255, 255, 255, 0))
-		else:
-			newData.append(item)
-	back.putdata(newData)
+		
+	## Get all images
+	px = x
+	py = y
+	img = []
+	### Get framed image for each
+	for c in coll:
+		img.append( get_FramedImage_by_id(request, c.stock_image_id, m_id, mount_color, 
+						mount_size, user_width, 'STOCK-IMAGE') )
+						
+	## Resize each image to fit in the card
+	total_w = 20
+	img_arr = []
+	total_h = 0
+	for i in img:
+		w = round((max_w / c.stock_collage.set_of) - 60)
+		
+		# reduce size by 30% in case of set of 2
+		if c.stock_collage.set_of == 2:
+			w =  round(w - (w * 0.3) )
+		
+		h = round(w / c.stock_image.aspect_ratio)
+		if h > max_h:
+			h = max_h
+			w = h * c.stock_image.aspect_ratio
+		total_h = h
+				
+		i = i.resize((w, h))
+		img_arr.append(i)
+		total_w = total_w + i.width + 20
 	
-	back.show()
-	back.save('test_save.png', "PNG")
-	return back
+	## Paste each image on to the card
+	w_gap = max_w - total_w
+	h_gap = max_h - total_h
+	px = round(px + w_gap /2) + 20
+	py = round(py + h_gap /2)
+	for i in img_arr:			
+		catalog_img.paste(i, (px, py))
+		px = px + i.width + 20
+		
+	return catalog_img
+
+
+def decode_base64_file(data):
+
+	def get_file_extension(file_name, decoded_file):
+		import imghdr
+
+		extension = imghdr.what(file_name, decoded_file)
+		extension = "jpg" if extension == "jpeg" else extension
+
+		return extension
+
+	from django.core.files.base import ContentFile
+	import base64
+	import six
+	import uuid
+
+	# Check if this is a base64 string
+	if isinstance(data, six.string_types):
+		# Check if the base64 string is in the "data:" format
+		if 'data:' in data and ';base64,' in data:
+			# Break out the header from the base64 content
+			header, data = data.split(';base64,')
+
+		# Try to decode the file. Return validation error if it fails.
+		try:
+			decoded_file = base64.b64decode(data)
+		except TypeError:
+			TypeError('invalid_image')
+
+		# Generate file name:
+		file_name = str(uuid.uuid4())[:12] # 12 characters are more than enough.
+		# Get the file name extension:
+		file_extension = get_file_extension(file_name, decoded_file)
+
+		complete_file_name = "%s.%s" % (file_name, file_extension, )
+
+		return ContentFile(decoded_file, name=complete_file_name)
+
+def change_pixel_color(img_file, color):
+	img = Image.open(img_file)
+	img = img.convert("RGBA")
+	pixdata = img.load()
+	 
+	# Clean the background noise, if color != white, then set to black.
+	for y in range(img.size[1]):
+		for x in range(img.size[0]):
+			if pixdata[x, y] == (255,255,255,255):
+				#pixdata[x, y] = (255, 0, 0, 255)
+				pixdata[x, y] = color
+
+	img.show()
+	img.save('output.png')
+	
+
+@csrf_exempt
+def show_on_wall(request):
+
+	i_color = request.POST.get('color', '')
+	wall_file_nm = i_color.replace(',','-')
+	i_color = i_color.split(',')
+	l_color = []
+	for i in i_color:
+		l_color.append(int(i))
+		
+	color = tuple(l_color)
+	
+	img_str = request.POST.get('img_str', '')
+	img_str = img_str.replace('data:image/png;base64,', '')
+                               
+	prod_id = request.POST.get('prod_id', '')
+	m_id = request.POST.get('moulding_id', '')
+	mount_size = float(request.POST.get('mount_size', '0'))
+	user_width = float(request.POST.get('image_width', '0'))
+	
+	imgdata = base64.b64decode(img_str)
+
+	from django.utils.crypto import get_random_string
+	if env == 'DEV' or env == 'TESTING':	
+		filename = settings.BASE_DIR + "/artevenue" + settings.STATIC_URL + 'tmp/' + get_random_string(8).lower() + ".jpg"
+	else:
+		filename = settings.PROJECT_DIR + '/' + settings.STATIC_URL  + 'tmp/' + get_random_string(8).lower() + ".jpg"
+
+	with open(filename, 'wb') as f:
+		f.write(imgdata)	
+	
+	painting = Image.open(filename)
+	
+	if env == 'DEV' or env == 'TESTING':
+		img = Image.open(settings.BASE_DIR + "/artevenue" + settings.STATIC_URL + "img/catalog/wall-" + wall_file_nm + ".jpg")
+	else:
+		img = Image.open(settings.PROJECT_DIR + "/" + settings.STATIC_URL + "img/catalog/wall-" + wall_file_nm + ".jpg")
+
+	img = img.convert("RGBA")
+	pixdata = img.load()
+	 
+	# if color != white, then set to given color.
+	'''
+	for y in range(img.size[1]):
+		for x in range(img.size[0]):
+			if pixdata[x, y] == (0, 168, 243):
+				pixdata[x, y] = color
+	'''
+	ratio = painting.width / painting.height
+	########################### This code sets the size proportionately on catalog card 
+	try:
+		moulding = Moulding_image.objects.get(moulding_id = m_id, image_type = "APPLY")
+		## Actual user width
+		u_width = user_width + mount_size * 2 + float(moulding.moulding.width_inner_inches) * 2
+	except Moulding_image.DoesNotExist:
+		u_width = user_width
+
+	
+	## For display purpose
+	#w = round(u_width * 16.66 )
+	w = round(u_width * 10.4 )
+	h = round(w / ratio)
+	###########################
+	
+	x = 50
+	y = 40
+	max_w = 765
+	max_h = 425
+	
+	size_crossed = False
+	if w > max_w:
+		size_crossed = True
+		w = max_w
+		h = int(max_w / ratio)
+	if h > max_h:
+		size_crossed = True
+		h = max_h
+		w = int(max_h * ratio)
+	painting = painting.resize((w, h))
+
+	if painting.width < max_w:
+		gap_w = max_w - painting.width 
+		x = x + round(gap_w / 2)
+	if painting.height < max_h:
+		gap_h = max_h - painting.height 
+		y = y + round(gap_h / 2)
+
+	img.paste(painting, (x, y))
+	img.resize( (850, round(850/ratio)) )
+	
+	buffered = BytesIO()
+	img.save(buffered, format='PNG')
+	img_data = buffered.getvalue()
+	img_str = base64.b64encode(img_data)
+
+	response = HttpResponse(img_str)
+	if (size_crossed == True):
+		response.set_cookie(key='size_crossed', value=1)
+	else:
+		response.set_cookie(key='size_crossed', value=0)
+	
+	return response
+	
+@csrf_exempt
+def show_on_wall_set(request):
+
+	i_color = request.POST.get('color', '')
+	wall_file_nm = i_color.replace(',','-')
+	i_color = i_color.split(',')
+	l_color = []
+	for i in i_color:
+		l_color.append(int(i))
+		
+	color = tuple(l_color)
+	
+	prod_id = request.POST.get('prod_id', '')
+	m_id = request.POST.get('moulding_id', '')
+	mount_size = float(request.POST.get('mount_size', '0'))
+	user_width = float(request.POST.get('image_width', '0'))
+	mount_color = request.POST.get('mount_color', '0')
+	
+	coll = Collage_stock_image.objects.filter(stock_collage_id = prod_id)
+
+	x = 30
+	y = 185
+	max_w = 820
+	max_h = 220
+	#max_w = 725 
+	#max_h = 269
+	#x = 75
+	#y = 175
+	
+	try:
+		moulding = Moulding_image.objects.get(moulding_id = m_id, image_type = "APPLY")
+		## Actual user width
+		u_width = user_width + mount_size * 2 + float(moulding.moulding.width_inner_inches) * 2
+	except Moulding_image.DoesNotExist:
+		u_width = user_width
+
+	#img = Image.open(settings.BASE_DIR + "/artevenue" + settings.STATIC_URL + "img/catalog/wall-" + wall_file_nm + ".jpg")
+	if env == 'DEV' or env == 'TESTING':
+		img = Image.open(settings.BASE_DIR + "/artevenue" + settings.STATIC_URL + "img/catalog/wall-" + wall_file_nm + ".jpg")
+	else:
+		img = Image.open(settings.PROJECT_DIR + "/" + settings.STATIC_URL + "img/catalog/wall-" + wall_file_nm + ".jpg")
+	
+	img = img.convert("RGBA")
+	pixdata = img.load()
+
+	## Get all images
+	px = x
+	py = y
+	imgs = []	
+	### Get framed image for each
+	for c in coll:
+		i = get_FramedImage_by_id(request, c.stock_image_id, m_id, mount_color, 
+				mount_size, u_width, 'STOCK-IMAGE')		
+		imgs.append(i)
+		
+	size_crossed = False		
+
+	## Resize each image to fit in the card
+	total_w = 20
+	img_arr = []
+	total_h = 0
+	for i in imgs:
+		## For display purpose
+		w = round(u_width * 10.4 )
+		h = round(w / (i.width/i.height) )
+		
+		if h > max_h:
+			size_crossed = True
+			h = max_h
+			w = round(h * (i.width/i.height))
+		total_h = h
+				
+		i = i.resize((w, h))
+		img_arr.append(i)
+		total_w = total_w + i.width + 20
+
+	
+	## Paste each image on to the card
+	w_gap = max_w - total_w
+	h_gap = max_h - total_h
+	px = round(px + w_gap /2) + 20
+	py = round(py + h_gap /2)
+	for i in img_arr:			
+		img.paste(i, (px, py))
+		px = px + i.width + 20
+
+	ratio = img.width / img.height
+	
+	img.resize( (850, round(850/ratio)) )
+	
+	buffered = BytesIO()
+	img.save(buffered, format='PNG')
+	img_data = buffered.getvalue()
+	img_str = base64.b64encode(img_data)
+
+	response = HttpResponse(img_str)
+	if (size_crossed == True):
+		response.set_cookie(key='size_crossed', value=1)
+	else:
+		response.set_cookie(key='size_crossed', value=0)
+	
+	return response
+	
+	
+def test_wall(p_id, width):
+
+	from django.http import HttpRequest
+	request = HttpRequest()
+	
+	framed_img = get_FramedImage_by_id(request, p_id, 18, '#fff', 
+		1, width, 'STOCK-IMAGE' )
+
+	buffered = BytesIO()
+	framed_img.save(buffered, format='JPEG')
+	img_data = buffered.getvalue()
+	img_str = base64.b64encode(img_data)
+
+	show_on_wall(img_str, (137,46,58,255), 14)
+	

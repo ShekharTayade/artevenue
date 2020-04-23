@@ -4,7 +4,7 @@
 {% load indian_numbers_tags %}
 {% load show_trending_categories from prod_template_tags %}
 {% block page-title %} 
-	<title>All art categories</title>
+	<title>Arte'Venue | All art categories</title>
 {% endblock page-title %} 
 {% block page-description %}
 <meta name="description" content="Show all categories of art available at ArteVenue.com">
@@ -12,6 +12,9 @@
 {% block page-keywords %}
 <meta name="keywords" content="art, Artvenue, All art categories, Art prints, Wall Art, Buy Art, Buy Art prints, Print photos online, Print Art online">
 {% endblock page-keywords %}	<!-- Only Override the site content block -->
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
 
 	<!-- Only Override the site content block -->
 	{% block sitecontent %}

@@ -4,6 +4,7 @@ import datetime
 from django.db import IntegrityError, DatabaseError, Error
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
 
 from django.shortcuts import render,redirect
 from django.contrib import messages
@@ -23,11 +24,13 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 import urllib
 import json
+import os
 
 from .cart_views import *
 
 today = datetime.date.today()
 ecom = get_object_or_404 (Ecom_site, store_id=settings.STORE_ID )
+env = settings.EXEC_ENV
 
 def index(request):
 	'''
@@ -66,7 +69,7 @@ def index(request):
 			)
 			ip_rec.save()
 	'''	
-	return render(request, "artevenue/estore_base.html",{})
+	return render(request, "artevenue/estore_base.html",{'env': env})
 
 
 def offers(request) :
@@ -542,6 +545,41 @@ def send_order_emails():
 	return
 		
 
-
 			
+def countlines(start, extn, lines=0, header=True, begin_start=None):
+	if header:
+		print('{:>10} |{:>10} | {:<20}'.format('ADDED', 'TOTAL', 'FILE'))
+		print('{:->11}|{:->11}|{:->20}'.format('', '', ''))
+
+	import pdb
+	pdb.set_trace()
+	for thing in os.listdir(start):
+		thing = os.path.join(start, thing)
+		if os.path.isfile(thing):
+			if thing.endswith(extn):
+				with open(thing, 'r') as f:
+					newlines = f.readlines()
+					newlines = len(newlines)
+					lines += newlines
+
+					if begin_start is not None:
+						reldir_of_thing = '.' + thing.replace(begin_start, '')
+					else:
+						reldir_of_thing = '.' + thing.replace(start, '')
+
+					print('{:>10} |{:>10} | {:<20}'.format(
+							newlines, lines, reldir_of_thing))
+
+
+	for thing in os.listdir(start):
+		thing = os.path.join(start, thing)
+		if os.path.isdir(thing):
+			lines = countlines(thing, lines, header=False, begin_start=start)
+
+	return lines
 	
+def how_to_customize(request):
+	return render(request, "artevenue/how_to_customize.html") 
+	
+def how_to_hang(request):
+	return render(request, "artevenue/how_to_hang.html") 	

@@ -18,6 +18,27 @@
 <meta name="author" content="Arte'venue">
 {% endblock page-author %}
 
+{% block jqueryui-stylesheet %}
+<link rel="stylesheet" href="{% static 'vendor/jquery-ui-1.12.1/jquery-ui.min.css' %}">
+{% endblock jqueryui-stylesheet %}
+
+{% block jqueryui-script %}
+<script src="{% static '/vendor/jquery-ui-1.12.1/jquery-ui.min.js' %}"></script>
+{% endblock jqueryui-script %}
+
+{% block popper-script %}
+<script src="{% static 'vendor/popper.js/umd/popper.min.js' %}"> </script>
+{% endblock popper-script %}
+
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+{% block cropper %}
+<link  href="{% static 'vendor/cropper.js/cropper.css' %}" rel="stylesheet">
+<script src="{% static 'vendor/cropper.js/cropper.js' %}"></script>
+{% endblock cropper %}
+
 
 {% load moulding_url %}
 {% load update_cart_message from estore_base %}
@@ -700,7 +721,9 @@
 						cart_qty = data.cart_qty;
 						//Update items in cart
 						$("#itemsincart").html(cart_qty); 
-						$('#msg-modal').modal('show');
+						$("#itemsincart_m").html(cart_qty); 
+						$('#stay_btn').hide();
+						$('#cart-msg-modal').modal('show');
 					}
 				},
 				error: function(xhr){

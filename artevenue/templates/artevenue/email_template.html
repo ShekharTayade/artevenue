@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+{% load utils %}
+{% load static %}
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="robots" content="all,follow">
+		<!-- Bootstrap CSS-->
+		<link rel="stylesheet" href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}">
+				
+		<!-- Font Awesome CSS-->
+		<link rel="stylesheet" href="{% static 'vendor/font-awesome/css/font-awesome.min.css' %}">
+		<!-- Google fonts - Roboto -->
+		<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:400,500,700,300,100">
+		<!-- Custom stylesheet -->
+		<link rel="stylesheet" href="{% static  'css/custom.css' %}">
+		<!-- theme stylesheet-->
+		<link rel="stylesheet" href="{% static 'css/style.default.css' %}" id="theme-stylesheet">
+
+	</head>
+
+	<body>
+		<div class = "row"  style = "border:1px solid #d4d4d4; padding:10px; margin:0px;">
+			<table style = "width: 100%; maring-bottom: 15px; ">
+				<tbody>
+					<tr>
+						<td>
+							<img src = "https://artevenue.com/static/img/av_logo_circle2_m1.png" %}" alt="Arte'venue" style = "left:0, margin:0px; padding:0px;" width=150>
+						</td>
+						<td style = "text-align: right;">
+							<span style = "font-size: 10px; right:0px;">www.artevenue.com</span><br>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<div style = "margin-top:10px; border-top: 1px solid #dddddd;">
+				<h3></h3>	<!-- Heading/Headline -->
+				<h5 style = "margin-top:20px;" >
+					Dear {% if user.first_name %} 
+							{{user.first_name}}&nbsp;{{user.last_name}} 
+						{% else %}
+							{{user.username}}
+						{% endif %},
+				</h5>
+
+				<!-- Email content -->
+
+
+
+
+				<!-- END: Email content -->
+				<hr>
+
+				<h6>If you need any assitance, please feel free to write to us at 
+					support@artevenue.com, chat with us online at www.artevenue.com,
+					or call us at +91 96115 03626. We will be happy help.
+				</h6>
+			</div>
+
+			<!--  Signature -->
+			<div style = " margin-top: 20px;">
+				<h5>
+					With warm regards,<br />
+					Team Arte'Venue
+					<br />
+					<img src = "https://artevenue.com/static/img/artevenue_logo_new.png" alt="Arte'Venue Logo"  height="25" width="110"> <br />
+					<a href = "https://www.artevenue.com">www.artevenue.com</a>
+				</h5>
+			</div>
+		</div>
+	</body>
+</html>

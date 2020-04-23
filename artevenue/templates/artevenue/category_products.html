@@ -35,13 +35,12 @@
 							</div>-->
 							<div class="card-body">
 								<ul class="nav navbar-collapse nav-pills flex-column category-menu pull-left">
-									<li><span class="badge badge-secondary">{{prod_cat_count}}</span>
-									{% for p in prod_categories %}
+									<li><span class="badge badge-secondary">{{cat_count}}</span>
+									{% for c in categories %}
 										<ul class="list-unstyled">
-											<li><a href="{% url 'category_stock_images' cat_nm=p.name %}" class="nav-link">{{p.name|title}}</a></li>
+											<li><a href="" class="nav-link">{{c.name|title}}</a></li>
 										</ul>
 									{% endfor prod_categories %}
-										<a href="{% url 'show_all_categories' %}"><small>See All...</small></a>
 									</li>
 								</ul>
 							</div>

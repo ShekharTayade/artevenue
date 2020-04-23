@@ -1,0 +1,109 @@
+
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% block page-title %} 
+	<title>How to Cutomize Art Prints, Artworks at Artevenue.com </title>
+{% endblock page-title %} 
+{% block page-description %}
+	<meta name="description" content="Customize Art print Artwork  artevenue.com">
+{% endblock page-description %}
+{% block page-keywords %}
+	<meta name="keywords" content="customized art print, customized painting, how to customize, art print customization, wall art customization, framing customization, customized frames">
+{% endblock page-keywords %}
+
+{% block page-author %}
+	<meta name="author" content="Arte'Venue">
+{% endblock page-author %}
+
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+    <div class="container">
+		<div class = "row">
+			<div class="row">
+				<div class="col-12">
+					<!-- breadcrumb-->
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+							<li class="breadcrumb-item"><a href="{% url 'index' %}">How To</a></li>
+							<li class="breadcrumb-item active">Customize Art Prints</li>
+						</ol>
+					</nav>
+				</div>
+			</div>
+			<div class = "col-12" style="background-color#11b6bd; color#fff; padding10px;">
+				<h1>How to Customize Art Prints</h1>
+				<h4>Learn about the customizing artwork</h4>
+			</div>
+		</div>
+		<div class = "row">			
+			<div class = "col-12 how-customize">
+				<p><strong>Artevenue.com offers fantastic customization for each artprint, a first in India.</strong></p>
+				<p>
+					On the artwork product page you can customize:
+					<ul>
+					<li>Print Surface - Print on PAPER or CANVAS</li>
+					<li>Choose artwork size (inch-by-inch)</li>
+					<li>Frame</li>
+					<li>Mount colour and size</li>
+					<li>Canvas Stretched (when not framed)</li>
+					<li>Buy without frame</li>
+					</ul>
+					With every customization you perform, you instantaneuously see the artwork 
+					with the changes. So you know exactly what you are buying.
+				</p>
+				<p>Let's walk you quickly through HOW TO CUSTOMIZE</p>
+			</div>			
+		</div>
+
+		<div class = "row">			
+			<div class = "col-12 col-md-6 customize-box">
+				<div class = "customize-title">					
+					Choose Print Surface
+				</div>
+				<img src = "{% static 'img/how-to/customization/surface_buyunframed.jpg' %}"
+					alt = "Choose print surface" width = 500 class = "img-fluid customize-pic">
+			</div>
+			<div class = "col-12 col-md-6 customize-box">
+				<div class = "customize-title">
+					Choose from standard Sizes or Customize
+				</div>
+				<img src = "{% static 'img/how-to/customization/framed_customize.jpg' %}"
+					alt = "Buy Framed or Customize" width = 500  class = "img-fluid customize-pic">
+			</div>
+			<div class = "col-12 col-md-6 customize-box">
+				<div class = "customize-title">
+					Choose Artwork Width and Height
+				</div>
+				<img src = "{% static 'img/how-to/customization/choose_size.jpg' %}"
+					alt = "Choose size" width = 500  class = "img-fluid customize-pic">
+			</div>
+			<div class = "col-12 col-md-6 customize-box">
+				<div class = "customize-title">
+					Choose Frame
+				</div>
+				<img src = "{% static 'img/how-to/customization/choose_frame.jpg' %}"
+					alt = "Choose frame" width = 500  class = "img-fluid customize-pic">
+			</div>
+			<div class = "col-12 col-md-6 customize-box">
+				<div class = "customize-title">
+					Choose Mount Colour and Width
+				</div>
+				<img src = "{% static 'img/how-to/customization/mount_color_size.jpg' %}"
+					alt = "Choose Mount Color and Size" width = 500  class = "img-fluid customize-pic">
+			</div>
+			<div class = "col-12 col-md-6 customize-box">
+				<div class = "customize-title">
+					Choose Stretched Canvas
+				</div>
+				<img src = "{% static 'img/how-to/customization/stretched.jpg' %}"
+					alt = "Streched Canvas" width = 500  class = "img-fluid customize-pic">
+			</div>
+		</div>
+    </div>
+	{% endblock sitecontent %}
+	
+	
+	{% block jscripts %}
+	{% endblock jscripts %}
+	

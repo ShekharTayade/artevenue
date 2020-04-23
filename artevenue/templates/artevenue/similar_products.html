@@ -9,7 +9,7 @@
 									<input hidden class ='iuser_width' id="iuser_width_{{prod.product_id}}" name = "iuser_width" type = "number" value = '{{width}}' min="4" max="60" >
 									<input hidden class ='iuser_height' id="iuser_height_{{prod.product_id}}" name = "iuser_height" type = "number"  value = '{{height}}' min="4" max="60" >
 									
-									<img src="{% if ENV == 'DEV' or ENV == 'TESTING' %} {{prod.url}} {% else %} {% static prod.url %} {% endif %}" alt="" class="img-fluid image-display" 
+									<img data-src="{% if ENV == 'DEV' or ENV == 'TESTING' %} {{prod.url}} {% else %} {% static prod.url %} {% endif %}" alt="" class="img-fluid image-display lazyload" 
 											style = "filter: drop-shadow(0.25rem 0.25rem 0.25rem grey); display: block; margin-left: auto;" onclick="$('#img-form_{{prod.product_id}}').submit();">
 								</form>
 								<!--</a>-->

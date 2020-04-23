@@ -287,9 +287,15 @@ class Pin_city_state_country(models.Model):
 		
 	
 class Shipping_method (models.Model):
+	SHIPPING_METHOD = (
+		('STANDARD', 'Standard'),
+		('ECONOMY', 'Economy'),
+		('EXPRESS', 'Express'),
+		('EXPEDITED', 'Expedited'),
+	)	
 	shipping_method_id = models.AutoField(primary_key=True, null=False)
 	store = models.ForeignKey(Ecom_site, models.CASCADE)
-	name = models.CharField(max_length = 128, null=False)
+	name = models.CharField(max_length = 128, null=False, choices=SHIPPING_METHOD)
 	effective_from = models.DateField(blank=True, null=True)
 	effective_to = models.DateField(blank=True, null=True)
 
@@ -320,8 +326,9 @@ class Shipper_shipping_method (models.Model):
 	store = models.ForeignKey(Ecom_site, models.CASCADE)
 	shipper = models.ForeignKey(Shipper, models.CASCADE, null=False)
 	shipping_method_id = models.ForeignKey(Shipping_method, models.CASCADE, null=False)
-	rate_type = models.CharField(max_length = 128, null=False) #KG (per KG), #SQFT (per Sqft) etc.....
-	rate = models.DecimalField(max_digits=5, decimal_places=2, blank=False, null=False)
+	rate_type = models.CharField(max_length = 128, null=True) #KG (per KG), #SQFT (per Sqft) etc.....
+	slab = models.CharField(max_length = 10, null=True)
+	rate = models.DecimalField(max_digits=12, decimal_places=2, null=True)
 	effective_from = models.DateField(blank=True, null=True)
 	effective_to = models.DateField(blank=True, null=True)
 
@@ -330,8 +337,12 @@ class Shipper_shipping_method (models.Model):
 	
 
 class Shipping_status (models.Model):
+	SHIPPING_STATUS = (
+		('IN TRANSIT', 'In Transit'),
+		('DELIVERED', 'Delivered'),
+	)	
 	shipping_status_id = models.AutoField(primary_key=True, null=False)
-	shipping_status_code = models.CharField(max_length = 128, null=False)
+	shipping_status_code = models.CharField(max_length = 128, null=False, choices=SHIPPING_STATUS)
 	description = models.CharField(max_length = 1000, null=True)
 
 	def __str__(self):
@@ -562,10 +573,22 @@ class User_image (models.Model):
 class Stock_collage(models.Model):
 	product_id = models.AutoField(primary_key=True, null=False)
 	product_type = models.ForeignKey(Product_type, models.CASCADE, null=True)
-	collage_layout = models.ForeignKey('Collage_layout', models.CASCADE, null=False)
+	collage_layout = models.ForeignKey('Collage_layout', models.CASCADE, null=True)
 	name = models.CharField(max_length = 200, null=False)
 	is_published = models.BooleanField(null=False, default=False)
 	category_disp_priority = models.IntegerField(null = True)
+	set_of = models.IntegerField(null = True)
+	stock_image_category = models.ForeignKey(Stock_image_category, models.CASCADE, null=True) 
+	aspect_ratio = models.DecimalField(max_digits = 21, decimal_places=18, null=True)
+	orientation = models.CharField(max_length = 20, null=True)
+	max_width = models.DecimalField(max_digits = 6, decimal_places=2, null=True)
+	max_height = models.DecimalField(max_digits = 6, decimal_places=2, null=True)
+	min_width = models.DecimalField(max_digits = 6, decimal_places=2, null=True)
+	colors = models.CharField(max_length = 600, null=True)
+	key_words = models.CharField(max_length = 2000, null=True)
+	url = models.CharField(max_length = 1000, blank=True, default='')
+	thumbnail_url = models.CharField(max_length = 1000, blank=True, default='')
+	price = models.DecimalField(max_digits=12, decimal_places=2, null=True)
 
 	def __str__(self):
 		return str( self.product_id ) + " " + self.name
@@ -656,7 +679,11 @@ class Collage_layout(models.Model):
 	def __str__(self):
 		return self.name + str(moulding)
 
-
+class Collage_stock_image(models.Model):
+	collage_id = models.AutoField(primary_key=True, null=False)
+	stock_collage = models.ForeignKey(Stock_collage, models.PROTECT, null=False)
+	stock_image = models.ForeignKey(Stock_image, models.PROTECT, null=False)
+	
 # A DB view "product_view". This holds data for all product types. 
 class Product_view(models.Model):
 	store = models.ForeignKey(Ecom_site, models.CASCADE)
@@ -1013,6 +1040,8 @@ class Cart_item(models.Model):
 	image_height = models.DecimalField(max_digits=3, decimal_places=0, blank=False, null=False)	
 	created_date = models.DateTimeField(auto_now_add=True, null=False)	
 	updated_date = models.DateTimeField(auto_now=True, null=False)	
+	url = models.CharField(max_length = 1000, blank=True, default='')
+	thumbnail_url = models.CharField(max_length = 1000, blank=True, default='')
 
 	class Meta:
 		abstract = True
@@ -1061,6 +1090,8 @@ class Cart_item_view(models.Model):
 	created_date = models.DateTimeField(auto_now_add=True, null=False)	
 	updated_date = models.DateTimeField(auto_now=True, null=False)	
 	product_type = models.ForeignKey(Product_type, models.PROTECT, null=False) 
+	url = models.CharField(max_length = 1000, blank=True, default='')
+	thumbnail_url = models.CharField(max_length = 1000, blank=True, default='')
 	
 	class Meta:
 		managed = False
@@ -1263,6 +1294,10 @@ class Order (models.Model):
 	invoice_date = models.DateTimeField(null=True)
 	channel = models.ForeignKey('Order_channel', on_delete=models.PROTECT, null = False, default = 'ART')
 	deferred_payment = models.BooleanField(null=False, default=False)
+	tracking_number =  models.CharField(max_length=30, blank=True, default='')
+	shipment_date = models.DateTimeField(blank=True, null=True)
+	tracking_url =  models.CharField(max_length=1000, blank=True, default='')
+
 	
 	def __str__(self):
 		return str(self.order_id) + ' - ' + str(self.user)
@@ -1413,7 +1448,6 @@ class Order_shipping_status_log (models.Model):
 	def __str__(self):
 		return str(self.order)
 	
-
 class Order_billing (models.Model):
 	order_billing_id = models.AutoField(primary_key=True, null=False)
 	store = models.ForeignKey(Ecom_site, models.PROTECT)
@@ -1999,6 +2033,12 @@ class Amazon_data(models.Model):
 	parent_child = models.CharField(max_length = 1, null=True, default = 'P',
 		choices = PARENT_CHILD)
 	parent_amz_sku = models.CharField(max_length = 15, null=True, default = '')
+	card1_url = models.CharField(max_length = 1000, blank=True, default='')
+	card2_url = models.CharField(max_length = 1000, blank=True, default='')
+	card3_url = models.CharField(max_length = 1000, blank=True, default='')
+	card4_url = models.CharField(max_length = 1000, blank=True, default='')
+	card5_url = models.CharField(max_length = 1000, blank=True, default='')
+	card6_url = models.CharField(max_length = 1000, blank=True, default='')
 	def __str__(self):
 		return str( self.product_id ) + " " + self.product_name
 

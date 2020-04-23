@@ -7,7 +7,10 @@
 				</div>
                 <div class="modal-body">
                     <div class="coupon">
-                        <img src="{% static 'img/coupon_15percent.jpg' %}" alt="Arte'Venue: 15% off coupon">
+                        <img src="{% static 'img/coupon_15percent.jpg' %}" 
+							alt="Arte'Venue: 15% off coupon"
+							onclick = "$('#promocontent').hide(); $('#signup_popup-modal').modal('show');"
+							style = "cursor:pointer;">
                     </div>
                 </div>
             </div>

@@ -1,0 +1,141 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% block page-title %} 
+	<title>Great tips on Artwork from Arte'Venue | Worth a read</title>
+	<meta name="description" content="Great tips for you on how to choose an art, how to customize, how, where to hang, etc.">
+	<meta name="keywords" content="How to choose artowrk, how to hang art, how to customize art">	
+{% endblock page-title %} 
+{% block page-description %}
+{% endblock page-description %}
+{% block page-keywords %}
+{% endblock page-keywords %}
+
+{% block coursel-stylesheet %}
+{% endblock coursel-stylesheet %}
+
+{% block coursel-script %}
+{% endblock coursel-script %}
+{% block front.js %}
+{% endblock front.js %}
+
+<!-- Only Override the site content block -->
+{% block sitecontent %}
+	<div class="container-fluid">
+		<div class="row">
+			<!-- breadcrumb-->
+			<div class="col-12 col-lg-12">
+				<nav aria-label="breadcrumb">
+					<ol class="breadcrumb">
+						<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+						<li aria-current="page" class="breadcrumb-item active">How-To Tips</li>
+					</ol>
+				</nav>
+			</div>
+
+			<div class="col-12 col-md-3 mb-4">
+				<button type="button" data-toggle="collapse" data-target="#howto_navigation" class="navbar-toggler" style = "width:100%; border:1px solid #eee; padding: 5px;">
+					<span class="sr-only">Toggle navigation</span>
+					<i class="fa fa-align-justify"></i><span style="font-size:1rem; font-color:#555;">All Tips</span>
+				</button>
+
+			
+				 <!--
+				 *** CATEGORIES AND FILTERS ***
+				_________________________________________________________
+				-->
+				<div id = "howto_navigation" class="collapse show navbar-collapse">
+					<div class="card sidebar-menu">
+						<!--<div class="card-header">
+							<h3 class="h4 card-title">Categories</h3>
+						</div>-->
+						<div class="card-body">
+							<ul class="nav navbar-collapse nav-pills flex-column category-menu pull-left">
+								<li><span class="badge badge-secondary"></span>
+									<ul class="list-unstyled">
+										<li><a href="" class="nav-link">Choosing and Artwork</a></li>
+									</ul>
+									<ul class="list-unstyled">
+										<li><a href="" class="nav-link">The Art of Hanging</a></li>
+									</ul>
+									<ul class="list-unstyled">
+										<li><a href="" class="nav-link">The Size Matters</a></li>
+									</ul>
+									<ul class="list-unstyled">
+										<li><a href="" class="nav-link">Customize Art Print</a></li>
+									</ul>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="col-12 col-md-9">
+				<h1 class = "text-center">THE ART OF HANGING</h1>
+				<h4 class = "text-center">
+					Where and how you hang the art carries a lot of weight 
+					while giving the space a fabulous look.
+					Here are great tips for you to know.
+				</h4>
+				
+				<div class="row mt-5">
+					<div class="col-12 col-md-4 mb-3">
+						<div class = "row">
+							<div class = "col-12 text-center">
+								<h3 style = "width: 100%; background-color: #f6f6f6; padding:5px;">
+									Tip 1
+								</h3>
+							</div>
+						</div>
+						<div class = "row mt-1">
+							<div class = "col-12">
+								<img src="{% static 'img/how-to/how-to-hang/how-to-hang-banner.jpeg' %}" alt="How to hang art" class="img-fluid">
+							</div>
+							<div class = "col-12 mt-3">
+								<span class="price text-center">
+								<p>The ideal height to hang the art is such that the center of the 
+								art is at 5.5 feet from the floor.</p>
+								<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. In et erat a ex sagittis gravida vitae sed sapien. Interdum et malesuada fames ac ante ipsum primis in faucibus. Interdum et malesuada fames ac ante ipsum primis in faucibus. Etiam gravida nisi in tellus dictum imperdiet. Etiam commodo ipsum ac vulputate dapibus. Praesent nec nibh ex. Ut metus lacus, fringilla vitae congue vel, sollicitudin a enim. Praesent accumsan faucibus est, ac pharetra orci lacinia vulputate.
+								</p>
+								</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	{% endblock sitecontent %}
+
+	
+	{% block jscripts %}
+	<script>
+		var isBreakpoint = function(viewport_size){
+		  //return $('.device-' + viewport_size).is(':visible');
+		  if (viewport_size == 'xs'){
+			return window.innerWidth < 768;
+		  }
+		  if (viewport_size == 'sm'){
+			return window.innerWidth < 991;
+		  }
+		  if (viewport_size == 'md'){
+			return window.innerWidth < 1199;
+		  }
+		  if (viewport_size == 'lg'){
+			return window.innerWidth > 1199;
+		  }
+		}	
+	
+		jQuery(document).ready(function(){
+
+			if (isBreakpoint('xs')){
+				$('#howto_navigation').removeClass('show');
+			} else {
+				$('#howto_navigation').addClass('show');
+			}	
+
+		});
+	</script>
+	{% endblock jscripts %}
+	

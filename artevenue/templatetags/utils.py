@@ -1,7 +1,9 @@
 from django import template
 from decimal import Decimal
 
-from artevenue.models import Moulding
+from artevenue.models import Moulding, Collage_stock_image
+
+from artevenue.views  import price_views
 
 register = template.Library()
 
@@ -131,3 +133,42 @@ def replace(str, args):
 		return str.replace(old, new)
 	else:
 		return ''
+
+@register.simple_tag
+def get_collage_price( collage_id, aspect_ratio, user_width ):
+
+	if user_width > 0:
+		width = user_width
+	else:
+		if width >= 10:
+			width = 10
+	height = round(width / aspect_ratio)
+
+	prods = Collage_stock_image.objects.filter(collage_id = collage_id,
+		stock_collage__is_published = True)
+	
+	p_arr = []
+	t_price = 0
+	for p in prods:
+		price = price_views.get_prod_price(p.stock_image_id, 
+				prod_type='STOCK-IMAGE',
+				image_width=width, 
+				image_height=height,
+				print_medium_id = 'PAPER',
+				acrylic_id = '1',
+				moulding_id = 18,
+				mount_size = 1,
+				mount_id = 3,
+				board_id = 1,
+				stretch_id = '')
+			
+		#p_arr.append( price['item_price'] )
+		t_price = t_price + price['item_price']
+		print(str(t_price))
+	#for price in p_arr:
+	#	t_price = t_price + price
+	return Decimal(t_price)
+
+@register.filter
+def replace_comma(str):
+   return str.replace(',', '_')

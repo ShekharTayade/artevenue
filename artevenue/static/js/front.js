@@ -27,6 +27,13 @@ $(function () {
 		
     });
 
+	$('#card-slider').owlCarousel({
+		loop:false,
+		nav:false,
+		pagination:false,
+		items: 1,
+		singleItem:true
+    });
 
     $('#get-inspired').owlCarousel({
         items: 1,

@@ -13,9 +13,13 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
 import urllib
+import urllib.request
+import urllib.parse
+
 from PIL import ImageFont, ImageDraw, Image
 
 from django.contrib.auth.models import User
+from django.conf import settings
 
 from artevenue.models import Order, Order_items_view, Publisher, Egift_card_design
 from artevenue.models import Voucher, eGift_sms_email, Egift, Voucher_user, Cart
@@ -24,6 +28,8 @@ from artevenue.models import Business_profile, User_sms_email, Contact_us, Cart_
 
 today = datetime.datetime.today()
 cc = "support@artevenue.com"
+
+SMS_API_KEY = settings.SMS_API_KEY
 
 def send_customer_emails():
 	# Select orders where customer emails not sent
@@ -514,4 +520,94 @@ def offer_25():
 		emsg.send()	
 	
 	
+def send_corona_alert():
 	
+	users = User.objects.all()
+	
+	for o in users:
+		subject = "Alert: Covid-19 Communication"
+		html_message = render_to_string('artevenue/corona.html', 
+				{'user':o})
+		plain_message = strip_tags(html_message)
+		from_email = 'support@artevenue.com'
+		to = [o.email]
+		cc = ['shekhar@artevenue.com']
+
+		emsg = EmailMultiAlternatives(subject, plain_message, from_email, to, cc)
+		emsg.attach_alternative(html_message, "text/html")
+		emsg.send()	
+
+def send_tracking_no_to_cust(order_id=None):
+	if order_id == None:
+		return
+	try:
+		order = Order.objects.get(order_id = order_id)
+	except Order.DoesNotExist:
+		return
+	except Order.MultipleObjectsReturned:
+		return
+
+	if order.tracking_number is None or order.tracking_number == '':
+		return
+
+	order_ids = Order.objects.filter(order_id = order_id).values('order_id')
+	order_items_list = Order_items_view.objects.select_related('product').filter(order_id__in = order_ids,
+		product__product_type_id = F('product_type_id'))
+
+	subject = "Arte'Venue Order No: " + order.order_number + " has been shipped"
+	html_message = render_to_string('artevenue/cust_order_tracking_no.html', 
+			{'order':order, 'order_items_list': order_items_list})
+	plain_message = strip_tags(html_message)
+	from_email = 'support@artevenue.com'
+	to = [order.order_billing.email_id]
+	cc = ['']
+
+	emsg = EmailMultiAlternatives(subject, plain_message, from_email, to, cc)
+	emsg.attach_alternative(html_message, "text/html")
+	emsg.send()	
+	
+def send_ord_update_sh(order_id):
+	if order_id == None:
+		return
+		
+	try:
+		order = Order.objects.get(order_id = order_id)
+	except Order.DoesNotExist:
+		return
+	except Order.MultipleObjectsReturned:
+		return
+
+	order_ids = Order.objects.filter(order_id = order_id).values('order_id')
+	order_items_list = Order_items_view.objects.select_related('product').filter(order_id__in = order_ids,
+		product__product_type_id = F('product_type_id'))
+
+	
+	subject = "Arte'Venue Order No: " + order.order_number + " is ready for shipping"
+	html_message = render_to_string('artevenue/cust_order_ready_for_shipping.html', 
+			{'order':order, 'order_items_list': order_items_list})
+	plain_message = strip_tags(html_message)
+	from_email = 'support@artevenue.com'
+	to = [order.order_billing.email_id]
+	cc = ['']
+
+	emsg = EmailMultiAlternatives(subject, plain_message, from_email, to, cc)
+	emsg.attach_alternative(html_message, "text/html")
+	emsg.send()	
+	
+
+
+ 
+def sendSMS(apikey, numbers, sender, message):
+    data =  urllib.parse.urlencode({'apikey': apikey, 'numbers': numbers,
+        'message' : message})
+    data = data.encode('utf-8')
+    request = urllib.request.Request("https://api.textlocal.in/send/?")
+    f = urllib.request.urlopen(request, data)
+    fr = f.read()
+    return(fr)
+ 
+def testSMS(num): 
+	ph_no = str(num)
+	resp =  sendSMS(SMS_API_KEY, num,
+		'ARTVNE', 'This is a test SMS from artevenue.com')
+	print (resp)

@@ -3,6 +3,7 @@ from .views import *
 from .tax_views import *
 from .price_views import *
 from .product_views import *
+from .collage_views import *
 from .frame_views import *
 from .image_views import *
 from .cart_views import *
@@ -24,3 +25,4 @@ from .api_views import *
 
 from .amazon_views import *
 from .other_channel_order_views import *
+from .amz_av_for_montage import *

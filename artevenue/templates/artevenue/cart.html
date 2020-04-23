@@ -8,7 +8,27 @@
 {% endblock page-description %}
 {% block page-keywords %}
 <meta name="keywords" content="Art, arvenue, shopping cart">
-{% endblock page-keywords %}	<!-- Only Override the site content block -->
+{% endblock page-keywords %}	
+
+
+{% block coursel-stylesheet %}
+{% endblock coursel-stylesheet %}
+
+{% block jqueryui-script %}
+{% endblock jqueryui-script %}
+
+{% block coursel-script %}
+{% endblock coursel-script %}
+
+{% block front.js %}
+{% endblock front.js %}
+
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+
+<!-- Only Override the site content block -->
 	{% block sitecontent %}
         <div class="container" id = "cart-display" >
 			{% include 'artevenue/cart_include.html' %}
@@ -334,10 +354,17 @@
 		</script>
 		
 		<script>
-			function edit_item(cart_item_id, product_id){
+			function edit_item(cart_item_id, product_id, product_type='STOCK-IMAGE'){
 				$("#product_id").val(product_id);
+				$("#product_type").val(product_type);
 				$("#cart_item_id").val(cart_item_id);
 				$("#edit_form").submit();
+			}
+			function edit_item_collage(cart_item_id, product_id, product_type='STOCK-COLLAGE'){
+				$("#c_product_id").val(product_id);
+				$("#c_product_type").val(product_type);
+				$("#c_cart_item_id").val(cart_item_id);
+				$("#edit_form_collage").submit();
 			}
 		</script>
 		

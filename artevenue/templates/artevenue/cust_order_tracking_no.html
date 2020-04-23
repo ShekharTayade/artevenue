@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+{% load utils %}
+{% load static %}
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="robots" content="all,follow">
+		<!-- Bootstrap CSS-->
+		<link rel="stylesheet" href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}">
+				
+		<!-- Font Awesome CSS-->
+		<link rel="stylesheet" href="{% static 'vendor/font-awesome/css/font-awesome.min.css' %}">
+		<!-- Google fonts - Roboto -->
+		<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:400,500,700,300,100">
+		<!-- Custom stylesheet -->
+		<link rel="stylesheet" href="{% static  'css/custom.css' %}">
+		<!-- theme stylesheet-->
+		<link rel="stylesheet" href="{% static 'css/style.default.css' %}" id="theme-stylesheet">
+
+	</head>
+
+	<body>
+		<div class = "row"  style = "border:1px solid #d4d4d4; padding:10px; margin:0px;">
+			<table style = "width: 100%; maring-bottom: 15px; ">
+				<tbody>
+					<tr>
+						<td>
+							<img src = "https://artevenue.com/static/img/av_logo_circle2_m1.png" %}" alt="Arte'venue" style = "left:0, margin:0px; padding:0px;" width=150>
+						</td>
+						<td style = "text-align: right;">
+							<span style = "font-size: 10px; right:0px;">www.artevenue.com</span><br>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<div style = "margin-top:10px; border-top: 1px solid #dddddd;">
+				<h3></h3>	<!-- Heading/Headline -->
+				
+				<!-- Make sure user objects is passed -->
+				<h5>
+					Dear {{order.order_billing.full_name}} 
+						{% if order.order_billing.Company %}
+							, <br> {{order.order_billing.Company}}
+						{% endif %},
+				</h5>
+				<h5>Thank you for choosing Arte’Venue!</h5>
+
+				<h5>Your Order number {{order.order_number}}, dated {{order.order_date}}
+					has been shipped via {{order.shipper.name}}.
+					The tracking number is 
+					<span style = "color: #11b6bd;">{{order.tracking_number}}</span>.
+				</h5>
+				<h5>
+					<a style = "background-color: #000; color: #fff; padding:7px; width:100%; margin-bottom:20px;" href = "{{order.tracking_url}}">Track it here
+					</a>
+				</h5>
+				
+				<!--  Email content -->
+				<table style = "font-size: 10px; margin-top: 20px;">
+					<thead>
+						<tr>
+							<th width="100%" style="text-align:left"><strong>Shipping Address:</strong></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>
+								{% if order.order_shipping %}
+								<div>
+									{{order.order_shipping.full_name}} 
+									{% if order.order_shipping.Company %}
+										, {{order.order_shipping.Company}}
+										<br />
+									{% endif %}
+									{{order.order_shipping.address_1}}
+									{% if order.order_shipping.address_2 %}
+										{{order.order_shipping.address_2 }}
+									{% endif %}
+									{% if order.order_shipping.address_1 or order.order_shipping.address_2 %}
+										<br />
+									{% endif %}
+									{% if order.order_shipping.land_mark %}
+										{{order.order_shipping.land_mark}}
+										<br />
+									{% endif %}
+									
+									{{order.order_shipping.city}} {{order.order_shipping.state}} {{order.order_shipping.pin_code_id}}
+									<br />
+									Ph: {{order.order_shipping.phone_number}} Email: {{order.order_shipping.email_id}}
+								</div>
+								{% endif %}
+							</td>
+						</tr>
+					</tbody>
+				</table>
+
+				<table  style = "font-size: 10px;  margin-top: 20px;">
+					<thead>
+						<tr>
+							<th width="70%" style="text-align:left"></th>
+							<th width="30%" style="text-align:left"></th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for i in order_items_list %}
+						{% if i.order_id != order.order_id %}
+							<!-- Nothing -->
+							
+						{% else %}
+						<tr>
+							<td>
+								<img src = "{% if i.product_type|cut:' ' == 'USER-IMAGE' %} https://artevenue.com{{MEDIA_URL}}{{i.product.image_to_frame_thumbnail}} {% else %}https://www.artevenue.com/{% static i.product.thumbnail_url %}{% endif %}" style = "width:50px; height:50px; object-fit:contain;">
+							
+								<br />
+								<div class = "pull-left">
+									<span style = "padding-left:0px;" >
+										{% if i.product_type == 'USER-IMAGE' %}
+											User Uploaded Image
+										{% else %}
+											{{i.product.name}}
+										{% endif %}
+									</span>
+								</div>
+							</td>
+							<td style = "text-align:right">
+								<small>{{i.quantity}}</small>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								{% with width=i.moulding.width_inner_inches|add_width_frame_mount:i.mount_size %}
+								<small>
+								<li>Print on {{i.print_medium_id|title}}</li>
+								{% if i.moulding_id %}
+								<li>Image Print Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+								<li>Frame {{i.moulding.name }} ({{i.moulding.width_inches}} inch)</li>
+								{% if i.mount_id %}
+									<li>Mount: {{i.mount_size }}", Color: {{i.mount.name|title }} </li>
+								{% endif %}
+								<li>Total Size: 
+									{{ i.image_width|add_width:width|add_width:width }}" X {{i.image_height|add_width:width|add_width:width }}"</li>
+								{% else %}
+									<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+								{% endif %}
+								
+								{% if i.acrylic_id %}
+									<li>Acrylic covered</li>
+								{% endif %}
+								{% if i.stretch_id %}
+									<li>Canvas Stretched</li>
+								{% endif %}
+								</small>
+								{% endwith %}
+							</td>						
+						</tr>
+						{% endif %}
+						{% endfor %}
+						
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div style = " margin-top: 20px;">
+			<h5>
+				With warm regards,<br />
+				Team Arte'Venue
+				<br />
+				<img src = "https://artevenue.com/static/img/artevenue_logo_new.png" alt="Arte'Venue Logo"  height="25" width="110"> <br />
+				<a href = "https://www.artevenue.com">www.artevenue.com</a>
+			</h5>
+		</div>
+	</body>
+</html>

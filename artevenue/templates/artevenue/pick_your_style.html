@@ -4,20 +4,20 @@
 		<h2 class="text-center">PICK YOUR STYLE STATEMENT
 		</h2>
 	
-		<div class="row" style="margin:5px;">
+		<div class="row" style="">
 			<div class = "col-lg-6 mt-3" >			
-				<a class="btn-link" href="{% url 'curated_collections' cat_nm='Minimalistic' %}">
+				<a class="btn-link" href="{% url 'curated_collections' cat_nm='Minimalistic' page=1 prod_id=80247 %}">
 				<div class="curated-container">
-					<img src="{% static 'img/pick_style/minimalist.jpg' %}" alt="Minimalist" style="width:100%">
+					<img src="{% static 'img/pick_style/minimalist_apr2020.jpg' %}" alt="Minimalist" style="width:100%">
 					<div class = "btn">MINIMALISTIC</div>
 				</div>
 				</a>
 			</div>
 			<div class = "col-lg-6 mt-3" >			
-				<a class="btn-link" href = "{% url 'curated_collections' cat_nm='Contemporary' %}">
+				<a class="btn-link" href = "{% url 'stock_collage_products' %}">
 				<div class="curated-container">
-					<img src="{% static 'img/pick_style/contemporary.jpg' %}" alt="Contemporary" style="width:100%">
-					<div class = "btn">CONTEMPORARY</div>
+					<img src="{% static 'img/collage/collage_banner.jpg' %}" alt="Collage" style="width:100%">
+					<div class = "btn">SETS OF 2 OR 3</div>
 				</div>
 				</a>
 			</div>

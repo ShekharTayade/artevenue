@@ -4,13 +4,31 @@
 	<title>Curated art works from '{{ product_category.name }}' category</title>
 {% endblock page-title %} 
 {% block page-description %}
-<meta name="description" content="Displaying specially selected art works from '{{product_category.name}}' category. Arte'Venue.com has a large collection of over 250,000
+<meta name="description" content="Specially selected art works from '{{product_category.name}}' category. Arte'Venue.com has a large collection of over 250,000
 art works from artists across the world. We deliver customized art prints at your door steps.">
 {% endblock page-description %}
 {% block page-keywords %}
-<meta name="keywords" content="Art, {{product_category.name}}, Art prints, Wall Art, Buy Art, Buy Art prints, Print photos online, Print Art online,
+<meta name="keywords" content="Art, {{product_category.name}}, Paintings, Art prints, Wall Art, Buy Art, Buy Art prints, Print photos online, Print Art online,
 	Custom Framing, Online Framing, Online Art, Online Art prints">
 {% endblock page-keywords %}
+
+
+{% block coursel-stylesheet %}
+{% endblock coursel-stylesheet %}
+
+{% block coursel-script %}
+{% endblock coursel-script %}
+
+{% block front.js %}
+{% endblock front.js %}
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+{% block lazysizes %}
+<script src="{% static '/vendor/lazysizes/lazysizes.min.js' %}" async=""></script>
+{% endblock lazysizes %}
+
 
 	<!-- Only Override the site content block -->
 	{% block sitecontent %}
@@ -50,7 +68,11 @@ art works from artists across the world. We deliver customized art prints at you
 									<li><span class="badge badge-secondary">{{prod_cat_count}}</span>
 									{% for p in prod_categories %}
 										<ul class="list-unstyled">
-											<li><a href="{% url 'art_by_category' p.category_id %}" class="nav-link">{{p.name|title}}</a></li>
+											{% if p.category_id %}
+												<li><a href="{% url 'art_by_category' cat_nm=p.name page=page%}" class="nav-link">{{p.name|title}}</a></li>
+											{% else %}
+												<li><a href="{% url 'art_by_category' %}" class="nav-link">{{p.name|title}}</a></li>
+											{% endif %}
 										</ul>
 									{% endfor prod_categories %}
 										<a href="{% url 'show_all_categories' %}"><small>See All...</small></a>
@@ -216,28 +238,61 @@ art works from artists across the world. We deliver customized art prints at you
 
 				<div class="col-lg-9">
 					<div class="box-cat">
-						<h1 style="text-decoration: underline;">Hand-picked {% if product_category %} {{ product_category.name }} Art Prints{% else %} All Art Prints{% endif %}</h1>
+						<h1>Hand-picked {% if product_category %} {{ product_category.name }} Art Prints{% else %} All Art Prints{% endif %}</h1>
 						<!-- <h4>Brinnig You This Hand-picked Range of {% if product_category.name%}{{product_category.name}}{% endif %} Art Prints of Impressive Paintings, Artworks from Artists Across the World.<br />
 							Breathe Life Into Your Room Walls with these Amazing Artworks.</h4>
 						</h4>-->
-						{% if product_category.description %} 
+						<!--{% if product_category.description %} 
 							<h4>
 								{{product_category.description}}
 							<h4>
-							<h5>Select from finished sizes or customize each artwork to suit your rooms, whether it's your living room, bedroom room, kitchen, Dining, Study or any other space.
-								Bring it home as framed art print by choosing the size, frame, print surface, mount. You may even choose to get it as stretched on canvas art print. Or get it just as a wall poster without the frame.
-							</h5>
-						{% endif %}
-
+						{% endif %} -->
+						<h5>{{product_category.description}}</h5>						
 					 </div>
 
 					<div id = "img-display">
 						{% include 'artevenue/prod_display_include.html' %}
 					</div> <!-- END:  img-display -->
+					<h4>
+						Find perfect art for your living room, bedroom room, kitchen, Dining, Study, office or any other space.
+						Each is fully customizable. Get it as Paper or Canvas art print, selection of size, frame, mount and more. 
+					</h4>
 				</div>
 				<!-- /.col-lg-9-->
 				{% include 'artevenue/wishlist-add-message.html' %}
 				{% include 'artevenue/message-modal_ok.html' %}
+				{% if product_category.category_id %}
+					<form  hidden id="cat-form" action = "{% url 'curated_collections' cat_nm=product_category.name %}">
+						<input id = "id_page_num" name = "page_num">
+						<input id = "id_sort" name = "sort">
+						<input id = "id_show" name = "show">
+						<input id = "id_keywords" name = "keywords">
+						<input id = "id_f_colors" name = "filt_colors">
+						<input id = "id_f_size" name = "filt_size">
+						<input id = "id_f_width" name = "filt_width">
+						<input id = "id_f_height" name = "filt_height">
+						<input id = "id_f_artist" name = "filt_artist">
+						<input id = "id_f_orientation" name = "filt_orientation">
+						<input id = "id_f_image_type" name = "filt_image_type">
+						<input id = "id_tf" name = "t_f">
+						
+					</form>
+				{% else %}
+					<form  hidden id="cat-form" action = "{% url 'curated_collections' %}">
+						<input id = "id_page_num" name = "page_num">
+						<input id = "id_sort" name = "sort">
+						<input id = "id_show" name = "show">
+						<input id = "id_keywords" name = "keywords">
+						<input id = "id_f_colors" name = "filt_colors">
+						<input id = "id_f_size" name = "filt_size">
+						<input id = "id_f_width" name = "filt_width">
+						<input id = "id_f_height" name = "filt_height">
+						<input id = "id_f_artist" name = "filt_artist">
+						<input id = "id_f_orientation" name = "filt_orientation">
+						<input id = "id_f_image_type" name = "filt_image_type">
+						<input id = "id_tf" name = "t_f">
+					</form>
+				{% endif %}
 				
 			</div>
 		</div>
@@ -276,11 +331,21 @@ art works from artists across the world. We deliver customized art prints at you
 	
 	<script>
 		function getAllFilters(page, sort, show, keywords){   
+			$("#id_f_colors").val('');
+			$("#id_f_size").val('');
+			$("#id_f_artist").val('');
+			$("#id_f_orientation").val('');
+			$("#id_f_image_type").val('');
+
+
 			if (isNaN(page) == false) {
 				page_num = parseInt(page);
 			} else {
 				page_num = 1;  // default
 			}
+			$("#id_page_num").val(page_num);
+
+			
 			var filter = '{';
 			var fcnt = 0;
 			{% for pf in prod_filters %}
@@ -302,6 +367,22 @@ art works from artists across the world. We deliver customized art prints at you
 								rec = rec + ', "' + val.trim() + '": ' + ' " ' + sts + '"';
 							}
 							valcnt = valcnt + 1;
+							filt = "{{pf}}";
+							
+							switch (filt) {
+							  case 'ORIENTATION':
+								var o = $("#id_f_orientation").val();
+								$("#id_f_orientation").val( o + "|" + val.trim());
+								break;
+							  case "ARTIST":
+								var a = $("#id_f_artist").val();
+								$("#id_f_artist").val( a + "|" + val.trim());
+								break;
+							  case "IMAGE-TYPE":
+								var i = $("#id_f_image_type").val();
+								$("#id_f_image_type").val( i + "|" + val.trim());
+								break;
+							}
 						}
 						
 					});
@@ -313,7 +394,6 @@ art works from artists across the world. We deliver customized art prints at you
 			var size_val = $("#size_select").val();
 			var w = $("#size_width").val();
 			var h = $("#size_height").val();
-			var size_input = w + "_" + h;
 			if ( (w) && (h) ) {
 				if (w < 4 || h < 4) {
 					$("#msg").html ("We can print images with Width and Height between 4 and 60 inches");
@@ -321,15 +401,29 @@ art works from artists across the world. We deliver customized art prints at you
 					return
 				}
 			}
+			
+			var size_input = w + "_" + h;
 			if ( ( parseInt(w) >= 4) && ( parseInt(h) >= 4) ){
 				size_val = size_input;
+				$("#id_f_size").val( size_input );
 			}
 
 			if (size_val != "any") {
 				rec = ', "SIZE": {"' + size_val + '" : ' + ' "true"';
 				filter = filter + rec + ' }';
+				$("#id_f_size").val( size_val );
 			}
-			
+
+			if (w != "") {
+				$("#id_f_width").val(w);
+			} else {
+				$("#id_f_width").val("");
+			}
+			if (h != "") {
+				$("#id_f_height").val(h);
+			} else {
+				$("#id_f_height").val("");
+			}
 			var chl = document.getElementById("colors-div").childNodes;
 			var len = chl.length;
 			var rec = ', "COLORS": {' ;
@@ -343,6 +437,8 @@ art works from artists across the world. We deliver customized art prints at you
 						rec = rec + ', "' + ele.style.backgroundColor + '"  : ' + ' "true"';					
 					}
 					valcnt = valcnt + 1;
+					col = $("#id_f_colors").val();
+					$("#id_f_colors").val(col + "|" + ele.style.backgroundColor );
 				}
 			}
 			
@@ -357,10 +453,12 @@ art works from artists across the world. We deliver customized art prints at you
 			if (sort != '' && sort != 'None' ){
 				rec = ', "SORT": {"sort":"' + sort + '"}';
 				filter = filter + rec
+				$("#id_sort").val(sort);
 			}
 			if (keywords != '' && keywords !== 'None'){
 				rec = ', "KEY-WORDS": {"keywords":"{{ikeywords}}"}';
 				filter = filter + rec
+				$("#id_keywords").val("{{ikeywords}}");
 			}
 			
 			if (isNaN(show) == false) {
@@ -375,13 +473,16 @@ art works from artists across the world. We deliver customized art prints at you
 			if (show_num != '' ){
 				rec = ', "SHOW": {"show":"' + show_num + '"}';
 				filter = filter + rec
+				$("#id_show").val(show_num);
 			}			
 			
 			filter = filter + '}';
 			
 			document.body.scrollTop = 0; // For Safari
 			document.documentElement.scrollTop = 0; 
-						
+			$("#cat-form").submit();
+			
+			/*			
 			{% if product_category.category_id %}								
 				$.ajax({url: '{% url "curated_collections" product_category.name %}', 
 					data: filter, 
@@ -396,6 +497,7 @@ art works from artists across the world. We deliver customized art prints at you
 					}
 				});			
 			{% endif %}
+			*/
 		}
 	</script>
 	

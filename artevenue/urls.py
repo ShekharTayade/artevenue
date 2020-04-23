@@ -95,7 +95,7 @@ urlpatterns = [
 
 	url(r'^product/$', views.stock_image_detail, name='stock_image_detail'),	
 	path('product/<int:prod_id>/', views.stock_image_detail, name='stock_image_detail'),	
-	path('product/<int:prod_id>/<int:iuser_width>/<int:iuser_height>', views.stock_image_detail, name='stock_image_detail'),	
+	path('product/<int:prod_id>/<int:iuser_width>/<int:iuser_height>', views.stock_image_detail, name='stock_image_detail'),
 	url(r'^products-by-keywords/$', views.search_products_by_keywords, name='art_by_category'),
 	url(r'^art-by-category/$', views.get_stock_images, name='art_by_category'),
 	path('art-by-category/<str:cat_nm>/', views.get_stock_images, name='art_by_category'),
@@ -112,15 +112,16 @@ urlpatterns = [
 	path('original-art-by-category/<int:cat_id>/', views.original_art_by_category, name='original_art_by_category'),
 	path('original-art-by-category/<int:cat_id>/<int:page>', views.original_art_by_category, name='original_art_by_category'),
 
-
+	url(r'^ajax/get-catalog-card/$', views.get_catalog_card, name='get_catalog_card'),
 	
 	url(r'^show-all-categories/$', views.show_categories, name='show_all_categories'),
 	#url(r'^all_images/$', views.all_stock_images, name='all_stock_images'),
 	url(r'^all-art-images/$', views.get_stock_images, name='all_art_images'),
 	url(r'^curated-collections/$', views.curated_collections, name='curated_collections'),
 	path('curated-collections/<str:cat_nm>/', views.curated_collections, name='curated_collections'),
+	path('curated-collections/<str:cat_nm>/<int:page>', views.curated_collections, name='curated_collections'),
 	path('curated-collections/<int:cat_id>/', views.curated_collections, name='curated_collections'),	
-	path('curated-collections/<str:cat_nm>/<int:prod_id>', views.curated_collections, name='curated_collections'),
+	path('curated-collections/<str:cat_nm>/<int:page>/<int:prod_id>', views.curated_collections, name='curated_collections'),
 	path('curated-collections/<int:cat_id>/<int:prod_id>', views.curated_collections, name='curated_collections'),
 	url(r'^image-by-image-code/$', views.image_by_image_code, name='image_by_image_code'),
 
@@ -198,6 +199,20 @@ urlpatterns = [
 	url(r'^my-business-report/$', views.my_business_report_wrap, name='my_business_report_wrap'),	
 	path('my-client-order-report/<int:client_id>/', views.my_client_order_report, name='my_client_order_report'),
 
+	url(r'^artprint-sets/$', views.stock_collage_products, name='stock_collage_products'),
+	url(r'^ajax/get-framed-collage/$', views.get_framed_collage, name='get_framed_collage'),
+	url(r'^ajax/get-collage-price/$', views.get_collage_price, name='get_collage_price'),
+	url(r'^artprint-set/$', views.stock_collage_detail, name='stock_collage_detail'),
+	path('artprint-set/<int:prod_id>/', views.stock_collage_detail, name='stock_collage_detail'),	
+	path('artprint-set/<int:prod_id>/<int:iuser_width>/<int:iuser_height>', views.stock_collage_detail, name='stock_collage_detail'),
+	url(r'^ajax/get-collage-catalog-card/$', views.get_collage_catalog_card, name='get_collage_catalog_card'),
 		 
+	url(r'^ajax/show-on-wall/$', views.show_on_wall, name='show_on_wall'),
+	url(r'^ajax/show-on-wall-set/$', views.show_on_wall_set, name='show_on_wall_set'),
+
+	url(r'^how-to-customize-art-print/', views.how_to_customize, name='how_to_customize'),	
+
+	url(r'^how-to-hang-art/', views.how_to_hang, name='how_to_hang'),	
+
 	] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

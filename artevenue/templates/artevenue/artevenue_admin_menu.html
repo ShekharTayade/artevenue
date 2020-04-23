@@ -15,7 +15,7 @@
 		<a href="{% url 'image_by_image_code' %}">Find Images by Code</a>
 		<a href="{% url 'homelane_products' %}">View HomeLane Images</a>
 		<a href="{% url 'amazon_products' %}">View Amazon Images</a>
-		<a href="{% url 'create_artist_group' %}">Create Artist Group</a>
+		<!--<a href="{% url 'create_artist_group' %}">Create Artist Group</a>-->
 		<li class="dropdown-divider"></li>
 		<a href="{% url 'store_carts' %}">View Carts Created</a>
 		<!--
@@ -31,9 +31,9 @@
 		<a href="{% url 'amazon_orders_manage' %}">Amazon Orders</a>
 		
 	</div>	
-	<span style="font-size:1rem; cursor:pointer" onclick="openNav()">&#9776; Staff Menu</span>
-
-<script>
+	<span style="padding:5px; color:#fff; background-color: #000; font-size:1rem; cursor:pointer; top:50%; left:-40px; position:fixed; z-index: 99999; text-orientation:upright; -ms-transform: rotate(270deg); transform: rotate(270deg);" onclick="openNav()">&#9776; Staff Menu</span>
+	
+	<script>
 	function openNav() {
 	  document.getElementById("mySidenav").style.width = "250px";
 	}

@@ -95,7 +95,7 @@
 										{% else %}
 										<tr>
 											<td>
-												<img src = "{% if i.product_type|cut:' ' == 'USER-IMAGE' %} https://artevenue.com{{MEDIA_URL}}{{i.product.image_to_frame_thumbnail}} {% else %} {% static i.product.thumbnail_url %} {% endif %}" style = "width:75px; height:75px; object-fit:contain;">
+												<img src = "{% if i.product_type|cut:' ' == 'USER-IMAGE' %} https://artevenue.com{{MEDIA_URL}}{{i.product.image_to_frame_thumbnail}} {% else %} {% if env == 'DEV' or env == 'TESTING' %} {{ i.product.thumbnail_url }} {% else %} {% static i.product.thumbnail_url %} {% endif %} {% endif %}" style = "width:75px; height:75px; object-fit:contain;">
 												<br />
 												<div class = "pull-left">
 													<small style = "padding-left:0px;" >

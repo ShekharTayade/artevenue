@@ -443,7 +443,9 @@ class OrderStatusUpdate(forms.ModelForm):
 				
 	class Meta:
 		model = Order
-		fields = ['order_number', 'order_date','order_status', 'order_id']
+		fields = ['order_number', 'order_date','order_status', 'order_id',
+			'shipper', 'shipping_method', 'tracking_number', 'shipment_date',
+			'tracking_url']
 	
 '''
 class Amzon_artevenue_orders_list(forms.ModelForm):

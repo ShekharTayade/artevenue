@@ -1,34 +1,260 @@
+{% load static %}
+{% load widget_tweaks %}
+
 <!-- Message Modal -->
 <div id="order-status-modal" tabindex="-1" role="dialog" aria-labelledby="Order Order Status" aria-hidden="true" class="modal fade">
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h5 class="modal-title">Update Order Status</h5>
+				<h3 class="modal-title">Update Order Status</h3>
 				<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
 			</div>
 			<div class="modal-body">
 				<form novalidate>
-					<div class = "mb-4">
-						<div class = "col-sm-12">
-							<div class = "box">
-								{% csrf_token %}
-								{% include 'includes/form.html' %}								
+					<div class = "row">
+						{% for hidden in form.hidden_fields %}
+						  {{ hidden }}
+						{% endfor %}									
+					</div>
+					<div class = "row">
+						<div class = "col-4">
+							<div class = "form-group">
+								{{ form.order_number.label_tag }}
+								{% if form.is_bound %}
+									{% if form.order_number.errors %}
+							
+										{% render_field form.order_number class="form-control is-invalid" %}
+										{% for error in form.order_number.errors %}
+											<div class="invalid-feedback">
+											  {{ error }}
+											</div>
+										{% endfor %}
+							
+									{% else %}
+										{% render_field form.order_number class="form-control is-valid" %}
+									{% endif %}
+								{% else %}
+									{% render_field form.order_number class="form-control" %}
+								{% endif %}
+							
+								{% if form.order_number.help_text %}
+									<small class="form-text text-muted">
+										{{ form.order_number.help_text }}
+									</small>
+								{% endif %}
+							</div>
+						</div>
+						<div class = "col-4">
+							<div class = "form-group">
+								{{ form.order_date.label_tag }}
+								{% if form.is_bound %}
+									{% if form.order_date.errors %}
+							
+										{% render_field form.order_date class="form-control is-invalid" %}
+										{% for error in form.order_date.errors %}
+											<div class="invalid-feedback">
+											  {{ error }}
+											</div>
+										{% endfor %}
+							
+									{% else %}
+										{% render_field form.order_date class="form-control is-valid" %}
+									{% endif %}
+								{% else %}
+									{% render_field form.order_date class="form-control" %}
+								{% endif %}
+							
+								{% if form.order_date.help_text %}
+									<small class="form-text text-muted">
+										{{ form.order_date.help_text }}
+									</small>
+								{% endif %}
+							</div>
+						</div>
+						<div class = "col-4">
+							<div class = "form-group">
+								{{ form.order_status.label_tag }}
+								{% if form.is_bound %}
+									{% if form.order_status.errors %}
+							
+										{% render_field form.order_status class="form-control is-invalid" %}
+										{% for error in form.order_status.errors %}
+											<div class="invalid-feedback">
+											  {{ error }}
+											</div>
+										{% endfor %}
+							
+									{% else %}
+										{% render_field form.order_status class="form-control is-valid" %}
+									{% endif %}
+								{% else %}
+									{% render_field form.order_status class="form-control" %}
+								{% endif %}
+							
+								{% if form.order_status.help_text %}
+									<small class="form-text text-muted">
+										{{ form.order_status.help_text }}
+									</small>
+								{% endif %}
 							</div>
 						</div>
 					</div>
-					<br />
-					<div class = "pull-left">
-						<button class="btn btn-primary pull-right"
-							type = "button"
-							onclick = "$('#order-status-modal').modal('hide');">
-							<i class="fa fa-close"></i>Cancel
-						</button>
+					<div class = "row">
+						<div class = "col-4">
+							<div class = "form-group">
+								{{ form.shipper.label_tag }}
+								{% if form.is_bound %}
+									{% if form.shipper.errors %}
+							
+										{% render_field form.shipper class="form-control is-invalid" %}
+										{% for error in form.shipper.errors %}
+											<div class="invalid-feedback">
+											  {{ error }}
+											</div>
+										{% endfor %}
+							
+									{% else %}
+										{% render_field form.shipper class="form-control is-valid" %}
+									{% endif %}
+								{% else %}
+									{% render_field form.shipper class="form-control" %}
+								{% endif %}
+							
+								{% if form.shipper.help_text %}
+									<small class="form-text text-muted">
+										{{ form.shipper.help_text }}
+									</small>
+								{% endif %}
+							</div>
+						</div>
+						<div class = "col-4">
+							<div class = "form-group">
+								{{ form.shipping_method.label_tag }}
+								{% if form.is_bound %}
+									{% if form.shipping_method.errors %}
+							
+										{% render_field form.shipping_method class="form-control is-invalid" %}
+										{% for error in form.shipping_method.errors %}
+											<div class="invalid-feedback">
+											  {{ error }}
+											</div>
+										{% endfor %}
+							
+									{% else %}
+										{% render_field form.shipping_method class="form-control is-valid" %}
+									{% endif %}
+								{% else %}
+									{% render_field form.shipping_method class="form-control" %}
+								{% endif %}
+							
+								{% if form.shipping_method.help_text %}
+									<small class="form-text text-muted">
+										{{ form.shipping_method.help_text }}
+									</small>
+								{% endif %}
+							</div>
+						</div>
+						<div class = "col-4">
+							<div class = "form-group">
+								{{ form.tracking_number.label_tag }}
+								{% if form.is_bound %}
+									{% if form.tracking_number.errors %}
+							
+										{% render_field form.tracking_number class="form-control is-invalid" %}
+										{% for error in form.tracking_number.errors %}
+											<div class="invalid-feedback">
+											  {{ error }}
+											</div>
+										{% endfor %}
+							
+									{% else %}
+										{% render_field form.tracking_number class="form-control is-valid" %}
+									{% endif %}
+								{% else %}
+									{% render_field form.tracking_number class="form-control" %}
+								{% endif %}
+							
+								{% if form.tracking_number.help_text %}
+									<small class="form-text text-muted">
+										{{ form.tracking_number.help_text }}
+									</small>
+								{% endif %}
+							</div>
+						</div>
 					</div>
-					<div class = "pull-right">
-						<button type = "button" class="btn btn-primary pull-left"
-							onclick = "updateOrderStatus($('#id_order_id').val(), $('#id_order_status').val());">
-							<i class="fa fa-right"></i> Update
-						</button>
+					<div class = "row">
+						<div class = "col-4">
+							<div class = "form-group">
+								{{ form.shipment_date.label_tag }}
+								{% if form.is_bound %}
+									{% if form.shipment_date.errors %}							
+										<input type="date" name="shipment_date" class="form-control is-invalid" id="id_shipment_date" value ="{{form.shipment_date.value|date:'Y-m-d'}}">
+										{% for error in form.shipment_date.errors %}
+											<div class="invalid-feedback">
+											  {{ error }}
+											</div>
+										{% endfor %}
+							
+									{% else %}
+										<input type="date" name="shipment_date" class="form-control is-valid" id="id_shipment_date" value ="{{form.shipment_date.value|date:'Y-m-d'}}">
+									{% endif %}
+								{% else %}
+									<input type="date" name="shipment_date" class="form-control" id="id_shipment_date" value ="{{form.shipment_date.value|date:'Y-m-d'}}">
+								{% endif %}
+							
+								{% if form.shipment_date.help_text %}
+									<small class="form-text text-muted">
+										{{ form.shipment_date.help_text }}
+									</small>
+								{% endif %}
+							</div>
+						</div>
+						<div class = "col-8">
+							<div class = "form-group">
+								{{ form.tracking_url.label_tag }}
+								{% if form.is_bound %}
+									{% if form.tracking_url.errors %}
+							
+										{% render_field form.tracking_url class="form-control is-invalid" %}
+										{% for error in form.tracking_url.errors %}
+											<div class="invalid-feedback">
+											  {{ error }}
+											</div>
+										{% endfor %}
+							
+									{% else %}
+										{% render_field form.tracking_url class="form-control is-valid" %}
+									{% endif %}
+								{% else %}
+									{% render_field form.tracking_url class="form-control" %}
+								{% endif %}
+							
+								{% if form.tracking_url.help_text %}
+									<small class="form-text text-muted">
+										{{ form.tracking_url.help_text }}
+									</small>
+								{% endif %}
+							</div>
+						</div>
+					</div>
+					<div class = "row">
+						<div class = "col-6">
+							<div class = "text-center">
+								<button class="btn btn-primary pull-right"
+									type = "button"
+									onclick = "$('#order-status-modal').modal('hide');">
+									<i class="fa fa-close"></i>Cancel
+								</button>
+							</div>
+						</div>
+						<div class = "col-6">
+							<div class = "text-center">
+								<button type = "button" class="btn btn-primary pull-left"
+									onclick = "updateOrderStatus($('#id_order_id').val(), $('#id_order_status').val(), $('#id_shipper').val(), $('#id_shipping_method').val(), $('#id_tracking_number').val(), $('#id_shipment_date').val(), $('#id_tracking_url').val());">
+									<i class="fa fa-check"></i> Update
+								</button>
+							</div> 
+						</div> 
 					</div>
 				</form>
 			</div>

@@ -44,6 +44,23 @@
 {% block page-keywords %}
 {% endblock page-keywords %}
 
+{% block coursel-stylesheet %}
+{% endblock coursel-stylesheet %}
+
+{% block coursel-script %}
+{% endblock coursel-script %}
+
+{% block front.js %}
+{% endblock front.js %}
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+{% block lazysizes %}
+<script src="{% static '/vendor/lazysizes/lazysizes.min.js' %}" async=""></script>
+{% endblock lazysizes %}
+
+
 	<!-- Only Override the site content block -->
 	{% block sitecontent %}
         <div class="container-fluid">
@@ -256,13 +273,12 @@
 							<h1>Search Results</h1>
 							<p>{% if ikeywords %} You Searched for: "{{ikeywords}}" {% endif %}</p>
 						{% else %}
-							<h1 style="text-decoration: underline;">{% if product_category %} {{ product_category.name }} Art Prints{% else %} All Art Prints {% endif %}</h1>
-							<h4>Choose From Wide Range of {% if product_category.name%}{{product_category.name}}{% endif %} Art Prints of Impressive Paintings, Artworks from Artists Across the World.<br/>
-							Bring Home the Art Prints that Breathe Life Into Your Room Walls.</h4>
-							{% if product_category.description %} <p>{{product_category.description}}</p>{% endif %}
-							<h5>Select from finished sizes or customize each artwork to suit your rooms, whether it's your living room, bedroom room, kitchen, Dining, Study or any other space.
-							Bring it home as framed art print by choosing the size, frame, print surface, mount. You may even choose to get it as stretched on canvas art print. Or get it just as a wall poster without the frame.
-							</h5>							
+							<h1>{% if product_category %} {{ product_category.name }} {% else %} All Art Prints {% endif %}</h1>
+							<p>{% if product_category.description %} {{product_category.description}}{% endif %}</p>
+							<h4>Wide Range of {{product_category.name}} Art Prints of 
+							Impressive Paintings, Artworks from Artists Across the 
+							World
+							</h4>
 						{% endif %}
 					</div>
 					 

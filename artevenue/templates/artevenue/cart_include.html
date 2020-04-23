@@ -42,7 +42,7 @@
 										{% for i in usercartitems %}
 										<tr>
 											<td>
-												<img src = "{% if i.product_type == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product__image_to_frame}} {% else %} {% static i.product__thumbnail_url %} {% endif %}" style = "width:50px; height:50px; object-fit:contain;">
+												<img src = "{% if i.product_type == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product__image_to_frame}} {% else %} {% if env == 'DEV' or env == 'TESTING' %} {{i.product__thumbnail_url}} {% else %} {% static i.product__thumbnail_url %} {% endif %} {% endif %}" style = "width:50px; height:50px; object-fit:contain;">
 												<br />
 
 												<div class = "pull-left">
@@ -54,6 +54,9 @@
 											<td>
 													{% with width=i.moulding__width_inner_inches|add_width_frame_mount:i.mount_size %}
 													<small>
+													{% if i.product_type == 'STOCK-COLLAGE' %}
+														EACH ITEM: <br/>
+													{% endif %}
 													{% if i.product_type == 'ORIGINAL-ART' %}
 														<li>{{i.product__description}}</li>
 													{% else %}													
@@ -73,7 +76,7 @@
 													{% if i.acrylic_id %}
 														<li>Acrylic covered</li>
 													{% endif %}
-													{% if i.stretch_id %}
+													{% if i.stretch_id and not i.moulding_id %}
 														<li>Canvas Stretched</li>
 													{% endif %}
 													</small>
@@ -86,12 +89,24 @@
 											<td style = "text-align:right">{{i.item_total|floatformat}}</td>
 											<td>
 												<ul style="list-style-type:none; padding-left:5px;">
-													{% if i.product_type == 'STOCK-IMAGE' %}
+													{% if i.product_type == 'STOCK-IMAGE'%}
 													<li>
 													<a>
 														<i style = "cursor: pointer; color:#007bff;" 
 															data-toggle="tooltip" title="Edit!" class="fa fa-edit"
 															onclick = "edit_item('{{i.cart_item_id}}', '{{i.product_id}}');">
+															<small> Edit</small>
+														</i>
+													</a>
+													</li>
+													<li>
+													{% endif %}
+													{% if i.product_type == 'STOCK-COLLAGE'%}
+													<li>
+													<a>
+														<i style = "cursor: pointer; color:#007bff;" 
+															data-toggle="tooltip" title="Edit!" class="fa fa-edit"
+															onclick = "edit_item_collage('{{i.cart_item_id}}', '{{i.product_id}}');">
 															<small> Edit</small>
 														</i>
 													</a>
@@ -230,6 +245,12 @@
 				<form id = "edit_form" hidden action = "{% url 'stock_image_detail' %}" method = 'GET'>
 					<input hidden id="cart_item_id" name = "cart_item_id" value = ''>
 					<input hidden id="product_id" name = "product_id" value = ''>
+					<input hidden id="product_type" name = "product_type" value = ''>
+				</form>
+				<form id = "edit_form_collage" hidden action = "{% url 'stock_collage_detail' %}" method = 'GET'>
+					<input hidden id="c_cart_item_id" name = "cart_item_id" value = ''>
+					<input hidden id="c_product_id" name = "product_id" value = ''>
+					<input hidden id="c_product_type" name = "product_type" value = ''>
 				</form>
 
 			</div>

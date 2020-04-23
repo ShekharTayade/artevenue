@@ -59,8 +59,14 @@
 		</script>
 	
 	<script>
-		$( document ).ready(function() {
+		jQuery(document).ready(function(){
 
+			$body = $("body");
+			
+			$(document).on({
+				ajaxStart: function() { $body.addClass("loading");},
+				ajaxStop: function() { $body.removeClass("loading");}
+			});
 		});
 	
 		function showOrderStatus(ord_id){
@@ -80,18 +86,22 @@
 				}					
 			});
 		}
-		function updateOrderStatus(ord_id, order_status){
+		function updateOrderStatus(ord_id, order_status, shipper, shipping_method, tracking_number, shipment_date, tracking_url){
 			$('#order-status-modal').modal('hide');
 		
 			$.ajax({
 				url: '{% url "update_order_status" %}', 
-				data: {'order_id': ord_id, 'order_status':order_status},
+				data: {'order_id': ord_id, 'order_status':order_status,
+				'shipper': shipper, 'shipping_method': shipping_method,
+				'tracking_number': tracking_number, 'shipment_date' :shipment_date,
+				'tracking_url':tracking_url
+				},
 				dataType: 'text', 
 				type: 'POST',
 				success: function (data) {
 					data = JSON.parse(data);
-					$('#msg').html(data.msg);
 					$('#msg-modal').modal('show');
+					$('#msg').html(data.msg);
 				},
 				error: function(xhr){
 					alert("An error occured: " + xhr.status + " " + xhr.statusText + " Apologies for the inconvenience!! Please contact support team and we will be happy to help sort it out."); 

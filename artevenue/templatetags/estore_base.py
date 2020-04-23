@@ -15,7 +15,7 @@ from django import template
 today = datetime.date.today()
 
 register = template.Library()
-@register.inclusion_tag('artevenue/topbar.html')
+@register.inclusion_tag('artevenue/topbar_NEW.html')
 def topbar(request , auth_user):
 	ecom = get_object_or_404 (Ecom_site, store_id=settings.STORE_ID )
 	if request:
@@ -51,11 +51,22 @@ def admin_menu(request):
 	
 	
 	
-@register.inclusion_tag('artevenue/estore_menu_with_search.html')	
+@register.inclusion_tag('artevenue/estore_menu_NEW.html')	
 #@register.inclusion_tag('artevenue/estore_menu_two_lines.html')	
-def menubar(request):
+def menubar(request, auth_user):
 
 	ecom = get_object_or_404 (Ecom_site, store_id=settings.STORE_ID )
+	if request:
+		if request.user:
+			business_user = False
+			try:
+				usr = User.objects.get(username = request.user)
+				bus_prof = Business_profile.objects.get(user = usr)
+				business_user = True
+			except Business_profile.DoesNotExist:
+				business_user = False		
+			except User.DoesNotExist:
+				usr = None
 	
 	#Level 0
 	level0_menuitems = Menu.objects.filter(store = ecom, effective_from__lte = today, 
@@ -96,11 +107,12 @@ def menubar(request):
 	except Cart.DoesNotExist:
 			usercart = {}
 	
-	return {'level0_menuitems':level0_menuitems, 
+	return {'ecom_site':ecom, 'level0_menuitems':level0_menuitems, 
 			'level1_menuitems':level1_menuitems,
 			'level2_menuitems':level2_menuitems,
-			'usercart':usercart,
-			'level1_menuitems_original_art':level1_menuitems_original_art}
+			'usercart':usercart, 'request':request,
+			'level1_menuitems_original_art':level1_menuitems_original_art,
+			'user': request.user, 'auth_user' : auth_user, 'business_user':business_user}
 
 
 @register.inclusion_tag('artevenue/artevenue_text.html')	

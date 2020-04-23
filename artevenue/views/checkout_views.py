@@ -1263,7 +1263,7 @@ def checkout_step3_order_review(request):
 		
 		
 		return render(request, "artevenue/checkout_step3_order_review.html", {'order':o, 'order_items':order_items, 
-					'usercartitems':usercartitems, "posted":posted})
+					'usercartitems':usercartitems, "posted":posted, 'env': env})
 
 @csrf_exempt
 def get_shipping_cost_by_slab(order_total):
