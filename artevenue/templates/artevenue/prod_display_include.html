@@ -49,7 +49,7 @@
 
 							</div>
 						{% else %}
-							{{prods.paginator.count|intcomma_indian}} results found
+							{{prods.paginator.count|intcomma_indian}} artworks found
 						{% endif %}
 					</h5>
 					<div class="box-cat info-bar">
@@ -78,10 +78,10 @@
 								<div class="img-container">
 									<a id = "alink_{{prod.product_id}}" href="{% url 'stock_image_detail' prod.product_id %}">
 										{% if env == 'DEV' or env == 'TESTING' %}
-											<img data-src="{{ prod.url }}" alt="Art Print: {{prod.name}}" class="img-fluid image-display lazyload" 
+											<img data-src="{{ prod.url }}" alt="Wall art painting: {{prod.name}}, by {{prod.artist}}" class="img-fluid image-display lazyload" 
 													style = "filter: drop-shadow(0.25rem 0.25rem 0.25rem grey);" onclick="$('#img-form_{{prod.product_id}}').submit();">
 										{% else %}
-											<img data-src="{% static prod.url %}" alt="Art Print: {{prod.name}}" class="img-fluid image-display lazyload"
+											<img data-src="{% static prod.url %}" alt="Wall art painting: {{prod.name}}, by {{prod.artist}}" class="img-fluid image-display lazyload"
 													style = "filter: drop-shadow(0.25rem 0.25rem 0.25rem grey);" onclick="$('#img-form_{{prod.product_id}}').submit();">
 										{% endif %}		
 									</a>

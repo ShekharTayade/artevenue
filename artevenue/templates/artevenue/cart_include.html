@@ -73,7 +73,7 @@
 													{% else %}
 														<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
 													{% endif %}
-													{% if i.acrylic_id %}
+													{% if i.acrylic_id and i.print_medium_id == 'PAPER' %}
 														<li>Acrylic covered</li>
 													{% endif %}
 													{% if i.stretch_id and not i.moulding_id %}

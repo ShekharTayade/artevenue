@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block page-title %} 
-<title>Contact Us For Sales, Support & Enquiries | Arte'venue</title>
+<title>Contact Us For Wall Art Paiting Sales, Support & Enquiries | Arte'venue</title>
 {% endblock page-title %} 
   
 {% block page-description %}
@@ -34,7 +34,7 @@
 {% endblock imagemap-resize-script %}
 
 {% block gmap-script %}
-<script src="https://maps.googleapis.com/maps/api/js"></script>
+	<script src="https://maps.googleapis.com/maps/api/js"></script>
 {% endblock gmap-script %}
 
 {% load widget_tweaks %}
@@ -128,7 +128,7 @@
 						</div>
 						<div class="row justify-content-center">
 							<div class="col-8">
-								<form method="post" novalidate">
+								<form method="post" novalidate>
 									{% csrf_token %}
 									<input hidden name="curr_pg" value="{{request.path}}" >						
 									<div class="panel panel-default cpanel cpanel-default">

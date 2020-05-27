@@ -17,87 +17,156 @@
 
 	<!-- Only Override the site content block -->
 	{% block sitecontent %}
-    <div class="container">
+    <div class="container mb-5">
 		<div class = "row">
-			<div class="row">
-				<div class="col-12">
-					<!-- breadcrumb-->
-					<nav aria-label="breadcrumb">
-						<ol class="breadcrumb">
-							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
-							<li class="breadcrumb-item"><a href="{% url 'index' %}">How To</a></li>
-							<li class="breadcrumb-item active">Customize Art Prints</li>
-						</ol>
-					</nav>
+			<div class="col-12">
+				<!-- breadcrumb-->
+				<nav aria-label="breadcrumb">
+					<ol class="breadcrumb">
+						<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+						<li class="breadcrumb-item active">Customize Art Prints</li>
+					</ol>
+				</nav>
+			</div>
+			<div class="col-12 mb-5">
+				<div id="accordion" class="accordion">
+					<div class=" mb-0">
+						<div class="card-header collapsed text-center" data-toggle="collapse" href="#collapseOne"
+								style = "padding: 0 0.5rem !important;">
+							<a class="card-title">ALL HOW-TO TIPS</a>
+						</div>
+						<div id="collapseOne" class="card-body collapse" data-parent="#accordion"
+							style = "background-color: #f9f9f9;">
+							<div class="row">
+								<div class="col-4 text-center">
+									<a href = "{% url 'how_to_hang' %}" class = "btn btn-primary">Hang Art</a>
+								</div>
+								<div class="col-4 text-center">
+									<a href = "{% url 'how_to_size' %}" class = "btn btn-primary" href="">Size Matters</a>
+								</div>
+								<div class="col-4 text-center">
+									<a href = "{% url 'how_to_customize' %}" class = "btn btn-outline-secondary disabled" href="">Customize</a>
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
-			<div class = "col-12" style="background-color#11b6bd; color#fff; padding10px;">
+			<div class = "col-12 text-center">
 				<h1>How to Customize Art Prints</h1>
-				<h4>Learn about the customizing artwork</h4>
 			</div>
-		</div>
-		<div class = "row">			
-			<div class = "col-12 how-customize">
-				<p><strong>Artevenue.com offers fantastic customization for each artprint, a first in India.</strong></p>
-				<p>
-					On the artwork product page you can customize:
+			<div class = "col-12 mt-3">
+				<p>Artevenue.com offers complete customization for each art print, 
+				a first in India.</p>
+				<h4>On the artwork product page you can customize:
 					<ul>
-					<li>Print Surface - Print on PAPER or CANVAS</li>
-					<li>Choose artwork size (inch-by-inch)</li>
-					<li>Frame</li>
-					<li>Mount colour and size</li>
-					<li>Canvas Stretched (when not framed)</li>
-					<li>Buy without frame</li>
+						<li>Print Surface - Print on PAPER or CANVAS</li>
+						<li>Choose artwork size (inch-by-inch)</li>
+						<li>Frame</li>
+						<li>Mount colour and size</li>
+						<li>Canvas Stretched (when not framed)</li>
+						<li>Buy without frame</li>
 					</ul>
-					With every customization you perform, you instantaneuously see the artwork 
-					with the changes. So you know exactly what you are buying.
-				</p>
-				<p>Let's walk you quickly through HOW TO CUSTOMIZE</p>
+					With every customization you perform, instantaneuously see the artwork 
+					with the changes. Gives a very good idea of what you are buying and how it would look.
+				</h4>
+				<h4>From the various categories of art or from search results page, 
+					select the art you like. Cutomization can be done on the 
+					art print product page.
+					Let's walk you quickly through how to customize art prints:
+				</h4>
 			</div>			
 		</div>
 
 		<div class = "row">			
-			<div class = "col-12 col-md-6 customize-box">
-				<div class = "customize-title">					
-					Choose Print Surface
+			<div class = "col-12 col-md-6 mt-5">
+				<div class = "row">
+					<div class = "col-12 text-center">
+						<h3 style = "width: 100%; background-color: #f6f6f6; padding:5px;">
+							Customize print surface
+						</h3>
+					</div>
 				</div>
-				<img src = "{% static 'img/how-to/customization/surface_buyunframed.jpg' %}"
-					alt = "Choose print surface" width = 500 class = "img-fluid customize-pic">
+				<div class = "row">
+					<div class = "col-12 text-center">
+						<img src = "{% static 'img/how-to/customization/surface_buyunframed.jpg' %}"
+						alt = "Buy Framed or Customize" width = 500  class = "img-fluid customize-pic">
+					</div>
+				</div>
 			</div>
-			<div class = "col-12 col-md-6 customize-box">
-				<div class = "customize-title">
-					Choose from standard Sizes or Customize
+			<div class = "col-12 col-md-6 mt-5">
+				<div class = "row">
+					<div class = "col-12 text-center">
+						<h3 style = "width: 100%; background-color: #f6f6f6; padding:5px;">
+							Choose from Standard Sizes or Customize
+						</h3>
+					</div>
 				</div>
-				<img src = "{% static 'img/how-to/customization/framed_customize.jpg' %}"
-					alt = "Buy Framed or Customize" width = 500  class = "img-fluid customize-pic">
+				<div class = "row">
+					<div class = "col-12 text-center">
+						<img src = "{% static 'img/how-to/customization/framed_customize.jpg' %}"
+						alt = "Buy Framed or Customize" width = 500  class = "img-fluid customize-pic">
+					</div>
+				</div>
 			</div>
-			<div class = "col-12 col-md-6 customize-box">
-				<div class = "customize-title">
-					Choose Artwork Width and Height
+			<div class = "col-12 col-md-6 mt-5">
+				<div class = "row">
+					<div class = "col-12 text-center">
+						<h3 style = "width: 100%; background-color: #f6f6f6; padding:5px;">
+							Customize Artwork Width and Height
+						</h3>
+					</div>
 				</div>
-				<img src = "{% static 'img/how-to/customization/choose_size.jpg' %}"
-					alt = "Choose size" width = 500  class = "img-fluid customize-pic">
+				<div class = "row">
+					<div class = "col-12 text-center">
+						<img src = "{% static 'img/how-to/customization/choose_size.jpg' %}"
+						alt = "Choose size" width = 500  class = "img-fluid customize-pic">
+					</div>
+				</div>
 			</div>
-			<div class = "col-12 col-md-6 customize-box">
-				<div class = "customize-title">
-					Choose Frame
+			<div class = "col-12 col-md-6 mt-5">
+				<div class = "row">
+					<div class = "col-12 text-center">
+						<h3 style = "width: 100%; background-color: #f6f6f6; padding:5px;">
+							Customize Frame
+					</div>
 				</div>
-				<img src = "{% static 'img/how-to/customization/choose_frame.jpg' %}"
-					alt = "Choose frame" width = 500  class = "img-fluid customize-pic">
+				<div class = "row">
+					<div class = "col-12 text-center">
+						<img src = "{% static 'img/how-to/customization/choose_frame.jpg' %}"
+						alt = "Choose frame" width = 500  class = "img-fluid customize-pic">
+					</div>
+				</div>
 			</div>
-			<div class = "col-12 col-md-6 customize-box">
-				<div class = "customize-title">
-					Choose Mount Colour and Width
+			<div class = "col-12 col-md-6 mt-5">
+				<div class = "row">
+					<div class = "col-12 text-center">
+						<h3 style = "width: 100%; background-color: #f6f6f6; padding:5px;">
+							Customize Mount Colour and Width
+						</h3>
+					</div>
 				</div>
-				<img src = "{% static 'img/how-to/customization/mount_color_size.jpg' %}"
-					alt = "Choose Mount Color and Size" width = 500  class = "img-fluid customize-pic">
+				<div class = "row">
+					<div class = "col-12 text-center">
+						<img src = "{% static 'img/how-to/customization/mount_color_size.jpg' %}"
+						alt = "Choose Mount Color and Size" width = 500  class = "img-fluid customize-pic">
+					</div>
+				</div>
 			</div>
-			<div class = "col-12 col-md-6 customize-box">
-				<div class = "customize-title">
-					Choose Stretched Canvas
+			<div class = "col-12 col-md-6 mt-5">
+				<div class = "row">
+					<div class = "col-12 text-center">
+						<h3 style = "width: 100%; background-color: #f6f6f6; padding:5px;">
+							Choose Stretched Canvas
+						</h3>
+					</div>
 				</div>
-				<img src = "{% static 'img/how-to/customization/stretched.jpg' %}"
-					alt = "Streched Canvas" width = 500  class = "img-fluid customize-pic">
+				<div class = "row">
+					<div class = "col-12 text-center">
+						<img src = "{% static 'img/how-to/customization/stretched.jpg' %}"
+						alt = "Streched Canvas" width = 500  class = "img-fluid customize-pic">
+					</div>
+				</div>
 			</div>
 		</div>
     </div>

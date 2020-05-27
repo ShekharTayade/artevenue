@@ -1,0 +1,62 @@
+{% if usercartitems %}
+{% load static %}
+{% load utils %}
+<section class=""
+	style="margin:25px; padding:5px;">
+	<p class="text-muted">You have {{cart_qty}} frame(s) in your cart.</p>
+		<div class="card-deck">
+		{% for i in usercartitems %}
+			<div class="col-12 col-md-4">
+				<div class="card">
+					<div class="card-body">
+						<div class="card-text">
+							<div class = "row">
+								<div class = "col-6">
+								<img src = "{% if i.product_type == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product__image_to_frame}} {% else %} {% if env == 'DEV' or env == 'TESTING' %} {{i.product__thumbnail_url}} {% else %} {% static i.product__thumbnail_url %} {% endif %} {% endif %}" 
+								style = "width:100px; height:100px; object-fit:contain;"
+								alt = "Photo to Frame">
+								</div>
+								<div class = "col-6">
+									{% with width=i.moulding__width_inner_inches|add_width_frame_mount:i.mount_size %}
+									<small>
+									{% if i.product_type == 'STOCK-COLLAGE' %}
+										EACH ITEM: <br/>
+									{% endif %}
+									{% if i.product_type == 'ORIGINAL-ART' %}
+										<li>{{i.product__description}}</li>
+									{% else %}													
+										<li>Print on {{i.print_medium_id|title}}</li>
+									{% endif %}
+									{% if i.moulding_id %}
+										<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+										<li>Frame: {{i.moulding__name }} ({{i.moulding__width_inches}}")</li>
+										{% if i.mount_id %}
+											<li>Mount: {{i.mount_size }}", Color: {{i.mount__name|title }} </li>
+										{% endif %}
+										<li>Total Size: 
+											{{ i.image_width|add_width:width|add_width:width }}" X {{i.image_height|add_width:width|add_width:width }}"</li>
+									{% else %}
+										<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+									{% endif %}
+									{% if i.acrylic_id and i.print_medium_id == 'PAPER' %}
+										<li>Acrylic covered</li>
+									{% endif %}
+									{% if i.stretch_id and not i.moulding_id %}
+										<li>Canvas Stretched</li>
+									{% endif %}
+									</small>
+									{% endwith %}
+									<br/>
+									<h5 class = "text-center">
+										<i class = "fa fa-inr"> {{i.item_total}} </i>								
+									</h5>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		{% endfor %}
+		</div>
+</section>
+{% endif %}

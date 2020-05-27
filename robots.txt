@@ -1,0 +1,19 @@
+User-agent: *
+Disallow: 
+Disallow: /store_order_summary/
+Disallow: /store_orders/
+Disallow: /store_invoices/
+Disallow: /pending_business_accounts/
+Disallow: /update_orders/
+Disallow: /image_by_image_code/
+Disallow: /homelane-products/
+Disallow: /amazon-products/
+Disallow: /ajax/show_mouldings/
+Disallow: /ajax/add_to_cart/
+Disallow: /ajax/add_to_wishlist/
+Disallow: /ajax/delete_wishlist_item/
+Disallow: /ajax/get_FramedUserImage_by_id/
+Disallow: /ajax/move_all_to_cart/
+Disallow: /ajax/move_item_to_cart/
+
+Sitemap: https://www.artevenue.com/static/sitemap.xml

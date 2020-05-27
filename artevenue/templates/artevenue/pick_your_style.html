@@ -1,25 +1,32 @@
 {% load static %}
-
-	<div class="col-md-12 text-center mt-5">
-		<h2 class="text-center">PICK YOUR STYLE STATEMENT
-		</h2>
-	
-		<div class="row" style="">
-			<div class = "col-lg-6 mt-3" >			
-				<a class="btn-link" href="{% url 'curated_collections' cat_nm='Minimalistic' page=1 prod_id=80247 %}">
-				<div class="curated-container">
-					<img src="{% static 'img/pick_style/minimalist_apr2020.jpg' %}" alt="Minimalist" style="width:100%">
-					<div class = "btn">MINIMALISTIC</div>
-				</div>
-				</a>
-			</div>
-			<div class = "col-lg-6 mt-3" >			
-				<a class="btn-link" href = "{% url 'stock_collage_products' %}">
-				<div class="curated-container">
-					<img src="{% static 'img/collage/collage_banner.jpg' %}" alt="Collage" style="width:100%">
-					<div class = "btn">SETS OF 2 OR 3</div>
-				</div>
-				</a>
-			</div>
+<div class = "container-fluid mt-5">
+	<div class="row text-center">
+		<div class="col-md-12 text-center">
+			<h2 class="text-center">PICK YOUR STYLE PAINTINGS FOR HOME DECOR
+			</h2>
 		</div>
-	</div>	
+	</div>
+	<div class="row mt-1 text-center">
+		<div class = "col-12 col-md-6 mt-3" >			
+			<h3>
+				MINIMALISTIC
+			</h3>
+			<a class="btn-link" href="{% url 'curated_collections' cat_nm='Minimalistic' page=1 prod_id=80247 %}">
+			<div class="curated-container">
+				<img src="{% static 'img/pick_style/minimalist_apr2020.jpg' %}" alt="Painting for home decore in Minimalistic category" style="width:100%">
+				<!--<div class = "btn">MINIMALISTIC</div>-->
+			</div>
+			</a>
+		</div>
+		<div class = "col-12 col-md-6 mt-3" >
+			<h3>
+				SETS OF PAINTINGS
+			</h3>
+			<a class="btn-link" href = "{% url 'stock_collage_products' %}">
+			<div class="curated-container">
+				<img src="{% static 'img/collage/collage_banner.jpg' %}" alt="Set of Paintings for home decore" style="width:100%">
+			</div>
+			</a>
+		</div>
+	</div>
+</div>	

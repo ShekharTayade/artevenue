@@ -87,7 +87,7 @@ Customer ID: 186164730 (NO "ARTEVENUE.COM": 186165241)
 login-
 	username: dugarneeraj1976
 	email: shekhart@hotmail.com
-	pwd: Jpn78@54vm  (Old: Nsj211001)
+	pwd: Adx34X45$2a   (Jpn78@54vm)  (Old: Nsj211001)
 
 Shekhar: shekhar@artevneue.com / Arch8262~1
 
@@ -95,7 +95,7 @@ rahul@artevenue.com / Rahul@54vm
 	
 
 Support -
-	support@artevenue.com / support@54vm
+	support@artevenue.com / @78jpn&54vm   (support@54vm)
 	
 Factory:
 	factory@artevenue.com / factory@jpn78 		
@@ -109,6 +109,12 @@ Media:
 	pwd: media@jpn78
 
 
+MAIL CHIMP:
+~~~~~~~~~~~~~~
+	email: media@artevneue.com
+	username: artevenue
+	pwd: MailsFrom@jpn78
+
 SOCIAL:
 ~~~~~~~~~~~~~~~~~~~~~
 FB: media@artevenue.com / av$10M@12m  (Arte_$54vm) (Arte_$54vm)     (Montage@54)
@@ -119,6 +125,20 @@ Arte'Venue Google Account:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Email: info.artevenue@gmail.com 
 Pwd: av$10M@12m (Arte_$54vm) (art_venue@321)
+
+Backup code for signing when phone not available:
+6976 0989	
+8059 7919
+3252 4926	
+6480 0031
+4181 5368	
+8977 5370
+1311 3615	
+9148 2199
+9880 2110	
+2909 8699
+
+
 
 
 Homelane Order Excel File
@@ -146,6 +166,7 @@ Amazon Seller
 shekhar@artevenue.com / av$10M@12m (Arch8262$1)
 
 Flipkart Seller
+
 ~~~~~~~~~~~~~~~~~~~~~~~~
 shekhar@artevenue.com / Arch8262$1
 
@@ -162,3 +183,7 @@ TextLocal - SMS service
 log in: Shekhar / Arch8262~1
 API Key: 6ka0OAoLF88-zLQpYYVbjBdSx1uNfps6CvnodVU9o0
 
+
+LSI Graph
+~~~~~~~~~~~~~~~~~
+login: Shekhar@artevenue.com / art@54vm

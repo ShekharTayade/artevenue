@@ -3,10 +3,12 @@
 <div id="footer" style="background-color:#000; color:#fff;">
 	<div class="row">
 		<div class="col-lg-3 col-md-6">
-			<img src="{% static 'img/layer_2_0.png' %}" alt="{{ecvom_site.store_name}}" style="width:164px; height:29px; display:block;">
+			<img src="{% static 'img/layer_2_0.png' %}" alt="{{ecom_site.store_name}} Logo" style="width:164px; height:29px; display:block;">
 			<p class="mt-3 about-us" style="font-size:0.85rem;">
-			One-stop-shop to discover, buy and bring home your favorite art prints in India.
-			Over 2,75,000 artworks, 4500+ artists, and 70+ categories to pick from.
+			One-stop-art-shop to discover, <span style = "font-style:italic;"> 
+			buy paintings online. Beautiful collection of paintings and art prints of paintings for home walls</span>.
+			Over 2,75,000 artworks, 4500+ artists, and 70+ categories to pick from.<br/>
+			Share Us on FB: <div class="fb-share-button" data-href="https://www.facebook.com/Artevenueofficial/" data-layout="button" data-size="small"><a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwww.facebook.com%2FArtevenueofficial%2F&amp;src=sdkpreparse" class="fb-xfbml-parse-ignore">Share</a></div>					
 			</p>
 		</div>
 		<div class="col-lg-3 col-md-6">
@@ -15,7 +17,7 @@
 			</p>
 			<div class = "row mt-3" style = "font-size:0.75rem; padding-left:0px;">
 				{% for main in level0_menuitems %}
-					{% if main.name|upper == 'ART PRINTS' %}
+					{% if main.name|upper == 'CATEGORIES' %}
 						{% for level1 in level1_menuitems %}
 							{% if level1.name != '' %} 
 								{% if forloop.counter < 7 %}
@@ -44,10 +46,10 @@
 			<p class="footer-heading" style="font-size:0.85rem; font-weight:700;">IMPORTANT LINKS</p>
 			<div class = "row mt-3">
 				<div class="col-md-6">
-					<ul class="list-unstyled" style = "font-size:0.75rem; color:fff !important;">
+					<ul class="list-unstyled" style = "font-size:0.75rem; color:fff !important; line-height:2;">
+						<li><a href="{% url 'about_us' %}">About Us</a></li>
 						<li><a href="{% url 'faq' %}">FAQ</a></li>
 						<li><a href="{% url 'contact_us' %}">Contact Us</a></li>
-						<li><a href="{% url 'about_us' %}">About Us</a></li>
 						<li><a class = "" data-toggle="modal" data-target="#phone-help">Support</a></li>
 						
 						{% if user.is_authenticated %}
@@ -95,6 +97,7 @@
 						
 					</form>
 					<p class="social mt-3">
+						Visit Us On:
 						<a href="https://www.facebook.com/Artevenueofficial/" class="facebook external"><i class="fa fa-facebook"></i></a>
 						<!--<a href="#" class="twitter external"><i class="fa fa-twitter"></i></a>-->
 						<a href="https://www.instagram.com/artevenue/" class="instagram external"><i class="fa fa-instagram"></i></a>
@@ -103,6 +106,54 @@
 					</p>
 				</div>
 			</div>
+		</div>
+	</div>
+	<div class="row mt-3">
+		<div class="col-12 text-center" style = "text-align:justify; color: #979797; 
+				margin-top:0px; font-size:11px; margin-bottom:0px; line-height: 1;">
+			<p>
+				Artevenue is an online platform for affordable 
+				<span style = "font-style:italic;">wall art paintings for home decor</span>
+				or any empty wall space which can adorn one. 
+			</p>
+			<p>We host a collection of over 2,70,000 licensed artworks under one roof with 
+			a comprehensive database of various genres, sub-genres like 
+			<span style = "font-style:italic;"> Buddha paintings, 
+			flower paintings, rose paintings, bird paintings, sunrise painting, 
+			sunset painting, love paintings, 7 horse painting, sea paintings, beautiful 
+			paintings of a girl, running horse painting, beach paintings, 
+			beautiful paintings of nature, movie posters, architectural drawings 
+			and artworks by grand masters like Vincent Van Gogh, Michaelangelo, 
+			Leonardo Da Vinci, Gustav Klimt </span> etc.
+			</p>
+
+			<p>Putting up <span style = "font-style:italic;">beautiful paintings</span> 
+				on walls speaks louder than words.  
+				You are never short of choices when it comes to 
+				<span style = "font-style:italic;">paintings for home walls, 
+				Wall art paintings for bedroom, 
+				wall art paintings for living room</span> etc...
+				make your home a more personal space by enhancing it with good pieces of art. 
+
+				While catering to a wide variety of <span style = "font-style:italic;">
+				wall art paintings, posters, prints and 
+				canvas paintings</span>, our expertise and commitment in delivering the best to our 
+				customers is our priority, so you can buy paintings online with us, as we 
+				ensure a seamless customer experience.
+			</p>
+			<p> Anyone can frame ? 
+				Virtually of course!! 
+				Our website enables you to visualise a frame around your picture or 
+				artwork by a simple customisation tool, which makes 
+				<span style = "font-style:italic;">online photo framing</span>
+				as easy as pie.
+				We have a few frame designs for you to choose from for your photo print 
+				which aids you to make an exclusive family wall or a photo frames collage. 
+			</p>
+			<p>Who knew picture framing would be this easy ? 
+				Photo frame anything, Photo frame online with us!
+			</p>
+
 		</div>
 	</div>
 </div>

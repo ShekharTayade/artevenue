@@ -1,0 +1,95 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% block page-title %} 
+	<title>Great tips on Artwork from Arte'Venue | Worth a read</title>
+	<meta name="description" content="Great tips for you on how to choose an art size, how to customize, how, where to hang, etc.">
+	<meta name="keywords" content="How to choose the size of art, how to hang art, how to customize art">	
+{% endblock page-title %} 
+{% block page-description %}
+{% endblock page-description %}
+{% block page-keywords %}
+{% endblock page-keywords %}
+
+{% block coursel-stylesheet %}
+{% endblock coursel-stylesheet %}
+
+{% block coursel-script %}
+{% endblock coursel-script %}
+{% block front.js %}
+{% endblock front.js %}
+
+{% block sitecontent %}
+	<div class="container mb-5">
+		<div class="row">
+			<div class="col-12">
+				<nav aria-label="breadcrumb">
+					<ol class="breadcrumb">
+						<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+						<li aria-current="page" class="breadcrumb-item active">How To Choose Artwork Size</li>
+					</ol>
+				</nav>
+			</div>
+			<div class="col-12 mb-5">
+				<div id="accordion" class="accordion">
+					<div class=" mb-0">
+						<div class="card-header collapsed text-center" data-toggle="collapse" href="#collapseOne"
+								style = "padding: 0 0.5rem !important;">
+							<a class="card-title">ALL HOW-TO TIPS</a>
+						</div>
+						<div id="collapseOne" class="card-body collapse" data-parent="#accordion"
+							style = "background-color: #f9f9f9;">
+							<div class = "row" >
+								<div class="col-4 text-center">
+									<a href = "{% url 'how_to_hang' %}" class = "btn btn-primary">Hang Art</a>
+								</div>
+								<div class="col-4 text-center">
+									<a href = "{% url 'how_to_size' %}" class = "btn btn-outline-secondary disabled" href="">Size Matters</a>
+								</div>
+								<div class="col-4 text-center">
+									<a href = "{% url 'how_to_customize' %}" class = "btn btn-primary" href="">Customize</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+						
+			<div class="col-12">
+				<h1 class = "text-center">THE SIZE MATTERS</h1>
+				<h4 class = "text-center">
+					Go too big or too small and it may not work.
+					For that great look on the wall here's a tip.
+				</h4>
+				
+				<div class="row mt-5">
+					<div class="col-12 col-md-6">
+						<div class = "row">
+							<div class = "col-12 text-center">
+								<h3 style = "width: 100%; background-color: #f6f6f6; padding:5px;">
+									70% IS RIGHT SIZE
+								</h3>
+							</div>
+						</div>
+						<div class = "row">
+							<div class = "col-12">
+								<img src="{% static 'img/how-to/how-to-hang/hang-size.jpeg' %}" alt="How to hang collage" class="img-fluid">
+							</div>
+							<div class = "col-12 mt-3">
+								<span class="price text-center">
+								<p>Typically the artwork width should cover about 2/3rd of the sofa or bed width.</p>
+								</span>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+			</div>
+		</div>
+	</div>
+	
+	{% endblock sitecontent %}
+
+	
+	{% block jscripts %}
+	{% endblock jscripts %}
+	

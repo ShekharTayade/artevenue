@@ -2,13 +2,13 @@
 {% load static %}
 {% load widget_tweaks %}
 {% block page-title %} 
-	<title>Artevenue.com | Frequently Asked Questions</title>
+	<title>ArteVenue.com | Frequently Asked Questions</title>
 {% endblock page-title %} 
 {% block page-description %}
-<meta name="description" content="Frequently asked question while shopping at artevenue.com">
+<meta name="description" content="Frequently asked questions while shopping at artevenue.com">
 {% endblock page-description %}
 {% block page-keywords %}
-<meta name="keywords" content="Art, artevenue, faq, Art prints faq, Wall Art faq, How To Customize Art Prints">
+<meta name="keywords" content="Wall art painting, painting for bed room, painting for living room, paintings for home walls, paintings for home decor, offers on paintings, buy painting online faq, painting sale faq, photo framing faq, artevenue, faq, Art prints faq, Wall Art faq, How To Customize Art Prints">
 {% endblock page-keywords %}
 
 
@@ -28,13 +28,57 @@
 {% block imagemap-resize-script %}
 {% endblock imagemap-resize-script %}
 
-
+{% block JSON-LD %}
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [{
+        "@type": "Question",
+        "name": "What is the return policy?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "If you are not satisfied, we are happy to accept the return within 5 days of delivery for full refund. Please note that, Arte'Venue will arrangefor the pick up of the artwork and customer will bear the return shipping charges."
+        }
+      }, {
+        "@type": "Question",
+        "name": "Can I cancel order?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Our artwork is customized as per your order. The production process starts as soon as you place the order. We are unable to cancel your order after the payment is made and you receive the confirmation. However, please let us know asap, we are happy to cancel the order for you before our production process begins"
+        }
+      }, {
+        "@type": "Question",
+        "name": "When will I get my painting?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "You can expect your artwork to arrive between 5-10 days depending on the delivery point."
+        }
+      }, {
+        "@type": "Question",
+        "name": "How do I track my order?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "All the orders are shipped primariy through FedEx. You will receive a tracking number through which you can track your order. You can also track your order online on our website at https:/www.artevenue.com/my-orders (if you have logged) and https:/www.artevenue.com/find-orders (if you have not logged)."
+        }
+      }, {
+        "@type": "Question",
+        "name": "How much will shipping cost?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Shipping is free."
+        }
+      }]
+    }
+    </script>
+{% endblock JSON-LD %}
+	
 	{% block sitecontent %}
         <div class="container">
 			<div class="row">
 
 				<!-- breadcrumb-->
-				<div class="col-lg-12">
+				<div class="col-12">
 					<nav aria-label="breadcrumb">
 						<ol class="breadcrumb">
 							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
@@ -45,9 +89,17 @@
 
 				<div class="col-lg-12">
 					<div class="box">
-						<h1>Frequently Asked Questions</h1>
+						<h1 class = "text-center">Frequently Asked Questions</h1>
 						<div class = "row mt-5">
-							<div class = "col-sm-12">
+							<div class = "col-12">
+								Welcome to our support center. You will find here the frequently
+								asked questions and their anwers.If none of these answer your
+								question then please feel free to <a href="https://www.artevenue.com/contact-us">
+								get in touch</a> with us <a href="https://www.artevenue.com/contact-us">here</a>.
+							</div>
+						</div>
+						<div class = "row mt-5">
+							<div class = "col-12">
 								<h2>Ordering</h2>
 								<strong>How do I place an order?</strong>
 
@@ -91,7 +143,7 @@
 								<strong>What kind of image can I upload to be 
 									printed?</strong>
 
-								<p>You can upload a .jpg, or .gif, under 30MB 
+								<p>You can upload a .jpg, or .png, under 30MB 
 									and we'll print and frame it for you! 
 								</p>
 								
@@ -114,8 +166,12 @@
 								<strong>How do I track my order?</strong>
 
 								<p>All the orders are shipped through FedEx. 
-									You will receive an AWB number through which 
+									You will receive a tracking number through which 
 									you can track your order.
+								</p>
+								<p>You can also track your order online on our website at
+									https:/www.artevenue.com/my-orders (if you have logged)<br>
+									https:/www.artevenue.com/find-orders (if you have not logged)									
 								</p>
 								
 								<strong>How much will shipping cost?</strong>
@@ -124,32 +180,48 @@
 					
 								
 								<hr>
-								<h2>Returns and Cancellation Policy</h2>
+								<h2>Returns and Cancellation</h2>
 								<strong>What is your return & cancellation policy?</strong>
-								<p>We are committed to quality products and your 
-									satisfaction is 100% guaranteed. We print and 
-									customize the art as per your order and our 
-									production starts immediately after you place 
-									an order. Hence we have no return or cancellation
-									policy.  However, if you have received your 
-									product in a damaged condition, please 
-									intimate us immediately by following the 
-									below instructions:
-
-									<ol>
-										<li>Take a digital photo of your damaged 
-										product and the shipping container it 
-										arrived in.</li>
-										<li>Attach your photos to an email and 
-										send them to support@artevenue.com. 
-										Please include your order number, and 
-										the product name with a description of 
-										the damage.</li>
-										<li>You will receive an email within 
-										24-48 hours confirming a replacement 
-										after we have verified the cause of 
-										damage.</li>
-									</ol>
+								<strong>Order Cancellation:</strong>
+								<p>Our artwork is customized as per your order. The production process 
+									starts as soon as you place the order. We are unable to cancel your order
+									after the payment is made and you receive the confirmation.<br />
+									However, we are happy to cancel the order for you before our production process
+									begins, which is typically within an hour of you placing an order. 
+									In case you wish to cancel please call/write back to us as soon as possible, and 
+									we can let you know if the order can be cancelled.<br />
+									If the order is cancelled, we will ask you for your bank details and it will take
+									up to 7 business days to process the refund.
+								</p>									
+								<strong>Damaged Delivery:</strong>
+								<p>
+									In an unlikely event of damages during delivery, artwork having quailty issue or wrong artwork 
+									delivered to you, it is eligible for free replacement.
+									Customer shall inform Arte'Venue about the damaged artwork, quality issue or wrong artwork
+									within 48 hours of delivery along the photos of artwork showing the issue as a proof. 
+									Arte'Venue shall not be liable to replace the artwork or refund the money if Arte'Venue 
+									is informed after completion of 48 hours from time of delivery.
+								</p>
+								
+								<strong>Returns:</strong>
+								<p>
+									If you are not satisfied, we are happy to accept the return
+									within 5 days of delivery for full refund. Please note that, Arte'Venue will arrange
+									for the pick up of the artwork and customer will bear the return shipping charges.
+									Arte'Venue will deduct the return delivery charges before making the refund. To be
+									eligible for refund, the returned artwork Arte'Venue receives should be in new condition,
+									exactly as it was delivered to you.
+								</p>
+									
+								<p>Please keep the artwork in condition it was received, and in original packaging. 
+									We will arrange for the pick up. Upon receipt of the returned Arte'Venue 
+									will ascertain the condition of the artwork prior to issuing refund/replacement. 
+									The artwork will not be eligible for refund in case further damages are found.
+								</p>
+									
+								<p>Please refer to section 5 of <a href = "{% url 'terms_conditions' %}">terms of use</a> 
+									for detailed procedures and policies.
+								</p>
 							</div>
 						</div>
 					</div>

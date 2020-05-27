@@ -188,4 +188,6 @@ def show_referral():
 
 	return{}
 	
-	
+@register.inclusion_tag('artevenue/how_to_tips.html')	
+def how_to_tips(request):
+	return {}

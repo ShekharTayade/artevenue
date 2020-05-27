@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from django.conf import settings
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
-from django.db.models import Count
+from django.db.models import Count, F
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 
@@ -11,7 +11,7 @@ import datetime
 import json
 import os
 
-from artevenue.models import Ecom_site, User_image, Print_medium
+from artevenue.models import Ecom_site, User_image, Print_medium, Cart, Cart_item_view
 
 from .frame_views import *
 from .image_views import *
@@ -49,26 +49,55 @@ def user_image(request):
 	stretches = get_stretches(request)
 
 	printmedium = Print_medium.objects.all()
+	try:
+		if request.user.is_authenticated:
+			user = User.objects.get(username = request.user)
+			user_instance = User_image.objects.filter(user = user, status = "INI").first()
+			usercart = Cart.objects.get(user = user, cart_status = "AC")
+		else:
+			session_id = request.session.session_key
+			user_instance = User_image.objects.filter(session_id = session_id, status = "INI").first()
+			usercart = Cart.objects.get(session_id = session_id, cart_status = "AC")
 
+		# If user uploaded image is not found then display the default image in frames
+		if not user_instance:
+			user_instance = User_image.objects.filter(status = "DEF").first()		
+
+	except Cart.DoesNotExist:
+			usercart = {}
 	
-	if request.user.is_authenticated:
-		user = User.objects.get(username = request.user)
-		user_instance = User_image.objects.filter(user = user, status = "INI").first()
+	## Get cart items for user image
+	if usercart:
+		usercartitems = Cart_item_view.objects.select_related('product', 'promotion').filter(
+				cart = usercart.cart_id, product_type_id = 'USER-IMAGE',
+				product__product_type_id = F('product_type_id')
+				).values(
+			'cart_item_id', 'product_id', 'product__publisher','quantity', 'item_total', 'moulding_id',
+			'moulding__name', 'moulding__width_inches', 'print_medium_id', 'mount_id', 'mount__name',
+			'acrylic_id', 'mount_size', 'product__name', 'image_width', 'image_height', 'stretch_id', 'board_id',
+			'product__thumbnail_url', 'cart_id', 'promotion__discount_value', 'promotion__discount_type', 'mount__color',
+			'item_unit_price', 'item_sub_total', 'item_disc_amt', 'item_tax', 'item_total', 'product_type',
+			'product__image_to_frame', 'promotion_id', 'moulding__width_inner_inches', 'product__description'
+			).order_by('product_type')
 	else:
-		session_id = request.session.session_key
-		user_instance = User_image.objects.filter(session_id = session_id, status = "INI").first()
-
-	# If user uploaded image is not found then display the default image in frames
-	if not user_instance:
-		user_instance = User_image.objects.filter(status = "DEF").first()		
-
-
-	return render(request, "artevenue/user_image.html", {'mounts':mounts,
+		usercartitems = {}
+	
+	if usercartitems:
+		cart_qty = usercartitems.count()
+	else:
+		cart_qty = 0
+		
+	if request.is_ajax():
+		template = "artevenue/custom_framing_items_in_cart_include.html"
+	else:
+		template = "artevenue/custom_framing.html"
+	#return render(request, "artevenue/user_image.html", {'mounts':mounts,
+	return render(request, template, {'mounts':mounts,
 			'mouldings_apply':paper_mouldings_apply, 
 			'mouldings_show':paper_mouldings_show, 'mounts':mounts,
 			'printmedium':printmedium, 'user_instance':user_instance,
 			'acrylics':acrylics, 'boards':boards, 'stretches':stretches,			
-			})
+			'usercartitems':usercartitems, 'cart_qty':cart_qty})
 
 
 @csrf_exempt
@@ -283,3 +312,4 @@ def crop_user_image(request):
 		img_str = base64.b64encode(img_data)	
 		
 		return HttpResponse(img_str)
+		

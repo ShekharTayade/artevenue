@@ -1,0 +1,169 @@
+.file-upload {
+  background-color: #ffffff;
+  width: 100%;
+  margin: 0 auto;
+  padding: 5px 20px;
+}
+
+.file-upload-btn {
+  width: 100%;
+  margin: 0;
+  border: none;
+  padding: 10px;
+  transition: all .2s ease;
+  font-weight: 700;
+}
+
+.file-upload-btn:hover {
+  transition: all .2s ease;
+  cursor: pointer;
+}
+
+.file-upload-btn:active {
+  border: 0;
+  transition: all .2s ease;
+}
+
+.file-upload-content {
+  display: none;
+  text-align: center;
+}
+
+.file-upload-input {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  outline: none;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.image-upload-wrap {
+  margin-top: 20px;
+  border: 2px dashed #e6e6e6;
+  position: relative;
+}
+
+.image-dropping,
+.image-upload-wrap:hover {
+    -webkit-box-shadow: 0 1px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.3);
+}
+
+/*.image-title-wrap {
+  padding: 0 15px 15px 15px;
+  color: #222;
+}*/
+
+.drag-text {
+  text-align: center;
+}
+
+.drag-text h3 {
+  padding: 60px 0;
+}
+
+.file-upload-image {
+  max-width: 100%;
+  margin: auto;
+  padding: 20px;
+}
+
+.remove-image {
+  margin: 0;
+  border: none;
+  padding: 10px;
+  transition: all .2s ease;
+  outline: none;
+  font-weight: 700;
+}
+
+.remove-image:hover {
+}
+
+.remove-image:active {
+  border: 0;
+  transition: all .2s ease;
+}
+
+
+
+.slick-prev::before, .slick-next::before {
+    color: #000;
+}
+.slick-prev, .slick-next {
+	top: 50%;
+}
+.slick-prev::before {
+    font-family: FontAwesome;
+    content: "\f0d9";
+    font-size: 22px;
+}  
+.slick-next::before {
+    font-family: FontAwesome;
+    content:  "\f0da";
+    font-size: 22px;        
+} 
+
+.frame-sec-disabled {
+  background-color: rgba(192,192,192,0.5); /* Black background with opacity */
+  z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+  cursor: not-allowed; /* Add a pointer on hover */
+}	
+
+#overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5);
+  z-index: 2;
+  cursor: not-allowed;
+}
+
+#text{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  font-size: 2rem;
+  color: white;
+  transform: translate(-50%,-50%);
+  -ms-transform: translate(-50%,-50%);
+}
+
+#upload-show:hover {
+	cursor: pointer;
+}
+
+#upload-show {
+	padding: 25px;
+}
+
+.edit-img{
+	margin-left: 5px;	
+	margin-right: 5px;	
+	border: none;
+	font-size: 1rem;
+	color: #11b6bd !important;
+	background-color:transparent !important;
+	cursor: pointer;
+	padding:0px;
+	margin-bottom: 0.5rem;
+	font-family: inherit;
+	font-weight: 400;
+	line-height: 1.2;
+}
+
+.edit-img:disabled{
+	color: #6c757d !important;
+}
+
+
+.edit-img:hover{
+	color:#11b6bd;	
+}

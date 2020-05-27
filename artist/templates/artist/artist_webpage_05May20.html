@@ -1,0 +1,225 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block page-title %}
+<title>Artist profile webpage| Artist profile webpage on Arte'Venue</title>
+{% endblock page-title %}
+
+{% block page-description %}
+<meta name="description" content="Webpage for artist">
+{% endblock page-description %}
+
+{% block page-keywords %}  
+<meta name="keywords" content="platform for artist, artist profile webpage, showcase artists, artist gallary">
+{% endblock page-keywords %}  
+
+{% block page-author %}  
+<meta name="author" content="Arte'venue">
+{% endblock page-author %}  
+	
+{% block add_to_head %}  
+	{{ form.media }}
+{% endblock add_to_head %}  
+
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+
+	
+    <div class="container pg_border mt-2 mb-4">		
+		<div class="row mt-3">
+			<div class="col-12">
+				{% if artist.profile_photo %}
+				<!-- <div class = "col-4" style = "border:1px solid #ced4da; border-radius: 0.25rem; padding:15px;"> -->
+					<img class="img-thumbnail img-artist pull-right" src="{{artist.profile_photo.url}}" alt="">
+				{% endif %}				
+				{% if artist.profile_name %}
+					<span class = "arist-name">
+						{{artist.profile_name}}
+					</span>
+				{% endif %}
+				{% if artist.profile_tagline %}
+					<br /><strong style = "font-style:italic; text-align:justify;">{{artist.profile_tagline}}</strong><br /><br />
+				{% endif %}
+				<span id = "tiny-profile" style="text-align:justify;">{{artist.artist_profile|linebreaks|safe}}</span>
+			</div>
+		</div>
+		{% if artist.artist_showcase1_name %}
+		<div class="row mt-3">
+			<div class="col-12">
+				<div class = "artist-section">
+					{{artist.artist_showcase1_name|upper}}
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-12 mt-2">
+				{{artist.artist_showcase1|linebreaks|safe}}
+			</div>
+		</div>
+		{% endif %}
+		{% if artist.artist_showcase2_name %}
+		<div class="row mt-3">
+			<div class="col-12">
+				<div class = "artist-section">
+					{{artist.artist_showcase2_name|upper}}
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-12 mt-2">
+				{{artist.artist_showcase2|linebreaks|safe}}
+			</div>
+		</div>
+		{% endif %}
+		{% if artist.artist_showcase3_name %}
+		<div class="row mt-3">
+			<div class="col-12">
+				<div class = "artist-section">
+					{{artist.artist_showcase3_name|upper}}
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-12 mt-2">
+				{{artist.artist_showcase3|linebreaks|safe}}
+			</div>
+		</div>
+		{% endif %}
+		<div class="row mt-3">
+			<div class="col-12">
+				<div style = "color:#fff; background-color:#000; padding-left:15px;">
+					MY GALLARY
+				</div>
+			</div>
+		</div>
+				
+		<div class="row mb-3">
+			{% for prod in prods %}
+			{% if prod.publisher %}
+			<div class="col-md-6 col-lg-3">
+				<div class = "prod-details">
+					<div class="img-container artist-item">
+						<a id = "alink_{{prod.product_id}}" 
+							{% if prod.image_type == '0' %} 
+								href="{% url 'original_art_detail' prod.product_id %}"  
+							{% else %}
+								href="{% url 'stock_image_detail' prod.stock_image_id %}"  
+							{% endif %}
+							>
+								
+							{% if env == 'DEV' or env == 'TESTING' %}
+								<img src="{{ prod.url }}" alt="" class="img-fluid image-display" 
+										style = "filter: drop-shadow(0.25rem 0.25rem 0.25rem grey);" onclick="$('#img-form_{{prod.product_id}}').submit();">
+							{% else %}
+								<img src="{% static prod.url %}" alt="" class="img-fluid image-display" 
+										style = "filter: drop-shadow(0.25rem 0.25rem 0.25rem grey);" onclick="$('#img-form_{{prod.product_id}}').submit();">
+							{% endif %}		
+						</a>
+						<span class = "art-type">
+							{% if prod.image_type == '0' %}
+								Fine Art
+							{% else %}
+								Photograph
+							{% endif %}
+						</span>
+					</div>
+
+					<div class="text text-center" style = "margin-top: 5px;">
+						<h4><strong>{{prod.name}}</strong></h4>
+						{% if prod.image_type == '0' %}
+							<h4>{{prod.get_art_medium_display}} on {{prod.get_art_surface_display}} {{prod.art_width}}" X {{prod.art_height}}"</h4>
+						{% else %}
+							<h4>{{prod.description}}</h4>
+						{% endif %}
+						<p class="price">
+							{% if prod.image_type == '0' %}
+							<i class = "fa fa-inr">{{prod.original_art_price}}</i> 
+							{% endif %}
+							<del></del>
+							{% if prod.product_id in wishlist_prods %}
+								<span id = "fav_{{prod.product_id}}" class = "pull-right">
+									<i class = "fa fa-heart"  
+										onclick = "deleteItem('{{prod.product_id}}')" 
+										style="color:red; padding-right:5px;cursor:alias;" data-toggle="tooltip" title="Added to Favorites!"></i>
+								</span>
+							{% else %}
+								<span  id = "fav_{{prod.product_id}}" class = "pull-right">
+									<i class = "fa fa-heart-o"  
+										onclick = "addToFav({{prod.product_id}}, {% if prod.max_width > 16 %} 16 {%else%} {{prod.max_width}} {%endif%}, {{prod.aspect_ratio}}, 0, '', 0, 0, 0);"
+										style="color:red; padding-right:5px;cursor:alias;" data-toggle="tooltip" title="Add to Favourites!"></i>
+								</span>
+							{% endif %}
+						</p>
+					</div>
+				</div>
+			</div>
+			<!-- END of Products -->
+			{% endif %}
+			{% endfor prods %}
+
+		</div>
+
+		<div class="box-cat info-bar">
+			<div class="row">
+				<div class="col-md-12 col-lg-12">
+					<ul class = "pagination justify-content-center"style="margin-bottom:0px !important">
+						{% if prods.has_previous %}
+						<li class="page-item">
+						  <button class="page-link" onclick="getAllFilters(page='1', sort='{{sortOrder}}', show='{{show}}', keywords='{{ikeywords}}');" aria-label="Previous">
+							<span aria-hidden="true">&laquo; First</span>
+							<span class="sr-only">begin</span>
+						  </button>
+						</li>   {% endif %}
+
+						{% for n in prods.paginator.page_range %}
+						  {% if prods.number == n %}
+							<li class="page-item active">
+							  <span class="page-link">{{ n }}<span class="sr-only">(current)</span></span>
+							</li>
+						  {% elif n > prods.number|add:'-5' and n < prods.number|add:'5' %}
+							<li class="page-item">
+							<button class="page-link" onclick="getAllFilters(page='{{n}}', sort='{{sortOrder}}', show='{{show}}', keywords='{{ikeywords}}');">{{ n }}</li>
+						  {% endif %}
+						{% endfor %}
+
+						{% if prods.has_next %}
+						  <li class="page-item">
+							<button class="page-link" onclick="getAllFilters(page='{{prods.paginator.num_pages}}', sort='{{sortOrder}}', show='{{show}}', keywords='{{ikeywords}}');" aria-label="Next">
+							  <span aria-hidden="true">Last &raquo;</span>
+							  <span class="sr-only">end</span>
+							</button>
+						  </li>
+						  {% endif %}   
+					</ul> 
+				</div>
+			</div>
+		</div>		
+		
+    </div>
+
+	
+	{% endblock sitecontent %}
+
+	
+	{% block jscripts %}
+	<script>
+	  tinymce.init({
+		selector: '#id_artist_profile',
+		menubar: false,
+		  plugins: [
+			'advlist autolink lists link image charmap print preview anchor',
+			'searchreplace visualblocks code fullscreen',
+			'insertdatetime media table paste code help wordcount'
+		  ],
+		  toolbar: 'undo redo | formatselect | ' +
+		  ' bold italic backcolor | alignleft aligncenter ' +
+		  ' alignright alignjustify | bullist numlist outdent indent |' +
+		  ' removeformat | help',
+		  content_css: [
+			'//fonts.googleapis.com/css?family=Lato:300,300i,40		
+	  });
+	</script>
+	{% endblock jscripts %}
+			
+	

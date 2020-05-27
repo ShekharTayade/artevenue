@@ -1,9 +1,0 @@
-User-agent: *
-Disallow: 
-Disallow: /store_order_summary/
-Disallow: /store_orders/
-Disallow: /store_invoices/
-Disallow: /pending_business_accounts/
-Disallow: /update_orders/
-Disallow: /image_by_image_code/
-Sitemap: https://www.artevenue.com/static/sitemap.xml

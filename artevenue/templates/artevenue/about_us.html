@@ -1,98 +1,214 @@
 {% extends 'artevenue/estore_base.html' %}
 {% load static %}
-{% load widget_tweaks %}
-
-{% block page-title %}
-<title>Arte'Venue | Largest Collection of Artworks in India. Art Prints & Custom Framing Services.</title>
-{% endblock page-title %}  
-
+{% block page-title %} 
+	<title>About Arte'Venue | Beautiful Wall Art Paintings </title>
+	<meta name="description" content="ArteVenue.com is India's One-Stop-Wall-Art-Painting-Shop, be it wall painting for bedroom, living room or any home walls. Arte'Venue has it all.">
+	<meta name="keywords" content="Wall art painting, wall painting for bedroom, wall painting for living room, paintings for home walls, paintings for home decor, buy paintings online, buy canvas prints, arte'venue">
+{% endblock page-title %} 
 {% block page-description %}
-<meta name="description" content="Arte'venue is India's largest marketplace of fine art prints & custom framing services. Learn more about us here.">
 {% endblock page-description %}
- 
 {% block page-keywords %}
-<meta name="keywords" content="artevenue, custom framing, art print, Canvas prints, customized art, framed art prints">
 {% endblock page-keywords %}
-
-{% block page-author %}
-<meta name="author" content="Arte'venue">
-{% endblock page-author %}
 
 {% block coursel-stylesheet %}
 {% endblock coursel-stylesheet %}
 
-{% block jqueryui-script %}
-{% endblock jqueryui-script %}
-
 {% block coursel-script %}
 {% endblock coursel-script %}
-
 {% block front.js %}
 {% endblock front.js %}
 
-
-{% block imagemap-resize-script %}
-{% endblock imagemap-resize-script %}
-
-
-	<!-- Only Override the site content block -->
-	{% block sitecontent %}
-        <div class="container">
-			<div class="row">
-
-				<!-- breadcrumb-->
-				<div class="col-lg-12">
-					<nav aria-label="breadcrumb">
-						<ol class="breadcrumb">
-							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
-							<li aria-current="page" class="breadcrumb-item active">About Us</li>
-						</ol>
-					</nav>
-				</div>
-
-				<div class="col-lg-12">
-					<div class="box">
-						<h1>About Us</h1>
-						<div class = "row mt-3">
-							<div class = "col-sm-12">
-								<h3>
-								<p>Arte’Venue is a one of a kind platform where 
-								you get to choose from a range of more than 2,50,000
-								art prints of various artists and genres worldwide. 
-								You even have the option of customizing the size of 
-								your print and adding a mount and a frame of your 
-								choice. You will then see how your finished product 
-								will look and you will have it delivered to your 
-								doorstep just as you see it. 
-								</p>
-								<p>After gathering over 20 years of experience in 
-								the art and framing industry we wanted to offer 
-								customers a possibility to procure art as they like 
-								it and/or frame their souvenirs from the comfort of 
-								their home making it both time and cost effective. 
-								From the inception of this idea until its 
-								realization a lot of thought, time and effort has 
-								produced Arte’Venue for you. 
-								</p>
-								<p>
-								With an indisputable reputation in aiming at absolute
-								customer satisfaction, we decided to maximize on 
-								our trump card. Thus, every facet of this 
-								platform has been designed and integrated keeping 
-								you in mind.   
-								</h3>
-							</div>
-						</div>
-					</div>
-
-				</div>
+{% block sitecontent %}
+	<div class="container mb-2">
+		<div class="row">
+			<div class="col-12">
+				<nav aria-label="breadcrumb">
+					<ol class="breadcrumb">
+						<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+						<li aria-current="page" class="breadcrumb-item active">About Us</li>
+					</ol>
+				</nav>
 			</div>
 		</div>
+		<div class="row mb-5">
+			<div class="col-12">
+				<h1 class = "text-center">FOR WALL ART PAINTING ART PRINTS WE ARE ONE-STOP-ART-SHOP</h1>
+			</div>
+			<div class="col-12 mt-3" style = "text-align: center;">
+				<p>
+					Online art gallery with unmatched 
+					features & collection that brings life to the art virtually. 
+				</p>
+			</div>
+			<div class="col-12 mt-3">
+				<blockquote>
+					<p class = "big">
+						Our mission is to provide the best in class online wall art buying 
+						experience leveraging the latest technology platform. Some of our
+						unique offerings are 
+						the India's largest & licensed art collection, unparalleled customization,
+						instant previews, and a 'Size Guide and Wall Color' tool that helps
+						you to decide the size and preview it on different color walls. 
+						We are confident 
+						of our quality and offer 100% satisfaction and free returns.
+					</p>
+					<p style = "margin-top:10px">- Shekhar Tayade, Director, Montage Art Pvt Ltd</p>
+				</blockquote>
+			</div>
+			<div class="col-12 mt-3" style = "text-align: justify;">
+				<h3>			
+					When it comes to <span style = "font-style:italic;">home decor</span> 
+					and <span style = "font-style:italic;">paintings for home walls, a 
+					beautiful wall painting for bedroom, living room,</span> 
+					or any room, is what it takes for that mesmarizing look on the 
+					walls. 
+					We have amazing collection of modern art, contemporary art, 
+					abstract 
+					paintings, landscape paintings, floral paintings, photography 
+					prints and a large number of other categories. 
+					You have 70+ categories to choose from.						
+				</h3>
+				
+				<h3>For <span style = "font-style:italic;">online photo framing</span> 
+					too, you are at the right place.
+					Upload your photograph, artwork, poster and we print, frame, and deliver
+					as per your requirements.
+				</h3>
+			</div>
+			<div class="col-12 mt-3" style = "background-color: #f6f6f6; padding:10px;">
+				<h3>Why Arte'Venue?</h3>
+			</div>
+
+			<div class="col-12 mt-3"  style = "text-align: justify;">
+				<p>
+				Leveraging our 20+ years of experience in the art and framing industry,
+				we have built one of a kind platform - ArteVenue.com.
+				</p>
+			</div>
+
+			<div class="col-12 mt-3"  style = "text-align: justify;">
+				<h3><strong>Choose from Ready Sizes or Customize Each Art Print:</strong></h3>
+				<img src = "{% static 'img/why_artevenue/customize.png' %}" align = "left" width=70 alt="Customize the wall art painting">
+				<div style = "margin-left:120px;">A choice of ready sizes or complete customization. 
+				You can choose size (inch-by-inch),
+				print surface (Paper or Canvas), frame, mount color & size, or buy 
+				unframed. You can even have the canvas stretched.
+				</div>
+			</div>
+			<div class="col-12 mt-4"  style = "text-align: justify;">
+				<h3><strong>Great Previews:</strong></h3>
+				<img src = "{% static 'img/why_artevenue/art_preview.png' %}" align = "left" width=70
+						alt="Excellent preview of the wall art painting">
+				<div style = "margin-left:120px;">
+					Not only that you get to see the artwork with every customization you perform,
+					you can also use our 'Size Guide and Wall Color' tool to see how the artwork 
+					with chosen size would look in a room view with your choice of wall color.
+				</div>
+			</div>
+			<div class="col-12 mt-4" style = "text-align: justify;">
+				<h3><strong>Largest and Licensed Collection:</strong></h3>
+				<img src = "{% static 'img/why_artevenue/largest.png' %}" align = "left" width=70
+						alt="India's largest the wall art painting online store">
+				<div style = "margin-left:120px;">
+					Arte'Venue has largest collection of licensed artworks in India. With over 2,75,000 artworks
+					in various genres from over 4,500 artists from across the world.
+				</div>
+			</div>
+			<div class="col-12 mt-4" style = "text-align: justify;">
+				<h3><strong>Frame Your Photos:</strong></h3>
+				<img src = "{% static 'img/why_artevenue/upload_art.png' %}" align = "left" width=70
+						alt="Upload art or photo for online photo framing">
+				<div style = "margin-left:120px;">
+					Arte'Venue offers <a href = "https://www.artevenue.com/custom-framing">
+					custom framing</a>. Upload your own photo/artwork/poster, choose size, canvas or paper print, 
+					frame, mount as you like and place the order. We will deliver it 
+					your doorstep.
+				</div>
+			</div>
+			<div class="col-12 mt-4" style = "text-align: justify;">
+				<h3><strong>Satisfaction Guarantee, Free Returns:</strong></h3>
+				<img src = "{% static 'img/why_artevenue/guarantee.png' %}" align = "left" width=70
+						alt = "Satifaction guarantee">
+				<div style = "margin-left:120px;">
+					We are confident of the quality & affordable prices of our art prints, paintings and 
+					artworks. No compromises. Hence we don't hesitate to 
+					offer our customers free returns in case they don't like it.
+				</div>
+			</div>
+			<div class="col-12 mt-4" style = "text-align: justify;">
+				<h3><strong>Free Shipping:</strong></h3>
+				<img src = "{% static 'img/why_artevenue/truck.png' %}" align = "left" width=70
+					alt="Free delivery of wall art painting">
+				<div style = "margin-left:120px;">
+					Get your art delivered for free at your doorstep anywhere in India.
+				</div>
+			</div>
+
+
+		</div>
+		<hr>
+		<div class = "row">
+			<div class="col-12" style = "text-align: justify;">
+				Why wait! Get on and browse through the various art categories, 
+				pick your art, and customise to the level of details that suit 
+				your requirements. You can also preview the art to match the colour of 
+				your wall – <strong>Because we believe until you have virtually seen it
+				on the wall its not worth buying!</strong>
+			</div>
+		</div>
+		<hr>
+		<div class = "row">
+			<div class="col-12 mt-5">
+				<h3><strong>Our Showrooms:</strong></h3>
+			</div>
+		</div>
+		<div class = "row" style = "padding-left: 15px;">
+			<div class="col-12 col-md-6 mt-3" style = "border-left: 2px solid #11b6bd; padding-left:10px;">
+				54, Vittal Mallya Road<br />
+				Near UB City<br />
+				Bangalore 560 001<br />
+				India
+				</span>
+			</div>
+			<div class="col-12 col-md-6 mt-3" style = "border-left: 2px solid #11b6bd; padding-left:10px;">
+				No. 165, 15th Cross<br />
+				J P Nagar <br />
+				Bangalore 560 078<br />
+				India
+				</span>
+			</div>
+		</div>
+		<div class = "row mt-5">
+			<div class="col-12 mt-5">
+				<h3><strong>Registered Office:</strong></h3>
+			</div>
+		</div>
+		<div class = "row mt-2" style = "padding-left: 15px;">
+			<div class="col-12 col-md-6 mt-3" style = "border-left: 2px solid #11b6bd; padding-left:10px;">
+				Montage Art Pvt Ltd<br />
+				No. 165, 15th Cross<br />
+				J P Nagar <br />
+				Bangalore 560 078<br />
+				India<br />
+			</div>
+			<div class="col-12 col-md-6 mt-3" style = "border-left: 2px solid #11b6bd; padding-left:10px;">
+				<a href = "https:/www.artevenue.com">www.artevenue.com</a><br />
+				Email: support@artevenue.com<br />
+				(+91) 96115 03626<br />
+			</div>
+		</div>
+		<div class = "row mt-5">
+			<div class="col-12">
+				<h5 class = "text-center">
+					<a href = "https:/www.artevenue.com">ArteVenue.com</a> platform is developed and owned by Montage Art Pvt Ltd. All rights reserved.
+				</h5>
+			</div>
+		</div>
+	</div>
+	
 	{% endblock sitecontent %}
 
 	
 	{% block jscripts %}
-
 	{% endblock jscripts %}
-			
 	

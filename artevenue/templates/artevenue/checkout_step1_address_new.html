@@ -26,15 +26,15 @@
 							<h1>Checkout - Address</h1>
 							<div class="py-3">
 								{% if msg %}
-									<div id = "ship_err_div" class="col-12">
-										<div style =" margin: 10px; color:#dc3545; padding:5px; border: 1px solid #dc3545">
-										<ul>
-											{% for m in msg %}
-												<li> {{m}}<li>
+								<div class="row mb-3">
+									<div id = "err_div" class="col-12">
+										<div style ="font-size:0.8rem; padding: 10px; color:#dc3545; border: 1px solid #dc3545">
+											{% for e in msg %}
+												<i class = "fa fa-info-circle"></i> {{e}}<br />
 											{% endfor %}
-											</div>
-										</ul>
+										</div>
 									</div>
+								</div>
 								{% endif %}
 								<div class="row">
 									<div class="col-6">
@@ -51,9 +51,9 @@
 										</div>
 									</div>
 								</div>
-								<div class="row">
+								<div class = "row">
 									<div id = "ship_err_div" class="col-12" style ="display:none;">
-										<div id = "shipping_addr_error" style =" margin: 10px; color:#dc3545; padding:5px; border: 1px solid #dc3545">
+										<div id = "ship_addr_error" style =" margin: 10px; color:#dc3545; padding:5px; border: 1px solid #dc3545">
 										</div>
 									</div>
 								</div>
@@ -702,15 +702,14 @@
 						$("#ship_err_div").show();
 						html = "<ul> " ;
 						for (i = 0; i < msg.length; i++) { 
-					
-							html = html + " <li> " + msg[i]  + " </li> ";
+							html = html + " <li style = 'color: #dc3545;'> " + msg[i]  + " </li> ";
 						}	
 						html = html + " </ul>";
-						$("#shipping_addr_error").html(html);
+						$("#ship_err_div").html(html);
 						err_displyed = true;
 						$("#fix-err-modal").modal('show');
 					} else {
-						$("#shipping_addr_error").html('');
+						$("#ship_err_div").html('');
 						$("#ship_err_div").hide();
 						//$("#addr_form").unbind('submit').submit();  -- Will be submitted after billing addr validation
 					}
@@ -744,16 +743,16 @@
 						html = "<ul> " ;
 						for (i = 0; i < msg.length; i++) { 
 					
-							html = html + " <li> " + msg[i]  + " </li> ";
+							html = html + " <li style = 'color: #dc3545;'> " + msg[i]  + " </li> ";
 						}	
 						html = html + " </ul>";
-						$("#billing_addr_error").html(html);
+						$("#bill_err_div").html(html);
 						if (err_displyed == false) {
 							$("#fix-err-modal").modal('show');
 						}
 					} else {
 						$("#bill_err_div").hide();
-						$("#billing_addr_error").html('');
+						$("#bill_err_div").html('');
 						if (err_displyed == false) {
 							$("#addr_form").unbind('submit').submit();
 						}

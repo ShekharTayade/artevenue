@@ -26,3 +26,4 @@ from .api_views import *
 from .amazon_views import *
 from .other_channel_order_views import *
 from .amz_av_for_montage import *
+from .montage_views import *

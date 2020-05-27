@@ -1,17 +1,14 @@
 {% extends 'artevenue/estore_base.html' %}
 {% load static %}
 {% block page-title %} 
-	<title>Curated art works from '{{ product_category.name }}' category</title>
+	<title>Wall art paintings for bedroom, living room from '{{ product_category.name }}' category</title>
 {% endblock page-title %} 
 {% block page-description %}
-<meta name="description" content="Specially selected art works from '{{product_category.name}}' category. Arte'Venue.com has a large collection of over 250,000
-art works from artists across the world. We deliver customized art prints at your door steps.">
+<meta name="description" content="Designer curated art prints and paintings for home walls from {{product_category.name}}Category. Find Beautiful wall painting for bedroom and living room or for any home walls">
 {% endblock page-description %}
 {% block page-keywords %}
-<meta name="keywords" content="Art, {{product_category.name}}, Paintings, Art prints, Wall Art, Buy Art, Buy Art prints, Print photos online, Print Art online,
-	Custom Framing, Online Framing, Online Art, Online Art prints">
+<meta name="keywords" content="wall art painting, wall painting for bedroom, wall painting for living room, paintings for home walls, paintings for home decor, {{product_category.name}} Paintings, Buy painting online, online photo framing, wall art, abstract art, abstract paintings, canvas painting">
 {% endblock page-keywords %}
-
 
 {% block coursel-stylesheet %}
 {% endblock coursel-stylesheet %}
@@ -29,12 +26,48 @@ art works from artists across the world. We deliver customized art prints at you
 <script src="{% static '/vendor/lazysizes/lazysizes.min.js' %}" async=""></script>
 {% endblock lazysizes %}
 
+{% block JSON-LD %}
+	<script type="application/ld+json">
+	{% for prod in prods %}
+	{% if prod.publisher %}
+    {
+      "@context": "https://schema.org/",
+      "@type": "Product",
+      "name": "{{ prod.name }}",
+      "image": [
+        "{% static prod.url %}"
+       ],
+      "description": "Choose from ready sizes or customize it.",
+      "sku": "{{ prod.product_id }}",
+      "mpn": "",
+      "brand": {
+        "@type": "Brand",
+        "name": "Arte'Venue"
+      },
+      
+      "offers": {
+        "@type": "Offer",
+        "url": "https://www.artevenue.com/offers",
+        "priceCurrency": "INR",
+        "price": "500",
+        "priceValidUntil": "2022-12-31",
+        "itemCondition": "NewCondition",
+        "availability": "InStock",
+        "seller": {
+          "@type": "Organization",
+          "name": "Montage Art Pvt Ltd"
+        }
+      }
+    }
+	{% endif %}
+	{% endfor %}
+	</script>
+{% endblock JSON-LD %}
 
 	<!-- Only Override the site content block -->
 	{% block sitecontent %}
         <div class="container-fluid">
 			<div class="row">
-
 				<!-- breadcrumb-->
 				<div class="col-lg-12">
 					<nav aria-label="breadcrumb">
@@ -93,11 +126,11 @@ art works from artists across the world. We deliver customized art prints at you
 							</div>-->
 							{% for pf in prod_filters %}
 							{% if pf == 'ARTIST' or pf == 'SIZE' %}
-							<div class="card-body" style = "max-height:300px; width:auto; overflow:auto; margin-bottom:30px;">
+							<div class="card-body" style = "max-height:200px; width:auto; overflow:auto; margin-bottom:10px;">
 							{% else %}
-							<div class="card-body" style = "max-height:200px; width:auto; overflow:auto; margin-bottom:30px;">
+							<div class="card-body" style = "width:auto; overflow:auto; margin-bottom:10px;">
 							{% endif  %}
-								<div class = "sticky"> <h3 class="card-title">{{ pf|title }}</h3></div>
+								<div> <h3 class="card-title">{{ pf|title }}</h3></div>
 								<form id= "f_{{pf}}" role="form">
 									<div class="form-group" style="margin-bottom:0.25em !important;">
 										<div class="checkbox filter-class {{pf}}">
@@ -121,7 +154,7 @@ art works from artists across the world. We deliver customized art prints at you
 														
 													{% else %}
 														{% if pf == 'ARTIST' %}
-															<div class = "sticky mb-2">
+															<div class = "mb-2">
 																<input id="artist_search" name="artist-search" class = "form-control" type="search" placeholder="Search...">
 															</div>
 														{% endif %}
@@ -148,9 +181,9 @@ art works from artists across the world. We deliver customized art prints at you
 								<button type = "button" class="btn btn-secondary btn-sm pull-left" onclick = "getAllFilters('1', '{{sortOrder}}', '{{show}}', '{{ikeywords}}')"><i class="fa fa-pencil"></i> Apply</button>
 								<button type = "button" class="btn btn-sm btn-outline-secondary pull-right" onclick = "clearFilter('{{pf}}')"><i class="fa fa-times-circle"></i> Clear</button>
 							</div>
-							<hr>
+							<hr style = "margin-top: 10px; margin-bottom: 10px;">
 							{% endfor prod_filters %}
-							<div class="card-body" style = "max-height:300px; width:auto; overflow:auto; margin-bottom:30px;">
+							<div class="card-body" style = "max-height:300px; width:auto; overflow:auto; margin-bottom:10px;">
 								<h3 class="card-title">Size</h3>
 								<form id= "f_size" role="form">
 									<div class="form-group" style="margin-bottom:0.25em !important;">
@@ -238,25 +271,22 @@ art works from artists across the world. We deliver customized art prints at you
 
 				<div class="col-lg-9">
 					<div class="box-cat">
-						<h1>Hand-picked {% if product_category %} {{ product_category.name }} Art Prints{% else %} All Art Prints{% endif %}</h1>
-						<!-- <h4>Brinnig You This Hand-picked Range of {% if product_category.name%}{{product_category.name}}{% endif %} Art Prints of Impressive Paintings, Artworks from Artists Across the World.<br />
-							Breathe Life Into Your Room Walls with these Amazing Artworks.</h4>
-						</h4>-->
-						<!--{% if product_category.description %} 
-							<h4>
-								{{product_category.description}}
-							<h4>
-						{% endif %} -->
-						<h5>{{product_category.description}}</h5>						
+						<h1>Hand-picked {% if product_category %} Art Prints and 
+						Wall Art Paintings in {{ product_category.name }} Category{% else %} Art Prints and Wall 
+						Art Paitings{% endif %}</h1>
+						<!--<h3>{{product_category.description}}</h3>-->
+						<h3>Buy paintings online and get delivered to home! Beautiful collection of wall art prints, paintings for bedroom, living room & more. <h3>
 					 </div>
 
 					<div id = "img-display">
 						{% include 'artevenue/prod_display_include.html' %}
 					</div> <!-- END:  img-display -->
-					<h4>
-						Find perfect art for your living room, bedroom room, kitchen, Dining, Study, office or any other space.
-						Each is fully customizable. Get it as Paper or Canvas art print, selection of size, frame, mount and more. 
-					</h4>
+					<div class = "mt-3 mb-5" style = "line-height:1;">
+						<small>Buy licensed art prints of paintings for home decor of any space, office 
+						or any wall that needs a stunning look.
+						All our artworks are licensed. We offer top quality and satisfaction guarantee. 
+						Free returns and free delivery of art prints.</small>
+					</div>
 				</div>
 				<!-- /.col-lg-9-->
 				{% include 'artevenue/wishlist-add-message.html' %}
@@ -520,14 +550,15 @@ art works from artists across the world. We deliver customized art prints at you
 	
 		jQuery(document).ready(function(){
 
-			  if (isBreakpoint('xs')){
+			if (isBreakpoint('xs')){
 				$('#cat_navigation').removeClass('show');
 				$('#filter_navigation').removeClass('show');
-			  }
-			  else {
+			} else {
 				$('#cat_navigation').addClass('show');
 				$('#filter_navigation').addClass('show');
-			  }		
+			}		
+			  
+			setFilterDisplay();
 		});
 	</script>
 	
@@ -681,6 +712,75 @@ art works from artists across the world. We deliver customized art prints at you
 			$(".iuser_height").val(value);
 		}		
 	}
+	</script>
+
+	<script>
+		function setFilterDisplay(){
+			$("#id_f_colors").val('{{filt_colors}}');
+			$("#id_f_size").val('{{filt_size}}');
+			$("#id_f_artist").val('{{filt_artist}}');
+			$("#id_f_orientation").val('{{filt_orientation}}');
+			$("#id_f_image_type").val('{{filt_image_type}}');
+			$("#size_width").val("{{filt_width}}");
+			$("#size_height").val("{{filt_height}}");
+			
+			if ("{{filt_colors}}" != '' ) {
+				var chld = document.getElementById("colors-div").childNodes;
+				var leng = chld.length;
+				for (i=0; i < leng; i++){
+					var e = chld[i];
+					if ( e.tagName == 'DIV' ){
+						var color = e.style.backgroundColor;
+						var col = color.toUpperCase();
+						var f = "{{filt_colors}}".toUpperCase();
+						var n = f.search(col);
+						if (n >= 0){
+							e.innerHTML = "<i class=\"fa fa-check\"></i>";
+						} else {
+							e.innerHTML = "";
+						}
+					}
+					
+				}
+			}
+			
+			if ("{{filt_orientation}}" != '') {
+				$(".i_ORIENTATION").each(function () {
+					var val = $(this).next('label').text().toUpperCase().trim();
+					var filt = "{{filt_orientation}}".toUpperCase().trim();
+					var n = filt.indexOf(val);
+					if (n >= 0) {
+						$(this).prop('checked', true);
+					} else {
+						$(this).prop('checked', false);					
+					}
+				});
+			}
+			if ("{{filt_artist}}" != '') {
+				$(".i_ARTIST").each(function () {
+					var val = $(this).next('label').text().toUpperCase().trim();
+					var filt = "{{filt_artist}}".toUpperCase().trim();
+					var n = filt.indexOf(val);
+					if (n >= 0) {
+						$(this).prop('checked', true);
+					} else {
+						$(this).prop('checked', false);					
+					}
+				});
+			}
+			if ("{{filt_image_type}}" != '') {
+				$(".i_IMAGE-TYPE").each(function () {
+					var val = $(this).next('label').text().toUpperCase().trim();
+					var filt = "{{filt_image_type}}".toUpperCase().trim();
+					var n = filt.indexOf(val);
+					if (n >= 0) {
+						$(this).prop('checked', true);
+					} else {
+						$(this).prop('checked', false);					
+					}
+				});
+			}
+		}
 	</script>
 	
 	{% endblock jscripts %}

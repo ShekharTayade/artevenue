@@ -5,17 +5,17 @@
 {% load indian_numbers_tags %}
 
 {% block estore-title %}
-	<title>Hand-picked sets of 2 or 3 art prints. 
+	<title>Hand-picked sets of 2 or 3 wall art paintings. 
 		Options to choose size, print medium, frame and mount.</title>
 {% endblock estore-title %}
 
 
 {% block page-description %}
-<meta name="description" content="Buy art printset. Choose from standard sizes or customize it exactly as you like. Use size guide and wall color tool to see how it will look.">
+<meta name="description" content="Buy set of paintings for home walls. Choose from standard sizes or customize it exactly as you like. Use size guide and wall color tool to see how it will look.">
 {% endblock page-description %}
   
 {% block page-keywords %}
-<meta name="keywords" content="Art print set, custom framing, customized art print, customized wall art, wall color tool, artwork size guide">
+<meta name="keywords" content="set of paintings, wall art painting, painting for bedroob, painting for living room, paintings for home walls, paintings for home decore, custom framing, customized wall art">
 {% endblock page-keywords %}
   
 {% block page-author %}
@@ -55,22 +55,22 @@
 					<div id="productMain" class="row">
 						<div class = "d-none d-md-block col-12 col-md-2 img-thumbs">
 								<div class = "col-2">
-									<img alt ="Card0" class = "card-thumb" id = "card0">
+									<img alt ="Set of wall art paintings full view" class = "card-thumb" id = "card0">
 								</div>
 								<div class = "col-2">
-									<img alt ="Card1" class = "card-thumb" id = "card1">
+									<img alt ="Set of wall art paintings in living room" class = "card-thumb" id = "card1">
 								</div>
 								<div class = "col-2">
-									<img src = '' alt ="Card2" class = "card-thumb" id = "card2">
+									<img src = '' alt ="Set of wall art paintings in a room" class = "card-thumb" id = "card2">
 								</div>
 								<div class = "col-2">
-									<img src = '' alt ="Card3" class = "card-thumb" id = "card3">
+									<img src = '' alt ="Set of wall art paintings in bedroom" class = "card-thumb" id = "card3">
 								</div>
 								<div class = "col-2">
-									<img src = '' alt ="Card4" class = "card-thumb" id = "card4">
+									<img src = '' alt ="Wall art painting features" class = "card-thumb" id = "card4">
 								</div>
 								<div class = "col-2">
-									<img src = '' alt ="Card5" class = "card-thumb" id = "card5">
+									<img src = '' alt ="more Wall art painting features" class = "card-thumb" id = "card5">
 								</div>
 						</div>
 						<div class = "d-none d-md-block col-12 col-md-5 img-div">
@@ -84,7 +84,7 @@
 									ontouchend="stopMagnify()"
 									id = "image-div">
 								<img id = "prod-img" src="{% if env == 'DEV' or end == 'TESTING' %} {{ collage.url }} {% else %} {% static collage.url %} {% endif %}" 
-										alt="Art Print: {{collage.product_id}}"  data-action = "zoom" class="img-fluid"
+										alt="A set of wall art painting: {{collage.product_id}}"  data-action = "zoom" class="img-fluid"
 										style = "max-width: 100%; max-height:500px; margin:0px;"/>
 							</div>
 							<img src = "{% static '/img/licensed_artprint.jpg' %}" alt="Licensed Art Print"
@@ -110,22 +110,22 @@
 						<div class = "d-block d-md-none" style = "width: 100%;">
 							<div id="card-slider" class="owl-carousel owl-theme">
 								<div class="item card-img">
-									<img id = "prod-img-card" src="" alt="Art Print: {{collage.product_id}}">
+									<img id = "prod-img-card" src="" alt="A set of wall art painting">
 								</div>
 								<div class="item card-img">
-									<img id= "prod-card1" src="" alt="card1">
+									<img id= "prod-card1" src="" alt="Set of wall art painting in living room">
 								</div>
 								<div class="item card-img">
-									<img id= "prod-card2" src="" alt="card2">
+									<img id= "prod-card2" src="" alt="Set of wall art painting in a room">
 								</div>
 								<div class="item card-img">
-									<img id= "prod-card3" src="" alt="card3" >
+									<img id= "prod-card3" src="" alt="Set of wall art painting in bedroom" >
 								</div>
 								<div class="item card-img">
-									<img id= "prod-card4" src="" alt="card4">
+									<img id= "prod-card4" src="" alt="Wall art painting features">
 								</div>
 								<div class="item card-img">
-									<img id= "prod-card5" src="" alt="card5" >
+									<img id= "prod-card5" src="" alt="More wall art painting features" >
 								</div>
 							</div>
 							<img src = "{% static '/img/licensed_artprint.jpg' %}" alt="Licensed Art Print"
@@ -419,7 +419,7 @@
 									<div class="col-4 mb-3 why-artevenue-div">
 										<div onclick = "show_modal('FREE_SHIPPING');">
 											<img src="{% static 'img/why_artevenue/truck.png' %}" 
-											alt = "Free Shipping for all Art print, Artwork" class = "why_artevenue">
+											alt = "Free Shipping for all wall art painting" class = "why_artevenue">
 											<div class = "why-artevenue-head">
 												Free Shipping
 											</div>
@@ -431,7 +431,7 @@
 									<div class="col-4 mb-3 why-artevenue-div" >
 										<div onclick = "show_modal('CUSTOMIZATION');">
 											<img src="{% static 'img/why_artevenue/customize.png' %}" 
-											alt= "Customize The Art Print, Artwork" class = "why_artevenue">
+											alt= "Customize the wall art" class = "why_artevenue">
 											<div class = "why-artevenue-head">
 												Customize it
 											</div>
@@ -646,7 +646,7 @@
 						<div class="modal-body">
 							<div class="">
 								<img src = "{% static 'img/framed_product.png' %}" 
-								alt = "Framed Art Print, Artwork"
+								alt = "Framed wall art painting"
 								style = "display:block; margin-left:auto; margin-right:auto; width:200px;">
 							</div>
 						</div>

@@ -1,40 +1,40 @@
 {% load static %}
-<div id = "headln">
-	
-</div>
 
 {% if ecom_site.show_promotion_section %}
 			
-<div style="">						
+<div class="">
 	<div class="col-12">
 		<div class="d-none d-md-block">
-			<img src="{% static 'img/main-image/banner1_apr2020.jpg' %}" alt="Banner 1" class="img-fluid" usemap="#bannermap">
+			<img src="{% static 'img/main-image/banner1_apr2020.jpg' %}" alt="Buy beautiful paintings online and save 15%" class="img-fluid" usemap="#bannermap">
 			<map name="bannermap">
-			  <area shape="rect" coords="0,0,505,922" href="{% url 'register' %}" alt="Sign Up">
 
-			  <area shape="rect" coords="915,55,1557,375" href="{% url 'stock_image_detail' 148993  %}" alt="Sign Up">
+			  <area shape="rect" coords="0,0,481,878" data-toggle="modal" data-target="#signup_popup-modal" style = "cursor:pointer;">
 
-			  <area shape="rect" coords="555,600,760,910" href="{% url 'stock_image_detail' 220224 %}" alt="Show Product">
-			  <area shape="rect" coords="790,600,1012,915" href="{% url 'stock_image_detail' 23309 %}" alt="Show Product">
-			  <area shape="rect" coords="1028,600,1269,915" href="{% url 'stock_image_detail' 23309 %}" alt="Show Product">
-			  <area shape="rect" coords="1284,600,1496,915" href="{% url 'stock_image_detail' 155726 %}" alt="Show Product">
-			  <area shape="rect" coords="1515,600,1752,915" href="{% url 'stock_image_detail' 164403 %}" alt="Show Product">
-			  <area shape="rect" coords="1772,600,1979,915" href="{% url 'stock_image_detail' 198778 %}" alt="Show Product">
+			  <area shape="rect" coords="870,40,1485,355" href="{% url 'stock_image_detail' 148993  %}">
+
+			  <area shape="rect" coords="530,575,725,870" href="{% url 'stock_image_detail' 220224 %}">
+			  <area shape="rect" coords="755,575,965,870" href="{% url 'stock_image_detail' 23309 %}">
+			  <area shape="rect" coords="980,575,1200,870" href="{% url 'stock_image_detail' 33249 %}">
+			  <area shape="rect" coords="1225,575,1425,870" href="{% url 'stock_image_detail' 155726 %}">
+			  <area shape="rect" coords="1440,575,1670,870" href="{% url 'stock_image_detail' 164403 %}">
+			  <area shape="rect" coords="1685,575,1885,870" href="{% url 'stock_image_detail' 198778 %}">
 			</map>		
 		</div>
 		<div class="d-block d-md-none">
-			<img src="{% static 'img/main-image/banner1_mobile_apr2020.jpg' %}" alt="Banner 1" class="img-fluid" usemap="#bannermap_m">
+			<img src="{% static 'img/main-image/banner1_mobile_apr2020.jpg' %}" alt="Main Banner on Mobile" class="img-fluid" usemap="#bannermap_m">
 			<map name="bannermap_m">
-			  <area shape="rect" coords="540,0,768,477" href="{% url 'register' %}" alt="Sign Up">
+
+			  <area shape="rect" coords="540,0,768,477" data-toggle="modal" data-target="#signup_popup-modal" alt="Sign Up">
 			  
 			  <area shape="rect" coords="71,81,401,246" href="{% url 'stock_image_detail' 148993  %}" alt="Sign Up">
 			  
 			  <area shape="rect" coords="11,577,119,741" href="{% url 'stock_image_detail' 220224 %}" alt="Show Product">
 			  <area shape="rect" coords="134,577,250,741" href="{% url 'stock_image_detail' 23309 %}" alt="Show Product">
-			  <area shape="rect" coords="259,577,380,741" href="{% url 'stock_image_detail' 23309 %}" alt="Show Product">
+			  <area shape="rect" coords="259,577,380,741" href="{% url 'stock_image_detail' 33249 %}" alt="Show Product">
 			  <area shape="rect" coords="393,577,504,741" href="{% url 'stock_image_detail' 155726 %}" alt="Show Product">
 			  <area shape="rect" coords="514,577,639,741" href="{% url 'stock_image_detail' 164403 %}" alt="Show Product">
 			  <area shape="rect" coords="648,577,758,741" href="{% url 'stock_image_detail' 198778 %}" alt="Show Product">
+
 			</map>		
 		</div>
 		

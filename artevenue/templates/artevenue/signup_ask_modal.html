@@ -1,16 +1,20 @@
 {% load static %}
     <div class="modal fade" id="signup-ask-modal" tabindex="-1" role="dialog" data-backdrop ="true" aria-labelledby="mySmallModalLabel" aria-hidden="true">
-        <div id="promocontent" class="modal-dialog modal-md">
-            <div class="modal-content">
+        <div id="signup-ask-modal" class="modal-dialog modal-sm">
+            <div class="modal-content" style="background-color: transparent; border:none">
 				<div class = "pull-right">
-					<button type="button" class="close" data-dismiss="modal">X</button>
 				</div>
-                <div class="modal-body">
+                <div class="modal-body" style="padding:0px;">
                     <div class="coupon">
-                        <img src="{% static 'img/coupon_15percent.jpg' %}" 
+                        <img src="{% static 'img/15off.jpg' %}" 
 							alt="Arte'Venue: 15% off coupon"
 							onclick = "$('#promocontent').hide(); $('#signup_popup-modal').modal('show');"
 							style = "cursor:pointer;">
+							
+						<div type="button" class="modal-close text-center" data-dismiss="modal"
+							style = "color:#000;">
+							X
+						</div>
                     </div>
                 </div>
             </div>

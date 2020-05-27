@@ -1,38 +1,39 @@
 {% load static %}
 <div class = "container-fluid mt-5">
-	<div class="row mb-4" style = "display: flex; flex-wrap: wrap;">
-	<div class = "d-none d-md-flex col-md-6 p-0" style = "display: flex; flex-direction: column;">
-		<div class="" style = "background-color:#f0f0f0 !important;">
-			<a class="btn-link" href="">
-				<div class="curated-container">
-					<img src="{% static 'img/signup_banner.jpg' %}" class = "img-fluid">
-				</div>
-			</a>
+	<div class="row" style = "display: flex; flex-wrap: wrap;">
+		<div class = "d-none d-md-flex col-md-6 p-0" style = "display: flex; flex-direction: column;">
+			<div class="" style = "background-color:#f0f0f0 !important;">
+				<a class="btn-link" href="">
+					<div class="curated-container">
+						<img src="{% static 'img/signup_banner.jpg' %}" class = "img-fluid" alt="Sign Up Banner">
+					</div>
+				</a>
+			</div>
 		</div>
-	</div>
-	<div class = "col-12 d-md-flex col-md-6 p-5 align-items-center" style = "display: flex; flex-direction: column; background-color:#393939; color:#fff;">
-		<div style="">
-			<div class = "col-12 col-md-12">
-				<h2>SIGN UP NOW AND GET 15% OFF <span>——</span></h2>
-			</div>
-			<div class = "col-12 col-md-12 py-3">
-				<p>Get great deals and offers from Arte'Venue exclusively for you. Sign up for updates now.</p>
-			</div>
-			<div class = "col-12 col-md-12">
-				<form action="{% url 'register' %}" style="width: 100%;">
-					<div class="input-group py-3">
-						<div class="col-8 px-0">
-							<input type="email" name="email" class="form-control" placeholder="Enter your email" style="border-radius:0px;  border:none;">
-						</div>
-						<div class="col-4 px-0">
-							 <span class="input-group-btn">
-								 <button class="btn btn-primary" type="submit" style="border-radius:0px; background-color:#777; border:none;">
-									Sign Up
-								 </button>
-							 </span>
-						</div>
-					</div>				
-				</form>
+		<div class = "col-12 d-md-flex col-md-6 p-5 align-items-center" style = "display: flex; flex-direction: column; background-color:#393939; color:#fff;">
+			<div style="">
+				<div class = "col-12 col-md-12">
+					<h2>SIGN UP NOW AND GET 15% OFF <span>——</span></h2>
+				</div>
+				<div class = "col-12 col-md-12 py-3">
+					<p>Get great deals and offers from Arte'Venue exclusively for you. Sign up for updates now.</p>
+				</div>
+				<div class = "col-12 col-md-12">
+					<form action="{% url 'register' %}" style="width: 100%;">
+						<div class="input-group py-3">
+							<div class="col-8 px-0">
+								<input type="email" name="email" class="form-control" placeholder="Enter your email" style="border-radius:0px;  border:none;">
+							</div>
+							<div class="col-4 px-0">
+								 <span class="input-group-btn">
+									 <button class="btn btn-primary" type="submit" style="border-radius:0px; background-color:#777; border:none;">
+										Sign Up
+									 </button>
+								 </span>
+							</div>
+						</div>				
+					</form>
+				</div>
 			</div>
 		</div>
 	</div>

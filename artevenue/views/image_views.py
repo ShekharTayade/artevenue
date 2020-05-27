@@ -29,6 +29,7 @@ def get_FramedImage(request):
 	m_id = request.GET.get('moulding_id', '') 
 	mount_color = request.GET.get('mount_color', '') 
 	m_size = request.GET.get('mount_size', '0')
+	prod_type = request.GET.get('prod_type', 'STOCK-IMAGE')
 	if m_size == '' or m_size == '0':
 		mount_size = 0
 	else:
@@ -647,7 +648,7 @@ def get_FramedImage_by_id(request, prod_id, m_id, mount_color='',
 
 
 @csrf_exempt
-def get_catalog_card(request):
+def get_catalog_card(request, return_img_str=True):
 
 	card_no = request.GET.get('card_no', '')
 	prod_id = request.GET.get('prod_id', '')
@@ -703,6 +704,11 @@ def get_catalog_card(request):
 				mount_size, user_width, prod_type, card_no, False)
 
 
+	if card_no == 'AMZ_C1':
+		card = get_catalog(request, False, 'feature_1_amz.jpg', 315, 80, 580, 510, prod_id, m_id, mount_color, 
+				mount_size, user_width, prod_type, card_no, False)
+
+
 	'''
 	if card_no == '1':
 		#card = get_catalog(request, True, 'feature_1.jpg', 0, 105, 550, 760, prod_id, m_id, mount_color, 
@@ -738,13 +744,15 @@ def get_catalog_card(request):
 
 	'''
 	
-	buffered = BytesIO()
-	card.save(buffered, format='JPEG')
-	card = buffered.getvalue()
-	img_str = base64.b64encode(card)
-	
-	return HttpResponse(img_str)
-
+	if return_img_str:
+		buffered = BytesIO()
+		card.save(buffered, format='JPEG')
+		card = buffered.getvalue()
+		img_str = base64.b64encode(card)
+		
+		return HttpResponse(img_str)
+	else:
+		return card
 	
 def get_catalog(request, crop_half, file_nm, x, y, max_w, max_h, prod_id, m_id, mount_color='', 
 		mount_size=0, user_width=0, prod_type='STOCK-IMAGE', card_no=1, size_perps = False):

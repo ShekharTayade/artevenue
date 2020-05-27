@@ -7,9 +7,9 @@
 								<div class="img-container-coll">
 									<a id = "alink_{{c.product_id}}" href="{% url 'stock_collage_detail' c.product_id %}">
 										{% if env == 'DEV' or env == 'TESTING' %}
-											<img id = "coll_{{c.product_id}}" src="{{ c.url }}" alt="{{c.name}}" class="img-fluid image-display-coll">
+											<img id = "coll_{{c.product_id}}" src="{{ c.url }}" alt="Set of wall art painting,{{c.name}}" class="img-fluid image-display-coll">
 										{% else %}
-											<img id = "coll_{{c.product_id}}" src="{% static c.url %}" alt="{{c.name}}" class="img-fluid image-display-coll">
+											<img id = "coll_{{c.product_id}}" src="{% static c.url %}" alt="Set of wall art painting,{{c.name}}" class="img-fluid image-display-coll">
 										{% endif %}
 									</a>
 								</div>

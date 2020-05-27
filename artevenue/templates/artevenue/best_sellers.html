@@ -1,71 +1,71 @@
 {% load static %}
 <div class = "container-fluid mt-5">
-	<div class="col-md-12 text-center">
-		<h2 class="text-center">BEST SELLERS
-		</h2>
+	<div class="row text-center">
+		<div class="col-12 col-md-12">
+			<h2>BUY BEST SELLING ART PRINTS OF PAINTINGS FOR HOME DECOR
+			</h2>
+		</div>
 	</div>
-
-	<div class="row"  style = "">
-		<div class = "col-lg-4 mt-3">
-			<div class="" style = "background-color:#f0f0f0 !important;">
+	<div class="row text-center">
+		<div class = "col-12 col-md-4 mt-3">
+			<div class="" style = "">
 				<!-- <div class="curatedHeading2 curatedHeading2-1 mb-1">
 					The Ways of Nature
 				</div> -->
+				<h3>
+					PAINTINGS OF NATURE - LANDSCAPES
+				</h3>
 				<a class="btn-link" href="{% url 'curated_collections' cat_nm='Landscape' page=1 prod_id=212229 %}">
 				<div class="curated-container">
-					<img src="{% static 'img/best_sellers/landscape_apr2020.jpg' %}" class="img-fluid">
-					<div class = "btn">LANDSCAPE</div>
+					<img src="{% static 'img/best_sellers/landscape.jpg' %}" class="img-fluid" alt="Paintings of Nature - Landscapes">
+					<!--<div class = "btn">LANDSCAPE</div>-->
 				</div>
 				</a>
 			</div>
 		</div>	
-		<div class = "col-lg-4 mt-3">
-			<div style="background-color:#f0f0f0 !important;">
-				<!--<div class="curatedHeading2 curatedHeading2-1 mb-1">
-					Buds and Blooms
-				</div>-->
-				<a class="btn-link" href="{% url 'curated_collections' cat_nm='Floral' page=1 prod_id=264553 %}">
-				<div class="curated-container">
-					<img src="{% static 'img/best_sellers/floral_apr2020.jpg' %}" class="img-fluid">
-					<div class = "btn">FLORAL</div>
-				</div>
-				</a>
+		<div class = "col-12 col-md-4 mt-3">
+			<h3>
+				FLOWER PAINTINGS
+			</h3>
+			<a class="btn-link" href="{% url 'curated_collections' cat_nm='Floral' page=1 prod_id=264553 %}">
+			<div class="curated-container">
+				<img src="{% static 'img/best_sellers/floral.jpg' %}" class="img-fluid" alt="Collection of Flower Paintings">
+				<!--<div class = "btn">FLORAL</div>-->
 			</div>
+			</a>
 		</div>
-		<div class = "col-lg-4 mt-3">
-			<div class="" style = "background-color:#f0f0f0 !important;">
-				<!--<div class="curatedHeading2 curatedHeading2-1 mb-1">
-					Playful and More
-				</div>-->
-				<a class="btn-link" href="{% url 'curated_collections' cat_nm='Kids' page=1 prod_id=121677 %}">
-				<div class="curated-container">
-					<img src="{% static 'img/best_sellers/kids_apr2020.jpg' %}" class="img-fluid">
-					<div class = "btn">KIDS</div>
-				</div>
-				</a>
+		<div class = "col-12 col-md-4 mt-3">
+			<h3>
+				PAINTINGS FOR KIDS ROOMS
+			</h3>
+			<a class="btn-link" href="{% url 'curated_collections' cat_nm='Kids' page=1 prod_id=121677 %}">
+			<div class="curated-container">
+				<img src="{% static 'img/best_sellers/kids.jpg' %}" class="img-fluid" alt="Kids Wall Art Painting Collection">
+				<!--<div class = "btn">KIDS</div>-->
 			</div>
+			</a>
 		</div>	
 	</div>
-	<div class="row mb-4"  style = "">
-		<div class = "col-lg-6 mt-3">
-			<div class="" style = "background-color:#f0f0f0 !important;">
-				<!--<div class="curatedHeading2 curatedHeading2-1 mb-1">
-					The Horizon, Yonder
-				</div>-->
-				<a class="btn-link" href="{% url 'curated_collections' cat_nm='Coastal' page=1 prod_id=244172 %}">
-				<div class="curated-container">
-					<img src="{% static 'img/best_sellers/coastal_apr2020.jpg' %}" class="img-fluid">
-					<div class = "btn">COASTAL</div>
-				</div>
-				</a>
+	<div class="row mb-4 text-center">
+		<div class = "col-12 col-md-6 mt-3">
+			<h3>
+				SEA PAINTINGS
+			</h3>
+			<a class="btn-link" href="{% url 'curated_collections' cat_nm='Coastal' page=1 prod_id=244172 %}">
+			<div class="curated-container">
+				<img src="{% static 'img/best_sellers/coastal.jpg' %}" class="img-fluid" alt="Collection of Sea Paintings">
+				<!--<div class = "btn">COASTAL</div>-->
 			</div>
+			</a>
 		</div>
-		<div class = "col-lg-6 mt-3">
-			<div class="" style = "background-color:#f0f0f0 !important;">
+		<div class = "col-12 col-md-6 mt-3">
+			<div class="" style = "">
+				<h3>
+					VINTAGE PAINTINGS
+				</h3>
 				<a class="btn-link" href="{% url 'curated_collections' cat_nm='Vintage' page=1 prod_id=88421 %}">
 				<div class="curated-container">
-					<img src="{% static 'img/best_sellers/vintage_apr2020.jpg' %}" class="img-fluid">
-					<div class = "btn">VINTAGE</div>
+					<img src="{% static 'img/best_sellers/vintage.jpg' %}" class="img-fluid" alt="Vintage Wall Art Painting Collection">
 				</div>
 				</a>
 			</div>

@@ -675,6 +675,13 @@ def checkout_saveAddr_shippingMethod(request):
 	if billing_country == '':
 		err_msg.append("Bill To country can't be blank")
 
+
+	if shipping_phone_number == '':
+		err_msg.append("Shipping mobile number is required")
+	if billing_phone_number == '':
+		err_msg.append("Billing mobile number is required")		
+
+
 	# get the order
 	order = Order.objects.get(pk = order_id)
 	order_number = order.order_number
@@ -928,6 +935,7 @@ def checkout_step3_order_review(request):
 		err_msg.append("Ship To name can't be blank")
 	if billing_full_name == '':
 		err_msg.append("Bill To name can't be blank")		
+	'''
 	if shipping_phone_number == '':
 		err_msg.append("Ship To phone can't be blank")
 	if billing_phone_number == '':
@@ -935,7 +943,8 @@ def checkout_step3_order_review(request):
 	if shipping_email_id == '':
 		err_msg.append("Ship To email can't be blank")
 	if billing_email_id == '':
-		err_msg.append("Bill To email can't be blank")		
+		err_msg.append("Bill To email can't be blank")
+	'''
 	if shipping_address_1 == '':
 		err_msg.append("Enter atleast one line of Ship To street address")
 	if billing_address_1 == '':
@@ -952,6 +961,7 @@ def checkout_step3_order_review(request):
 		err_msg.append("Ship To country can't be blank")
 	if billing_country == '':
 		err_msg.append("Bill To country can't be blank")
+
 
 	# get the order
 	##order = Order.objects.get(pk = order_id)
@@ -1144,13 +1154,24 @@ def checkout_step3_order_review(request):
 	for p in pin_code_list:
 		pin_code_arr.append(p.pin_code)
 
+	if o.phone_number is None or o.phone_number == '':
+		err_msg.append("Mobile number in Shipping Address is required. Courier companies need contact number for delivering your order. Besides this, we don't share your personal information with any third parties.")
+	if b.phone_number is None or b.phone_number == '':
+		err_msg.append("Mobile number in BILLING ADDRESS is required. This is only used to get in touch with you regading order. As per our privacy policy, we don't share your personal information with any third parties.")
+
+	if o.email_id is None or o.email_id == '':
+		err_msg.append("Your email in Shipping Address is required. Courier companies need email for delivering your order. Besides this, we don't share your personal information with any third parties.")
+	if b.email_id is None or b.email_id == '':
+		err_msg.append("Your email in BILLING ADDRESS is required. This is only used to get in touch with you regading order. As per our privacy policy, we don't share your personal information with any third parties.")
+
 	
 	# if there is any error, return to the same page
 	if len(err_msg) > 0 :
 		return render(request, "artevenue/checkout_step1_address_new.html", {'msg':err_msg, 'order_total':order.order_total,
 						'sub_total':order.sub_total, 'tax':order.tax,'shipping_addr':o, 'billing_addr':b,  'order_shipping_cost':order.shipping_cost,
 						'disc_amt':order.order_discount_amt, 'country_arr':country_arr, 'state_arr':state_arr, 
-						'city_arr':city_arr, 'pin_code_arr':pin_code_arr, 'order_id':order_id, 'cart_id':order.cart_id})
+						'city_arr':city_arr, 'pin_code_arr':pin_code_arr, 'order_id':order_id, 'cart_id':order.cart_id ,
+						'order_number':order_number})
 
 	## Order Review page starts....
 	else:

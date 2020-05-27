@@ -108,6 +108,35 @@ def get_prod_price(prod_id,**kwargs):
 				stretch_price = image_width * image_height * get_stretch_price_by_id(stretch_id)
 				item_price = Decimal(item_price + stretch_price)
 			
+	elif prod_type == 'ORIGINAL-ART':
+		item_price = prod.price
+		
+		# Moulding price
+		if moulding_id:
+			moulding_price = (image_width + image_height) * 2 * get_moulding_price_by_id(moulding_id)
+			item_price = Decimal(item_price + moulding_price)
+			
+		if prod.art_surface != 'CVS':
+			# Acrylic Price	
+			if acrylic_id:
+				acrylic_price = image_width * image_height * get_acrylic_price_by_id(acrylic_id)
+				item_price = Decimal(item_price + acrylic_price)
+			# Mount price
+			if mount_size and mount_id:
+				mount_price = ((image_width + image_height) * 2 * Decimal(mount_size))  * get_mount_price_by_id(mount_id)
+				item_price = Decimal(item_price + mount_price)
+			
+			# Board price
+			if board_id:
+				board_price = image_width * image_height * Decimal(get_board_price_by_id(board_id))
+				item_price = Decimal(item_price + board_price)			
+			
+		
+		if prod.art_surface == 'CVS':
+			if stretch_id:			
+				stretch_price = image_width * image_height * get_stretch_price_by_id(stretch_id)
+				item_price = Decimal(item_price + stretch_price)
+
 	## Not STOCK-IMAGE or USER-IMAGE
 	else:
 		per_sqinch_price = get_per_sqinch_price(prod_id, prod_type)

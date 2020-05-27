@@ -124,7 +124,7 @@
 											{% if c.cart_id == i.cart_id %}
 											<tr>
 												<td>
-													<img src = "{% if i.product_type_id == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product__image_to_frame}} {% else %} {% if env == 'DEV' or env == 'TESTING' %} {{i.product__thumbnail_url}} {% else %} {% static i.product__thumbnail_url %} {% endif %} {% endif %}" style = "width:50px; height:50px; object-fit:contain;">
+													<img src = "{% if i.product_type_id == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product.image_to_frame}} {% else %} {% if env == 'DEV' or env == 'TESTING' %} {{i.product.thumbnail_url}} {% else %} {% static i.product.thumbnail_url %} {% endif %} {% endif %}" style = "width:50px; height:50px; object-fit:contain;">
 													<br />
 
 													<div class = "pull-left">
@@ -136,29 +136,35 @@
 													</div>
 												</td>
 												<td>
-														{% with width=i.moulding.width_inner_inches|add_width_frame_mount:i.mount_size %}
-														<small>
+													{% with width=i.moulding.width_inner_inches|add_width_frame_mount:i.mount_size %}
+													<small>
+													{% if i.product_type == 'STOCK-COLLAGE' %}
+														EACH ITEM: <br/>
+													{% endif %}
+													{% if i.product_type == 'ORIGINAL-ART' %}
+														<li>{{i.product.description}}</li>
+													{% else %}													
 														<li>Print on {{i.print_medium_id|title}}</li>
-														{% if i.moulding_id %}
-															<li>Image Print Size : {{ i.image_width }}" X {{i.image_height }}"</li>
-															<li>Frame: {{i.moulding.name }} ({{i.moulding.width_inches}} inch, Polystyrene)</li>
-															{% if i.mount_id %}
-																<li>Mount: {{i.mount_size }}", Color: {{i.mount.name|title }} </li>
-															{% endif %}
-															<li>Total Size: 
-																{{ i.image_width|add_width:width|add_width:width }}" X {{i.image_height|add_width:width|add_width:width }}"</li>
-														{% else %}
-															<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+													{% endif %}
+													{% if i.moulding_id %}
+														<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+														<li>Frame: {{i.moulding.name }} ({{i.moulding.width_inches}} inch, Polystyrene)</li>
+														{% if i.mount_id %}
+															<li>Mount: {{i.mount_size }}", Color: {{i.mount.name|title }} </li>
 														{% endif %}
-														
-														{% if i.acrylic_id %}
-															<li>Acrylic covered</li>
-														{% endif %}
-														{% if i.stretch_id %}
-															<li>Canvas Stretched</li>
-														{% endif %}
-														</small>
-														{% endwith %}
+														<li>Total Size: 
+															{{ i.image_width|add_width:width|add_width:width }}" X {{i.image_height|add_width:width|add_width:width }}"</li>
+													{% else %}
+														<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+													{% endif %}
+													{% if i.acrylic_id %}
+														<li>Acrylic covered</li>
+													{% endif %}
+													{% if i.stretch_id and not i.moulding_id %}
+														<li>Canvas Stretched</li>
+													{% endif %}
+													</small>
+													{% endwith %}
 												</td>
 												<td style = "text-align:right;">
 													{{i.quantity|floatformat}}

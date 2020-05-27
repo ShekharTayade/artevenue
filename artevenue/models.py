@@ -427,6 +427,7 @@ class Stock_image_category(models.Model):
 	trending = models.BooleanField(null=False, default=False)
 	url = models.CharField(max_length = 1000, blank=True, default='')
 	featured_collection = models.BooleanField(null=False, default=False)
+	url_suffix = models.CharField(max_length = 1000, blank=True, default='')
 
 	def __str__(self):
 		return self.name
@@ -439,10 +440,13 @@ class Stock_image_category(models.Model):
 class Product_type(models.Model):
 	TYPE_CHOICES = (
 		('STOCK-IMAGE', 'Stock Image'),
-		('USER-IMAGE', 'User Uploaded Image'),
+		('USER-IMAGE', 'Custom Frame'),
 		('STOCK-COLLAGE', 'Stock Collage Layout'),
 		('ORIGINAL-ART', 'Original Art'),
-		('FRAME', 'Frame')
+		('FRAME', 'Frame'),
+		('TABLE-TOP', 'Tabletop Frame'),
+		('COLLAGE-FRAME', 'Callage Frame'),
+		('ART-FRAME', 'Art Frame'),
 	)	
 
 	store = models.ForeignKey(Ecom_site, models.CASCADE)
@@ -2126,7 +2130,12 @@ def update_image(sender, instance, **kwargs):
 	if instance.image_to_frame:
 	#BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 	#fullpath = BASE_DIR + instance.image_to_frame.url
-		fullpath = settings.PROJECT_DIR + instance.image_to_frame.url
+		if settings.EXEC_ENV == "DEV" or settings.EXEC_ENV == "TESTING":
+			fullpath = settings.BASE_DIR + instance.image_to_frame.url
+		else:
+			fullpath = settings.PROJECT_DIR + instance.image_to_frame.url
+		print("PATH=============================================")
+		print(fullpath)
 		rotate_image(fullpath)
 
 	

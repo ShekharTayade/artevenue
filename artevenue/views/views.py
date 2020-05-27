@@ -97,7 +97,7 @@ def about_us(request):
 	
 def terms_conditions(request):
 
-	return render(request, "artevenue/tnc_26jun2019.html", {})
+	return render(request, "artevenue/terms_of_use_apr2020.html", {})
 	
 def privacy_policy(request):
 
@@ -551,8 +551,6 @@ def countlines(start, extn, lines=0, header=True, begin_start=None):
 		print('{:>10} |{:>10} | {:<20}'.format('ADDED', 'TOTAL', 'FILE'))
 		print('{:->11}|{:->11}|{:->20}'.format('', '', ''))
 
-	import pdb
-	pdb.set_trace()
 	for thing in os.listdir(start):
 		thing = os.path.join(start, thing)
 		if os.path.isfile(thing):
@@ -583,3 +581,6 @@ def how_to_customize(request):
 	
 def how_to_hang(request):
 	return render(request, "artevenue/how_to_hang.html") 	
+	
+def how_to_size(request):
+	return render(request, "artevenue/how_to_size.html") 

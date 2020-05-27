@@ -45,61 +45,9 @@
 										{% endif %}
 								  </div>
 								</div>
-
-								<!--
-								<div class="dropdown">
-									<button class="dropbtn">Dropdown
-										<i class="fa fa-caret-down"></i>
-									</button>
-									<div class="dropdown-content">
-										{% if slab_0_50 == "YES" %}
-											<button class="dropdown-item" type="button" onclick="getAllFilters(page='{{n}}', sort='{{sortOrder}}', show='{{show}}', keywords='{{ikeywords}}', result_limit='0-50');"><i class = "fa fa-caret-down under_line"> up to 50 thousand</i></button>
-										{% endif %}
-										{% if slab_50_100 == "YES" %}
-											<button class="dropdown-item" type="button" onclick="getAllFilters(page='{{n}}', sort='{{sortOrder}}', show='{{show}}', keywords='{{ikeywords}}', result_limit='50-100');"><i class = "fa fa-caret-down under_line"> 50 thousand to 1 lakh</i></button>
-										{% endif %}
-										{% if slab_100_150 == "YES" %}
-												<button class="dropdown-item" type="button" onclick="getAllFilters(page='{{n}}', sort='{{sortOrder}}', show='{{show}}', keywords='{{ikeywords}}', result_limit='100-150');"><i class = "fa fa-caret-down under_line"> 1 lakh to 1.5 lakh</i></button>
-										{% endif %}
-										{% if slab_150_200 == "YES" %}
-												<button class="dropdown-item" type="button" onclick="getAllFilters(page='{{n}}', sort='{{sortOrder}}', show='{{show}}', keywords='{{ikeywords}}', result_limit='150-200');"><i class = "fa fa-caret-down under_line"> 1.5 lakh to 2 lakh</i></button>
-										{% endif %}
-										{% if slab_200_plus == "YES" %}
-												<button class="dropdown-item" type="button" onclick="getAllFilters(page='{{n}}', sort='{{sortOrder}}', show='{{show}}', keywords='{{ikeywords}}', result_limit='200+');"><i class = "fa fa-caret-down under_line"> over 2 lakh</i></button>
-										{% endif %}
-									</div>
-								</div>-->
-								<!--
-								<ul class="list-inline mb-0 text-center">
-								{% if slab_0_50 == "YES" %}
-									<li class="list-inline-item clickable">
-										<button class="result-btn" onclick="getAllFilters(page='{{n}}', sort='{{sortOrder}}', show='{{show}}', keywords='{{ikeywords}}', result_limit='50-100');"><i class = "fa fa-caret-down under_line"> up to 50 thousand</i></button>
-									</li>										
-								{% endif %}
-								{% if slab_50_100 == "YES" %}
-									<li class="list-inline-item clickable under_line">
-										<button class="result-btn" onclick="getAllFilters(page='{{n}}', sort='{{sortOrder}}', show='{{show}}', keywords='{{ikeywords}}', result_limit='50-100');"><i class = "fa fa-caret-down under_line"> 50 thousand to 1 lakh</i></button>
-									</li>										
-								{% endif %}
-								{% if slab_100_150 == "YES" %}
-									<li class="list-inline-item clickable under_line">
-										<button class="result-btn" onclick="getAllFilters(page='{{n}}', sort='{{sortOrder}}', show='{{show}}', keywords='{{ikeywords}}', result_limit='100-150');"><i class = "fa fa-caret-down under_line"> 1 lakh to 1.5 lakh</i></button>
-									</li>										
-								{% endif %}
-								{% if slab_150_200 == "YES" %}
-									<li class="list-inline-item clickable under_line">
-										<button class="result-btn" onclick="getAllFilters(page='{{n}}', sort='{{sortOrder}}', show='{{show}}', keywords='{{ikeywords}}', result_limit='150-200');"><i class = "fa fa-caret-down under_line"> 1.5 lakh to 2 lakh</i></button>
-									</li>										
-								{% endif %}
-								{% if slab_200_plus == "YES" %}
-									<li class="list-inline-item clickable under_line">
-										<button class="result-btn" onclick="getAllFilters(page='{{n}}', sort='{{sortOrder}}', show='{{show}}', keywords='{{ikeywords}}', result_limit='200+');"><i class = "fa fa-caret-down under_line"> over 2 lakh</i></button>
-									</li>										
-								{% endif %}
-								</ul> -->
 							</div>
 						{% else %}
-							{{prods.paginator.count}} results found
+							{{prods.paginator.count}} artworks found
 						{% endif %}
 					</h5>
 					<div class="box-cat info-bar">

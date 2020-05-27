@@ -69,6 +69,30 @@ $(function () {
         }
     });
 
+    $('.frame-slider').owlCarousel({
+        items: 4,
+        dots: false,
+        nav: true,
+		navText: ["<i class='fa fa-chevron-left' aria-hidden='true'></i>","<i class='fa fa-chevron-right' aria-hidden='true'></i>"],
+		loop:true,
+        autoplay: false,
+		autoWidth: false,
+        responsive: {
+            480: {
+                items: 4
+            },
+            765: {
+                items: 4
+            },
+            991: {
+                items: 4
+            },
+            1200: {
+                items: 4
+            }
+        }
+    });
+
 	
 	$('.collection-slider').owlCarousel({
         items: 1,

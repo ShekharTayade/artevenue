@@ -1,6 +1,12 @@
 {% extends 'artevenue/estore_base.html' %}
 {% load static %}
 {% block page-title %} 
+
+	<title>Amazing Wall Art Paintings and Art prints in {{product_category.name}} category</title>
+	<meta name="description" content="Largest collection of {{product_category.name}} paintings in India. Find the beautiful wall painting for bedroom, living room or any home wall.">
+	<meta name="keywords" content="wall art painting, wall painting for bedroom, wall painting for living room, paintings for home walls, paintings for home decor, buy online paintings, abstract paintings, abstract art, canvas paintings, art posters,  modern art, {{product_category.name}} paintings">
+	
+	<!--
 	{% if product_category.category_id == 5 %}
 		<title>Modern Abstract Art Prints Online | Abstract Prints</title>
 		<meta name="description" content="Buy Abstract Artworks Online with abstract watercolor prints. Arte’Venue has various Modern art prints with a large choice of Blue Abstract Prints for sale.">
@@ -37,7 +43,8 @@
 		<title>Artwork from '{{product_category.name}}' category.</title>
 		<meta name="description" content="Decorate your walls with great artwork from a large collection in {{product_category.name}} category.">
 		<meta name="keywords" content="Art, Abstract, Art prints, Wall Art, wall decor, Buy Art, Buy Art prints, Print photos online, Print Art online, Custom Framing, Online Framing, Online Art, Online Art prints">
-	{% endif %}
+	{% endif %} -->
+	
 {% endblock page-title %} 
 {% block page-description %}
 {% endblock page-description %}
@@ -59,6 +66,57 @@
 {% block lazysizes %}
 <script src="{% static '/vendor/lazysizes/lazysizes.min.js' %}" async=""></script>
 {% endblock lazysizes %}
+
+{% block JSON-LD %}
+	<script type="application/ld+json">
+	{% for prod in prods %}
+	{% if prod.publisher %}
+    {
+      "@context": "https://schema.org/",
+      "@type": "Product",
+      "name": "{{ prod.name }}",
+      "image": [
+        "{% static prod.url %}"
+       ],
+      "description": "Choose from ready sizes or customize it.",
+      "sku": "{{ prod.product_id }}",
+      "mpn": "",
+      "brand": {
+        "@type": "Brand",
+        "name": "Arte'Venue"
+      },
+      
+      "offers": {
+        "@type": "Offer",
+        "url": "https://www.artevenue.com/offers",
+        "priceCurrency": "INR",
+        "price": "500",
+        "priceValidUntil": "2022-12-31",
+        "itemCondition": "NewCondition",
+        "availability": "InStock",
+        "seller": {
+          "@type": "Organization",
+          "name": "Montage Art Pvt Ltd"
+        }
+      }
+    }
+	{% endif %}
+	{% endfor %}
+	</script>
+	
+	{% for prod in prods %}
+	{% if prod.publisher %}
+	<script type="application/ld+json">
+	{
+	  "@context": "http://schema.org",
+	  "@type": "Painting",
+	  "name": "{{product.name}}",
+	  "genre": "{{product_category.stock_image_category.name}}"
+	}
+	{% endif %}
+	{% endfor %}
+    </script>
+{% endblock JSON-LD %}
 
 
 	<!-- Only Override the site content block -->
@@ -124,11 +182,11 @@
 							</div>-->
 							{% for pf in prod_filters %}
 							{% if pf == 'ARTIST' or pf == 'SIZE' %}
-							<div class="card-body" style = "max-height:300px; width:auto; overflow:auto; margin-bottom:30px;">
+							<div class="card-body" style = "max-height:200px; width:auto; overflow:auto; margin-bottom:10px;">
 							{% else %}
-							<div class="card-body" style = "max-height:200px; width:auto; overflow:auto; margin-bottom:30px;">
+							<div class="card-body" style = "width:auto; overflow:auto; margin-bottom:10px;">
 							{% endif  %}
-								<div class = "sticky"> <h3 class="card-title">{{ pf|title }}</h3></div>
+								<div> <h3 class="card-title">{{ pf|title }}</h3></div>
 								<form id= "f_{{pf}}" role="form">
 									<div class="form-group" style="margin-bottom:0.25em !important;">
 										<div class="checkbox filter-class {{pf}}">
@@ -152,7 +210,7 @@
 														
 													{% else %}
 														{% if pf == 'ARTIST' %}
-															<div class = "sticky mb-2">
+															<div class = "mb-2">
 																<input id="artist_search" name="artist-search" class = "form-control" type="search" placeholder="Search...">
 															</div>
 														{% endif %}
@@ -179,9 +237,9 @@
 								<button type = "button" class="btn btn-secondary btn-sm pull-left" onclick = "getAllFilters('1', '{{sortOrder}}', '{{show}}', '{{ikeywords}}')"><i class="fa fa-pencil"></i> Apply</button>
 								<button type = "button" class="btn btn-sm btn-outline-secondary pull-right" onclick = "clearFilter('{{pf}}')"><i class="fa fa-times-circle"></i> Clear</button>
 							</div>
-							<hr>
+							<hr style = "margin-top: 10px; margin-bottom: 10px;">
 							{% endfor prod_filters %}
-							<div class="card-body" style = "max-height:300px; width:auto; overflow:auto; margin-bottom:30px;">
+							<div class="card-body" style = "max-height:300px; width:auto; overflow:auto; margin-bottom:10px;">
 								<h3 class="card-title">Size</h3>
 								<form id= "f_size" role="form">
 									<div class="form-group" style="margin-bottom:0.25em !important;">
@@ -270,15 +328,20 @@
 				<div class="col-sm-12 col-lg-9">
 					<div class="box-cat">
 						{% if ikeywords %}
-							<h1>Search Results</h1>
-							<p>{% if ikeywords %} You Searched for: "{{ikeywords}}" {% endif %}</p>
+							<h1>Wall Art Paintings & Artworks for Your Search "{{ikeywords}}"</h1>
+							<h3>Wall painting for bedroom, living room and other spaces.
+								Don't miss the most important factor - paintings for 
+								home decor. Choose paintings for home walls and give 
+								that beatiful look to the space.
+							</h3>
 						{% else %}
-							<h1>{% if product_category %} {{ product_category.name }} {% else %} All Art Prints {% endif %}</h1>
+							<h1>Wall Art Paintings & Art Prints {% if product_category %} from {{ product_category.name }} Category {% endif %}</h1>
 							<p>{% if product_category.description %} {{product_category.description}}{% endif %}</p>
-							<h4>Wide Range of {{product_category.name}} Art Prints of 
-							Impressive Paintings, Artworks from Artists Across the 
-							World
-							</h4>
+							<h3>{{product_category.name}} wall painting and prints for bedroom, living room and other spaces.
+								Don't miss the most important factor - paintings for 
+								home decor. Choose paintings for home walls and give 
+								that beatiful look to the space.
+							</h3>
 						{% endif %}
 					</div>
 					 

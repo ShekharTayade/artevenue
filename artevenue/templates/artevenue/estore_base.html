@@ -22,6 +22,7 @@
 {% load pick_style from prod_template_tags %}
 {% load best_sellers from prod_template_tags %}
 {% load signup_banner from estore_base %}
+{% load how_to_tips from estore_base %}
  
 <html class = "gr__artevenue_com">
 	<head>
@@ -37,15 +38,18 @@
 		<meta name="robots" content="all,follow">
 		
 		{% block page-title %}
-		<title>Buy Art Prints, Wall Art, Framed Art & Custom Photo Framing | Arte'venue</title>
+		<title>Beautiful Paintings For Home Walls | Arte'Venue</title>
 		{% endblock page-title %}
 		
 		{% block page-description %}
-		<meta name="description" content="Buy wall art prints, custom framed arts & abstract prints online. Choose from 300 artists, 30 categories & 2,50,000 prints on Arte'venue.">
+		<meta name="description" content="
+				Buy Paintings Online? Art prints are fashionable when it 
+				comes to wall art paintings for home decor, be it wall paintings for bedroom, 
+				living room, or other spaces.">
 		{% endblock page-description %}
 		  
 		{% block page-keywords %}
-		<meta name="keywords" content="art prints, wall art, framed art, custom photo framing">
+		<meta name="keywords" content="beautiful paintings, wall art painting, buy paintings online, wall paintings for bedroom, paintings for home walls, wall paintings for living room, paintings for home decor, online photo framing, wall art, abstract art, abstract paintings, canvas paintings online india, abstract paintings, floral paintings">
 		{% endblock page-keywords %}
 		
 		{% block page-author %} 
@@ -137,7 +141,26 @@
 		<script src="https://www.google.com/recaptcha/api.js?render=6Le2ZqAUAAAAAIAvZ7dRPJkj5zLI2IYAxfPktXqE"></script>
 		{% endblock google-recaptcha-3 %}
 
+
+	{% if env == 'PROD' %}
+
+		<script type="application/ld+json">
+		{
+		  "@context": "https://schema.org",
+		  "@type": "WebSite",
+		  "url": "https://www.artevenue.com/",
+		  "potentialAction": {
+			"@type": "SearchAction",
+			"target": "https://artevenue.com/art-by-category/?keywords={search_term_string}",
+			"query-input": "required name=search_term_string"
+		  }
+		}
+		</script>
+		{% block JSON-LD %}
+		{% endblock JSON-LD %}
+		
 		<!-- Google Tag Manager -->
+		<!--
 		<script>
 			(function(w,d,s,l,i)
 				{w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -147,9 +170,16 @@
 				}
 			)
 			(window,document,'script','dataLayer','GTM-57D4W4D');
-		</script>
+		</script> -->
+		<!-- End Google Tag Manager -->		
+		<!-- Google Tag Manager -->
+		<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+		new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+		j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+		'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+		})(window,document,'script','dataLayer','GTM-KKN69MB');</script>
 		<!-- End Google Tag Manager -->
-
+	
 		{% block google-analytics %}
 		<!-- Global site tag (gtag.js) - Google Analytics -->
 		<script async src="https://www.googletagmanager.com/gtag/js?id=UA-145310649-1"></script>
@@ -160,19 +190,21 @@
 
 		  gtag('config', 'UA-145310649-1');
 		</script>
-		{% endblock google-analytics %}
-		
-		
-		<!-- Global site tag (gtag.js) - Google Analytics --> 
-		<script async src="https://www.googletagmanager.com/gtag/js?id=UA-148505930-1">
-		</script> 
+		{% endblock google-analytics %}	
+
+		<!--
 		<script> 
-			window.dataLayer = window.dataLayer || []; 
-			function gtag(){
+			gtag('event', 'conversion', { 'send_to': 'AW-704394330/KqzSCPvGtq8BENro8M8C', 'transaction_id': '' }); 
+		</script>
+		-->
+		
+		<!-- Global site tag (gtag.js) - Google Ads: 704394330 --> 
+		<script async src="https://www.googletagmanager.com/gtag/js?id=AW-704394330"></script> 
+		<script> 
+			window.dataLayer = window.dataLayer || []; function gtag(){
 				dataLayer.push(arguments);
 			} 
-			gtag('js', new Date()); 
-			gtag('config', 'UA-148505930-1'); 
+			gtag('js', new Date()); gtag('config', 'AW-704394330'); 
 		</script>		
 
 		<!-- Facebook Pixel Code -->
@@ -193,26 +225,14 @@
 		/></noscript>
 		<!-- End Facebook Pixel Code -->
 
-		<!-- Google - Event snippet for Purchase Tracking conversion page --> 
-		<script> 
-			gtag('event', 'conversion', { 'send_to': 'AW-704394330/KqzSCPvGtq8BENro8M8C', 'transaction_id': '' }); 
-		</script>
+	{% endif %}
 
-		
-		<!-- Global site tag (gtag.js) - Google Ads: 704394330 --> 
-		<script async src="https://www.googletagmanager.com/gtag/js?id=AW-704394330"></script> 
-		<script> 
-			window.dataLayer = window.dataLayer || []; function gtag(){
-				dataLayer.push(arguments);
-			} 
-			gtag('js', new Date()); gtag('config', 'AW-704394330'); 
-		</script>	
-	
 		{% block cropper %}
 		<!-- <link  href="{% static 'vendor/cropper.js/cropper.css' %}" rel="stylesheet">-->
 		<!-- <script src="{% static 'vendor/cropper.js/cropper.js' %}"></script>-->
 		{% endblock cropper %}
 
+	{% if env == 'PROD' %}
 		{% block hotjar %}
 		<!-- Hotjar Tracking Code for www.artevenue.com -->
 		<script>
@@ -226,7 +246,7 @@
 			})(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
 		</script>
 		{% endblock hotjar %}
-		
+	{% endif %}
 		{% block add_to_head %}
 		{% endblock add_to_head %}
 		
@@ -235,14 +255,21 @@
 
 	<body data-gr-c-s-loaded="true" cz-shortcut-listen="true">	
 
+	{% if env == 'PROD' %}
 		<!-- Google Tag Manager (noscript) -->
-			<noscript>
+			<!--<noscript>
 				<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-57D4W4D"
 				height="0" width="0" style="display:none;visibility:hidden"></iframe>
-			</noscript>
+			</noscript> -->
+		<!-- End Google Tag Manager (noscript) -->
+		<!-- Google Tag Manager (noscript) -->
+		<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KKN69MB"
+		height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 		<!-- End Google Tag Manager (noscript) -->
 
-
+		<div id="fb-root"></div>
+		<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v7.0&appId=2449878791952932&autoLogAppEvents=1"></script>		
+	{% endif %}
 		<!-- Header Section with top slim line, logo/search/cart and menu-->
 		{% block siteheader %}
 		<header class="header">
@@ -270,21 +297,19 @@
 
 				{% show_trending_categories %}
 
-				{% why_artevenue_text %}
-
 				{% show_curated_collections %}
 
-				{% signup_banner %}
-
-				{% best_sellers %}
-
-				{% pick_style %}
-				
-				{% artevenue_text request %}
+				{% why_artevenue_text %}
 
 				{% show_frame_my_art request %}			
 
+				{% best_sellers %}
 
+				{% signup_banner %}
+
+				{% pick_style %}				
+
+				{% how_to_tips request %}
 
 				{% endblock sitecontent %}
 

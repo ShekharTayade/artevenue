@@ -1183,7 +1183,7 @@ def delete_cart_item(request):
 	cart_total = request.POST.get('cart_total','')
 	tax = request.POST.get('tax','')
 	item_total = request.POST.get('item_total','')
-	
+
 	cart_item = Cart_item_view.objects.filter(cart_item_id = cart_item_id).first()
 	if not cart_item:
 		return JsonResponse({'msg':'Not cart items found for cart # ' + cart_item_id}, safe=False)	
@@ -1791,25 +1791,36 @@ def add_to_cart_new(request):
 		#####################################
 		#         Get the item price
 		#####################################
-		price = get_prod_price(prod_id, 
-				prod_type=prod_type,
-				image_width=image_width,
-				image_height=image_height,
-				print_medium_id = print_medium_id,
-				acrylic_id = acrylic_id,
-				moulding_id = moulding_id,
-				mount_size = mount_size,
-				mount_id = mount_id,
-				board_id = board_id,
-				stretch_id = stretch_id)
-		item_price = price['item_price']
-		msg = price['msg']
-		cash_disc = price['cash_disc']
-		percent_disc = price['percent_disc']
-		item_unit_price = price['item_unit_price']
-		item_disc_amt = price['disc_amt']
-		disc_applied = price['disc_applied']
-		promotion_id = price['promotion_id']
+		if prod_id:
+			price = get_prod_price(prod_id, 
+					prod_type=prod_type,
+					image_width=image_width,
+					image_height=image_height,
+					print_medium_id = print_medium_id,
+					acrylic_id = acrylic_id,
+					moulding_id = moulding_id,
+					mount_size = mount_size,
+					mount_id = mount_id,
+					board_id = board_id,
+					stretch_id = stretch_id)
+			item_price = price['item_price']
+			msg = price['msg']
+			cash_disc = price['cash_disc']
+			percent_disc = price['percent_disc']
+			item_unit_price = price['item_unit_price']
+			item_disc_amt = price['disc_amt']
+			disc_applied = price['disc_applied']
+			promotion_id = price['promotion_id']
+		else:
+			item_price = 0
+			msg = 'Product not given'
+			cash_disc = 0
+			percent_disc = 0
+			item_unit_price = 0
+			item_disc_amt = 0
+			disc_applied = False
+			promotion_id = None
+			
 		#####################################
 		# END::::    Get the item price
 		#####################################	
@@ -2693,14 +2704,14 @@ def validatePromotions(request):
 						)
 						
 					if order:
-						order_sub_total = order.order_sub_total - u.item_sub_total + item_sub_total,
-						order_disc_amt = order.order_disc_amt - u.item_disc_amt + disc_amt,
-						order_tax  = order.order_tax - u.item_tax + item_tax,
-						order_total = order.order_total - u.item_total + total_price,
+						order_sub_total = order.sub_total - u.item_sub_total + item_sub_total,
+						order_disc_amt = order.order_discount_amt - u.item_disc_amt + disc_amt,
+						order_tax  = order.tax - u.item_tax + item_tax,
+						order_total = order.total - u.item_total + total_price,
 						o = Order.objects.filter(order_id = order.order_id).update(
-								order_sub_total = order_sub_total,
-								order_disc_amt = order_disc_amt,
-								order_tax  = order_tax,
+								order_sub_total = sub_total,
+								order_disc_amt = order_discount_amt,
+								order_tax  = tax,
 								order_total = order_total,
 								updated_date = today
 							) 

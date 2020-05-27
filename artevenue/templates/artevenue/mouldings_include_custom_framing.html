@@ -1,0 +1,19 @@
+				{% load static %}
+				{% load utils %}
+				  <section class="frames-slider slider" 
+					style="margin:25px; padding:10px 5px 5px; border:1px solid #cfcfcf; box-shadow: 0 1px 8px rgba(0, 0, 0, 0.15);">
+					{% for f in mouldings_show %}
+					<a onclick = "moulding_change('{{f.moulding_id}}');"> 
+						{% with 'img/'|add:f.url as image_static %}
+						<img src="{% static image_static %}" class="img-fluid" alt = "Framing option: {{f.moulding_id}}">
+						{% endwith %}
+						<span class="text text-center" onclick = "moulding_change('{{f.moulding_id}}')">
+							<div class = "mt-1" style = "font-size:0.45rem; color:#000 !important;">
+								{% if f.moulding__width_inches %} {{f.moulding__width_inches}}" {% endif %} {{ f.moulding__name }}
+								
+							</div>
+						</span>
+					</a>
+					{% endfor %}
+				  </section>
+				

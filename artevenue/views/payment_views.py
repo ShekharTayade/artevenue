@@ -35,7 +35,7 @@ env = settings.EXEC_ENV
 
 if env == 'DEV' or env == 'TESTING':
 	PAYU_BASE_URL = "https://sandboxsecure.payu.in/_payment"  # Testing
-	SURL = 'http://localhost:7000/payment-done/'
+	SURL = 'http://localhost:7000/order-confirmation/'
 	FURL = 'http://localhost:7000/payment-unsuccessful/'
 	CURL = 'http://localhost:7000/payment-unsuccessful/'
 	E_SURL = 'http://localhost:7000/egift-payment-done/'
@@ -43,7 +43,7 @@ if env == 'DEV' or env == 'TESTING':
 	E_CURL = 'http://localhost:7000/egift-payment-unsuccessful/'
 elif env == 'PROD':
 	PAYU_BASE_URL = "https://secure.payu.in/_payment "  # LIVE 
-	SURL = 'https://www.artevenue.com/payment-done/'
+	SURL = 'https://www.artevenue.com/order-confirmation/'
 	FURL = 'https://www.artevenue.com/payment-unsuccessful/'
 	CURL = 'https://www.artevenue.com/payment-unsuccessful/'
 	E_SURL = 'https://www.artevenue.com/egift-payment-done/'

@@ -23,5 +23,16 @@ urlpatterns = [
 	path('artist/<str:profile_name>', views.artist_webpage, name='artist_profile'),
 	path('create_artist_profile/<int:id>', views.create_artist_profile, name='create_artist_profile'),
 
+	path('product-original-art/<int:prod_id>/', views.original_art_detail, name='original_art_detail'),	
+
+	url(r'^original-art-by-category/$', views.get_original_arts, name='original_art_by_category'),
+	path('original-art-by-category/<str:cat_nm>/', views.get_original_arts, name='original_art_by_category'),
+	path('original-art-by-category/<str:cat_nm>/<int:page>', views.get_original_arts, name='original_art_by_category'),
+
+
+	#url(r'^original-art-by-category/$', views.get_original_arts, name='original_art_by_category'),
+	#path('original-art-by-category/<int:cat_id>/', views.get_original_arts, name='original_art_by_category'),
+	#path('original-art-by-category/<int:cat_id>/<int:page>', views.get_original_arts, name='original_art_by_category'),
+
 ]  + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

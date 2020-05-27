@@ -148,8 +148,8 @@ top #phone-help .modal-header h5 {
 }
 
 #headln {
-	color : darkgrey;
-	background-color: #fff;
+	color : #fff;
+	background-color: #525252;
 	font-size : 1.25em;
 	text-align: center;
 /*	margin-top : 15px; */
@@ -245,6 +245,8 @@ top #phone-help .modal-header h5 {
 .p_clicked {
 	background-color: #11b6bd;
 	color: #fff;
+	-webkit-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
+	box-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);	
 }
 
 .size-text {
@@ -1249,7 +1251,7 @@ section .section-title {
 .curated-container {
   position: relative;
   width: 100%;
-  height:100%;
+  /*height:100%;*/
 }
 
 .curated-container img {
@@ -1392,10 +1394,6 @@ body.loading .ajax-modal {
     border-radius: 30px 30px 30px 30px;
     padding:5px 10px;
     font-size:0.55rem;
-}
-
-.india_largest{
-    background-color: #fafafa;
 }
 
 
@@ -1603,7 +1601,7 @@ nav > div a.nav-item.nav-link:focus
 
 
 .why_artevenue {
-	width: 50px;
+	width: 30px;
 	display: block;
 	margin-left: auto;
 	margin-right: auto;
@@ -1897,7 +1895,6 @@ nav > div a.nav-item.nav-link:focus
 }
 
 
-
 .ajax-modal-wall-tool {
     display:    none;
     position:   fixed;
@@ -1916,4 +1913,152 @@ nav > div a.nav-item.nav-link:focus
     overflow: hidden;   
     display: block;
 }
+
+
+.home-section-header{
+	font-family: 'Cormorant Garamond', serif;
+	font-weight: 400;
+	line-height: 1.2;
+	color: inherit;
+	letter-spacing: 2px;
+	width:100%;
+	background-color: #f6f6f6;
+	text-align: center;
+	padding:10px;
+}
+
+
+
+
+
+blockquote {
+  border: none;
+  padding: 0;
+  margin: 1em 0 0 0;
+  position: relative;
+  background: url(../img/bg_blockquote.png) left top no-repeat;
+}
+blockquote:before,
+blockquote:after {
+  content: " ";
+  display: table;
+}
+blockquote:after {
+  clear: both;
+}
+blockquote p {
+  padding: 0 1em 1em 50px;
+  text-align: center;
+  font-size: 14px !important;
+  font-style: italic;
+  font-family: Georgia, "Times New Roman", Times, serif;
+  font-weight: normal;
+  line-height: 1.55;
+}
+
+blockquote .big {
+  text-align: center;
+  font-size: 16px !important;
+  font-style: italic;
+  font-family: Georgia, "Times New Roman", Times, serif;
+  font-weight: normal;
+  line-height: 1.55;
+}
+
+
+blockquote img {
+  position: absolute;
+  bottom: 0;
+  left: 50px;
+  max-width: 120px;
+}
+blockquote small {
+  display: block;
+  padding: 10px;
+  padding-left: 160px;
+  background: #6b7175;
+  color: #d0d3d4;
+}
+blockquote small:before {
+  content: ' ';
+}
+blockquote small strong,
+blockquote small .spacer {
+  color: #ffffff;
+  font-size: 15px;
+}
+blockquote small a {
+  color: #d0d3d4;
+}
+blockquote small a:hover {
+  color: #d0d3d4;
+}
+blockquote.right {
+  background: url(../img/bg_blockquote-flipped.png) right top no-repeat;
+}
+blockquote.right p {
+  padding: 0 160px 1em 1em;
+}
+blockquote.right img {
+  left: auto;
+  right: 50px;
+}
+blockquote.right small {
+  padding-right: 180px;
+  text-align: right;
+  padding-left: 0;
+}
+
+#tnc_list ol li{
+	margin-bottom: 1rem;
+}
+
+.custom-framing-box {
+    /*background: #f6f6f6;
+    border-bottom: solid 1px #e6e6e6;
+    border-top: solid 1px #e6e6e6;
+    padding: 20px;
+    -webkit-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);*/
+	text-align: center;
+}
+
+.custom-framing-box:hover {
+    -webkit-box-shadow: 0 1px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.2);
+}
+
+#framing-card .card-title {
+	font-size: 1.5rem;
+}
+
+#framing-card .card-text {
+	font-size: 1rem;
+}
+
+.modal-close{
+	position: absolute;
+	top: 0%;
+	left: 100%;
+	transform: translate(-50%, -50%);
+	-ms-transform: translate(-50%, -50%);
+	background-color: #fff;
+	color: #000;
+	font-size: 14px;
+	border-radius: 50%;
+	cursor: pointer;
+	width: 30px;
+	height: 30px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+#signup-ask-modal .modal-body{
+	box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.tooltip.primary .tooltip-inner{
+	background-color: #337ab7; 
+}	
 

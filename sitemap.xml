@@ -1,238 +1,243 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<urlset xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="https://www.w3.org/1999/xhtml" >
+<url>
+<loc>https://artevenue.com/</loc>
+<lastmod>2020-05-22T08:03:57+00:00</lastmod>
+<priority>1.00</priority>
+</url>
 
 <url>
 <loc>https://www.artevenue.com/</loc>
-<lastmod>2020-04-22T08:03:57+00:00</lastmod>
+<lastmod>2020-05-22T08:03:57+00:00</lastmod>
 <priority>1.00</priority>
 </url>
 
 <url>
-<loc>https://www.artevenue.com/art-by-category/</loc>
-<lastmod>2020-04-22T08:03:57+00:00</lastmod>
+<loc>https://artevenue.com/wall-art-painting-by-category/</loc>
+<lastmod>2020-05-22T08:03:57+00:00</lastmod>
 <priority>1.00</priority>
 </url>
 
 <url>
-<loc>https://www.artevenue.com/art-by-category/Abstract/</loc>
-<lastmod>2020-04-22T08:03:57+00:00</lastmod>
+<loc>https://artevenue.com/wall-art-painting-by-category/Abstract/</loc>
+<lastmod>2020-05-22T08:03:57+00:00</lastmod>
 <priority>1.00</priority>
 </url>
 
 <url>
-<loc>https://www.artevenue.com/art-by-category/Landscape/</loc>
-<lastmod>2020-04-22T08:03:57+00:00</lastmod>
+<loc>https://artevenue.com/wall-art-painting-by-category/Landscape/</loc>
+<lastmod>2020-05-22T08:03:57+00:00</lastmod>
 <priority>1.00</priority>
 </url>
 
 <url>
-<loc>https://www.artevenue.com/art-by-category/Floral</loc>
-<lastmod>2020-04-22T08:03:57+00:00</lastmod>
+<loc>https://artevenue.com/wall-art-painting-by-category/Floral</loc>
+<lastmod>2020-05-22T08:03:57+00:00</lastmod>
 <priority>1.00</priority>
 </url>
 
 <url>
-<loc>https://www.artevenue.com/art-by-category/Animals</loc>
-<lastmod>2020-04-22T08:03:57+00:00</lastmod>
+<loc>https://artevenue.com/wall-art-painting-by-category/Animals</loc>
+<lastmod>2020-05-22T08:03:57+00:00</lastmod>
 <priority>1.00</priority>
 </url>
 
 <url>
-<loc>https://www.artevenue.com/art-by-category/Photography</loc>
-<lastmod>2020-04-22T08:03:57+00:00</lastmod>
+<loc>https://artevenue.com/wall-art-painting-by-category/Photography</loc>
+<lastmod>2020-05-22T08:03:57+00:00</lastmod>
 <priority>1.00</priority>
 </url>
 
 <url>
-<loc>https://www.artevenue.com/art-by-category/Coastal</loc>
-<lastmod>2020-04-22T08:03:57+00:00</lastmod>
+<loc>https://artevenue.com/wall-art-painting-by-category/Coastal</loc>
+<lastmod>2020-05-22T08:03:57+00:00</lastmod>
 <priority>1.00</priority>
 </url>
 
 <url>
-<loc>https://www.artevenue.com/art-by-category/Kids</loc>
-<lastmod>2020-04-22T08:03:57+00:00</lastmod>
+<loc>https://artevenue.com/wall-art-painting-by-category/Kids</loc>
+<lastmod>2020-05-22T08:03:57+00:00</lastmod>
 <priority>1.00</priority>
 </url>
 
 <url>
-<loc>https://www.artevenue.com/art-by-category/Vintage</loc>
-<lastmod>2020-04-22T08:03:57+00:00</lastmod>
+<loc>https://artevenue.com/wall-art-painting-by-category/Vintage</loc>
+<lastmod>2020-05-22T08:03:57+00:00</lastmod>
 <priority>1.00</priority>
 </url>
 
 <url>
-<loc>https://www.artevenue.com/curated-collections/Abstract</loc>
-<lastmod>2020-04-22T08:03:57+00:00</lastmod>
+<loc>https://artevenue.com/wall-art-painting-collections/Abstract</loc>
+<lastmod>2020-05-22T08:03:57+00:00</lastmod>
 <priority>1.00</priority>
 </url>
 
 <url>
-<loc>https://www.artevenue.com/curated-collections/Black%20And%20White</loc>
-<lastmod>2020-04-22T08:03:57+00:00</lastmod>
+<loc>https://artevenue.com/wall-art-painting-collections/Black%20And%20White</loc>
+<lastmod>2020-05-22T08:03:57+00:00</lastmod>
 <priority>1.00</priority>
 </url>
 
 <url>
-<loc>https://www.artevenue.com/curated-collections/Femme</loc>
-<lastmod>2020-04-22T08:03:57+00:00</lastmod>
+<loc>https://artevenue.com/wall-art-painting-collections/Femme</loc>
+<lastmod>2020-05-22T08:03:57+00:00</lastmod>
 <priority>1.00</priority>
 </url>
 
 <url>
-<loc>https://www.artevenue.com/curated-collections/Art%20Over%20Centuries</loc>
-<lastmod>2020-04-22T08:03:57+00:00</lastmod>
+<loc>https://artevenue.com/wall-art-painting-collections/Art%20Over%20Centuries</loc>
+<lastmod>2020-05-22T08:03:57+00:00</lastmod>
 <priority>1.00</priority>
 </url>
 
 <url>
-<loc>https://www.artevenue.com/curated-collections/Photography</loc>
-<lastmod>2020-04-22T08:03:57+00:00</lastmod>
+<loc>https://artevenue.com/wall-art-painting-collections/Photography</loc>
+<lastmod>2020-05-22T08:03:57+00:00</lastmod>
 <priority>1.00</priority>
 </url>
 
 <url>
-<loc>https://www.artevenue.com/curated-collections/Landscape</loc>
-<lastmod>2020-04-22T08:03:57+00:00</lastmod>
+<loc>https://artevenue.com/wall-art-painting-collections/Landscape</loc>
+<lastmod>2020-05-22T08:03:57+00:00</lastmod>
 <priority>1.00</priority>
 </url>
 
 <url>
-<loc>https://www.artevenue.com/curated-collections/Floral</loc>
-<lastmod>2020-04-22T08:03:57+00:00</lastmod>
+<loc>https://artevenue.com/wall-art-painting-collections/Floral</loc>
+<lastmod>2020-05-22T08:03:57+00:00</lastmod>
 <priority>1.00</priority>
 </url>
 
 <url>
-<loc>https://www.artevenue.com/curated-collections/Kids</loc>
-<lastmod>2020-04-22T08:03:57+00:00</lastmod>
+<loc>https://artevenue.com/wall-art-painting-collections/Kids</loc>
+<lastmod>2020-05-22T08:03:57+00:00</lastmod>
 <priority>1.00</priority>
 </url>
 
 <url>
-<loc>https://www.artevenue.com/curated-collections/Coastal</loc>
-<lastmod>2020-04-22T08:03:57+00:00</lastmod>
+<loc>https://artevenue.com/wall-art-painting-collections/Coastal</loc>
+<lastmod>2020-05-22T08:03:57+00:00</lastmod>
 <priority>1.00</priority>
 </url>
 
 <url>
-<loc>https://www.artevenue.com/curated-collections/Vintage</loc>
-<lastmod>2020-04-22T08:03:57+00:00</lastmod>
+<loc>https://artevenue.com/wall-art-painting-collections/Vintage</loc>
+<lastmod>2020-05-22T08:03:57+00:00</lastmod>
 <priority>1.00</priority>
 </url>
 
 <url>
-<loc>https://www.artevenue.com/curated-collections/Minimalistic</loc>
-<lastmod>2020-04-22T08:03:57+00:00</lastmod>
+<loc>https://artevenue.com/wall-art-painting-collections/Minimalistic</loc>
+<lastmod>2020-05-22T08:03:57+00:00</lastmod>
 <priority>1.00</priority>
 </url>
 
 <url>
-<loc>https://www.artevenue.com/product/220224</loc>
-<lastmod>2020-04-22T08:03:57+00:00</lastmod>
+<loc>https://artevenue.com/wall-art/220224</loc>
+<lastmod>2020-05-22T08:03:57+00:00</lastmod>
 <priority>1.00</priority>
 </url>
 
 <url>
-<loc>https://www.artevenue.com/show-all-categories/</loc>
-<lastmod>2020-04-22T08:03:57+00:00</lastmod>
+<loc>https://artevenue.com/show-all-wall-art-categories/</loc>
+<lastmod>2020-05-22T08:03:57+00:00</lastmod>
 <priority>1.00</priority>
 </url>
 
 <url>
-<loc>https://www.artevenue.com/artprint-sets/</loc>
-<lastmod>2020-04-22T08:03:57+00:00</lastmod>
+<loc>https://artevenue.com/wall-art-sets/</loc>
+<lastmod>2020-05-22T08:03:57+00:00</lastmod>
 <priority>1.00</priority>
 </url>
 
 <url>
-<loc>https://www.artevenue.com/artprint-set/7/</loc>
-<lastmod>2020-04-22T08:03:57+00:00</lastmod>
+<loc>https://artevenue.com/wall-art-set/7/</loc>
+<lastmod>2020-05-22T08:03:57+00:00</lastmod>
 <priority>1.00</priority>
 </url>
 
 <url>
-<loc>https://www.artevenue.com/custom-framing/</loc>
-<lastmod>2020-04-22T08:03:57+00:00</lastmod>
+<loc>https://artevenue.com/photo-framing/</loc>
+<lastmod>2020-05-22T08:03:57+00:00</lastmod>
 <priority>1.00</priority>
 </url>
 
 <url>
-<loc>https://www.artevenue.com/current-offers/</loc>
-<lastmod>2020-04-22T08:03:57+00:00</lastmod>
+<loc>https://artevenue.com/offers-on-wall-art-painting/</loc>
+<lastmod>2020-05-22T08:03:57+00:00</lastmod>
 <priority>1.00</priority>
 </url>
 
 <url>
 <loc>https://artevenue.com/show-cart/</loc>
-<lastmod>2020-04-22T08:03:57+00:00</lastmod>
+<lastmod>2020-05-22T08:03:57+00:00</lastmod>
 <priority>1.00</priority>
 </url>
 
 <url>
 <loc>https://artevenue.com/show-wishlist/</loc>
-<lastmod>2020-04-22T08:03:57+00:00</lastmod>
+<lastmod>2020-05-22T08:03:57+00:00</lastmod>
 <priority>1.00</priority>
 </url>
 
 <url>
 <loc>https://artevenue.com/business-registration/</loc>
-<lastmod>2020-04-22T08:03:57+00:00</lastmod>
+<lastmod>2020-05-22T08:03:57+00:00</lastmod>
 <priority>1.00</priority>
 </url>
 
 <url>
 <loc>https://artevenue.com/sign-up/</loc>
-<lastmod>2020-04-22T08:03:57+00:00</lastmod>
+<lastmod>2020-05-22T08:03:57+00:00</lastmod>
 <priority>1.00</priority>
 </url>
 
 <url>
 <loc>https://artevenue.com/about-us/</loc>
-<lastmod>2020-04-22T08:03:57+00:00</lastmod>
+<lastmod>2020-05-22T08:03:57+00:00</lastmod>
 <priority>1.00</priority>
 </url>
 
 <url>
 <loc>https://artevenue.com/contact-us/</loc>
-<lastmod>2020-04-22T08:03:57+00:00</lastmod>
+<lastmod>2020-05-22T08:03:57+00:00</lastmod>
 <priority>0.80</priority>
 </url>
 
 <url>
 <loc>https://artevenue.com/privacy-policy/</loc>
-<lastmod>2020-04-22T08:03:57+00:00</lastmod>
+<lastmod>2020-05-22T08:03:57+00:00</lastmod>
 <priority>0.64</priority>
 </url>
 
 <url>
 <loc>https://artevenue.com/terms-conditions/</loc>
-<lastmod>2020-04-22T08:03:57+00:00</lastmod>
+<lastmod>2020-05-22T08:03:57+00:00</lastmod>
 <priority>0.64</priority>
 </url>
 
 <url>
-<loc>https://www.artevenue.com/faq</loc>
-<lastmod>2020-04-22T08:03:57+00:00</lastmod>
+<loc>https://artevenue.com/faq</loc>
+<lastmod>2020-05-22T08:03:57+00:00</lastmod>
 <priority>1.00</priority>
 </url>
 
 <url>
-<loc>https://www.artevenue.com/my-account</loc>
-<lastmod>2020-04-22T08:03:57+00:00</lastmod>
+<loc>https://artevenue.com/my-account</loc>
+<lastmod>2020-05-22T08:03:57+00:00</lastmod>
 <priority>1.00</priority>
 </url>
 
 <url>
-<loc>https://www.artevenue.com/my-orders</loc>
-<lastmod>2020-04-22T08:03:57+00:00</lastmod>
+<loc>https://artevenue.com/my-orders</loc>
+<lastmod>2020-05-22T08:03:57+00:00</lastmod>
 <priority>1.00</priority>
 </url>
 
 <url>
-<loc>https://www.artevenue.com/find-orders</loc>
-<lastmod>2020-04-22T08:03:57+00:00</lastmod>
+<loc>https://artevenue.com/find-orders</loc>
+<lastmod>2020-05-22T08:03:57+00:00</lastmod>
 <priority>1.00</priority>
 </url>
 

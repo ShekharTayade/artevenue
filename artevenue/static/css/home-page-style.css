@@ -510,7 +510,7 @@ ul.slick-dots li.slick-active button {
 }
 /*footer start*/
 #footer {
-    padding: 4% 4.6%;
+    padding: 2% 4.6% 10px;
 }
 #footer p.about-us,#footer li,
 #footer ul li a, #footer ul li i,

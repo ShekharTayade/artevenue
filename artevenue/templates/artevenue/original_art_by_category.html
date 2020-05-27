@@ -11,7 +11,7 @@
 						<ol class="breadcrumb">
 							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
 							<li class="breadcrumb-item"><a href= "{% url 'show_all_categories' %}">Categories</a></li>
-							<li aria-current="page" class="breadcrumb-item active">{{product_category.name}}</li>
+							<li aria-current="page" class="breadcrumb-item active">Original Paintings, Artworks</li>
 						</ol>
 					</nav>
 				</div>
@@ -38,7 +38,11 @@
 									<li><span class="badge badge-secondary">{{prod_cat_count}}</span>
 									{% for p in prod_categories %}
 										<ul class="list-unstyled">
-											<li><a href="{% url 'original_art_by_category' p.stock_image_category_id %}" class="nav-link">{{p.stock_image_category.name|title}}</a></li>
+											{% if p.category_id %}
+												<li><a href="{% url 'original_art_by_category' cat_nm=p.name page=page%}" class="nav-link">{{p.name|title}}</a></li>
+											{% else %}
+												<li><a href="{% url 'original_art_by_category' %}" class="nav-link">{{p.name|title}}</a></li>
+											{% endif %}
 										</ul>
 									{% endfor prod_categories %}
 										<a href=""><small>See All...</small></a>
@@ -205,11 +209,20 @@
 				<div class="col-lg-9">
 					<div class="box-cat">
 						{% if ikeywords %}
-							<h1>Search Results</h1>
-							<p>{% if ikeywords %} You Searched for: "{{ikeywords}}" {% endif %}</p>
+							<h1>Original Wall Art Paintings & Artworks for Your Search "{{ikeywords}}"</h1>
+							<h3>Wall paintings for bedroom, living room and other spaces.
+								Don't miss the most important factor - paintings for 
+								home decor. Choose paintings for home walls and give 
+								that beautiful look to the space.
+							</h3>
 						{% else %}
-							<h1>{% if product_category %} Original Art - Category '{{ product_category.name }}' {% else %} All Original Art {% endif %}</h1>
-							<p>{% if product_category.description %} {{product_category.description}} {% else %} Please use filters on left to narrow your search{% endif %}</p>
+							<h1>Original Wall Art Paintings & Artworks{% if product_category %} from {{ product_category.name }} Category {% endif %}</h1>
+							<p>{% if product_category.description %} {{product_category.description}}{% endif %}</p>
+							<h3>{{product_category.name}} wall paintings for bedroom, living room and other spaces.
+								Don't miss the most important factor - paintings for 
+								home decor. Choose paintings for home walls and give 
+								that beautiful look to the space.
+							</h3>
 						{% endif %}
 					</div>
 					 

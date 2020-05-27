@@ -1,0 +1,84 @@
+
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% block page-title %} 
+	<title>Online Photo Framing | Artevenue.com</title>
+{% endblock page-title %} 
+{% block page-description %}
+	<meta name="description" content="Upload your photos, pictures, poster or any digital image, choose frame, and mount. We print, frame it carefully and deliver to your door step.">
+{% endblock page-description %}
+{% block page-keywords %}
+	<meta name="keywords" content="Online photo framing, photo frames online shopping, custom framing, frame my photo, print and frame photos online, single photo frames online, multiple photo frame online, photo prints, photo frames collage, best online photo printing india, cheapest photo print online, online photo printing services">
+{% endblock page-keywords %}
+
+{% block page-author %}
+	<meta name="author" content="Arte'Venue">
+{% endblock page-author %}
+
+{% block coursel-stylesheet %}
+{% endblock coursel-stylesheet %}
+
+{% block jqueryui-script %}
+{% endblock jqueryui-script %}
+
+{% block coursel-script %}
+{% endblock coursel-script %}
+
+{% block front.js %}
+{% endblock front.js %}
+
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+	<div class="container mt-5">
+		<div class = "row mb-3">			
+			<div class="col-12">
+				<h1 class = "text-center">FRAME YOUR PHOTOS, POSTERS, ANY DIGITAL IMAGES</h1>
+				<h3 class = "text-center">As simple as one, two, three</h3>
+				<div class = "row mt-5 text-center">
+					<div class = "col-4">
+						<img src = "{% static 'img/custom_framing/step1.jpg' %}" alt="Upload digital image" width = 150>
+						<p>Upload one or more of your photos, posters or any digital image that you want to frame</p>
+					</div>
+					<div class = "col-4">
+						<img src = "{% static 'img/custom_framing/step2.jpg' %}" alt="Customized framing" width = 150>
+						<p>Size the size of print, choose the frame, mount and mount size</p>
+					</div>
+					<div class = "col-4">
+						<img src = "{% static 'img/custom_framing/step3.jpg' %}" alt="Add to cart and order" width = 150>
+						<p>Add it to the cart, order it and we deliver to your step</p>
+					</div>
+				</div>
+				<div class = "row mt-5 ">
+					<div class = "col-12 text-center">
+						<button class = "btn btn-primary">
+							<i class = "fa fa-chevron-right fa-lg">
+								LET'S START
+							</i>
+						</button>		
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class = "row mb-5">			
+			<div class="col-12 mt-2" style = "text-align: center;">
+				<li class="list-inline-item clickable">
+					<a class = "clickable" data-toggle="modal" data-target="#phone-help" style = "color: #77899e;">
+						<h3>Want to talk to us?
+						Call <img src="{% static 'img/phone_support.png' %}" alt="Phone Support" width=15> 
+						 </h3>
+					</a>
+				</li>
+			</div>
+		</div>
+    </div>
+	{% endblock sitecontent %}
+	
+	
+	{% block jscripts %}
+	{% endblock jscripts %}
+	
