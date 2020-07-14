@@ -1,7 +1,8 @@
 /* Border around all elements on the page */
 
 /*
-* { border: 1px solid red; }
+* { border: 1px solid red !important;
+	background-color:lightblue;}
 */
 
 
@@ -385,6 +386,8 @@ top #phone-help .modal-header h5 {
 	background-color: #f4f4f4;
 	width:150px;
 	height:150px;
+	margin-left: auto;
+	margin-right: auto;
 }	
 
 @media (min-width: 736px) {
@@ -492,16 +495,76 @@ top #phone-help .modal-header h5 {
 .cat-card {
 /*  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);*/
   border: 0px;
-  max-width: 300px;
-  margin: 10px 0px 10px;
+  height: 120px;
+  width: 100%;
+  /*margin: 10px 0px 10px;*/
+  margin: 3px;
   text-align: center;
-  font-family: arial;
+  border: 1px solid #cfcfcf;
+  font-size: 0.75rem;
+  display: flex; 
+  justify-content: center; 
+  align-items: center; 
 }
 
 .cat-card:hover {
   background-color: #dfdfdf;
+  border: 2px solid #11b6bd;
 }
 
+.cat-card .cat-nm{
+	font-size: 0.8rem;
+	font-weight: 700;	
+}
+
+.cat-count{
+	font-size:0.5rem; 
+	background-color: grey;
+	color: #fff;
+	padding: 2px 7px;
+	border-radius: 10px;
+	position: absolute;
+	right: 10px;
+	top: 15px;	
+}
+
+.cat-div a{
+	color: #272e38;
+}
+
+/*
+.cat-div div:nth-child(even) {background: #eee;}
+.cat-div div:nth-child(odd) { background: #FFF;}
+*/
+.img-container-all-cat{
+	padding:10px;
+	background-color: #f4f4f4;
+	margin-left: auto;
+	margin-right: auto;
+}	
+
+
+
+@media (max-width: 465px) {
+	.img-container-all-cat{
+		width: 75px;			
+	}
+}
+@media (min-width: 466px) {
+	.img-container-all-cat{
+		width:100%;
+		height: 15vw;
+		padding:10px;
+		text-align:center;
+	}
+
+	.img-container-all-cat img{
+		width: 125px;
+	}
+}	
+
+
+/*
 .cat-price {
   color: grey;
   font-size: 18px;
@@ -525,6 +588,7 @@ top #phone-help .modal-header h5 {
 .cat-card button:hover {
   opacity: 0.7;
 }
+*/
 
 .bottom-right {
     position: absolute;
@@ -996,18 +1060,34 @@ section .section-title {
 
 .curatedHeading1 {
 	/*font-family:Helvetica, sans-serif !important;*/
-	font-family: "DomaineDisplay",Georgia,"Times New Roman",Times,serif !important;
-	color:#665d6f;
+	/*font-family: "DomaineDisplay",Georgia,"Times New Roman",Times,serif !important;
+	color:#665d6f;*/
+	/*font-family: 'Felipa', cursive !important;*/
+	font-family: 'Lato', sans-serif;
+	font-weight:500;
 	margin: 0 auto;
-    font-size: 1.1rem;
-	font-weight:700;
-    letter-spacing: 3px;
+    font-size: 0.85rem;
     -ms-flex-align: center;
     -ms-grid-row-align: center;
     align-items: center;
-	padding-top:5px;
 	text-align:center;
+	background-color: #fafafa;
+	padding: 10px 5px 5px;
+	letter-spacing: 0px
 }
+
+@media only screen and (max-width: 480px) {
+	.curatedHeading1 {
+		font-size: 0.7rem;
+	}
+}
+@media only screen and (max-width: 480px) {
+	.curatedHeading2 {
+		font-size: 0.65rem;
+	}
+}
+
+
 
 .curatedHeading1-1{
     letter-spacing: 7px;	
@@ -1020,10 +1100,13 @@ section .section-title {
 
 .curatedHeading2 {
 	color: #5d5566; 
-	font-family:Helvetica, sans-serif; 
+	/*font-family: 'Felipa', cursive !important;*/
+	font-family: 'Lato', sans-serif;
 	font-size:0.75rem;
 	text-align:center;
-	letter-spacing:2px;
+	background-color: #fafafa;
+	padding: 0 5px 5px;
+	margin-bottom:0px;
 }
 
 .curatedHeading2-1{
@@ -1426,7 +1509,7 @@ body.loading .ajax-modal {
 	div.sticky {
 		padding:10px 0 !important;
 		/*border-top: 1px solid #dedddf;*/
-		border-bottom: 1px solid #dedddf;
+		/*border-bottom: 1px solid #dedddf;*/
 	}
 }
 
@@ -1615,14 +1698,14 @@ nav > div a.nav-item.nav-link:focus
 }
 
 .why-artevenue-head{
-	font-weight: 600;
+	font-weight: 500;
 	font-size: 0.75rem;
 	color: #1e4f59;
 	text-align:center;
 }
 
 .why-artevenue-text{
-	font-size: 0.55rem;
+	font-size: 0.6rem;
 	color: #666;
 	text-align:center;
 }
@@ -1755,6 +1838,11 @@ nav > div a.nav-item.nav-link:focus
 	height: 25px;
 }
 
+.rating-stars-small {
+	height: 15px;
+	padding: 0px;
+}
+
 .rating-stars-review{	
 	height: 15px;
 }
@@ -1769,6 +1857,25 @@ nav > div a.nav-item.nav-link:focus
 	font-size:20px;
 	cursor: pointer;
 	color: #ffca18;
+}
+
+#all_reviews ul li {
+	display: inline;
+	padding: 1px 0px 5px;
+	display:inline;
+}
+#all_reviews ul li:hover {
+	border: 1px solid #ddd;
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.2);
+}
+
+#all_reviews .selected_star {
+	border: 1px solid #11b6bd;
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.2);
+}
+
+#all_reviews .btn{
+	padding: 0px;
 }
 
 .image-display-review {
@@ -2061,4 +2168,9 @@ blockquote.right small {
 .tooltip.primary .tooltip-inner{
 	background-color: #337ab7; 
 }	
+
+
+.spciality-art-img{
+	border-radius: 3%;
+}
 

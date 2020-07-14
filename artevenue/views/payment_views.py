@@ -43,12 +43,12 @@ if env == 'DEV' or env == 'TESTING':
 	E_CURL = 'http://localhost:7000/egift-payment-unsuccessful/'
 elif env == 'PROD':
 	PAYU_BASE_URL = "https://secure.payu.in/_payment "  # LIVE 
-	SURL = 'https://www.artevenue.com/order-confirmation/'
-	FURL = 'https://www.artevenue.com/payment-unsuccessful/'
-	CURL = 'https://www.artevenue.com/payment-unsuccessful/'
-	E_SURL = 'https://www.artevenue.com/egift-payment-done/'
-	E_FURL = 'https://www.artevenue.com/egift-payment-unsuccessful/'
-	E_CURL = 'https://www.artevenue.com/egift-payment-unsuccessful/'
+	SURL = 'https://artevenue.com/order-confirmation/'
+	FURL = 'https://artevenue.com/payment-unsuccessful/'
+	CURL = 'https://artevenue.com/payment-unsuccessful/'
+	E_SURL = 'https://artevenue.com/egift-payment-done/'
+	E_FURL = 'https://artevenue.com/egift-payment-unsuccessful/'
+	E_CURL = 'https://artevenue.com/egift-payment-unsuccessful/'
 else:
 	PAYU_BASE_URL = "https://sandboxsecure.payu.in/_payment"  # Testing
 	SURL = 'http://localhost:7000/payment-done/'
@@ -96,6 +96,7 @@ def payment_details(request):
 		'order':order})
 		
 def payment_submit(request):
+	today = datetime.datetime.today()
 	posted={}
 	for i in request.POST:
 		posted[i]=request.POST[i]
@@ -115,8 +116,9 @@ def payment_submit(request):
 		bus = None
 	
 	if bus:
-		if bus.profile_group.deferred_payment:
-			deferred_payment = True
+		if bus.profile_group:
+			if bus.profile_group.deferred_payment:
+				deferred_payment = True
 	
 	if deferred_payment:
 
@@ -241,7 +243,8 @@ def payment_done(request):
 	msg = ''
 	c = {}
 	c.update(csrf(request))
-
+	today = datetime.datetime.today()
+	
 	sts = request.POST.get("status","")
 	if sts == "":
 		raise PermissionDenied
@@ -387,7 +390,7 @@ def payment_done(request):
 	return render(request, 'artevenue/payment_done.html',
 			{ "txnid":txnid, "status":status, "amount":amount, 'msg':msg,
 			'db_err':db_err, 'firstname':firstname, 'order':order,
-			'pay_status':pay_status, 'order_items':order_items}
+			'pay_status':pay_status, 'order_items':order_items,'env': env }
 		)
 
 
@@ -398,7 +401,8 @@ def payment_unsuccessful(request):
 	msg = ''
 	c = {}
 	c.update(csrf(request))
-
+	today = datetime.datetime.today()
+	
 	status=request.POST["status"]
 	firstname=request.POST["firstname"]
 	amount=request.POST["amount"]
@@ -478,6 +482,8 @@ def egift_payment_details(request):
 
 def egift_payment_submit(request):
 	posted={}
+	today = datetime.datetime.today()
+	
 	for i in request.POST:
 		posted[i]=request.POST[i]
 		
@@ -545,11 +551,12 @@ def egift_payment_submit(request):
 @csrf_protect
 @csrf_exempt						
 def egift_payment_done(request):
+	today = datetime.datetime.today()
 	pay_status = "FAIL"
 	msg = ''
 	c = {}
 	c.update(csrf(request))
-
+	
 	status=request.POST["status"]
 	firstname=request.POST["firstname"]
 	gift_amount=request.POST["amount"]
@@ -729,6 +736,7 @@ def egift_payment_done(request):
 @csrf_protect
 @csrf_exempt						
 def egift_payment_unsuccessful(request):
+	today = datetime.datetime.today()
 	pay_status = "FAIL"
 	msg = ''
 	c = {}

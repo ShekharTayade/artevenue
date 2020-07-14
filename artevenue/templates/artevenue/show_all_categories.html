@@ -2,23 +2,27 @@
 {% load static %}
 {% load utils %}
 {% load indian_numbers_tags %}
-{% load show_trending_categories from prod_template_tags %}
+
 {% block page-title %} 
-	<title>Arte'Venue | All art categories</title>
+	<title>All Wall Art Categories | Arte'Venue</title>
 {% endblock page-title %} 
 {% block page-description %}
-<meta name="description" content="Show all categories of art available at ArteVenue.com">
+<meta name="description" content="Show all wall art print categories at ArteVenue.com">
 {% endblock page-description %}
 {% block page-keywords %}
-<meta name="keywords" content="art, Artvenue, All art categories, Art prints, Wall Art, Buy Art, Buy Art prints, Print photos online, Print Art online">
+<meta name="keywords" content="art print categories, wall art, wall art categories, art prints, Wall Art, Buy Art, Buy Art prints online, artevenue">
 {% endblock page-keywords %}	<!-- Only Override the site content block -->
 
 {% block imagemap-resize-script %}
 {% endblock imagemap-resize-script %}
 
+{% block lazysizes %}
+<script src="{% static '/vendor/lazysizes/lazysizes.min.js' %}" async=""></script>
+{% endblock lazysizes %}
+
 	<!-- Only Override the site content block -->
 	{% block sitecontent %}
-        <div class="container-fluid">
+        <div class="container mb-5">
 			<div class="row">
 				<div class="col-12">
 					<nav aria-label="breadcrumb">
@@ -34,28 +38,69 @@
 					<div class="box-cat">
 						<h1>ALL CATEGORIES</h1>
 					</div>
-					{% show_trending_categories %}
 					
 					<div class = "row mt-2">
 						<div class="col-12">
-							<span class = "ml-4" style="font-size:0.7rem;">{{cnt}} categories, containing {{all_cnt|intcomma_indian}} artwork</span>
+							<span style="font-size:0.7rem;">{{cnt}} categories, containing {{all_cnt|intcomma_indian}} artworks</span>
 						</div>
 					</div>
 					<hr style="margin:0.3rem 0;">
-					<div class = "row">
+					<div class = "cat-div row">
 						{% for c in categories %}
-						<div class="col-lg-2 col-md-3 col-6">
-							<div class="cat-card">
-
-								<a href="{% url 'art_by_category' c.name|default_if_none:'NA'|replace:' ,-' %}">
-									<p style="color:#000 !important; margin-bottom: 0.1rem;">{{c.name|title|default:'Unspecified'|default_if_none:'Unspecified'}}</p>
-									<p><span style="font-size:0.6rem; color:#272e38;" data-counter-up >({{c.stock_image_stock_image_category__count}})</span></p>
-								</a>
+							{% if c.url_suffix %}
+								<a href="{% url 'art_by_category' c.url_suffix %}">
+							{% else %}
+								<a href="{% url 'art_by_category' c.name %}">
+							{% endif %}
+							<div class="col-4 col-md-6 col-lg-2" style="border: 1px solid #cfcfcf; padding:15px 5px 5px 5px; margin-bottom:0px; border-radius:5px;">
+								<span style = "margin-left: auto; margin-right: auto;">
+										{% if c.background_image %}
+											{% with c.background_image as image_static %}												
+											<img 
+											data-src = "{% static image_static %}" alt="{{c.name|title}} Category"
+											class="img-fluid lazyload"
+											style = "filter: drop-shadow(0.25rem 0.25rem 0.25rem grey);
+													display: block; margin-left: auto; margin-right: auto;"
+											width=70>
+											{% endwith %}
+										{% endif %}
+										<p class = "text-center" style="color: #11b6bd !important; font-size:0.9rem; font-weight: 700; margin-bottom:0px; padding-top:5px;">
+											{{c.name|title|default:'Unspecified'|default_if_none:'Unspecified'}}
+										</p>
+										<p class = "text-center" style="font-size:0.6rem;">
+											{{c.stock_image_stock_image_category__count|intcomma_indian}} artworks
+										</p>
+									</a>
+								</span>
 							</div>
-						</div>
+
+
+
+						<!-- <div class="col-lg-3 col-md-4 col-4 cat-div">
+								<div class="d-flex flex-column align-items-center justify-content-center">
+									{% if c.url_suffix %}
+										<a href="{% url 'art_by_category' c.url_suffix %}">
+									{% else %}
+										<a href="{% url 'art_by_category' c.name %}">
+									{% endif %}
+									{% if c.name|length < 10 %}
+										<img data-src = "{% static c.url_suffix %}"
+										class="img-fluid lazyload"
+										style = "filter: drop-shadow(0.25rem 0.25rem 0.25rem grey);">
+									{% endif %}
+									<p class = "cat-count mb-0">
+										{{c.stock_image_stock_image_category__count}}
+									</p>
+									<p class = "cat-nm mt-2 mb-0">
+										{{c.name|title|default:'Unspecified'|default_if_none:'Unspecified'}}
+									</p>
+									</a>
+								</div>
+						</div> -->
 						
 						{% endfor categories %}
 					</div>				
+				</div>
 			</div>
 		</div>
 	{% endblock sitecontent %}

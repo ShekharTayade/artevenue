@@ -428,6 +428,12 @@ class Stock_image_category(models.Model):
 	url = models.CharField(max_length = 1000, blank=True, default='')
 	featured_collection = models.BooleanField(null=False, default=False)
 	url_suffix = models.CharField(max_length = 1000, blank=True, default='')
+	banner_image_codes = models.CharField(max_length = 500, blank=True, default='')
+	keywords = models.CharField(max_length = 2000, blank=True, default='')
+	page_title = models.CharField(max_length = 65, blank=True, default='')
+	page_description = models.CharField(max_length = 165, blank=True, default='')
+	second_description = models.CharField(max_length = 2000, null=True)
+	header = models.CharField(max_length = 1000, null=True)
 
 	def __str__(self):
 		return self.name
@@ -744,6 +750,13 @@ class Curated_category(models.Model):
 	description = models.CharField(max_length = 2000, blank=True, default = '')
 	effective_from = models.DateField(blank=True, null=True)
 	effective_to = models.DateField(blank=True, null=True)
+	url_suffix = models.CharField(max_length = 1000, blank=True, default='')
+	banner_image_codes = models.CharField(max_length = 500, blank=True, default='')
+	keywords = models.CharField(max_length = 2000, blank=True, default='')
+	page_title = models.CharField(max_length = 65, blank=True, default='')
+	page_description = models.CharField(max_length = 165, blank=True, default='')
+	second_description = models.CharField(max_length = 2000, null=True)
+	header = models.CharField(max_length = 1000, null=True)
 
 	def __str__(self):
 		return str(self.category_id) + '-' + self.name
@@ -1329,6 +1342,9 @@ class Order_sms_email(models.Model):
 	factory_sms_sent = models.BooleanField(null=False, default=False)
 	created_date = models.DateTimeField(auto_now_add=True, null=False)	
 	updated_date = models.DateTimeField(auto_now=True, null=False)
+	customer_review_email_sent = models.BooleanField(null=False, default=False)
+	customer_review_sms_sent = models.BooleanField(null=False, default=False)
+
 	
 	def __str__(self):
 		return str(self.order)
@@ -2134,8 +2150,6 @@ def update_image(sender, instance, **kwargs):
 			fullpath = settings.BASE_DIR + instance.image_to_frame.url
 		else:
 			fullpath = settings.PROJECT_DIR + instance.image_to_frame.url
-		print("PATH=============================================")
-		print(fullpath)
 		rotate_image(fullpath)
 
 	

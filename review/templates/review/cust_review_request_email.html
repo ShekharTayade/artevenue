@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+{% load utils %}
+{% load static %}
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="robots" content="all,follow">
+
+		<link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@1,100&display=swap" rel="stylesheet">				
+		
+		<!-- Custom stylesheet -->
+		<link rel="stylesheet" href="{% static  'css/custom.css' %}">
+		<!-- theme stylesheet-->
+		<link rel="stylesheet" href="{% static 'css/style.default.css' %}" id="theme-stylesheet">
+		<!-- theme stylesheet-->
+		<link rel="stylesheet" href="{% static 'css/home-page-style.css' %}" id="theme-stylesheet">
+
+	</head>
+
+	<body>
+		<div class = "row" style = "border:1px solid #d4d4d4; padding:10px; margin:0px;  font-family: 'Lato', sans-serif; font-size: 11px;">
+			<table style = "width: 100%; maring-bottom: 15px;">
+				<tbody>
+					<tr>
+						<td>
+							<img src = "https://artevenue.com/static/img/av_logo_circle2_m1.png" %}" alt="Arte'venue" style = "left:0, margin:0px; padding:0px;" width=150>
+						</td>
+						<td style = "text-align: right;">
+							<span style = "font-size: 10px; right:0px;">www.artevenue.com</span><br>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<div >
+				<h3></h3>	<!-- Heading/Headline -->
+				
+				<h5>
+					Dear {{order.order.order_billing.full_name}} 
+						{% if order.order.order_billing.Company %}
+							, <br> {{order.order.order_billing.Company}}
+						{% endif %},
+				</h5>
+				<h5>Thank you for choosing Arte’Venue!</h5>
+
+				<h5>
+				Your Order number {{order.order.order_number}}, dated {{order.order.order_date|date:'d M Y'}}
+					would have reached you by now. We sincerely hope you are liking the artwork.
+					Should you have any issue, please feel free to drop us an email at support@artevenue.com or call us
+					at 96115 03626. </br>
+					Just in case your order has not reached yet, request you to please wait until it get delivered
+					and then write the review.
+ 					
+				</h5>
+				
+				<h5>We request to spare a few minutes to give us feedback on our artworks,
+				website features, our collection, service, and your overall experience. 
+				Your comments will go a long way in 
+				helping us in improving our products, services and customer experience.
+				</h5>
+
+				<h5> Please visit this link to <a href = "https://artevenue.com/write-customer-review/">
+					write a quick review.</a>
+				</h5>
+
+				<h5>Here are the artwork(s) you ordered.</h5>
+				<table  style = "font-size: 10px;  margin-top: 20px;">
+					<thead>
+						<tr>
+							<th width="70%" style="text-align:left"></th>
+							<th width="30%" style="text-align:left"></th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for i in order_items_list %}
+						{% if i.order_id != order.order_id %}
+							<!-- Nothing -->
+							
+						{% else %}
+						<tr>
+							<td>
+								<img src = "{% if i.product_type|cut:' ' == 'USER-IMAGE' %} https://artevenue.com{{MEDIA_URL}}{{i.product.image_to_frame_thumbnail}} {% else %}https://www.artevenue.com/{% static i.product.thumbnail_url %}{% endif %}" style = "width:50px; height:50px; object-fit:contain;">
+							
+								<br />
+								<div class = "pull-left">
+									<span style = "padding-left:0px;" >
+										{% if i.product_type == 'USER-IMAGE' %}
+											Uploaded Image
+										{% else %}
+											{{i.product.name}}
+										{% endif %}
+									</span>
+								</div>
+							</td>
+							<td style = "text-align:right">
+								<small>{{i.quantity}}</small>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								{% with width=i.moulding.width_inner_inches|add_width_frame_mount:i.mount_size %}
+								<small>
+								<ul>
+								<li>Print on {{i.print_medium_id|title}}</li>
+								{% if i.moulding_id %}
+								<li>Image Print Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+								<li>Frame {{i.moulding.name }} ({{i.moulding.width_inches}} inch)</li>
+								{% if i.mount_id %}
+									<li>Mount: {{i.mount_size }}", Color: {{i.mount.name|title }} </li>
+								{% endif %}
+								<li>Total Size: 
+									{{ i.image_width|add_width:width|add_width:width }}" X {{i.image_height|add_width:width|add_width:width }}"</li>
+								{% else %}
+									<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+								{% endif %}
+								
+								{% if i.acrylic_id %}
+									<li>Acrylic covered</li>
+								{% endif %}
+								{% if i.stretch_id %}
+									<li>Canvas Stretched</li>
+								{% endif %}
+								</ul>
+								</small>
+								{% endwith %}
+							</td>						
+						</tr>
+						{% endif %}
+						{% endfor %}
+						
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div style = " margin-top: 20px;">
+			<h6>If you need any assitance, please feel free to write to us at 
+				support@artevenue.com, chat with us online at www.artevenue.com,
+				or call us at +91 96115 03626. We will be happy help.
+			</h6>
+			<h5>
+				With warm regards,<br />
+				Team Arte'Venue
+				<br />
+				<img src = "https://artevenue.com/static/img/artevenue_logo_new.png" alt="Arte'Venue Logo"  height="25" width="110"> <br />
+				<a href = "https://www.artevenue.com">www.artevenue.com</a>
+			</h5>
+		</div>
+	</body>
+</html>

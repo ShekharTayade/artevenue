@@ -1,78 +1,76 @@
 {% load static %}
 <div class = "container-fluid mt-5">
-	<div style = "background-color: #fafafa;">
-		<div class="row">
-			<div class="col-4 col-md-2 mb-3 why-artevenue-div">
-				<div onclick = "show_modal('GUARANTEE');">
-					<img src="{% static 'img/why_artevenue/guarantee.png' %}"
-						alt="100% Guarantee" class = "why_artevenue">
-					<div class = "why-artevenue-head">
-						Free Returns
-					</div>
-					<div class = "why-artevenue-text">
-						Don't like it? Return it in 5 days and get the refund
-					</div>
-				</div>
+	<div class="row" style = "background-color: #fafafa;">
+		<div class="col-4 col-md-2 mb-3 why-artevenue-div">
+			<div onclick = "show_modal('GUARANTEE');">
+				<img src="{% static 'img/why_artevenue/guarantee.png' %}"
+					alt="100% Guarantee" class = "why_artevenue">
+				<h4 class = "why-artevenue-head">
+					Free Returns
+				</h4>
+				<h5 class = "why-artevenue-text">
+					Don't like it? Return it in 5 days and get the refund
+				</h5>
 			</div>
-			<div class="col-4 col-md-2 mb-3 why-artevenue-div">
-				<div onclick = "show_modal('FREE_SHIPPING');">
-					<img src="{% static 'img/why_artevenue/truck.png' %}" 
-					alt = "Free Shipping" class = "why_artevenue">
-					<div class = "why-artevenue-head">
-						Free Shipping
-					</div>
-					<div class = "why-artevenue-text">
-						Don't pay to bring it home, ships in 1-2 days
-					</div>
-				</div>
+		</div>
+		<div class="col-4 col-md-2 mb-3 why-artevenue-div">
+			<div onclick = "show_modal('FREE_SHIPPING');">
+				<img src="{% static 'img/why_artevenue/truck.png' %}" 
+				alt = "Free Shipping" class = "why_artevenue">
+				<h4 class = "why-artevenue-head">
+					Free Shipping
+				</h4>
+				<h5 class = "why-artevenue-text">
+					Don't pay to bring it home, ships in 1-2 days
+				</h5>
 			</div>
-			<div class="col-4 col-md-2 mb-3 why-artevenue-div" >
-				<div onclick = "show_modal('CUSTOMIZATION');">
-					<img src="{% static 'img/why_artevenue/customize.png' %}" 
-					alt= "Customize The Artwork" class = "why_artevenue">
-					<div class = "why-artevenue-head">
-						Customize it
-					</div>
-					<div class = "why-artevenue-text">
-						Every art print can be customized - surface, size, frame and more
-					</div>
-				</div>
+		</div>
+		<div class="col-4 col-md-2 mb-3 why-artevenue-div" >
+			<div onclick = "show_modal('CUSTOMIZATION');">
+				<img src="{% static 'img/why_artevenue/customize.png' %}" 
+				alt= "Customize The Artwork" class = "why_artevenue">
+				<h4 class = "why-artevenue-head">
+					Customize it
+				</h4>
+				<h5 class = "why-artevenue-text">
+					Every art print can be customized - surface, size, frame and more
+				</h5>
 			</div>
-			<div class="col-4 col-md-2 mb-3 why-artevenue-div">
-				<div onclick = "show_modal('LICENSED');">
-					<img src="{% static 'img/why_artevenue/licensed.png' %}" 
-					alt="Licensed Artworks" class = "why_artevenue">
-					<div class = "why-artevenue-head">
-						Licensed Art Prints
-					</div>
-					<div class = "why-artevenue-text">
-						Every art you buy is licensed, Image Quality Assured
-					</div>
-				</div>
+		</div>
+		<div class="col-4 col-md-2 mb-3 why-artevenue-div">
+			<div onclick = "show_modal('LICENSED');">
+				<img src="{% static 'img/why_artevenue/licensed.png' %}" 
+				alt="Licensed Artworks" class = "why_artevenue">
+				<h4 class = "why-artevenue-head">
+					Licensed Art Prints
+				</h4>
+				<h5 class = "why-artevenue-text">
+					Every art you buy is licensed, Image Quality Assured
+				</h5>
 			</div>
-			<div class="col-4 col-md-2 mb-3 why-artevenue-div">
-				<div onclick = "show_modal('QUALITY');">
-					<img src="{% static 'img/why_artevenue/quality.png' %}" 
-					alt="Quality and Affordability" class = "why_artevenue">
-					<div class = "why-artevenue-head">
-						Affordable Quality
-					</div>
-					<div class = "why-artevenue-text">
-						We promise top quality at afforable prices
-					</div>
-				</div>
+		</div>
+		<div class="col-4 col-md-2 mb-3 why-artevenue-div">
+			<div onclick = "show_modal('QUALITY');">
+				<img src="{% static 'img/why_artevenue/quality.png' %}" 
+				alt="Quality and Affordability" class = "why_artevenue">
+				<h4 class = "why-artevenue-head">
+					Affordable Quality
+				</h4>
+				<h5 class = "why-artevenue-text">
+					We promise top quality at afforable prices
+				</h5>
 			</div>
-			<div class="col-4 col-md-2 mb-3 why-artevenue-div">
-				<div onclick = "show_modal('LARGEST');">
-					<img src="{% static 'img/why_artevenue/largest.png' %}" 
-					alt="Largest Collection of Licensed Artworks" class = "why_artevenue">
-					<div class = "why-artevenue-head">
-						Largest Collection
-					</div>
-					<div class = "why-artevenue-text">
-						Look no further, collection of over 2.7 lakhs art prints
-					</div>
-				</div>
+		</div>
+		<div class="col-4 col-md-2 mb-3 why-artevenue-div">
+			<div onclick = "show_modal('LARGEST');">
+				<img src="{% static 'img/why_artevenue/largest.png' %}" 
+				alt="Largest Collection of Licensed Artworks" class = "why_artevenue">
+				<h4 class = "why-artevenue-head">
+					Largest Collection
+				<h4>
+				<h5 class = "why-artevenue-text">
+					Look no further, collection of over 2.7 lakhs art prints
+				</h5>
 			</div>
 		</div>
 	</div>
@@ -97,7 +95,7 @@
 			break;
 		  case 'LICENSED':
 			$("#modal-hedline").html('LICENSED ARTWORKS');			  
-			$("#msg").html("<p><strong>All our art prints are licensed from  artists.</strong></p> <p>We don't use unauthorized or fake images.</p> <p>No copyright issues and you can enjoy the art to the fullest.</p>");
+			$("#msg").html("<p><strong>All our art prints are licensed from  artists.</strong></p> <p>We don't use unauthorized or fake images.</p> <p>The image quality is assured. No copyright issues. You can enjoy the art to the fullest.</p>");
 			break;
 		  case 'SECURED':
 			$("#modal-hedline").html('SECURED CHECKOUT PROCESS');

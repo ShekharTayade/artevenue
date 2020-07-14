@@ -127,7 +127,10 @@ def show_curated_collections():
 	
 	return {}
 	
-	
 @register.inclusion_tag('artevenue/best_sellers.html')
 def best_sellers():
+	return {}
+	
+@register.inclusion_tag('artevenue/curated_speciality_art.html')
+def speciality_art():
 	return {}

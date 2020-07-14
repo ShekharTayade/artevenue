@@ -110,6 +110,7 @@ def faq(request):
 
 def newsletter_subscription_confirmation(request):
 	email = request.GET.get('email','')
+	today = datetime.date.today()
 
 	msg = 'SUCCESS'
 	if email:
@@ -300,6 +301,7 @@ def validate_address(request):
 
 @login_required
 def refer_us(request):
+	today = datetime.date.today()
 	msg = ''
 	if request.method == 'POST':
 		form = referralForm(request.POST, user=request.user)
@@ -371,7 +373,7 @@ def refer_confirm(request, ref_id):
 @login_required
 def egift_card(request):
 	msg = ''
-
+	today = datetime.date.today()
 	if request.method == 'POST':
 		gift_rec_id = request.GET.get('gift_rec_id','')
 		 
@@ -584,3 +586,82 @@ def how_to_hang(request):
 	
 def how_to_size(request):
 	return render(request, "artevenue/how_to_size.html") 
+
+
+def update_category_disp_priority():
+	from artevenue.models import Stock_image, Curated_category
+
+	priority = Curated_category.objects.all()
+	print("Count: " + str(priority.count()))
+	for p in priority:
+		print("Processing..." + p.name )
+		if p.banner_image_codes:
+			ids = p.banner_image_codes.replace(' ','')
+			ids = ids.split(",")
+			cnt = 0
+			for i in ids:
+				if i is None or i == '':
+					continue
+				print("Updating..." + " Category: " + p.name + ", Id: " + str(i) )
+				cnt = cnt + 1
+				pr = (-1) * cnt
+				prod = Stock_image.objects.filter(product_id = i).update(category_disp_priority = pr)					
+				if prod < 1:
+					print("ID " + str(i) + " not found in category " + p.name)
+				
+				# check is this exists in respective curated category,
+				# if not add it
+				c = Curated_collection.objects.filter(product_id = i).first()
+				if not c:
+					print("ADDING==============>" + str(i))
+					cc = Curated_collection(
+						curated_category_id = p.category_id,
+						product_id = i,
+						product_type_id = 'STOCK-IMAGE'
+					)
+					
+					cc.save()
+					
+					
+	return
+		
+
+def update_curated_collections():
+	from pathlib import Path
+	import csv
+	from artevenue.models import Curated_collection
+	## 4692
+	cfile = Path('C:/artevenue/DATA/CURATED_CATEGORIES_NEW_Jun2020/vastu_collections.csv')
+	if not cfile.is_file():
+		print("csv file not found.")
+		return
+	file = open('C:/artevenue/DATA/CURATED_CATEGORIES_NEW_Jun2020/vastu_collections.csv')
+	cr = csv.reader(file, delimiter=',')
+	
+	cnt = 0
+	for row in cr:
+		if cnt == 0:	## Skipping first header row
+			cnt = cnt + 1
+			continue
+		cnt = cnt + 1
+		print("Processing...." + str(row[1]))
+		prod_id = row[1]
+		prod = None
+		try:
+			prod = Stock_image.objects.get(product_id = prod_id)
+		except Stock_image.DoesNotExist:
+			continue
+		
+		if prod:
+			print("Updating...." + str(row[1]))
+			n = Curated_collection(
+				curated_category_id = row[0],
+				product_id = row[1],
+				product_type_id = 'STOCK-IMAGE'
+			)
+			
+			n.save()
+	print ("Count: " + str(cnt))
+				
+	
+	

@@ -1,0 +1,24 @@
+{% load static %}
+{% if review_pics_all  %}
+<div class = "row">
+	<div class = "col-12 text-muted">
+		Our Art at Customer Places
+	</div>
+</div>
+<section class="frames-slider slider" 
+	style="margin:15px 15px 40px; padding:10px 5px 5px;">
+	{% for p in review_pics_all  %}
+		<a onclick = "showCustImg('{{p.pic_id}}')">
+			<img src="{% if p.user_photo_thumbnail.url %} {{ p.user_photo_thumbnail.url }} {% endif %}" alt="User Review Pictures" 
+			class="img-fluid" 
+			style = "filter: drop-shadow(0.25rem 0.25rem 0.25rem grey); width: 12vw; height: 15vw; object-fit: scale-down;">
+		</a>
+	{% endfor %}
+</section>
+{% endif %}
+<div class = "row">
+	<div class = "col-12 text-muted">
+		<a class = " pull-right" href="{% url 'customer_photos_all' %}">See All Photos</a>
+	</div>
+</div>
+<hr>

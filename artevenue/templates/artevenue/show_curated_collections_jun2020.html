@@ -1,0 +1,75 @@
+{% load static %}
+{% load show_frame_my_art from prod_template_tags %}
+
+<div class = "container-fluid mt-5 text-center">
+	<div class="row">
+		<div class="col-12">
+			<!--<h1 class="text-center">ART PRINTS & PAINTINGS FOR HOME WALLS</h1>-->	
+			<h2 class="text-center">
+				OUR EXCLUSIVE COLLECTION OF CURATED ART PRINTS
+			</h2>
+		</div>
+	</div>
+	<div class="row text-center">
+		<div class = "col-12 col-md-6 mt-3" style = "">
+			<h3>
+				ABSTRACT
+			</h3>
+			<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='Abstract' page=1 prod_id=240176 %}">
+			<div class="curated-container">
+				<img class = "d-block" src="{% static 'img/curated/abstract.jpg' %}" alt="Art prints of Abstract Paintings for Home Walls">
+				<!--<img class = "d-block d-sm-none" src="{% static 'img/curated/abstract_apr2020.jpg' %}" alt="Abstract">-->
+				<!--<div class = "btn">ABSTRACT</div>-->
+			</div>
+			</a>
+		</div>
+		<div class = "col-12 col-md-6 mt-3" style = "">
+			<h3>
+				BLACK & WHITE
+			</h3>
+			<a class="btn-link" href="{% url 'curated_collections' cat_nm='Black & White' page=1 prod_id=320426 %}">
+				<div class="curated-container">
+					<img class = "d-block" src="{% static 'img/curated/black_white.jpg' %}" alt="Black and White Paintings Art Prints for Home Walls" style="width:100%">
+					<!--<img class = "d-block d-sm-none" src="{% static 'img/curated/black_white_apr2020.jpg' %}" alt="Black and White" style="width:100%">-->
+					<!-- <div class = "btn">BLACK & WHITE</div> -->
+				</div>
+			</a>
+		</div>
+		<div class = "col-12 col-md-4 mt-3" style = "">
+			<h3>
+				FEMME
+			</h3>
+			<a class="btn-link" href = "{% url 'curated_collections' cat_nm='Femme' page=1 prod_id=148114 %}">
+				<div class="curated-container">
+					<img class = "d-block" src="{% static 'img/curated/femme.jpg' %}" alt="Art Prints of Paintings of Girls, Women Category" style="width:100%">
+					<!--<img class = "d-block d-sm-none" src="{% static 'img/curated/femme_apr2020.jpg' %}" alt="Femme" style="width:100%">-->
+					<!-- <div class = "btn">FEMME</div> -->
+				</div>
+			</a>
+		</div>
+		<div class = "col-12 col-md-4 mt-3" style = "">
+			<h3>
+				ART OVER CENTURIES
+			</h3>
+			<a class="btn-link" href = "{% url 'curated_collections' cat_nm='Art Over Centuries' page=1 prod_id=185123 %}">
+				<div class="curated-container">
+					<img class = "d-block" src="{% static 'img/curated/monet.jpg' %}" alt="Art Print of Painting of famous artists and famous paintings" style="width:100%">
+					<!--<img class = "d-block d-sm-none" src="{% static 'img/curated/art_over_century_apr2020.jpg' %}" alt="Art Over Century" style="width:100%">-->
+					<!-- <div class = "btn">ART OVER CENTURIES</div>-->
+				</div>
+			</a>
+		</div>
+		<div class = "col-12 col-md-4 mt-3" style = "">
+			<h3>
+				PHOTOGRAPHY
+			</h3>
+			<a class="btn-link" href = "{% url 'curated_collections' cat_nm='Photography' page=1 prod_id=232014 %}">
+				<div class="curated-container">
+					<img class = "d-block" src="{% static 'img/curated/photography.jpg' %}" alt="Photography Art Prints for home walls" style="width:100%">
+					<!--<img class = "d-block d-sm-none" src="{% static 'img/curated/photography_apr2020.jpg'%}" alt="Photography" style="width:100%">-->
+					<!--<div class = "btn">PHOTOGRAPHY</div>-->
+				</div>
+			</a>
+		</div>
+	</div>
+</div>	

@@ -172,3 +172,49 @@ def get_collage_price( collage_id, aspect_ratio, user_width ):
 @register.filter
 def replace_comma(str):
    return str.replace(',', '_')
+   
+@register.filter
+def replace_dash(str):
+   return str.replace('-', ' ')
+
+@register.filter
+def endswith(value, suffix):
+    return value.endswith(suffix)   
+	
+@register.filter
+def startswith(value, prefix):
+    return value.startswith(prefix)   
+
+@register.filter
+def contains(value, str):
+	if value.find(str) >= 0:
+		ret = True
+	else:
+		ret = False
+		
+	return ret 
+
+@register.filter
+def convert_to_k(value):
+	if int(value) > 0:
+		if int(value) <= 999:
+			ret = str(value)
+		else:
+			ret = str(round((int(value) / 1000))) + "k"
+	else:
+		ret = value
+	return ret
+	
+@register.filter
+def create_cat_filenm(val=None, disp=None):
+	nm = val
+	if disp == 150:
+		print(150)
+		nm = "img/all_category_images/150/" + val.lower() + "_150.jpg"
+	elif disp == 75:
+		print(75)
+		nm = "img/all_category_images/75/" + val.lower() + "_75.jpg"
+	else :
+		nm = None
+		
+	return nm

@@ -1,0 +1,99 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load utils %}
+
+{% block page-title %} 
+	<title>Arte'Venue | Photos of Our Art at Customer Places| Customer Reviews </title>
+{% endblock page-title %} 
+
+{% block page-description %}
+<meta name="description" content="Arte'Venue - photos uploaded by customers showcasing our art their places.">
+{% endblock page-description %}
+{% block page-keywords %}
+<meta name="keywords" content="customer review photos, customer reviews of art prints, customer reviews of paintings, Arte'Venue customer reviews, Arte'Venue reviews">
+{% endblock page-keywords %}
+
+{% block coursel-script %}
+{% endblock coursel-script %}
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+
+
+<!-- Only Override the site content block -->
+{% block sitecontent %}
+<div class = "container">
+	<div class = "row mt-5">
+		<div class = "col-12">
+			<h1>OUR ART AT CUSTOMER PLACES</h1>
+			<hr>
+		</div>
+	</div>
+	<div class = "row mt-3">
+		<div class = "col-12 customer-rating-summary">
+			Photos shared by our happy customers showcasing the artworks at their places.
+		</div>
+	</div>
+	<div class = "row mt-3">
+		{% for p in review_pics %}
+		<div class = "display: flex; justify-content:space-around;">
+			<div style = "padding: 10px;">
+				<a onclick = "showCustImg('{{p.pic_id}}')">
+					<img src="{% if p.user_photo_thumbnail.url %} {{ p.user_photo_thumbnail.url }} {% endif %}" alt="User Review Pictures" 
+						class="img-fluid" 
+						style = "filter: drop-shadow(0.25rem 0.25rem 0.25rem grey); " width = 150>
+				</a>
+			</div>
+		</div>
+		{% endfor %}
+	</div>	
+	<div class = "row">
+		<div class = "col-12">
+		<hr>
+		</div>
+	</div>
+	
+	<div class="box-cat info-bar">
+		<div class="row">
+			<div class="col-md-12 col-lg-12">
+				<ul class = "pagination justify-content-center"style="margin-bottom:0px !important">
+					{% if review_pics.has_previous %}
+					<li class="page-item">
+					  <a class="btn page-link" href="?page={{ review_pics.previous_page_number }}{% if star %} &star={{star}} {% endif %}" aria-label="Previous">
+						<span aria-hidden="true">&laquo; First</span>
+						<span class="sr-only">begin</span>
+					  </a>
+					</li>   {% endif %}
+
+					{% for n in review_pics.paginator.page_range %}
+					  {% if review_pics.number == n %}
+						<li class="page-item active">
+						  <span class="page-link">{{ n }}<span class="sr-only">(current)</span></span>
+						</li>
+					  {% elif n > review_pics.number|add:'-5' and n < review_pics.number|add:'5' %}
+						<li class="page-item">
+							<a class="btn page-link" href="?page={{ n }}{% if star %} &star={{star}} {% endif %}">{{ n }}</a>
+						</li>
+					  {% endif %}
+					{% endfor %}
+
+					{% if review_pics.has_next %}
+					  <li class="page-item">
+						<a class="btn page-link" href="?page={{ review_pics.paginator.num_pages }}{% if star %} &star={{star}} {% endif %}" aria-label="Next">
+						  <span aria-hidden="true">Last &raquo;</span>
+						  <span class="sr-only">end</span>
+						</a>
+					  </li>
+					  {% endif %}   
+				</ul> 
+			</div>
+		</div>
+	</div>	
+	{% include 'review/show_customer_image.html' %}
+</div>
+{% endblock sitecontent %}
+
+
+{% block jscripts %}
+{% endblock jscripts %}

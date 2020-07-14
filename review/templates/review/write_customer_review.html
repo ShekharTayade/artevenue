@@ -2,256 +2,428 @@
 {% load static %}
 {% load widget_tweaks %}
 {% block page-title %} 
-<title>Arte'Venue - Write Review</title>
+<title>Arte'Venue - Write a Review</title>
 {% endblock page-title %} 
 {% block page-description %}
-<meta name="description" content="Write customer review">
+<meta name="description" content="Write a customer review for artevenue.com">
 {% endblock page-description %}
 {% block page-keywords %}
 <meta name="keywords" content="customer review of artworks, art, artvenue, artwork review, artevenue review">
 {% endblock page-keywords %}
 
-{% block add_to_head %}	
-	<link  href="{% static 'vendor/cropper.js/cropper.css' %}" rel="stylesheet">
-	<script src="{% static 'vendor/cropper.js/cropper.js' %}"></script>
+{% block cropper %}
+{% endblock cropper %}
+
+{% block coursel-script %}
+{% endblock coursel-script %}
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+{% block google-recaptcha-3 %}
+<script src="https://www.google.com/recaptcha/api.js?render=6Le2ZqAUAAAAAIAvZ7dRPJkj5zLI2IYAxfPktXqE"></script>
+{% endblock google-recaptcha-3 %}
+
+{% block add_to_head %}
+	<link rel="stylesheet" href="{% static  'css/custom_framing.css' %}">
 {% endblock add_to_head %}
+
 
 	<!-- Only Override the site content block -->
 	{% block sitecontent %}
-        <div class="container-fluid">
+        <div class="container">
 			<div class="row">
 				<!-- breadcrumb-->
 				<div class="col-sm-12">
 					<nav aria-label="breadcrumb">
 						<ol class="breadcrumb">
 							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
-							<li aria-current="page" class="breadcrumb-item active">Write Review</li>
+							<li aria-current="page" class="breadcrumb-item active">Write a Review</li>
 						</ol>
 					</nav>
 				</div>
 			</div>
-			<h1 class="section-title h1 text-center">Write a Review</h1>
-			<hr>
-			<div class = "row">
-				<div class="col-12 col-md-4">
-				{% if order_items %}
-					Choose Artworks you are writing review for: 
-					{% for i in order_items %}
-						<div class = "col-6">
-							<img src = "{% static i.product.url %}" class="img-fluid image-display-review">
-							<input type = "checkbox">{{i.order.order_number}}, Dt: {{i.order.order_date|date:'d M Y'}}
-						</div>
-					{% endfor %}
-				{% else %}
-					You haven't made any purchases yet. It would be better if you order an artwork
-					and then write a review. However, you can still write generic review of our products,
-					collections, website and other aspects, what you like and don't like.
-				{% endif %}
+			<h1 class="section-title h1 text-center">WRITE A REVIEW</h1>
+			<div class = "row mt-3">
+				<div class="col-12 text-muted text-center">
+					We would love to hear from you on our artworks,
+					collections, website features, customer service and your overall 
+					experience, to which we are committed.<br/>
+					{% if user.is_authenticated %}
+						{% if not order_items %}
+							(You don't any purchases in last 3 months)
+						{% endif %}
+					{% else %}
+						(Please login or sign up, if not already done)
+					{% endif %}
+						
 					<hr>
 				</div>
-				<div class = "col-12 col-md-8">
-					<div class="row">
-						{% if customer_review_form.errors or msg %}
-							<div id="errors" class="alert alert-warning alert-dismissable">
-								<button type="button" class="close" data-dismiss="alert">&times;</button>
-								<div class="inner">
-									{% if customer_review_form.errors %}
-										<p>There were issues in the information you entered. Please correct following:</p>
-									{% endif %}
-									<!-- Error messaging -->
-									{{ customer_review_form.non_field_errors }}
-									{% if customer_review_form.errors %}
+				<form id = "rev-form" method = 'POST' enctype="multipart/form-data">
+					{% csrf_token %}
+					<input type="hidden" id="g-recaptcha-response" name="g-recaptcha-response">
+					<input type="hidden" name="action" value="write_review">
+					<div class = "col-12">
+						<div class="row">
+							<div class = "col-12">
+							{% if status == 'FAILURE' %}
+								<div id="errors" class="alert alert-warning alert-dismissable">
+									<button type="button" class="close" data-dismiss="alert">&times;</button>
+									<div class="inner">
+										{% if msg %}
 										<ul>
-											<!-- Forms -->
-											{% for field in customer_review_form %}
-												{% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
-											{% endfor %}
+											<!-- Validations -->
+											<li>{{msg}}</li>
 										</ul>
-									{% endif %}
-									{% if msg %}
-									<ul>
-										<!-- Validations -->
-										<li>{{msg}}</li>
-									</ul>
-									{% endif %}							
-								</div>
-							</div>
-						{% endif %} 
-					
-					</div>
-					<div class = "row">
-						<div class="col-12 text-center">
-							Your Rating: 
-							<span onclick = "click_star(1);" id= "1star" class = "review-star"><i class="fa fa-star-o"></i></span>
-							<span onclick = "click_star(2);" id= "2star" class = "review-star"><i class="fa fa-star-o"></i></span>
-							<span onclick = "click_star(3);" id= "3star" class = "review-star"><i class="fa fa-star-o"></i></span>
-							<span onclick = "click_star(4);" id= "4star" class = "review-star"><i class="fa fa-star-o"></i></span>
-							<span onclick = "click_star(5);" id= "5star" class = "review-star"><i class="fa fa-star-o"></i></span>
-						</div>
-					</div>
-					<hr>
-					<div class = "row mt-3">
-						<div class="col-12 col-md-4">
-							<div class="form-group" >
-								<label>Name: </label>
-								<input placeholder="Your Name" type="text" name="name" 
-								maxlength="500" autofocus="" class="form-control"
-								required="" id="id_name"
-								value = "{{customer_review_form.name.value|default_if_none:''}}"
-								>
-								{% for error in customer_review_form.name.errors %}
-									<div class="invalid-feedback">
-									  {{ error }}
+										{% endif %}							
 									</div>
-								{% endfor %}
+								</div>
+							{% endif %} 
+							</div>
+						</div>
+						<div class = "row">
+							<div class="col-12 text-center">
+								<strong class = "mr-3" style = "font-size: 1.2rem;">Your Rating: </strong>
+								<span onclick = "click_star(1);" id= "1star" class = "review-star">
+									<i class="fa fa-star-o"></i>
+								</span>
+								<span onclick = "click_star(2);" id= "2star" class = "review-star">
+									<i class="fa fa-star-o"></i>
+								</span>
+								<span onclick = "click_star(3);" id= "3star" class = "review-star">
+									<i class="fa fa-star-o"></i>
+								</span>
+								<span onclick = "click_star(4);" id= "4star" class = "review-star">
+									<i class="fa fa-star-o"></i>
+								</span>
+								<span onclick = "click_star(5);" id= "5star" class = "review-star">
+									<i class="fa fa-star-o"></i>
+								</span>
+								<input hidden id = "id_rating" name = "rating"
+								value = "{{customer_review_form.rating.value}}">
+							</div>
+						</div>
+						<hr>
+						<div class = "row mt-3">
+							<div class="col-12 text-center">
+								YOUR INFORMATION:
+							</div>
+							<div class="col-12 col-md-4">
+								<div class="form-group" >
+									<label>Name: </label>
+									<input placeholder="Your Name" type="text" name="name" 
+									maxlength="500" autofocus="" class="form-control"
+									required=""  class = "form-control"
+									id="id_name"
+									value = "{{customer_review_form.name.value|default_if_none:''}}"
+									>
+								</div>						
+							</div>
+							<div class="col-12 col-md-4">
+								<div class="form-group" >
+									<label>Location: </label>
+									<input placeholder="Your Location(City/State)" type="text" 
+									name="location" id = "id_location"
+									maxlength="500" autofocus="" class="form-control"
+									required=""
+									value = "{{customer_review_form.location.value|default_if_none:''}}"
+									>
+								</div>							
+							</div>
+							<div class="col-12 col-md-4">
+								<label class = "form-label">Country: </label>
+								<div class="form-group" >
+									<input placeholder="Country" type="text" name="country" 
+									maxlength="500" autofocus="" class="form-control"
+									required="" id="id_country"
+									value = "{{customer_review_form.country.value|default_if_none:'India'}}"
+									>
+								</div>							
+							</div>
+						</div>
+						<div class = "row mt-3">					
+							<div class="col-12 col-md-6">
+								<div class="form-group" >
+									<label>Email ID: (Optional)</label>
+									<input placeholder="Your Email ID" type="email" 
+									name="email_id" id = "id_email_id" class = "form-control"
+									value = "{{customer_review_form.email_id.value|default_if_none:''}}"
+									>
+								</div>							
+							</div>
+							<div class="col-12 col-md-6">
+								<div class="form-group" >
+									<label>Mobile Number: (Optional)</label>
+									<input placeholder="Your Mobile Number" type="text" 
+									name="phone_number" id = "id_phone_number" class = "form-control"
+									value = "{{customer_review_form.phone_number.value|default_if_none:''}}"
+									>
+								</div>							
+							</div>
+							<div class="col-12">
+								<span style = "font-size: 0.6rem;">(Our customer experience team will use your email / 
+								mobile number only to contact you regarding the feedback you provide
+								and to address if you have any issues. As per our privacy policy
+								we will not publish your email or contact number without your explicit
+								permission.)</span>
 							</div>						
 						</div>
-						<div class="col-12 col-md-4">
-							<div class="form-group" >
-								<label>Location: </label>
-								<input placeholder="Your Location(City/State)" type="text" name="location" 
-								maxlength="500" autofocus="" class="form-control"
-								required="" id="id_location"
-								value = "{{customer_review_form.location.value|default_if_none:''}}"
-								>
-								{% for error in customer_review_form.location.errors %}
-									<div class="invalid-feedback">
-									  {{ error }}
-									</div>
-								{% endfor %}
-							</div>							
-						</div>
-						<div class="col-12 col-md-4">
-							<label class = "form-label">Country: </label>
-							<div class="form-group" >
-								<input placeholder="Country" type="text" name="country" 
-								maxlength="500" autofocus="" class="form-control"
-								required="" id="id_country"
-								value = "{{customer_review_form.country.value|default_if_none:''}}"
-								>
-								{% for error in customer_review_form.country.errors %}
-									<div class="invalid-feedback">
-									  {{ error }}
-									</div>
-								{% endfor %}
-							</div>							
-						</div>
-					</div>
-					<div class = "row">
-						<div class="col-12">
-							<div class="form-group" >
-								<label class = "form-label">Headline: </label>
-								<input placeholder="Title/Headline of your review" type="text" name="headline"
-								maxlength="100" autofocus="" class="form-control"
-								required="" id="id_headline"
-								value = "{{customer_review_form.headline.value}}"
-								>
-								{% for error in customer_review_form.headline.errors %}
-									<div class="invalid-feedback">
-									  {{ error }}
-									</div>
-								{% endfor %}
-							</div>							
-						</div>
-						<div class="col-12">
-							<div class="form-group" >
-								<label>Review Comments: </label>
-								<textarea placeholder="What you liked/disliked" type="text" name="comments" 
-									rows="5" cols="100"
-									maxlength="500" autofocus="" class="form-control"
-									required="" id="id_comments"
-									value = "{{customer_review_form.comments.value}}">
-								</textarea>
-								{% for error in customer_review_form.comments.errors %}
-									<div class="invalid-feedback">
-									  {{ error }}
-									</div>
-								{% endfor %}
+						<div class = "row">
+							<div class="col-12">
+								<hr>
 							</div>
 						</div>
-					</div>
-					<div class = "row">
-						<div class = "col-12">
-							We would love to see photos of artwork displayed at your place.
-							Want to upload some?<br />
-							<span style="color:#11b6bd;">Drag and drop photos or click arrow to upload</span>
-						</div>
-					</div>
-					<div id = "upload-pics" class = "row">
-						<div class = "col-6 col-md-3  photos-div">
-							<form id = "upload-form1" method = "post" enctype='multipart/form-data'>
-								{% csrf_token %}
-								<!-- <span id = "artist"> Click browse button to select an image</span> -->
-								<div class = "btn btn-default btn-file" style = "display: block !important;">
-									<input name="image_to_frame" class="form-control" id="user_image1" onchange = "$('#upld_btn1').click()" type="file" accept="image/png, image/jpeg, image/gif, image/bmp" required multiple />
-									<img class = "user-photo" id = "upload-photo1" src = "{% static 'img/upload_arrow.png' %}"><input hidden name="user_id"class="form-control" id="user_id" value = "{{request.user}}">
-								</div>
-								<button hidden id= "upld_btn1" class="btn btn-primary" type = "submit" form="upload-form1"> <i class = "fa fa-upload"></i></button>
-							</form>
-							<i title="Rotate Left" class = "fa fa-rotate-left" onclick = "rotateLeft(1);"></i>&nbsp;&nbsp;&nbsp;&nbsp;
-							<i title="Rotate Right" class = "fa fa-rotate-right" onclick = "rotateRight(1);"></i>
-							<i title="Remove Photo" class = "fa fa-trash pull-right" id = "delete-photo1"
-								style = "cursor: pinter;"
-								onclick = "delete_pic(1);"></i> 
-							
-						</div>
-						<div class = "col-6 col-md-3  photos-div">
-							<form id = "upload-form2" method = "post" enctype='multipart/form-data'>
-								{% csrf_token %}
-								<!-- <span id = "artist"> Click browse button to select an image</span> -->
-								<div class = "btn btn-default btn-file" style = "display: block !important;">
-									<input name="image_to_frame" class="form-control" id="user_image2" onchange = "$('#upld_btn2').click()" type="file" accept="image/png, image/jpeg, image/gif, image/bmp" required multiple />
-									<img class = "user-photo" id = "upload-photo2" src = "{% static 'img/upload_arrow.png' %}"><input hidden name="user_id"class="form-control" id="user_id" value = "{{request.user}}">
-								</div>
-								<button hidden id= "upld_btn2" class="btn btn-primary" type = "submit" form="upload-form2"> <i class = "fa fa-upload"></i></button>
-							</form>
-							<i title="Rotate Left" class = "fa fa-rotate-left" onclick = "rotateLeft(2);"></i>&nbsp;&nbsp;&nbsp;&nbsp;
-							<i title="Rotate Right" class = "fa fa-rotate-right" onclick = "rotateRight(2);"></i>
-							<i title="Remove Photo" class = "fa fa-trash pull-right" id = "delete-photo2"
-								style = "cursor: pinter;"
-								onclick = "delete_pic(2);"></i> 
-							
-						</div>
-						<div class = "col-6 col-md-3  photos-div">
-							<form id = "upload-form3" method = "post" enctype='multipart/form-data'>
-								{% csrf_token %}
-								<!-- <span id = "artist"> Click browse button to select an image</span> -->
-								<div class = "btn btn-default btn-file" style = "display: block !important;">
-									<input name="image_to_frame" class="form-control" id="user_image3" onchange = "$('#upld_btn3').click()" type="file" accept="image/png, image/jpeg, image/gif, image/bmp" required multiple />
-									<img class = "user-photo" id = "upload-photo3" src = "{% static 'img/upload_arrow.png' %}"><input hidden name="user_id"class="form-control" id="user_id" value = "{{request.user}}">
-								</div>
-								<button hidden id= "upld_btn3" class="btn btn-primary" type = "submit" form="upload-form3"> <i class = "fa fa-upload"></i></button>
-							</form>
-							<i title="Rotate Left" class = "fa fa-rotate-left" onclick = "rotateLeft(3);"></i>&nbsp;&nbsp;&nbsp;&nbsp;
-							<i title="Rotate Right" class = "fa fa-rotate-right" onclick = "rotateRight(3);"></i>
-							<i title="Remove Photo" class = "fa fa-trash pull-right" id = "delete-photo3"
-								style = "cursor: pinter;"
-								onclick = "delete_pic(3);"></i> 
-						</div>
-						<div class = "col-6 col-md-3  photos-div">
-							<form id = "upload-form4" method = "post" enctype='multipart/form-data'>
-								{% csrf_token %}
-								<!-- <span id = "artist"> Click browse button to select an image</span> -->
-								<div class = "btn btn-default btn-file" style = "display: block !important;">
-									<input name="image_to_frame" class="form-control" id="user_image4" onchange = "$('#upld_btn4').click()" type="file" accept="image/png, image/jpeg, image/gif, image/bmp" required multiple />
-									<img class = "user-photo" id = "upload-photo4" src = "{% static 'img/upload_arrow.png' %}"><input hidden name="user_id"class="form-control" id="user_id" value = "{{request.user}}">
-								</div>
-								<button hidden id= "upld_btn4" class="btn btn-primary" type = "submit" form="upload-form4"> <i class = "fa fa-upload"></i></button>
-							</form>
-							<i title="Rotate Left" class = "fa fa-rotate-left" onclick = "rotateLeft(4);"></i>&nbsp;&nbsp;&nbsp;&nbsp;
-							<i title="Rotate Right" class = "fa fa-rotate-right" onclick = "rotateRight(4);"></i>
-							<i title="Remove Photo" class = "fa fa-trash pull-right" id = "delete-photo4"
-								style = "cursor: pinter;"
-								onclick = "delete_pic(4);"></i> 
-						</div>
-					</div>
-						<div class="col-12 mt-5">
-							<div class="form-group">
-								<button class = "btn btn-primary">Submit Review</button>
+						<div class = "row ">
+							<div class="col-12 text-center">
+								YOUR REVIEW:
 							</div>
 						</div>
-					{% include "artevenue/fix-error-message.html" %}
-				</div>
+						{% if order_items %}
+						<div class = "row mt-3">
+							<div class="col-12">
+								<div class = "form-group">
+									Would you like to tag your review to artwork(s) you have purchased?
+									If yes, 
+									<a class = "btn btn-primary"
+										onclick = "$('#customer-products').modal('show');">
+										click here 
+									</a>
+									to select artwork(s), or continue writing the review.
+								</div>
+							</div>
+							<div id = "prod-select" class="col-12">
+								<div class = "form-group">
+									{% include 'review/customer_order_products_modal.html' %}
+									<input hidden id="id_selected-prods" name = "selected_prods">
+								</div>
+							</div>
+						</div>
+						{% endif %}
+						<div class = "row">
+							<div class="col-12">
+								<div class="form-group" >
+									<label class = "form-label">Headline: </label>
+									<input placeholder="Highlight of your feedback. What you think is best or worst." 
+									type="text" name="headline" id = "id_headline"
+									maxlength="100" autofocus="" class="form-control"
+									required="" id="id_headline"
+									value = "{{customer_review_form.headline.value|default_if_none:''}}"
+									>
+								</div>							
+							</div>
+							<div class="col-12">
+								<div class="form-group" >
+									<label>Feedback: </label>
+									<textarea 
+										placeholder="What you liked/disliked" 
+										type="text" name="comments" id = "id_comments"
+										rows="5" cols="400"
+										maxlength="2000" class="form-control"
+										required="" id="id_comments"
+										value = "">{{customer_review_form.comments.value|default_if_none:''}}</textarea>
+								</div>
+							</div>
+						</div>
+						<div class = "row">
+							<div class = "col-12">
+								We would love to see photos of artwork displayed at your place.
+								Want to upload some?<br />
+							</div>
+						</div>
+						<div id = "upload-pics" class = "row">
+							<div class = "col-6 col-md-3 photos-div">
+								<div class="file-upload-content" id = "content-1">
+									<img id = "cust-img1" class="file-upload-image" src="#" alt="User Photo 1" 
+										style = "padding:0px;" width=150/>
+									<i title="Remove Photo" 
+										class = "fa fa-trash pull-right" 
+										id = "delete-photo1"
+										style = "cursor: ponter; display:block;"
+										onclick = "removeUpload('1');">
+									</i> 
+								</div>
+								<div class = "row">
+									<div class = "col-12">
+										<div class="image-upload-wrap" id = "wrap-1" style = "margin-top: 0px; border: 2px solid  #e6e6e6;">
+											<div class="btn-default btn-file drag-text" style = "display: block;">
+												<input class="file-upload-input"  id = "input-1" 
+													type='file' 
+													onchange="readURL(this, '1');" 
+													accept="image/png, image/jpeg, image/gif, image/bmp" 
+													name="user_photo1" 
+													class="form-control"
+													style = "box-sizing: border-box;"/>
+												<div id = "upload-show1" onclick="$('#input-1').trigger( 'click' );">
+													<span style = "font-size: 0.7rem;" class = "text-center">
+														Click to Upload or Drag & Drop
+													</span>
+													<img id = "img-1" src = "{% static 'img/custom_framing/upload_icon.png' %}" 
+														class = "mt-4 mb-4"
+														alt="Upload Image Icon" 
+														width=40 style="  display: block; margin-left: auto; margin-right: auto; width: 30%;">
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							
+							<div class = "col-6 col-md-3 photos-div">
+								<div class="file-upload-content" id = "content-2">
+									<img id = "cust-img2" class="file-upload-image" src="#" alt="User Photo 2" 
+										style = "padding:0px;" width=150/>
+									<i title="Remove Photo" 
+										class = "fa fa-trash pull-right" 
+										id = "delete-photo2"
+										style = "cursor: pinter; display:block;"
+										onclick = "removeUpload('2');">
+									</i> 
+								</div>
+								<button hidden class="file-upload-btn" id = "upd-input-2" type="button" onclick="$('#input-2').trigger( 'click' );">
+									<i class = "fa fa-upload"> </i>
+								</button>							
+								<div class = "row">
+								<div class = "col-12">
+								<div class="image-upload-wrap" id = "wrap-2" style = "margin-top: 0px; border: 2px solid  #e6e6e6;">
+									<div class="btn-default btn-file drag-text" style = "display: block;">
+										<input class="file-upload-input" 
+											id = "input-2" type='file' 
+											onchange="readURL(this, '2');" 
+											accept="image/png, image/jpeg, image/gif, image/bmp" 
+											name="user_photo2" 
+											class="form-control"
+											style = "box-sizing: border-box; width: 50%"/>
+										<div id = "upload-show2" onclick="$('#input-2').trigger( 'click' );">
+											<!--<img id = "img-2" src = "{% static 'img/custom_framing/upload_icon.png' %}" 
+												alt="Upload Image Icon" 
+												width=100 style="top: 25%; position: absolute;left: 25%;">
+											<p style = "padding: 0px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+												Click to Upload or Drag & Drop
+											</p>-->
+											<span style = "font-size: 0.7rem;" class = "text-center">
+												Click to Upload or Drag & Drop
+											</span>
+											<img id = "img-2" src = "{% static 'img/custom_framing/upload_icon.png' %}" 
+												class = "mt-4 mb-4"
+												alt="Upload Image Icon" 
+												width=40 style="  display: block; margin-left: auto; margin-right: auto; width: 30%;">
+										</div>
+									</div>
+								</div>
+								</div>
+								</div>
+							</div>
+							
+							<div class = "col-6 col-md-3 photos-div">
+								<div class="file-upload-content" id = "content-3">
+									<img id = "cust-img3" class="file-upload-image" src="#" alt="User Photo 3" 
+										style = "padding:0px;" width=150/>
+									<i title="Remove Photo" 
+										class = "fa fa-trash pull-right" 
+										id = "delete-photo3"
+										style = "cursor: pinter; display:block;"
+										onclick = "removeUpload('3');">
+									</i> 
+								</div>
+								<button hidden class="file-upload-btn" id = "upd-input-3" type="button" onclick="$('#input-3').trigger( 'click' );">
+									<i class = "fa fa-upload"> </i>
+								</button>							
+								<div class = "row">
+								<div class = "col-12">
+								<div class="image-upload-wrap" id = "wrap-3" style = "margin-top: 0px; border: 2px solid  #e6e6e6;">
+									<div class="btn-default btn-file drag-text" style = "display: block;">
+										<input class="file-upload-input" 
+											id = "input-3" type='file' 
+											onchange="readURL(this, '3');" 
+											accept="image/png, image/jpeg, image/gif, image/bmp" 
+											name="user_photo3" 
+											class="form-control"
+											style = "box-sizing: border-box; width: 50%"/>
+										<div id = "upload-show3" onclick="$('#input-3').trigger( 'click' );">
+											<span style = "font-size: 0.7rem;" class = "text-center">
+												Click to Upload or Drag & Drop
+											</span>
+											<img id = "img-3" src = "{% static 'img/custom_framing/upload_icon.png' %}" 
+												class = "mt-4 mb-4"
+												alt="Upload Image Icon" 
+												width=40 style="  display: block; margin-left: auto; margin-right: auto; width: 30%;">
+										</div>
+									</div>
+								</div>
+								</div>
+								</div>
+							</div>
+
+
+							<div class = "col-6 col-md-3 photos-div">
+								<div class="file-upload-content" id = "content-4">
+									<img id = "cust-img4" class="file-upload-image" src="#" alt="User Photo 4" 
+										style = "padding:0px;" width=150/>
+									<i title="Remove Photo" 
+										class = "fa fa-trash pull-right" 
+										id = "delete-photo4"
+										style = "cursor: pinter; display:block;"
+										onclick = "removeUpload('4');">
+									</i> 
+								</div>
+								<button hidden class="file-upload-btn" id = "upd-input-4" type="button" onclick="$('#input-4').trigger( 'click' );">
+									<i class = "fa fa-upload"> </i>
+								</button>							
+								<div class = "row">
+								<div class = "col-12">
+								<div class="image-upload-wrap" id = "wrap-4" style = "margin-top: 0px; border: 2px solid  #e6e6e6;">
+									<div class="btn-default btn-file drag-text" style = "display: block;">
+										<input class="file-upload-input"
+											id = "input-4" 
+											type='file' 
+											onchange="readURL(this, '4');" 
+											accept="image/png, image/jpeg, image/gif, image/bmp" 
+											name="user_photo4" 
+											class="form-control"
+											style = "box-sizing: border-box; width: 50%"/>
+										<div id = "upload-show4" onclick="$('#input-4').trigger( 'click' );">
+											<span style = "font-size: 0.7rem;" class = "text-center">
+												Click to Upload or Drag & Drop
+											</span>
+											<img id = "img-4" src = "{% static 'img/custom_framing/upload_icon.png' %}" 
+												class = "mt-4 mb-4"
+												alt="Upload Image Icon" 
+												width=40 style="  display: block; margin-left: auto; margin-right: auto; width: 30%;">
+										</div>
+									</div>
+								</div>
+								</div>
+								</div>
+							</div>
+
+						</div>
+						<div class = "row mt-5">											  
+							<div class="col-12">
+								<div class = "form-group">
+									<label class="checkbox-inline">
+									  <input id = "id_allow_to_use" name = "allow_to_use"
+										type="checkbox" value="TRUE" checked>
+											Allow Arte'Venue to use the review & pictures on its website and the media posts<br/>
+										<small>(As per our privacy policy, we will not use your email, or contact number)</small>
+									</label>
+								</div>
+							</div>
+						</div>
+						<div class = "row">
+							<div class="col-12 mt-5 text-center">
+								<div class="form-group">
+									<button 
+										class = "btn btn-primary" type="submit" 
+										form = "rev-form">
+										Submit Review
+									</button>
+								</div>
+							</div>
+						</div>
+						{% include "artevenue/fix-error-message.html" %}
+						{% include 'artevenue/show-product.html' %}
+					</div>
+				</form>				
 			</div>
 		</div>
 	{% endblock sitecontent %}
@@ -261,10 +433,18 @@
 	
 	<script>
 		$( document ).ready(function() {
+			{% if customer_review_form.rating.value %}
+				var rating = parseInt('customer_review_form.rating.value');
+				if (isNaN(rating) == false && rating > 0) {
+					click_star(rating);
+				}
+			{% endif %}
+		
 		});	
 	</script>
 	<script>
 		function click_star(number){
+			$("#id_rating").val(number);
 			switch (number) {
 			  case 1:
 				$("#1star").html("<i class='fa fa-star'>");
@@ -393,72 +573,96 @@
 	</script>
 
 	<script>
-		var cropper;
-		
-		function rotateLeft(img_num){
-			image = document.getElementById('upload-photo' + img_num.toString());
-			cropper = new Cropper(image, {
-			});
-			cropper.rotate(-45);			
-		}
-		function rotateRight(img_num){
-			document.getElementById('upload-photo' + img_num.toString()).style.transform = "rotate(90deg)";
-		}
+	
+		function submit_review(){
+			var fileInput = document.getElementById('user_image1');
+			var file1 = fileInput.files[0];
+			var formData = new FormData();
+			formData.append('file1', file1);
+			var fileInput = document.getElementById('user_image2');
+			var file2 = fileInput.files[0];
+			formData.append('file2', file2);
+			var fileInput = document.getElementById('user_image3');
+			var file3 = fileInput.files[0];
+			formData.append('file3', file3);
+			var fileInput = document.getElementById('user_image4');
+			var file4 = fileInput.files[0];
+			formData.append('file4', file4);
+			
+			formData.append('product_id', product_id);
+			formData.append('name', $("#name").val());
+			formData.append('rating', rating);
+			formData.append('headline', $("#headline").val());
+			formData.append('comments', $("#comments").val());
+			formData.append('allow_to_use', $("#allow_to_use").val());
+			$.ajax({
+				url: '{% url "write_customer_review" %}', 
+				data:formData,
+				processData: false,
+				contentType: false,
+				type: 'post',				
+				success: function (data) {
+					var data = JSON.parse(data);
+					var sts = data.msg.toUpperCase();
+					if (data.sts = "ERROR") {
+						alert(data.msg);
+					}
+				},
+				error: function(xhr){
+					alert("An error occured: " + xhr.status + " " + xhr.statusText + " Please make sure that you are uploading a proper ,jpg, .gif or .png image."); 
+					return;
+				}
+			});				
+		}	
 	</script>
-
 
 	<script>
-		function getOrientation(file, callback) {
-			var reader = new FileReader();
-			reader.onload = function(e) {
-
-				var view = new DataView(e.target.result);
-				if (view.getUint16(0, false) != 0xFFD8)
-				{
-					return callback(-2);
-				}
-				var length = view.byteLength, offset = 2;
-				while (offset < length) 
-				{
-					if (view.getUint16(offset+2, false) <= 8) return callback(-1);
-					var marker = view.getUint16(offset, false);
-					offset += 2;
-					if (marker == 0xFFE1) 
-					{
-						if (view.getUint32(offset += 2, false) != 0x45786966) 
-						{
-							return callback(-1);
-						}
-
-						var little = view.getUint16(offset += 6, false) == 0x4949;
-						offset += view.getUint32(offset + 4, little);
-						var tags = view.getUint16(offset, little);
-						offset += 2;
-						for (var i = 0; i < tags; i++)
-						{
-							if (view.getUint16(offset + (i * 12), little) == 0x0112)
-							{
-								return callback(view.getUint16(offset + (i * 12) + 8, little));
-							}
-						}
-					}
-					else if ((marker & 0xFF00) != 0xFF00)
-					{
-						break;
-					}
-					else
-					{ 
-						offset += view.getUint16(offset, false);
-					}
-				}
-				return callback(-1);
+		function readURL(input, num) {
+		    if (input.files && input.files[0]) {
+				var reader = new FileReader();
+				var upd_wrap = '#wrap-' + num;
+				var upd_img = '#cust-img' + num
+				var upd_content = '#content-' + num;
+				reader.onload = function(e) {
+				$(upd_wrap).hide();
+				$(upd_img).attr('src', e.target.result);
+				$(upd_content).show();
 			};
-			reader.readAsArrayBuffer(file);
+			reader.readAsDataURL(input.files[0]);
+		  } else {
+			removeUpload(num);
+		  }
 		}
 
-		// usage:
+		function removeUpload(num) {
+			var upd_wrap = '#wrap-' + num;
+			var upd_img = '#cust-img' + num
+			var upd_inp = '#upd-input-' + num
+			var upd_content = '#content-' + num;
+			var inp = "#input-" + num;
+		  $(upd_inp).replaceWith($(upd_inp).clone());
+		  $(upd_content).hide();
+		  $(upd_wrap).show();		  
+		}
 	</script>
-	
-	{% endblock jscripts %}
+	<script>
+		$('.image-upload-wrap').bind('dragover', function () {
+				$('.image-upload-wrap').addClass('image-dropping');
+			});
+			$('.image-upload-wrap').bind('dragleave', function () {
+				$('.image-upload-wrap').removeClass('image-dropping');
+		});
+	</script>	
+
+	<script>
+		grecaptcha.ready(function() {
+			grecaptcha.execute('6Le2ZqAUAAAAAIAvZ7dRPJkj5zLI2IYAxfPktXqE', {action:'write_review'})
+					  .then(function(token) {
+				// add token value to form
+				document.getElementById('g-recaptcha-response').value = token;
+			});
+		});
+	</script>
+{% endblock jscripts %}
 			
 	

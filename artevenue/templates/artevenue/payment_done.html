@@ -1,6 +1,30 @@
 {% extends 'artevenue/estore_base.html' %}
 {% load static %}
 
+{% block page-title %} 
+	<title>Arte'Venue Order Confirmation</title>
+{% endblock page-title %} 
+{% block page-description %}
+	<meta name="description" content="Confirmation of order placed at artevenue.com">
+{% endblock page-description %}
+{% block page-keywords %}
+	<meta name="keywords" content="artevenue, order">
+{% endblock page-keywords %}
+
+{% block page-author %}
+	<meta name="author" content="Arte'Venue">
+{% endblock page-author %}
+
+{% block jqueryui-stylesheet %}
+{% endblock jqueryui-stylesheet %}
+
+{% block jqueryui-script %}
+{% endblock jqueryui-script %}
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+{% if env == 'PROD' %}
 {% block add_to_head %}
 	<script>
 	gtag('event', 'purchase', {
@@ -27,7 +51,18 @@
 	  ]
 	});	
 	</script>
+	
+	<!-- Event snippet for Buy Art conversion page -->
+	<script>
+	  gtag('event', 'conversion', {
+		  'send_to': 'AW-704394330/egnUCKr4gdMBENro8M8C',
+		  'value': {{order.order_total}},
+		  'currency': 'INR',
+		  'transaction_id': '{{order.order_number}}'
+	  });
+	</script>	
 {% endblock add_to_head %}
+{% endif %}
 	<!-- Only Override the site content block -->
 	{% block sitecontent %}
         <div class="container">

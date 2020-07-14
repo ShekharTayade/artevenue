@@ -21,10 +21,12 @@
 {% load why_artevenue_text from estore_base %}
 {% load pick_style from prod_template_tags %}
 {% load best_sellers from prod_template_tags %}
+{% load speciality_art from prod_template_tags %}
 {% load signup_banner from estore_base %}
 {% load how_to_tips from estore_base %}
+
  
-<html class = "gr__artevenue_com">
+<html class = "gr__artevenue_com"  lang="en-IN">
 	<head>
 		{% block html-head %}
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -36,20 +38,21 @@
 
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<meta name="robots" content="all,follow">
+
+		<meta name="p:domain_verify" content="70f50ce7e84f7c0bf1219c51b7012042" />
 		
 		{% block page-title %}
-		<title>Beautiful Paintings For Home Walls | Arte'Venue</title>
+		<title>Top Quality Wall Art Prints & Framing | Over 2.5 Lakh Paintings</title>
 		{% endblock page-title %}
 		
 		{% block page-description %}
-		<meta name="description" content="
-				Buy Paintings Online? Art prints are fashionable when it 
-				comes to wall art paintings for home decor, be it wall paintings for bedroom, 
-				living room, or other spaces.">
+		<meta name="description" content="Beautiful wall art collection. 
+			Buy paintings online? Licensed art prints of exquisite paintings from artists across 
+			the world. Customizable, paper or canvas prints.">
 		{% endblock page-description %}
 		  
 		{% block page-keywords %}
-		<meta name="keywords" content="beautiful paintings, wall art painting, buy paintings online, wall paintings for bedroom, paintings for home walls, wall paintings for living room, paintings for home decor, online photo framing, wall art, abstract art, abstract paintings, canvas paintings online india, abstract paintings, floral paintings">
+		<meta name="keywords" content="wall art, art prints, buy paintings online, canvas prints online, canvas prints , fine art prints, paintings for home walls, wall art paintings, painting for home decor, wall paintings for bedroom, wall paintings for living room, online photo framing, online printing and framing, abstract art, abstract paintings, canvas paintings online india, abstract paintings">
 		{% endblock page-keywords %}
 		
 		{% block page-author %} 
@@ -69,12 +72,12 @@
 		<!--<link rel="stylesheet" href="{% static 'vendor/font-awesome-5.10.1-web/css/all.min.css' %}">-->
 		
 		<!-- Google fonts - Roboto -->
-		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,500,700,300,100">
+		<!--<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,500,700,300,100">-->
 		
 		{% block coursel-stylesheet %}
 		<!-- owl carousel-->
-		<link rel="stylesheet" href="{% static 'vendor/owl.carousel/assets/owl.carousel.css' %}">
-		<link rel="stylesheet" href="{% static 'vendor/owl.carousel/assets/owl.theme.default.css' %}">
+		<link rel="stylesheet" href="{% static 'vendor/owl.carousel/assets/owl.carousel.css' %}" async>
+		<link rel="stylesheet" href="{% static 'vendor/owl.carousel/assets/owl.theme.default.css' %}" async>
 		{% endblock coursel-stylesheet %}
 
 		<!-- Custom stylesheet -->
@@ -89,7 +92,7 @@
 
 		
 		<!-- Goole Font -->
-		<link href="https://fonts.googleapis.com/css?family=Dosis" rel="stylesheet">
+		<!--<link href="https://fonts.googleapis.com/css?family=Dosis" rel="stylesheet">-->
 		
 		<!-- JavaScript files-->
 		<script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
@@ -102,15 +105,15 @@
 		<!-- <script src="{% static 'vendor/popper.js/umd/popper.min.js' %}"> </script>-->
 		{% endblock popper-script %}
 
-		<script src="{% static 'vendor/bootstrap/js/bootstrap.min.js' %}"></script>
+		<script src="{% static 'vendor/bootstrap/js/bootstrap.min.js' %}" async></script>
 
 		{% block js-cookie %}
-		<script src="{% static 'vendor/jquery.cookie/jquery.cookie.js' %}"> </script>
+		<script src="{% static 'vendor/jquery.cookie/jquery.cookie.js' %}" async> </script>
 		{% endblock js-cookie %}
 		
 		{% block coursel-script %}
-		<script src="{% static 'vendor/owl.carousel/owl.carousel.min.js' %}"></script>
-		<script src="{% static 'vendor/owl.carousel2.thumbs/owl.carousel2.thumbs.js' %}"></script>
+		<script src="{% static 'vendor/owl.carousel/owl.carousel.min.js' %}" async ></script>
+		<script src="{% static 'vendor/owl.carousel2.thumbs/owl.carousel2.thumbs.js' %}" async></script>
 		{% endblock coursel-script %}
 
 		{% block gmap-script %}
@@ -118,7 +121,7 @@
 		{% endblock gmap-script %}
 		
 		{% block front.js %}
-		<script src="{% static 'js/front.js' %}"></script>	
+		<script src="{% static 'js/front.js' %}" async></script>	
 		{% endblock front.js %}
 		
 		{% block waypoint-script %}
@@ -130,7 +133,7 @@
 		{% endblock counterup-script %}
 
 		{% block imagemap-resize-script %}
-		<script src="{% static 'vendor/imagemap/imageMapResizer.min.js' %}"></script>
+		<script src="{% static 'vendor/imagemap/imageMapResizer.min.js' %}" async></script>
 		{% endblock imagemap-resize-script %}
 
 		{% block lazysizes %}
@@ -141,37 +144,25 @@
 		<script src="https://www.google.com/recaptcha/api.js?render=6Le2ZqAUAAAAAIAvZ7dRPJkj5zLI2IYAxfPktXqE"></script>
 		{% endblock google-recaptcha-3 %}
 
-
-	{% if env == 'PROD' %}
-
+		{% if env == 'PROD' %}
 		<script type="application/ld+json">
 		{
 		  "@context": "https://schema.org",
 		  "@type": "WebSite",
-		  "url": "https://www.artevenue.com/",
+		  "url": "https://artevenue.com/",
 		  "potentialAction": {
 			"@type": "SearchAction",
-			"target": "https://artevenue.com/art-by-category/?keywords={search_term_string}",
+			"target": "https://artevenue.com/art-prints/?keywords={search_term_string}",
 			"query-input": "required name=search_term_string"
 		  }
 		}
 		</script>
+		{% endif %}
+		
 		{% block JSON-LD %}
 		{% endblock JSON-LD %}
-		
-		<!-- Google Tag Manager -->
-		<!--
-		<script>
-			(function(w,d,s,l,i)
-				{w[l]=w[l]||[];w[l].push({'gtm.start':
-				new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-				j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-				'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-				}
-			)
-			(window,document,'script','dataLayer','GTM-57D4W4D');
-		</script> -->
-		<!-- End Google Tag Manager -->		
+
+		{% if env == 'PROD' %}
 		<!-- Google Tag Manager -->
 		<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 		new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -179,36 +170,21 @@
 		'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
 		})(window,document,'script','dataLayer','GTM-KKN69MB');</script>
 		<!-- End Google Tag Manager -->
-	
-		{% block google-analytics %}
+
 		<!-- Global site tag (gtag.js) - Google Analytics -->
+		{% block google-analytics %}
 		<script async src="https://www.googletagmanager.com/gtag/js?id=UA-145310649-1"></script>
-		<script>
+		<script async>
 		  window.dataLayer = window.dataLayer || [];
 		  function gtag(){dataLayer.push(arguments);}
 		  gtag('js', new Date());
-
 		  gtag('config', 'UA-145310649-1');
+		  gtag('config', 'AW-704394330');
 		</script>
-		{% endblock google-analytics %}	
-
-		<!--
-		<script> 
-			gtag('event', 'conversion', { 'send_to': 'AW-704394330/KqzSCPvGtq8BENro8M8C', 'transaction_id': '' }); 
-		</script>
-		-->
+		{% endblock google-analytics %}
 		
-		<!-- Global site tag (gtag.js) - Google Ads: 704394330 --> 
-		<script async src="https://www.googletagmanager.com/gtag/js?id=AW-704394330"></script> 
-		<script> 
-			window.dataLayer = window.dataLayer || []; function gtag(){
-				dataLayer.push(arguments);
-			} 
-			gtag('js', new Date()); gtag('config', 'AW-704394330'); 
-		</script>		
-
 		<!-- Facebook Pixel Code -->
-		<script>
+		<script async>
 		  !function(f,b,e,v,n,t,s)
 		  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
 		  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
@@ -224,18 +200,17 @@
 		  src="https://www.facebook.com/tr?id=506471883218823&ev=PageView&noscript=1"
 		/></noscript>
 		<!-- End Facebook Pixel Code -->
-
-	{% endif %}
-
+		{% endif %}
+	
 		{% block cropper %}
 		<!-- <link  href="{% static 'vendor/cropper.js/cropper.css' %}" rel="stylesheet">-->
 		<!-- <script src="{% static 'vendor/cropper.js/cropper.js' %}"></script>-->
 		{% endblock cropper %}
 
-	{% if env == 'PROD' %}
+		{% if env == 'PROD' %}
 		{% block hotjar %}
 		<!-- Hotjar Tracking Code for www.artevenue.com -->
-		<script>
+		<!--<script>
 			(function(h,o,t,j,a,r){
 				h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
 				h._hjSettings={hjid:1698652,hjsv:6};
@@ -244,9 +219,11 @@
 				r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
 				a.appendChild(r);
 			})(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
-		</script>
+		</script>-->
 		{% endblock hotjar %}
-	{% endif %}
+		{% endif %}
+		
+		
 		{% block add_to_head %}
 		{% endblock add_to_head %}
 		
@@ -254,37 +231,33 @@
 	</head>
 
 	<body data-gr-c-s-loaded="true" cz-shortcut-listen="true">	
-
-	{% if env == 'PROD' %}
-		<!-- Google Tag Manager (noscript) -->
-			<!--<noscript>
-				<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-57D4W4D"
-				height="0" width="0" style="display:none;visibility:hidden"></iframe>
-			</noscript> -->
-		<!-- End Google Tag Manager (noscript) -->
+	
+		{% if env == 'PROD' %}
 		<!-- Google Tag Manager (noscript) -->
 		<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KKN69MB"
 		height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 		<!-- End Google Tag Manager (noscript) -->
 
-		<div id="fb-root"></div>
-		<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v7.0&appId=2449878791952932&autoLogAppEvents=1"></script>		
-	{% endif %}
+		<script
+			type="text/javascript"
+			async defer
+			src="//assets.pinterest.com/js/pinit.js"
+		></script>	
+		{% endif %}
+		
 		<!-- Header Section with top slim line, logo/search/cart and menu-->
 		{% block siteheader %}
 		<header class="header">
-
+			<!--
 			{% announcement %}			
-
-			<!-- Admin Menu-->
+			-->
+			
 			{% admin_menu request %}
 			
-			<!-- Top slim bar with tagline, login, register etc-->
-			{% topbar request messsages %}
-				
-			<!-- Navigation - Logo, menu, search and cart buttons -->
+			{% block menu %}				
 			{% menubar request messages %}
-			<!-- END: Navigation - Logo, menu, search and cart buttons -->
+			{% endblock menu %}	
+			
 		</header>
 		{% endblock siteheader %}
 		<!-- END: Header Section with top slim line, logo/search/cart and menu-->
@@ -298,55 +271,88 @@
 				{% show_trending_categories %}
 
 				{% show_curated_collections %}
-
+				
+				{% speciality_art %}
+				
 				{% why_artevenue_text %}
 
 				{% show_frame_my_art request %}			
 
-				{% best_sellers %}
-
 				{% signup_banner %}
 
-				{% pick_style %}				
-
 				{% how_to_tips request %}
+				
 
 				{% endblock sitecontent %}
 
+				<!--
+				{% promo_display request %}
+				-->
 				{% site_footer request %}
+				
+				<!--  Site Footer -->
+				<div class = "container-fluid"  style = "background-color: #000;">
+					<div class="row" style = "margin-top: 0px;">
+						<div class="col-12 text-center" style = "text-align:justify; color: #979797; 
+								margin-top:0px; font-size:11px; margin-bottom:0px; line-height: 1;
+								background-color: #000;">
+								
+							<p>
+								Arte'Venue is an online platform for high quality & affordable 
+								<span style = "font-style:italic;">wall art</span> for home decor
+								or any space which can adorn one. 
+								We host a collection of over 2,70,000 licensed art prints under one roof with a comprehensive database of various genres. While catering to a wide variety of wall art prints, posters and canvas prints, our expertise and commitment in delivering the best to our customers is our priority, so you can buy paintings online with us, as we ensure a seamless customer experience.
+								Anyone can frame ? 
+								Virtually of course!! 
+								Our website enables you to visualise a frame around your picture or artwork by a simple customisation tool, which makes online photo framing as easy as pie.
+							</p>
+														
+							{% block footer-text %}
+							<p>
+								You are never short of choices when it comes to 
+								<span style = "font-style:italic;">art prints</span> as
+								<span style = "font-style:italic;">paintings for home decor</span>, office,
+								or any space. 
+								Delivering the top notch quality products and service to our 
+								customers is our priority. You can <span style = "font-style:italic;">
+								buy paintings online</span> with us and you won't regret!
+							</p>
+							{% endblock footer-text %}
+
+						</div>
+					</div>				 
+				</div>
 				<!-- *** FOOTER END ***-->
 	
 				<!--COPYRIGHT -->
 				{% copy_right request %}
-				
- 				
+				 				
 			</div>
 			<div class="ajax-modal"></div>
 		</div>
 
 
 		{% block jscripts %}
-		<script>
-			imageMapResize();
-		</script>		
+			{% block image-resize-script %}
+			<script>
+				$( document ).ready(function() {
+					imageMapResize();
+				});
+			</script>
+			{% endblock image-resize-script %}
 		{% endblock jscripts %}
 		
 
 
 		<script>
 			$( document ).ready(function() {
-				val = sessionStorage.getItem("PopupShown");
+				val = sessionStorage.getItem("HomePopupShown");
 				if ( val == null){
 					setTimeout(function () {
 						$('#promo').modal('show');
-						sessionStorage.setItem("PopupShown", "yes");
-					}, 60000 );
-				
-					/*setTimeout(function () {
-						$('#promo').modal('hide')
-					}, 15000);*/
+						sessionStorage.setItem("HomePopupShown", "yes");
+					}, 1000 );
 				}
-
 			});
 		</script>
 		
@@ -433,9 +439,10 @@
 			}		
 		</script>
 
+		{% if env == 'PROD' %}
+
 		{% block tawkto %} 
-		<!--Start of Tawk.to Script-->
-		
+		<!--Start of Tawk.to Script-->		
 		<script type="text/javascript">		
 			var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
 			(function(){
@@ -449,6 +456,8 @@
 		</script>
 		<!--End of Tawk.to Script-->
 		{% endblock tawkto %}
+		
+		{% endif %}
 	</body>
 	
 </html>

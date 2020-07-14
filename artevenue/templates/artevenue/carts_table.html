@@ -10,7 +10,41 @@
 									{% endif %}
 								</p>
 							</div>	
-							{% regroup carts by created_date|date:"Y-m-d" as cartlist %}
+							<div class="row">
+								<div class = "col-12">
+									<strong>TODAY:</strong>
+								</div>
+								<table class ="table table-reponsive">
+									<thead>
+										<tr>
+											<th width="20%" style="text-align:left"><strong>Carts Created</strong></th>
+											<th width="20%" style="text-align:left"><strong>Carts Updated </strong></th>
+											<th width="20%" style="text-align:left"><strong>Carts Value</strong></th>
+											<th width="20%" style="text-align:left"><strong>Orders</strong></th>
+											<th width="20%" style="text-align:left"><strong>Orders Value</strong></th>											
+									</thead>
+									<tbody>
+										<tr>
+											<td>
+												{{created_count}}
+											</td>
+											<td>
+												{{updated_count}}
+											</td>
+											<td>
+												{{carts_value.c_total|floatformat}}
+											</td>
+											<td>
+												{{orders_count}}
+											</td>
+											<td>
+												{{orders_value.o_total|floatformat}}
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							{% regroup carts by updated_date|date:"Y-m-d" as cartlist %}
 							{% for crt in cartlist %}
 							<h3 style="padding:5px; font-weight:700; color:white; background-color:black;">{{ crt.grouper }}</h3>
 							{% for c in crt.list %}
@@ -33,8 +67,9 @@
 									{% else %}
 										<h3 style = "color:blue;">Anonymous User (not logged in)</h3>
 									{% endif %}
-									<h4>Cart Number : {{c.cart_id}}; 
-									Created on: {{c.created_date|date:"d M Y P"}}  | Status: {{ c.get_cart_status_display }}</h4>
+									<h4>Cart Number : {{c.cart_id}};</h4> 
+									<h4>Created on: {{c.created_date|date:"d M Y P"}}</h4>
+									<h4>Updated on: {{c.updated_date|date:"d M Y P"}}</h4>
 								</div>
 								<div class = "col-sm-12 col-md-6">	
 									<div class = "row">
@@ -136,35 +171,38 @@
 													</div>
 												</td>
 												<td>
-													{% with width=i.moulding.width_inner_inches|add_width_frame_mount:i.mount_size %}
-													<small>
-													{% if i.product_type == 'STOCK-COLLAGE' %}
-														EACH ITEM: <br/>
-													{% endif %}
-													{% if i.product_type == 'ORIGINAL-ART' %}
-														<li>{{i.product.description}}</li>
-													{% else %}													
-														<li>Print on {{i.print_medium_id|title}}</li>
-													{% endif %}
-													{% if i.moulding_id %}
-														<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
-														<li>Frame: {{i.moulding.name }} ({{i.moulding.width_inches}} inch, Polystyrene)</li>
-														{% if i.mount_id %}
-															<li>Mount: {{i.mount_size }}", Color: {{i.mount.name|title }} </li>
+													<button data-toggle="collapse" data-target="#details_{{i.cart_item_id}}">Details</button>
+													<div id = "details_{{i.cart_item_id}}" class="collapse">
+														{% with width=i.moulding.width_inner_inches|add_width_frame_mount:i.mount_size %}
+														<small>
+														{% if i.product_type == 'STOCK-COLLAGE' %}
+															EACH ITEM: <br/>
 														{% endif %}
-														<li>Total Size: 
-															{{ i.image_width|add_width:width|add_width:width }}" X {{i.image_height|add_width:width|add_width:width }}"</li>
-													{% else %}
-														<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
-													{% endif %}
-													{% if i.acrylic_id %}
-														<li>Acrylic covered</li>
-													{% endif %}
-													{% if i.stretch_id and not i.moulding_id %}
-														<li>Canvas Stretched</li>
-													{% endif %}
-													</small>
-													{% endwith %}
+														{% if i.product_type == 'ORIGINAL-ART' %}
+															<li>{{i.product.description}}</li>
+														{% else %}													
+															<li>Print on {{i.print_medium_id|title}}</li>
+														{% endif %}
+														{% if i.moulding_id %}
+															<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+															<li>Frame: {{i.moulding.name }} ({{i.moulding.width_inches}} inch, Polystyrene)</li>
+															{% if i.mount_id %}
+																<li>Mount: {{i.mount_size }}", Color: {{i.mount.name|title }} </li>
+															{% endif %}
+															<li>Total Size: 
+																{{ i.image_width|add_width:width|add_width:width }}" X {{i.image_height|add_width:width|add_width:width }}"</li>
+														{% else %}
+															<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+														{% endif %}
+														{% if i.acrylic_id %}
+															<li>Acrylic covered</li>
+														{% endif %}
+														{% if i.stretch_id and not i.moulding_id %}
+															<li>Canvas Stretched</li>
+														{% endif %}
+														</small>
+														{% endwith %}
+													</div>													
 												</td>
 												<td style = "text-align:right;">
 													{{i.quantity|floatformat}}

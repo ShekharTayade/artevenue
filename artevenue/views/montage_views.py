@@ -18,7 +18,6 @@ abstract_ids = [262896,232351,232388,165919,261963,247687,255442,42812,166669,15
 floral_ids = [226075,201564,190019,208356,221431,221455,246608,270667,206199,157659,157702,157695,219906,237062,166523,283351,254978,315771]
 landscape_ids = [246554,304861,270707,232260,220231,204619,19045,236818,246312,264975,226611,275667,218493,281025,267623,255026,255755,255765]
 
-
 def createABdata():
 	#m_createAmazonData("ABSTRACT", abstract_ids)	
 	#m_createAmazonImages("ABSTRACT", abstract_ids)
@@ -32,6 +31,16 @@ def createFLdata():
 def createLDdata():
 	m_createAmazonData("LANDSCAPE", landscape_ids)
 	m_createAmazonImages("LANDSCAPE", landscape_ids)
+	m_createAmazonFile("LANDSCAPE", landscape_ids)
+
+
+def createABFile():
+	m_createAmazonFile("ABSTRACT", abstract_ids)
+
+def createFLFile():
+	m_createAmazonFile("FLORAL", floral_ids)
+
+def createLDFile():
 	m_createAmazonFile("LANDSCAPE", landscape_ids)
 
 
@@ -550,8 +559,10 @@ def m_createAmazonImages(cat, ids):
 def m_createAmazonFile(cat, ids):
 		
 	cat = cat.title()
+	dt = datetime.datetime.strptime("2020-05-14", "%Y-%m-%d")	
+
 	amz = Amazon_data.objects.filter(is_published = True, product_id__in = ids,
-		amazon_key__gt = 36003).order_by('amazon_sku')
+		amazon_key__gt = 36531, created_date__gte = dt, amazon_sku__startswith = 'M').order_by('amazon_sku')
 		
 	file_nm = 'montage_amz_data_' + cat + '.csv'
 	
@@ -741,6 +752,7 @@ def m_createAmazonFile(cat, ids):
 			if h.image_width > h.max_width or h.image_height > h.max_height:
 				update_delete = "Delete"
 			
+			itm_weight = 1.5 if breadth * length <= 256 else 2 if breadth * length <= 800 else 3
 			
 			row =['furnitureanddecor', h.amazon_sku, "MONTAGE", 
 					'', '', prod_name, h.part_number, '4380583031',
@@ -764,7 +776,7 @@ def m_createAmazonFile(cat, ids):
 					## - Diamensions
 					"", "", "", 'Square/Rectangle',
 
-					"", "", "", "", "", "", "", "" , "", "",
+					"", "", str(breadth*2.65), "CM", str(length*2.65), "CM", str(4*2.65), "CM" , str(itm_weight), "KG",
 					"", "", "", "", "", "", "", "" , "", "",
 					"", "", "", "", "",
 

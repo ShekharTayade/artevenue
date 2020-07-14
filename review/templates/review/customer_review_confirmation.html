@@ -1,0 +1,71 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+
+{% block page-title %} 
+<title>Customer Review Submitted | Arte'venue</title>
+{% endblock page-title %} 
+  
+{% block page-description %}
+<meta name="description" content="Customer review has been submitted.">
+{% endblock page-description %}
+  
+{% block page-keywords %}
+<meta name="keywords" content="artevenue, customer review contifmation">
+{% endblock page-keywords %}
+  
+{% block page-author %}
+<meta name="author" content="Arte'Venue">
+{% endblock page-author %}
+
+{% block coursel-stylesheet %}
+{% endblock coursel-stylesheet %}
+
+{% block jqueryui-script %}
+{% endblock jqueryui-script %}
+
+{% block coursel-script %}
+{% endblock coursel-script %}
+
+{% block front.js %}
+{% endblock front.js %}
+
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+	
+    <div class="container mt-5 mb-5">
+		<div class="row">
+			<div class="col-12">
+				<h1>Thank You for Your Time!</h1>
+			</div>
+		</div>
+		<div class="row mt-3">
+			<div class="col-12">
+				<h3>Dear {{customer_review_form.name.value}},</h3>
+				<h4>Arte'Venue appreciates you taking time out to write this review.</h4>
+			</div>
+			<div class="col-12">
+				<h4>Your inputs will definitely go long way in making sure that keep improving
+				our product quality, service and customer experience, to which we are committed.
+				</h4>
+			</div>
+			
+		</div>
+
+    </div>
+
+	
+	{% endblock sitecontent %}
+
+	
+	{% block jscripts %}
+	<script>
+    $(document).ready( function(){
+    });
+	</script>
+	{% endblock jscripts %}
+			
+	

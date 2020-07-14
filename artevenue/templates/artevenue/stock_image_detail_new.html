@@ -3,16 +3,18 @@
 {% load utils %}
 {% load customer_review from customer_review %}
 
-{% block estore-title %}
-	<title>Wall art painting -  Name {{product.name}}, by {{product.artist}}. Buy ready size art print or customize it.
+{% block page-title %} 
+	<title>
+		Wall Art - Name {{product.name}}, by {{product.artist}}. Art Print ID: {{product.id}} | Buy ready size or customize it. 
 	</title>
-{% endblock estore-title %}
+{% endblock page-title %} 
+
 {% block page-description %}
-<meta name="description" content="Buy art print of wall art painting, artwork. Choose from standard sizes or customize it exactly as you like. Use size guide and wall color tool to see how it will look.">
+<meta name="description" content="Art Print ID {{product.id}}. Buy top quality art print. Buy ready size or customize it exactly as you like.">
 {% endblock page-description %}
   
 {% block page-keywords %}
-<meta name="keywords" content="Wall Art print, wall painting for bedroom, paintings for home walls, wall painting for living room, paintings for home decor, buy paintings online, online photo framing, custom framing, customized wall art">
+<meta name="keywords" content="Art print, canvas print, paper print, {{product.artist}},{{product.name}} ">
 {% endblock page-keywords %}
   
 {% block page-author %}
@@ -27,6 +29,11 @@
 {% block jqueryui-script %}
 <script src="{% static '/vendor/jquery-ui-1.12.1/jquery-ui.min.js' %}"></script>
 {% endblock jqueryui-script %}
+
+{% block popper-script %}
+	<script src="{% static 'vendor/popper.js/umd/popper.min.js' %}"> </script>
+{% endblock popper-script %}
+
 
 {% block imagemap-resize-script %}
 {% endblock imagemap-resize-script %}
@@ -79,6 +86,9 @@
     </script>
 {% endblock JSON-LD %}
 
+{% block add_to_head %}
+<meta name="robots" content="noindex">
+{% endblock %}
 
 {% load moulding_url %}
 {% load update_cart_message from estore_base %}
@@ -92,7 +102,15 @@
 						<ol class="breadcrumb">
 							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
 							<li class="breadcrumb-item"><a href="{% url 'show_all_categories' %}">Categories</a></li>
-							<li class="breadcrumb-item active"><a href="{% url 'art_by_category' cat_nm=product_category.stock_image_category.name %}">{{ product_category.stock_image_category.name }}</a></li>
+							<li class="breadcrumb-item">
+								{% if product_category.stock_image_category.url_suffix %}
+								<a href="{% url 'art_by_category' cat_nm=product_category.stock_image_category.url_suffix %}">{{product_category.stock_image_category.name|title}}
+								</a>
+								{% else %}
+								<a href="{% url 'art_by_category' cat_nm=product_category.stock_image_category.name %}">{{ product_category.stock_image_category.name |title}}
+								</a>
+								{% endif %}							
+							</li>
 							<li class="breadcrumb-item active">{{ product.product_id }}</li>
 						</ol>
 					</nav>
@@ -222,8 +240,8 @@
 										</div>
 									</div>
 									<div class= "pull-left">
-										<span id = "prod-name">{{ product.name }}</span><br />
-										<span id = "artist"> {% if product.artist %} By {{product.artist}} {% endif %} </span>
+										<h2 id = "prod-name">{{ product.name }}</h2>
+										<h3 id = "artist"> {% if product.artist %} By {{product.artist}} {% endif %} </h3>
 									</div>
 									<div class="price pull-right">
 										<div id = "promo-display" style = "display:none">
@@ -438,9 +456,9 @@
 									</div>										
 								</div>
 							</div>
-							<div class = "mt-1 mb-5">
-								<div class = "col-12 align-middle d-flex flex-row justify-content-between" style="display: inline; background-color:#f9f9f9; padding:5px;">
-									<img src = "{% static 'img/how-to/customization/how_to_icon.png' %}" alt="How To Customize the painting" width=20 onclick = "$('#how-to-customize').modal('show');">
+							<div class = "row mt-1 mb-5">
+								<div class = "col-12 align-middle d-flex flex-row justify-content-between" style="display: inline; background-color:#f9f9f9; padding:0 15px; align-items: flex-start;">
+									<img src = "{% static 'img/how-to/customization/how_to_icon_small.png' %}" alt="How To Customize the art print" width=20 onclick = "$('#how-to-customize').modal('show');">
 									<div class = "align-self-center" style = "cursor: pointer; text-decoration:underline; color:#11b6bd; font-size:0.85rem;" 
 										onclick = "$('#how-to-customize').modal('show');">
 										How to Customize
@@ -596,7 +614,7 @@
 									<div class="card-header collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">
 										<a class="card-title">SPECIFICATIONS</a>
 									</div>
-									<div id="collapseTwo" class="card-body collapse" data-parent="#accordion">
+									<div id="collapseTwo" class="card-body collapse show" data-parent="#accordion">
 										<table class = "table table-borderless">
 											<tbody>
 												<tr>
@@ -654,7 +672,7 @@
 												<tr>
 													<td class="accordian-subhead">SHIPPING TIME</td>
 													<td class = "comp-frame">
-														Ships by FedEx in 1-2 business days. Usually deliveres in 3-7 days in most parts of India.
+														Ships by courier in 1-2 business days. Usually deliveres in 3-7 days in most parts of India.
 													</td>
 												</tr>
 											</tbody>
@@ -817,8 +835,8 @@
 		// Global variables to store IDs of pricing components
 		var product_id = '{{product.product_id}}';
 		var print_medium_id = 'PAPER';
-		var image_width = 4;
-		var image_height = 4;
+		var image_width = 8;
+		var image_height = 8;
 		var moulding_id = '0';
 		var mount_id = '0';
 		var mount_color = '0';
@@ -828,7 +846,7 @@
 		var acrylic_id = '{{acrylics.acrylic_id}}';
 		var stretch_id = '1'; 
 
-		var minsize = 4;
+		var minsize = 8;
 		var maxsize = 0;
 		var ratio = 0;
 
@@ -1771,16 +1789,29 @@
 						//Update items in cart
 						//$("#itemsincart").html(cart_qty); 
 						updateCartItemsNum(cart_qty);
-						$('#cart-msg-modal').modal('show');
+						$('#cart-msg-modal').modal('show');					
+
+						/*
+						{% if env == 'PROD' %}
+						gtag('event','add_to_cart', {
+						  'value': total_price,
+						  'items':[{
+						  'id':prod_id,
+						  'location_id': '',
+						  'google_business_vertical': 'custom',
+						  }]
+						  });
+						{% endif %}
+						*/
 					}
 				},
 				error: function(xhr){
 					alert("An error occured: " + xhr.status + " " + xhr.statusText); 
 				}
 			});
+
 		}
-		
-	
+			
 		// ---- Add Product to Cart ----//
 		function addProdToWishlist(prod_id, qty) {
 			var cart_qty;

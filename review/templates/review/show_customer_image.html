@@ -1,0 +1,42 @@
+
+<div id="show-cust-image" tabindex="-1" role="dialog" aria-labelledby="Show-Customer-Photo" aria-hidden="true" class="modal fade">
+	<div class="modal-dialog modal-md">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title"></h5>
+				<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
+			</div>
+			<div class="modal-body">
+				<div class = "col-12">
+					<img id = "disp-img" style = "display: block; margin-left: auto; margin-right: auto;" src="" data-action = "zoom" class="img-fluid"/>
+				</div>
+				<div class = "col-12 mt-2 text-center">
+					<button class="btn btn-primary" onclick="$('#show-cust-image').modal('hide');"><i class="fa fa-chevron-right"></i>Continue</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<script>
+
+		function showCustImg(pic_id) {
+			// Get the framed image
+			$.ajax({
+					url: "{% url 'get_customer_review_image' %}", 
+					data: {'pic_id':pic_id}, 
+					dataType: 'text', 
+				success: function (data) {
+					document.getElementById("disp-img").src = "data:image/png;base64," + data;
+					$("#show-cust-image").modal('show');
+					},
+				error: function(xhr){
+					alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+				}
+			});
+		}		
+				
+</script>
+	
+<!-- END: Message modal -->		

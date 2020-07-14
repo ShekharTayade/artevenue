@@ -1,13 +1,30 @@
 {% extends 'artevenue/estore_base.html' %}
+{% load utils %}
 {% load static %}
 {% block page-title %} 
-	<title>Wall art paintings for bedroom, living room from '{{ product_category.name }}' category</title>
+	<title>
+		{% if product_category.page_title %} 
+			{{product_category.page_title}} 
+		{% else %}
+			Huge Collection of Beautiful
+			{% if product_category.url_suffix|endswith:'paintings' or product_category.url_suffix|endswith:'painting' or product_category.url_suffix|startswith:'paintings' or product_category.url_suffix|startswith:'painting'%}
+				Art Prints of Curated													 
+				{{ product_category.url_suffix|replace_dash|title }},
+			{% else %}
+				, Curated {{ product_category.url_suffix|replace_dash|title }},
+			{% endif %} 15% Off
+		{% endif %}
+	</title>
 {% endblock page-title %} 
 {% block page-description %}
-<meta name="description" content="Designer curated art prints and paintings for home walls from {{product_category.name}}Category. Find Beautiful wall painting for bedroom and living room or for any home walls">
+	{% if product_category.page_description %} 
+	<meta name="description" content="{{product_category.page_description}}">
+	{% else %}
+	<meta name="description" content="From across the world, we have curated for you {% if product_category.url_suffix|endswith:'paintings' or product_category.url_suffix|endswith:'painting' or product_category.url_suffix|startswith:'paintings' or product_category.url_suffix|startswith:'painting'%} art prints of {{ product_category.url_suffix|replace_dash }}{% else %} {{ product_category.url_suffix|replace_dash }} {% endif %}. For paintings for home walls and decor, pick beautiful wall arts here.">
+	{% endif %}
 {% endblock page-description %}
 {% block page-keywords %}
-<meta name="keywords" content="wall art painting, wall painting for bedroom, wall painting for living room, paintings for home walls, paintings for home decor, {{product_category.name}} Paintings, Buy painting online, online photo framing, wall art, abstract art, abstract paintings, canvas painting">
+<meta name="keywords" content="{{product_category.url_suffix|replace_dash}}, {{product_category.keywords}}, paintings for home walls, , home decor">
 {% endblock page-keywords %}
 
 {% block coursel-stylesheet %}
@@ -102,7 +119,11 @@
 									{% for p in prod_categories %}
 										<ul class="list-unstyled">
 											{% if p.category_id %}
-												<li><a href="{% url 'art_by_category' cat_nm=p.name page=page%}" class="nav-link">{{p.name|title}}</a></li>
+												{% if p.url_suffix %}												
+													<li><a href="{% url 'art_by_category' cat_nm=p.url_suffix %}" class="nav-link">{{p.name|title}}</a></li>
+												{% else %}
+													<li><a href="{% url 'art_by_category' cat_nm=p.name %}" class="nav-link">{{p.name|title}}</a></li>
+												{% endif %}
 											{% else %}
 												<li><a href="{% url 'art_by_category' %}" class="nav-link">{{p.name|title}}</a></li>
 											{% endif %}
@@ -126,7 +147,7 @@
 							</div>-->
 							{% for pf in prod_filters %}
 							{% if pf == 'ARTIST' or pf == 'SIZE' %}
-							<div class="card-body" style = "max-height:200px; width:auto; overflow:auto; margin-bottom:10px;">
+							<div class="card-body" style = "max-height:175px; width:auto; overflow:auto; margin-bottom:10px;">
 							{% else %}
 							<div class="card-body" style = "width:auto; overflow:auto; margin-bottom:10px;">
 							{% endif  %}
@@ -267,32 +288,60 @@
 				</div>
 				<!-- /.col-md-3-->
 	
-
-
 				<div class="col-lg-9">
 					<div class="box-cat">
-						<h1>Hand-picked {% if product_category %} Art Prints and 
-						Wall Art Paintings in {{ product_category.name }} Category{% else %} Art Prints and Wall 
-						Art Paitings{% endif %}</h1>
-						<!--<h3>{{product_category.description}}</h3>-->
-						<h3>Buy paintings online and get delivered to home! Beautiful collection of wall art prints, paintings for bedroom, living room & more. <h3>
-					 </div>
+						{% autoescape off %}
+						<h1>
+						{% if product_category %} 
+							{% if product_category.header %}
+								{{product_category.header}}
+							{% else %}
+								{% if product_category.url_suffix|contains:'paintings' or product_category.url_suffix|contains:'painting' %}
+									ART PRINTS OF CURATED
+									<span style = "font-weight: 600;">
+									{{ product_category.url_suffix|replace_dash|upper }}
+									</span>
+								{% else %}
+									<span style = "font-weight: 600;">
+									CURATED {{ product_category.url_suffix|replace_dash|upper }} 
+									</span>
+								{% endif %}
+							{% endif %}
+						{% endif %}
+						</h1>
+						<h3>
+						{% if product_category.description %} 
+							{{product_category.description}}
+						{% else %}
+							We bring to you fine 
+							<span style = "font-style: italic;">{{ product_category.url_suffix|replace_dash|title}}
+							</span> from across the world specially selected for the
+							home decor and interiors.
+						{% endif %}
+						</h3>
+						<h3>
+						{% if product_category %} 
+							{% if product_category.second_description %} 
+								{{product_category.second_description}}
+							{% else %}
+								<span style = "font-style: italic;">Paintings for home walls is a must.</span>
+								For your home or office decor, pick from our largest & beautiful collection.
+								Get it as paper or canvas print, customize the size, frame and more.
+							{% endif %}
+						{% endif %}
+						</h3>
+						{% endautoescape %}
+					</div>
 
 					<div id = "img-display">
 						{% include 'artevenue/prod_display_include.html' %}
 					</div> <!-- END:  img-display -->
-					<div class = "mt-3 mb-5" style = "line-height:1;">
-						<small>Buy licensed art prints of paintings for home decor of any space, office 
-						or any wall that needs a stunning look.
-						All our artworks are licensed. We offer top quality and satisfaction guarantee. 
-						Free returns and free delivery of art prints.</small>
-					</div>
 				</div>
 				<!-- /.col-lg-9-->
 				{% include 'artevenue/wishlist-add-message.html' %}
 				{% include 'artevenue/message-modal_ok.html' %}
 				{% if product_category.category_id %}
-					<form  hidden id="cat-form" action = "{% url 'curated_collections' cat_nm=product_category.name %}">
+					<form  hidden id="cat-form" action = "{% url 'curated_collections' cat_nm=product_category.url_suffix %}">
 						<input id = "id_page_num" name = "page_num">
 						<input id = "id_sort" name = "sort">
 						<input id = "id_show" name = "show">
@@ -327,6 +376,18 @@
 			</div>
 		</div>
 	{% endblock sitecontent %}
+
+	{% block footer-text %}
+		{% if product_category.url_suffix|endswith:'paintings' or product_category.url_suffix|endswith:'painting'  or product_category.url_suffix|startswith:'paintings' or product_category.url_suffix|startswith:'painting'%}
+			We have the largest collection of art prints of  
+			{{ product_category.url_suffix|replace_dash }}.
+		{% else %}
+			We have the largest collection of art prints from {{ product_category.url_suffix|replace_dash }} category.
+		{% endif %}
+		We offer complete satisfaction gurantee, free returns and free delivery. So look no further.
+		
+		
+	{% endblock footer-text %}
 
 	
 	{% block jscripts %}
@@ -784,5 +845,7 @@
 	</script>
 	
 	{% endblock jscripts %}
+	{% block tawkto %}
+	{% endblock tawkto %}
 			
 	

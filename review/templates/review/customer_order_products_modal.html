@@ -1,0 +1,71 @@
+{% load static %}
+{% if order_items  %}
+<!-- Message Modal -->
+<div id="customer-products" tabindex="-1" role="dialog" aria-labelledby="Customer-Products" aria-hidden="true" class="modal fade">
+	<div class="modal-dialog modal-md">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h3 id = "modal-title" class="modal-title">Select Artworks</h3>
+				<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
+			</div>
+			<div class="modal-body">
+				<div class = "row">
+					<div class = "col-12">
+						There are the artworks you have purchased in last 3 months. Check the checkbox to select the artwork for review.
+					</div>
+				</div>
+				<div class = "row">
+				{% for p in order_items  %}
+					<div class = "col-6">
+						<div style = "position: relative; padding: 10px;  border: 1px solid #cfcfcf; margin-bottom: 15px;">
+							<a id = "{{p.pic_id}}" onclick = "getFramedImg('{{p.product_id}}', '{{p.product_type}}', {% if p.product_type == 'ORIGINAL-ART' %} '{{p.art_width}}'  {% else %} '{{p.image_width}}' {% endif %}, '{{p.moulding_id | default_if_none:0}}', '{{p.mount.color | default_if_none:0}}','{{p.mount_size | default_if_none:0}}', '{{p.product.url | default_if_none:""}}');">
+								<img src="{% if p.product_type == 'USER-IMAGE' %} {{MEDIA_URL}}{{p.product.image_to_frame}} {% else %} {% if env == 'DEV' or env == 'TESTING' %} {{p.product.thumbnail_url}} {% else %} {% static p.product.thumbnail_url %} {% endif %} {% endif %}" alt="User Order Product" 
+								class="img-fluid" width=150>
+								<div style = "position: absolute; left: 15px; bottom: 0px; color: white;">
+									<h4>Order No: {{p.order.order_number}}<h4>
+									<p>Dt: {{p.order.order_date|date:"d M yy"}}</p>
+								</div>
+							</a>
+							<input class = "m-2" type="checkbox" id = "chk_{{p.order_item_id}}" 
+								class = "form-control" 
+								onclick = "select_prods('chk_{{p.order_item_id}}', '{{p.order_item_id}}');">
+						</div>
+					</div>
+				{% endfor %}
+				</div>
+				<div class = "row text-center">
+					<div class = "col-12">
+						<a class = "btn btn-primary"
+							onclick = "$('#customer-products').modal('hide');">
+							Done
+						</a>
+					</div>
+				</div>
+			</div>
+			
+			<script>
+				function select_prods(ele, itm_id){
+					var p;
+					//Get contents of selected prods
+					var prods = $("#id_selected-prods").val();
+					if (document.getElementById(ele).checked) {
+						if ( prods.indexOf(itm_id) < 0 ){
+							if (prods.length == 0) {
+								p = itm_id;
+							} else {
+								p = prods + "," + itm_id;
+							}
+						}
+					} else {
+						p = prods.replace(itm_id+',', "");
+						p = p.replace(itm_id, "");
+					}
+					$("#id_selected-prods").val(p);
+				}
+				
+			</script>
+			
+		</div>
+	</div>
+</div>
+{% endif %}

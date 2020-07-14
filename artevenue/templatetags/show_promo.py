@@ -8,7 +8,7 @@ import datetime
 today = datetime.date.today()
 
 register = template.Library()
-@register.inclusion_tag('artevenue/show_promo.html')
+@register.inclusion_tag('artevenue/show_insta_promo.html')
 def promo_display(request):
 
 	if request.user.is_authenticated:

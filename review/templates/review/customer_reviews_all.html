@@ -2,155 +2,366 @@
 {% load static %}
 {% load utils %}
 
-{% block estore-title %}
-	<title>Review of Art print, artwork</title>
-{% endblock estore-title %}
+{% block page-title %} 
+	<title>Customer Reviews of Art prints, artworks from Arte'Venue</title>
+{% endblock page-title %} 
 
 {% block page-description %}
-<meta name="description" content="Arte'Venue customer review">
+<meta name="description" content="Arte'Venue customer reviews of art prints, paintings, artworks. Filter by various ratings and know details.">
 {% endblock page-description %}
 {% block page-keywords %}
-<meta name="keywords" content="customer review of artworks, art, artvenue, artwork review, artevenue review">
+<meta name="keywords" content="customer reviews of art prints, customer reviews of paintings, Arte'Venue customer reviews, Arte'Venue reviews">
 {% endblock page-keywords %}
+
+{% block coursel-script %}
+{% endblock coursel-script %}
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+{% block add_to_head %}
+	<link rel="stylesheet" type="text/css" href="{% static 'vendor/slick/slick.css' %}"/>
+	<link rel="stylesheet" type="text/css" href="{% static 'vendor/slick/slick-theme.css' %}"/>	
+	<link rel="stylesheet" href="{% static  'css/custom_framing.css' %}">
+	<!-- Google Charts -->
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>			
+{% endblock add_to_head %}
+
 
 <!-- Only Override the site content block -->
 {% block sitecontent %}
 <div class = "container">
-	<div class = "row mt-5 mb-5">
+	<div class = "row mt-5">
 		<div class = "col-12">
 			<h1>VERIFIED CUSTOMER REVIEWS</h1>
 			<hr>
 		</div>
-		<div class = "col-12 customer-rating-summary">
+	</div>
+	<div class = "row mt-3">
+		<div class = "col-6 customer-rating-summary">
 			<div class = "col-6 customer-rating">
-				<div class= "">Overall Rating: </div>
+				<h2 >Overall Rating: </h2>
 				<div class = "rating">{{overall_rating}}</div> 
 			</div>
-			<div class = "col-6">
-				<div class = "pull-right">
-					<div >
-						{% if overall_rating == 0 %}
-							<img src = "{% static 'img/customer_reviews/0.png'%}" class = "rating-stars">
-						{% elif overall_rating > 0 and  overall_rating <= 0.5 %}
-							<img src = "{% static 'img/customer_reviews/0point5.png'%}" class = "rating-stars">
-						{% elif overall_rating > 0.5 and overall_rating <= 1 %}
-							<img src = "{% static 'img/customer_reviews/1.png'%}" class = "rating-stars">
-						{% elif overall_rating > 1 and overall_rating <= 1.5 %}
-							<img src = "{% static 'img/customer_reviews/1point5.png'%}" class = "rating-stars">
-						{% elif overall_rating > 1.5 and overall_rating <= 2 %}
-							<img src = "{% static 'img/customer_reviews/2.png'%}" class = "rating-stars">
-						{% elif overall_rating > 2 and overall_rating <= 2.5 %}
-							<img src = "{% static 'img/customer_reviews/2point5.png'%}" class = "rating-stars">
-						{% elif overall_rating > 2.5 and overall_rating <= 3 %}
-							<img src = "{% static 'img/customer_reviews/3.png'%}" class = "rating-stars">
-						{% elif overall_rating > 3 and overall_rating <= 3.5 %}
-							<img src = "{% static 'img/customer_reviews/3point5.png'%}" class = "rating-stars">
-						{% elif overall_rating > 3.5 and overall_rating <= 4 %}
-							<img src = "{% static 'img/customer_reviews/4.png'%}" class = "rating-stars">
-						{% elif overall_rating > 4 and overall_rating <= 4.5 %}
-							<img src = "{% static 'img/customer_reviews/4point5.png'%}" class = "rating-stars">
-						{% elif overall_rating > 4.5 %}
-							<img src = "{% static 'img/customer_reviews/5.png'%}">
-						{% endif %}					
-					</div>
-					<div class = "text-muted" style = "margin-left: 15px; font-size:0.65rem;">{%  if total_reviews > 0 %} ({{total_reviews}} reviews) {% endif %}</div>
-				</div>
-			</div>
 		</div>
-		<div class = "col-12">
-			<hr>
-		</div>
-		<div class = "col-12 mt-3 customer-review">
-			{% if product_id %}
-				{% if user_width %}
-					<form action = "{% url 'stock_image_detail' product_id user_width user_height %}" id = "show-prod" class = "pull-right">
-				{% else %}
-					<form action = "{% url 'stock_image_detail' product_id %}" id = "show-prod"  class = "pull-right">
-				{% endif %}
-					<input hidden name = "product_id" value = "{{product_id}}">
-					<input hidden name = "cart_item_id" value = "{{cart_item_id}}">
-					<input hidden name = "wishlist_item_id" value = "{{wishlist_item_id}}">
-					<input hidden name = "user_width" value = "{{user_width}}">
-					<input hidden name = "user_height" value = "{{user_height}}">
-					<button class = "btn btn-link" type = "submit"  form = "show-prod">
-						<img src = "{% static 'img/back.png' %}" width=30 height=30> Back
-					</button>
-				</form>
-			{%endif %}
-		</div>
-		{% for r in reviews %}
-		<div class = "col-12">
-			<div class = "row mt-3" style= "padding-left: 15px; font-size:0.8rem;">
-				<div class = "col-6 text-muted" >
-					{{r.name}}, {{r.location}}, {{r.country.country_name}}
-				</div>
-				<div class = "col-6 text-muted pull-right">
-					{{r.updated_date|date:'d M Y'}}
-				</div>
-			</div>
-		</div>
-		<div class = "col-12 customer-review">
-			<div class = "col-12">
-				<div class = "">
-					{% if r.rating == 0 %}
-						<img src = "{% static 'img/customer_reviews/0.png'%}" class = "rating-stars-review">
-					{% elif r.rating == 0.5 %}
-						<img src = "{% static 'img/customer_reviews/0point5.png'%}" class = "rating-stars-review">
-					{% elif r.rating == 1 %}
-						<img src = "{% static 'img/customer_reviews/1.png'%}" class = "rating-stars-review">
-					{% elif r.rating == 1.5 %}
-						<img src = "{% static 'img/customer_reviews/1point5.png'%}" class = "rating-stars-review">
-					{% elif r.rating == 2 %}
-						<img src = "{% static 'img/customer_reviews/2.png'%}" class = "rating-stars-review">
-					{% elif r.rating == 2.5 %}
-						<img src = "{% static 'img/customer_reviews/2point5.png'%}" class = "rating-stars-review">
-					{% elif r.rating == 3 %}
-						<img src = "{% static 'img/customer_reviews/3.png'%}" class = "rating-stars-review">
-					{% elif r.rating == 3.5 %}
-						<img src = "{% static 'img/customer_reviews/3point5.png'%}" class = "rating-stars-review">
-					{% elif r.rating == 4 %}
-						<img src = "{% static 'img/customer_reviews/4.png'%}" class = "rating-stars-review">
-					{% elif r.rating == 4.5 %}
-						<img src = "{% static 'img/customer_reviews/4point5.png'%}" class = "rating-stars-review">
-					{% elif r.rating == 5 %}
-						<img src = "{% static 'img/customer_reviews/5.png'%}" class = "rating-stars-review">
+		<div class = "col-6">
+			<div class = "pull-right">
+				<div >
+					{% if overall_rating == 0 %}
+						<img src = "{% static 'img/customer_reviews/0.png'%}" class = "rating-stars">
+					{% elif overall_rating > 0 and  overall_rating <= 0.5 %}
+						<img src = "{% static 'img/customer_reviews/0point5.png'%}" class = "rating-stars">
+					{% elif overall_rating > 0.5 and overall_rating <= 1 %}
+						<img src = "{% static 'img/customer_reviews/1.png'%}" class = "rating-stars">
+					{% elif overall_rating > 1 and overall_rating <= 1.5 %}
+						<img src = "{% static 'img/customer_reviews/1point5.png'%}" class = "rating-stars">
+					{% elif overall_rating > 1.5 and overall_rating <= 2 %}
+						<img src = "{% static 'img/customer_reviews/2.png'%}" class = "rating-stars">
+					{% elif overall_rating > 2 and overall_rating <= 2.5 %}
+						<img src = "{% static 'img/customer_reviews/2point5.png'%}" class = "rating-stars">
+					{% elif overall_rating > 2.5 and overall_rating <= 3 %}
+						<img src = "{% static 'img/customer_reviews/3.png'%}" class = "rating-stars">
+					{% elif overall_rating > 3 and overall_rating <= 3.5 %}
+						<img src = "{% static 'img/customer_reviews/3point5.png'%}" class = "rating-stars">
+					{% elif overall_rating > 3.5 and overall_rating <= 4 %}
+						<img src = "{% static 'img/customer_reviews/4.png'%}" class = "rating-stars">
+					{% elif overall_rating > 4 and overall_rating <= 4.5 %}
+						<img src = "{% static 'img/customer_reviews/4point5.png'%}" class = "rating-stars">
+					{% elif overall_rating > 4.5 %}
+						<img src = "{% static 'img/customer_reviews/5.png'%}">
 					{% endif %}					
 				</div>
-				<div style = "font-wight:500;">
-					{{r.headline}}
-				</div>
-				<div class = "pull-right">
-					
-				</div>
+				<div class = "text-muted" style = "margin-left: 15px; font-size:0.65rem;">{%  if total_reviews > 0 %} ({{total_reviews}} reviews) {% endif %}</div>
 			</div>
-			
-			<div class = "col-12" style = "font-size:0.65rem;">
-				{{r.comments|linebreaks}}
-			</div>
-		</div>
-		{% endfor %}
-		<div class = "col-12 mt-3 customer-review">
-			{% if product_id %}
-				{% if user_width %}
-					<form action = "{% url 'stock_image_detail' product_id user_width user_height %}" id = "show-prod1" class = "pull-right">
-				{% else %}
-					<form action = "{% url 'stock_image_detail' product_id %}" id = "show-prod1"  class = "pull-right">
-				{% endif %}
-					<input hidden name = "product_id" value = "{{product_id}}">
-					<input hidden name = "cart_item_id" value = "{{cart_item_id}}">
-					<input hidden name = "wishlist_item_id" value = "{{wishlist_item_id}}">
-					<input hidden name = "user_width" value = "{{user_width}}">
-					<input hidden name = "user_height" value = "{{user_height}}">
-					<button class = "btn btn-link" type = "submit"  form = "show-prod1">
-						<img src = "{% static 'img/back.png' %}" width=30 height=30> Back
-					</button>
-				</form>
-			{% endif %}
 		</div>
 	</div>
+	<div class = "row mb-2">
+		<div class = "col-12">
+		<hr>
+		</div>
+	</div>
+	<div class = "row">
+		<div class = "col-6">
+			<div id = "barchart"></div>
+		</div>
+		<div class = "col-6">
+			<span style = "font-size:0.55rem; font-weight:600">Filter Reviews By Rating:</span>
+			<div id = "all_reviews">
+				<ul style = "list-style: none; padding-left:0px;">
+					
+					<div class = "row">
+						<div class = "col-6">
+							<li id = "1star">
+								<a class = "btn btn-small" href = "?page=1&star=1">
+								<img src = "{% static 'img/customer_reviews/1_only.png'%}" class = "rating-stars-small">
+								</a>
+							</li>
+						</div>
+						<div class = "col-6">
+							<li id = "2star">
+								<a class = "btn btn-small" href = "?page=1&star=2">
+								<img src = "{% static 'img/customer_reviews/2_only.png'%}" class = "rating-stars-small">
+								</a>
+							</li>
+						</div>
+					</div>
+					<div class = "row">
+						<div class = "col-6">
+							<li id = "3star">
+								<a class = "btn btn-small" href = "?page=1&star=3">
+								<img src = "{% static 'img/customer_reviews/3_only.png'%}" class = "rating-stars-small">
+								</a>
+							</li>
+						</div>
+						<div class = "col-6">
+							<li id = "4star">
+								<a class = "btn btn-small" href = "?page=1&star=4">
+								<img src = "{% static 'img/customer_reviews/4_only.png'%}" class = "rating-stars-small">
+								</a>
+							</li>
+						</div>
+					</div>
+					<div class = "row">
+						<div class = "col-6">
+							<li id = "5star">
+								<a class = "btn btn-small" href = "?page=1&star=5">
+								<img src = "{% static 'img/customer_reviews/5_only.png'%}" class = "rating-stars-small">
+								</a>
+							</li>
+						</div>
+						{% if star != 0 %}
+						<div class = "col-6">
+							<li>
+								<a href = "?page=1" style="text-decoration: underline; font-size: 0.7rem;">
+									Show All
+								</a>
+							</li>
+						</div>
+						{% endif %}
+					</div>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div class = "row">
+		<div class = "col-12">
+			<span style="font-size:0.75rem;" id = "filter-text">
+			</span>
+		</div>
+	</div>
+	
+	<div class = "row">
+		<div class = "col-12">
+		<hr>
+		</div>
+	</div>
+	<div class = "row mt-3">
+		<div class = "col-12">
+			<a  style = "color:#11b6bd; text-decoration: underline;"
+				href = "{% url 'write_customer_review' %}">Write a review
+				<i class="fa fa-edit"></i>
+			</a>
+			<hr>
+		</div>
+	</div>
+
+	{% include 'review/customer_photos_all_include.html' %}
+
+
+	<div class = "row mt-3">
+		<div class = "col-12">
+			REVIEWS:
+		</div>
+	</div>
+	{% for r in reviews %}
+	<div class = "row mt-3">
+		<div class = "col-6 text-muted" >
+			{{r.name}}, {{r.location}}, {{r.country.country_name}}
+		</div>
+		<div class = "col-6 text-muted pull-right">
+			{{r.posted_date|date:'d M Y'}}
+		</div>
+	</div>
+	<div class = "row">
+		<div class = "col-12 customer-review">
+			<div class = "">
+				{% if r.rating == 0 %}
+					<img src = "{% static 'img/customer_reviews/0.png'%}" class = "rating-stars-review">
+				{% elif r.rating == 0.5 %}
+					<img src = "{% static 'img/customer_reviews/0point5.png'%}" class = "rating-stars-review">
+				{% elif r.rating == 1 %}
+					<img src = "{% static 'img/customer_reviews/1.png'%}" class = "rating-stars-review">
+				{% elif r.rating == 1.5 %}
+					<img src = "{% static 'img/customer_reviews/1point5.png'%}" class = "rating-stars-review">
+				{% elif r.rating == 2 %}
+					<img src = "{% static 'img/customer_reviews/2.png'%}" class = "rating-stars-review">
+				{% elif r.rating == 2.5 %}
+					<img src = "{% static 'img/customer_reviews/2point5.png'%}" class = "rating-stars-review">
+				{% elif r.rating == 3 %}
+					<img src = "{% static 'img/customer_reviews/3.png'%}" class = "rating-stars-review">
+				{% elif r.rating == 3.5 %}
+					<img src = "{% static 'img/customer_reviews/3point5.png'%}" class = "rating-stars-review">
+				{% elif r.rating == 4 %}
+					<img src = "{% static 'img/customer_reviews/4.png'%}" class = "rating-stars-review">
+				{% elif r.rating == 4.5 %}
+					<img src = "{% static 'img/customer_reviews/4point5.png'%}" class = "rating-stars-review">
+				{% elif r.rating == 5 %}
+					<img src = "{% static 'img/customer_reviews/5.png'%}" class = "rating-stars-review">
+				{% endif %}					
+			</div>
+			<div style = "font-wight:500;">
+				{{r.headline}}
+			</div>
+		</div>
+	</div>
+	<div class = "row">
+		<div class = "col-12" style = "font-size:0.65rem;">
+			{{r.comments|linebreaks}}
+		</div>
+	</div>
+	<div class = "row" style = "margin-top:0px;">
+		{% for p in review_pics %}
+		{% if p.customer_review_stock_image == r %}
+		<div class = "display: flex; justify-content:space-around;">
+			<div style = "padding: 10px;">
+				<a onclick = "showCustImg('{{p.pic_id}}')">
+					<img src="{% if p.user_photo_thumbnail.url %} {{ p.user_photo_thumbnail.url }} {% endif %}" alt="User Review Pictures" 
+						class="img-fluid" 
+						style = "filter: drop-shadow(0.25rem 0.25rem 0.25rem grey);" width=120>
+				</a>
+			</div>
+		</div>
+		{% endif %}
+		{% endfor %}
+	</div>	
+	<div class = "row">
+		<div class = "col-12">
+		<hr>
+		</div>
+	</div>
+	{% endfor %}
+	
+	<div class="box-cat info-bar">
+		<div class="row">
+			<div class="col-md-12 col-lg-12">
+				<ul class = "pagination justify-content-center"style="margin-bottom:0px !important">
+					{% if reviews.has_previous %}
+					<li class="page-item">
+					  <a class="btn page-link" href="?page={{ reviews.previous_page_number }}{% if star %} &star={{star}} {% endif %}" aria-label="Previous">
+						<span aria-hidden="true">&laquo; First</span>
+						<span class="sr-only">begin</span>
+					  </a>
+					</li>   {% endif %}
+
+					{% for n in reviews.paginator.page_range %}
+					  {% if reviews.number == n %}
+						<li class="page-item active">
+						  <span class="page-link">{{ n }}<span class="sr-only">(current)</span></span>
+						</li>
+					  {% elif n > reviews.number|add:'-5' and n < reviews.number|add:'5' %}
+						<li class="page-item">
+							<a class="btn page-link" href="?page={{ n }}{% if star %} &star={{star}} {% endif %}">{{ n }}</a>
+						</li>
+					  {% endif %}
+					{% endfor %}
+
+					{% if reviews.has_next %}
+					  <li class="page-item">
+						<a class="btn page-link" href="?page={{ reviews.paginator.num_pages }}{% if star %} &star={{star}} {% endif %}" aria-label="Next">
+						  <span aria-hidden="true">Last &raquo;</span>
+						  <span class="sr-only">end</span>
+						</a>
+					  </li>
+					  {% endif %}   
+				</ul> 
+			</div>
+		</div>
+	</div>	
+	{% include 'review/show_customer_image.html' %}
 </div>
 {% endblock sitecontent %}
 
 
 {% block jscripts %}
+	<script type="text/javascript" src="{% static 'vendor/slick/slick.min.js' %}"></script>	
+	<script type="text/javascript">	
+	</script>
+
+	<script>
+		$( document ).ready(function() {
+			{% if star != 0 %}
+			
+				if ( {{starcnt}} > 0 ){
+					$("#filter-text").html("Showing {{starcnt}} reviews with {{star}} stars, out of {{total_reviews}} total reviews");
+				} else {
+					$("#filter-text").html("There are no reviews with {{star}} stars");
+				}
+				
+				switch ({{star}}) {
+					case 1:
+						$("#1star").addClass('selected_star');
+						break;
+					case 2:
+						$("#2star").addClass('selected_star');
+						break;
+					case 3:
+						$("#3star").addClass('selected_star');
+						break;
+					case 4:
+						$("#4star").addClass('selected_star');
+						break;
+					case 5:
+						$("#5star").addClass('selected_star');
+						break;
+				}
+			{% endif %}
+			
+			$(".frames-slider").slick({
+				dots: true,
+				infinite: false,
+				mobileFirst: true,
+				slidesToShow: 4,
+				slidesToScroll: 4,
+			});
+			
+		});	
+	</script>
+
+	<script>	
+    google.charts.load("current", {packages:["corechart"]});    
+    google.charts.setOnLoadCallback(drawChart);
+	
+    function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+            ["Customer Reviews", "No. of Reviews", { role: "style" } ],
+            ["5 Star", {{star5_cnt}}, "#FFE27D"],
+            ["4 Star", {{star4_cnt}}, "#FFE27D"],
+            ["3 Star", {{star3_cnt}}, "#FFE27D"],
+            ["2 Star", {{star2_cnt}}, "#FFE27D"],
+            ["1 Star", {{star1_cnt}}, "##FFE27D"],
+        ]);   
+
+        var view = new google.visualization.DataView(data);
+        view.setColumns([0, 1,
+                       { calc: "stringify",
+                         sourceColumn: 1,
+                         type: "string",
+                         role: "annotation" },
+                       2]);
+
+        var options = {
+            title: "All Customer Reviews",
+            bar: {groupWidth: "60%"},
+            legend: { position: "none" },
+            is3D: false,
+            animation: {"startup": true},
+			vAxis: { gridlines: {  count: 0 }},
+			hAxis: { gridlines: {  count: 0 }, textPosition: 'none'  }
+        };
+        var chart = new google.visualization.BarChart(document.getElementById("barchart"));
+        chart.draw(view, options);
+	}
+        	
+    </script>	
+	
 {% endblock jscripts %}

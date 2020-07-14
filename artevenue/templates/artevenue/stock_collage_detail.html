@@ -699,8 +699,8 @@
 		// Global variables to store IDs of pricing components
 		var product_id = '{{collage.product_id}}';
 		var print_medium_id = 'PAPER';
-		var image_width = 4;
-		var image_height = 4;
+		var image_width = 8;
+		var image_height = 8;
 		var moulding_id = '0';
 		var mount_id = '0';
 		var mount_color = '0';
@@ -710,7 +710,7 @@
 		var acrylic_id = '{{acrylics.acrylic_id}}';
 		var stretch_id = '1'; 
 
-		var minsize = 4;
+		var minsize = 8;
 		var maxsize = 0;
 		var ratio = 0;
 
@@ -1631,6 +1631,19 @@
 						//Update items in cart
 						$("#itemsincart").html(cart_qty); 
 						$('#cart-msg-modal').modal('show');
+						
+						/*
+						{% if env == 'PROD' %}
+						gtag('event','add_to_cart', {
+						  'value': total_price,
+						  'items':[{
+						  'id':prod_id,
+						  'location_id': '',
+						  'google_business_vertical': 'custom',
+						  }]
+						  });
+						{% endif %}
+						*/
 					}
 				},
 				error: function(xhr){

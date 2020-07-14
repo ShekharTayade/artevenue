@@ -1,0 +1,100 @@
+{% load static %}
+<div class = "container-fluid  text-center">
+	<div class="row mt-5">
+		<div class="col-12">
+			<h2 class="text-center">
+				SPECIALITY ART
+			</h2>
+		</div>
+	</div>
+	<div class="row text-center">
+		<div class = "col-12 col-md-6">
+			<div class = "row">
+				<div class = "col-3 col-md-3">
+					<h3 class = "curatedHeading1">
+						SUNRISE
+					</h3>
+					<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='sunrise-paintings' %}">
+					<div class="curated-container">
+						<img class = "d-block" src="{% static 'img/best_sellers/sunrise1.jpg' %}" alt="Art Prints of Abstract Paintings">
+					</div>
+					</a>
+				</div>
+				<div class = "col-3 col-md-3">
+					<h3 class = "curatedHeading1">
+						SUNSET
+					</h3>
+					<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='sunset-paintings' %}">
+					<div class="curated-container">
+						<img class = "d-block" src="{% static 'img/best_sellers/sunset1.jpg' %}" alt="Art Prints of Abstract Paintings">
+					</div>
+					</a>
+				</div>
+				<div class = "col-3 col-md-3">
+					<h3 class = "curatedHeading1">
+						VASTU
+					</h3>
+					<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='vastu-paintings' %}">
+					<div class="curated-container">
+						<img class = "d-block" src="{% static 'img/best_sellers/vastu1.jpg' %}" alt="Art Prints of Abstract Paintings">
+					</div>
+					</a>
+				</div>
+				<div class = "col-3 col-md-3">
+					<h3 class = "curatedHeading1">
+						MOVIE
+					</h3>
+					<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='movie-posters' %}">
+					<div class="curated-container">
+						<img class = "d-block" src="{% static 'img/best_sellers/movie_posters.jpg' %}" alt="Art Prints of Abstract Paintings">
+					</div>
+					</a>
+				</div>
+			</div>
+		</div>
+		<div class = "col-12 col-md-6">
+			<div class = "row">
+				<div class = "col-3 col-md-3">
+					<h3 class = "curatedHeading1">
+						LINE ART
+					</h3>
+					<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='line-painting' %}">
+					<div class="curated-container">
+						<img class = "d-block" src="{% static 'img/best_sellers/line_drawing1.jpg' %}" alt="Art Prints of Abstract Paintings">
+					</div>
+					</a>
+				</div>
+				<div class = "col-3 col-md-3 ">
+					<h3 class = "curatedHeading1">
+						HORSE
+					</h3>
+					<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='horse-painting' %}">
+					<div class="curated-container">
+						<img class = "d-block" src="{% static 'img/best_sellers/horse1.jpg' %}" alt="Art Prints of Abstract Paintings">
+					</div>
+					</a>
+				</div>
+				<div class = "col-3 col-md-3 ">
+					<h3 class = "curatedHeading1">
+						BUDDHA
+					</h3>
+					<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='buddha-painting' %}">
+					<div class="curated-container">
+						<img class = "d-block" src="{% static 'img/best_sellers/buddha1.jpg' %}" alt="Art Prints of Abstract Paintings">
+					</div>
+					</a>
+				</div>
+				<div class = "col-3 col-md-3 ">
+					<h3 class = "curatedHeading1">
+						CITYSCAPE
+					</h3>
+					<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='cityscape' %}">
+					<div class="curated-container">
+						<img class = "d-block" src="{% static 'img/best_sellers/cityscape1.jpg' %}" alt="Art Prints of Abstract Paintings">
+					</div>
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

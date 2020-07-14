@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from datetime import datetime
 import datetime
 from decimal import Decimal
-from django.db.models import F
+from django.db.models import F, Count, Q, Max, Sum
 
 from artevenue.models import Cart, Cart_item_view, Order, Order_stock_image, Order_user_image
 from artevenue.models import Order_stock_collage, Order_original_art, Order_items_view
@@ -53,7 +53,7 @@ SERVICE_PROVIDER = 'Montage Art Private Limited'
 today = datetime.datetime.today()
 
 def checkout_step1_address(request):
-
+	today = datetime.datetime.today()
 	cart_id = request.POST.get('cart_id', '')
 	sub_total = Decimal(request.POST.get('sub_total', '0'))
 	tax = Decimal(request.POST.get('tax', '0'))	
@@ -181,7 +181,7 @@ def checkout_step1_address(request):
 							item_disc_amt  = c.item_disc_amt,
 							item_tax  = c.item_tax,
 							item_total = c.item_total,
-							moulding_id = c.moulding,
+							moulding_id = c.moulding_id,
 							moulding_size = c.moulding_size,
 							print_medium_id = c.print_medium_id, 
 							print_medium_size = c.print_medium_size,
@@ -539,7 +539,7 @@ def checkout_step1_address(request):
 					'sub_total':sub_total, 'tax':tax,'shipping_addr':shipping_addr, 'billing_addr':billing_addr,
 					'disc_amt':disc_amt, 'country_arr':country_arr, 'state_arr':state_arr,  'shipping_cost':shipping_cost,
 					'city_arr':city_arr, 'pin_code_arr':pin_code_arr, 'order_number':order_number,
-					'order_id':order_id})
+					'order_id':order_id,'env': env })
 
 '''					
 @csrf_exempt					
@@ -615,7 +615,7 @@ def validate_address(request):
 '''	
 	
 def checkout_saveAddr_shippingMethod(request):
-
+	today = datetime.datetime.today()
 	order_id = int(request.POST.get('order_id', '0'))
 
 	shipping_full_name = request.POST.get('shipping_full_name', '')
@@ -888,7 +888,7 @@ def checkout_saveAddr_shippingMethod(request):
 				'order_number':order_number})
 
 def checkout_step3_order_review(request):
-
+	today = datetime.datetime.today()
 	order_id = request.POST.get("order_id","")
 	
 	shipping_method = request.POST.get("shipping_method","")
@@ -1173,8 +1173,20 @@ def checkout_step3_order_review(request):
 						'city_arr':city_arr, 'pin_code_arr':pin_code_arr, 'order_id':order_id, 'cart_id':order.cart_id ,
 						'order_number':order_number})
 
-	## Order Review page starts....
+
+	#####################################################
+	#####################################################
+	## Order Review page starts....					#####
+	#####################################################
+	#####################################################
 	else:
+	
+		#####################################################
+		## Sync the car and order details, if not matching
+		#####################################################
+		syn_cart_order(request, order.cart_id)
+	
+	
 		######## Information for Payment Gateway
 		posted={}		
 		##order_id = request.POST.get('order_id','')
@@ -1208,8 +1220,15 @@ def checkout_step3_order_review(request):
 		################# ORDER REVIEW
 		order_items = Order_items_view.objects.filter(order = order).first()
 		usercart = Cart.objects.filter(cart_id = order.cart_id, cart_status = "AC").first()
+		if not usercart():
+			return render(request, "artevenue/checkout_step1_address_new.html", {'msg':'We are sorry, somthing went wrong! Please start over from your cart. Apologies for the inconvenience.', 'order_total':order.order_total,
+							'sub_total':order.sub_total, 'tax':order.tax,'shipping_addr':o, 'billing_addr':b,  'order_shipping_cost':order.shipping_cost,
+							'disc_amt':order.order_discount_amt, 'country_arr':country_arr, 'state_arr':state_arr, 
+							'city_arr':city_arr, 'pin_code_arr':pin_code_arr, 'order_id':order_id, 'cart_id':order.cart_id ,
+							'order_number':order_number})		
+		
 		usercartitems = Cart_item_view.objects.select_related('product', 'promotion').filter(
-				cart = usercart.cart_id, product__product_type_id = F('product_type_id')).values(
+				cart_id = usercart.cart_id, product__product_type_id = F('product_type_id')).values(
 			'cart_item_id', 'product_id', 'product__publisher', 'quantity', 'item_total', 'moulding_id',
 			'moulding__name', 'moulding__width_inches', 'print_medium_id', 'mount_id', 'mount__name',
 			'acrylic_id', 'mount_size', 'product__name', 'image_width', 'image_height', 'stretch_id', 
@@ -1278,9 +1297,18 @@ def checkout_step3_order_review(request):
 		
 			except IntegrityError as e:
 				err_msg.append('Apologies!! Could not save your order. Please use the "Contact Us" and let us know. We will be glad to help you.')
-
+				return render(request, "artevenue/checkout_step1_address_new.html", {'msg':err_msg, 'order_total':order.order_total,
+								'sub_total':order.sub_total, 'tax':order.tax,'shipping_addr':o, 'billing_addr':b,  'order_shipping_cost':order.shipping_cost,
+								'disc_amt':order.order_discount_amt, 'country_arr':country_arr, 'state_arr':state_arr, 
+								'city_arr':city_arr, 'pin_code_arr':pin_code_arr, 'order_id':order_id, 'cart_id':order.cart_id ,
+								'order_number':order_number})
 			except Error as e:
 				err_msg.append('Apologies!! Could not save your order. Please use the "Contact Us" and let us know. We will be glad to help you.')
+				return render(request, "artevenue/checkout_step1_address_new.html", {'msg':err_msg, 'order_total':order.order_total,
+								'sub_total':order.sub_total, 'tax':order.tax,'shipping_addr':o, 'billing_addr':b,  'order_shipping_cost':order.shipping_cost,
+								'disc_amt':order.order_discount_amt, 'country_arr':country_arr, 'state_arr':state_arr, 
+								'city_arr':city_arr, 'pin_code_arr':pin_code_arr, 'order_id':order_id, 'cart_id':order.cart_id ,
+								'order_number':order_number})
 		
 		
 		return render(request, "artevenue/checkout_step3_order_review.html", {'order':o, 'order_items':order_items, 
@@ -1338,5 +1366,316 @@ def get_order_next_order_number():
 	else:
 		generated_num = (mnth + str(num))
 	return generated_num 	
+
+@csrf_exempt
+def syn_cart_order(request, cart_id=None):
+	mismatch_flag = False
+	today = datetime.datetime.today()
+	status = "SUCCESS"
+	if not cart_id:
+		cart_id = request.POST.get("cart_id","")
 	
+	try:
+		cart = Cart.objects.get(cart_id = cart_id)
+	except Cart.DoesNotExist:
+		return JsonResponse({'status': 'NO-CART', 'msg': 'System Error! Cart not found. Please start over again.'})
+	
+	try:
+		order = Order.objects.get(cart_id = cart_id)
+	except Order.DoesNotExist:
+		return JsonResponse({'status': 'NO-ORDER', 'msg': 'System Error! Order not found. Please delete all items from cart and start over again.'})
+	except Order.MultipleObjectsReturned:
+		return JsonResponse({'status': 'MULTIPLE-ORDERS', 'msg': 'System Error! Multiple orders. Please delete all items from cart and start over again.'})
+	
+	cart_items = Cart_item_view.objects.filter(cart_id = cart_id)
+	order_items = Order_items_view.objects.filter(order_id = order.order_id)
+
+	###########################################################
+	## Check if cart_item total and cart total matches
+	###########################################################
+	cart_item_total = 0	
+	ctm_total = Cart_item_view.objects.filter(cart_id = cart_id).aggregate(
+			ci_total=Sum('item_total'))
+			
+	if ctm_total:
+		if ctm_total['ci_total']:
+			cart_item_total = ctm_total['ci_total']
+
+	## If there's a mismatch in cart totals
+	if cart_item_total != cart.cart_total:
+		return JsonResponse({'status': 'CART-TOTAL-MISMATCH', 'msg': "There's a technical glitch. We had to remove your cart. Our sincere apologies. But we don't want you to proceed with order with wrong details. Please start over again."})
+		
+	
+	###########################################################
+	## Check if cart total and order total matches
+	###########################################################
+	if order.order_total != cart.cart_total:
+		mismatch_flag = True
+
+	###########################################################
+	## Check if order total and order items total matches
+	###########################################################
+	order_item_total = 0	
+	orditm_total = Order_items_view.objects.filter(order_id = order.order_id).aggregate(
+			oi_total = Sum('item_total'))
+	if orditm_total:
+		if orditm_total['oi_total']:
+			order_item_total = orditm_total['oi_total']
+	## If there's a mismatch in cart & order totals
+	if order_item_total != order.order_total:
+		mismatch_flag = True
+
+	## Check if cart items and order items counts are same
+	if cart_items.count() != order_items.count():
+		mismatch_flag = True
+	
+	###########################################################
+	## Check if cart item total and order items total matches
+	###########################################################
+	if cart_item_total != order_item_total:
+		mismatch_flag = True
+			
+	###############################################################
+	## If there's any mismatch then we just remove the order and 
+	## order items and recreate those based on the cart and cart items
+	###############################################################	
+	if mismatch_flag:	
+		## Delete existing order items
+		for oi in order_items:
+			if oi.product_type_id == 'STOCK-IMAGE':
+				oi_delete = Order_stock_image.objects.filter(order_id = order.order_id).delete()
+			if oi.product_type_id == 'USER-IMAGE':
+				oi_delete = user_image.objects.filter(order_id = order.order_id).delete()
+			if oi.product_type_id == 'STOCK-COLLAGE':
+				oi_delete = Order_stock_collage.objects.filter(order_id = order.order_id).delete()
+			if oi.product_type_id == 'ORIGINAL-ART':
+				oi_delete = Order_originak_art.objects.filter(order_id = order.order_id).delete()
+
+		## Create new order items
+		for c in cart_items:
+			if c.product_type_id == 'STOCK-IMAGE' :
+				new_ord_item = Order_stock_image(	
+					order = order,
+					cart_item_id = c.cart_item_id,
+					promotion_id = c.promotion_id,
+					quantity = c.quantity,
+					item_unit_price = c.item_unit_price,
+					item_sub_total = c.item_sub_total,
+					item_disc_amt  = c.item_disc_amt,
+					item_tax  = c.item_tax,
+					item_total = c.item_total,
+					moulding_id = c.moulding_id,
+					moulding_size = c.moulding_size,
+					print_medium_id = c.print_medium_id, 
+					print_medium_size = c.print_medium_size,
+					mount_id = c.mount_id,
+					mount_size = c.mount_size,
+					board_id = c.board_id,
+					board_size = c.board_size,
+					acrylic_id = c.acrylic_id,
+					acrylic_size = c.acrylic_size,
+					stretch_id = c.stretch_id,
+					stretch_size = c.stretch_size,
+					image_width = c.image_width,
+					image_height = c.image_height,
+					created_date = 	today,
+					updated_date = today,
+					stock_image_id = c.product_id
+				)
+				new_ord_item.save()
+
+			if c.product_type_id == 'USER-IMAGE' :
+				new_ord_item = Order_user_image(	
+					order = order,
+					cart_item_id = c.cart_item_id,
+					promotion_id = c.promotion_id,
+					quantity = c.quantity,
+					item_unit_price = c.item_unit_price,
+					item_sub_total = c.item_sub_total,
+					item_disc_amt  = c.item_disc_amt,
+					item_tax  = c.item_tax,
+					item_total = c.item_total,
+					moulding_id = c.moulding_id,
+					moulding_size = c.moulding_size,
+					print_medium_id = c.print_medium_id, 
+					print_medium_size = c.print_medium_size,
+					mount_id = c.mount_id,
+					mount_size = c.mount_size,
+					board_id = c.board_id,
+					board_size = c.board_size,
+					acrylic_id = c.acrylic_id,
+					acrylic_size = c.acrylic_size,
+					stretch_id = c.stretch_id,
+					stretch_size = c.stretch_size,
+					image_width = c.image_width,
+					image_height = c.image_height,
+					created_date = 	today,
+					updated_date = today,
+					user_image_id = c.product_id
+				)
+				new_ord_item.save()
+			if c.product_type_id == 'STOCK-COLLAGE' :
+				new_ord_item = Order_stock_collage(	
+					order = order,
+					cart_item_id = c.cart_item_id,
+					promotion_id = c.promotion_id,
+					quantity = c.quantity,
+					item_unit_price = c.item_unit_price,
+					item_sub_total = c.item_sub_total,
+					item_disc_amt  = c.item_disc_amt,
+					item_tax  = c.item_tax,
+					item_total = c.item_total,
+					moulding_id = c.moulding_id,
+					moulding_size = c.moulding_size,
+					print_medium_id = c.print_medium_id, 
+					print_medium_size = c.print_medium_size,
+					mount_id = c.mount_id,
+					mount_size = c.mount_size,
+					board_id = c.board_id,
+					board_size = c.board_size,
+					acrylic_id = c.acrylic_id,
+					acrylic_size = c.acrylic_size,
+					stretch_id = c.stretch_id,
+					stretch_size = c.stretch_size,
+					image_width = c.image_width,
+					image_height = c.image_height,
+					created_date = 	today,
+					updated_date = today,
+					stock_collage_id = c.product_id
+				)
+				new_ord_item.save()
+			if c.product_type_id == 'ORIGINAL-ART' :
+				new_ord_item = Order_original_art(	
+					order = order,
+					cart_item_id = c.cart_item_id,
+					promotion_id = c.promotion_id,
+					quantity = c.quantity,
+					item_unit_price = c.item_unit_price,
+					item_sub_total = c.item_sub_total,
+					item_disc_amt  = c.item_disc_amt,
+					item_tax  = c.item_tax,
+					item_total = c.item_total,
+					moulding_id = c.moulding_id,
+					moulding_size = c.moulding_size,
+					print_medium_id = c.print_medium_id, 
+					print_medium_size = c.print_medium_size,
+					mount_id = c.mount_id,
+					mount_size = c.mount_size,
+					board_id = c.board_id,
+					board_size = c.board_size,
+					acrylic_id = c.acrylic_id,
+					acrylic_size = c.acrylic_size,
+					stretch_id = c.stretch_id,
+					stretch_size = c.stretch_size,
+					image_width = c.image_width,
+					image_height = c.image_height,
+					created_date = 	today,
+					updated_date = today,
+					original_art_id = c.product_id
+				)
+				new_ord_item.save()
+		
+			## END: Creating new order items
+			
+		####################################################
+		####### Update order from the cart
+		####################################################
+		o = Order.objects.filter(cart_id = cart_id).update(
+				order_id = order.order_id,
+				order_number = order.order_number,
+				order_date = order.order_date,
+				cart = cart,
+				store_id = settings.STORE_ID,
+				session_id = cart.session_id,
+				user = cart.user,
+				voucher = cart.voucher,
+				voucher_disc_amount = cart.voucher_disc_amount,
+				referral = cart.referral,
+				referral_disc_amount = cart.referral_disc_amount,					
+				unit_price = cart.cart_unit_price,
+				quantity = cart.quantity,
+				sub_total = cart.cart_sub_total,
+				order_discount_amt = cart.cart_disc_amt,
+				tax = cart.cart_tax,
+				shipping_cost = order.shipping_cost,
+				order_total = cart.cart_total,
+				shipping_method = order.shipping_method,
+				shipper = order.shipper,		
+				shipping_status = order.shipping_status,
+				created_date =  order.created_date,
+				updated_date =  today,
+				order_status = order.order_status				
+			)
+		
+
+	return JsonResponse({'status': 'SUCCESS', 'msg': ''})
+
+@csrf_exempt
+def verify_cart_order(request, cart_id=None):
+	mismatch_flag = False
+	today = datetime.datetime.today()
+	if not cart_id:
+		cart_id = request.POST.get("cart_id","")
+	
+	try:
+		cart = Cart.objects.get(cart_id = cart_id)
+	except Cart.DoesNotExist:
+		return JsonResponse({'status': 'NO-CART', 'msg': 'System Error! Cart not found. Please start over again.'})
+	
+	try:
+		order = Order.objects.get(cart_id = cart_id)
+	except Order.DoesNotExist:
+		return JsonResponse({'status': 'NO-ORDER', 'msg': 'System Error! Order not found. Please delete all items from cart and start over again.'})
+	except Order.MultipleObjectsReturned:
+		return JsonResponse({'status': 'MULTIPLE-ORDERS', 'msg': 'System Error! Multiple orders. Please delete all items from cart and start over again.'})
+	
+	cart_items = Cart_item_view.objects.filter(cart_id = cart_id)
+	order_items = Order_items_view.objects.filter(cart_id = order.order_id)
+
+	###########################################################
+	## Check if cart_item total and cart total matches
+	###########################################################
+	cart_item_total = 0	
+	ctm_total = Cart_item_view.objects.filter(cart_id = cart_id).aggregate(
+			ci_total=Sum('item_total'))
+			
+	if ctm_total:
+		if ctm_total['ci_total']:
+			cart_item_total = ctm_total['ci_total']
+
+	## If there's a mismatch in cart totals
+	if cart_item_total != cart.cart_total:
+		return JsonResponse({'status': 'CART-TOTAL-MISMATCH', 'msg': "There's a technical glitch. We had to remove your cart. Our sincere apologies. But we don't want you to proceed with order with wrong details. Please start over again."})
+		
+	
+	###########################################################
+	## Check if cart total and order total matches
+	###########################################################
+	if order.order_total != cart.cart_total:
+		mismatch_flag = True
+
+	###########################################################
+	## Check if order total and order items total matches
+	###########################################################
+	order_item_total = 0	
+	orditm_total = Order_items_view.objects.filter(order_id = order.order_id).aggregate(
+			oi_total = Sum('item_total'))
+	if orditm_total:
+		if orditm_total['oi_total']:
+			order_item_total = orditm_total['oi_total']
+	## If there's a mismatch in cart & order totals
+	if order_item_total != order.order_total:
+		mismatch_flag = True
+
+	## Check if cart items and order items counts are same
+	if cart_items.count() != order_item.count():
+		mismatch_flag = True
+	
+	###########################################################
+	## Check if cart item total and order items total matches
+	###########################################################
+	if cart_item_total != order_item_total:
+		mismatch_flag = True
+
+	return JsonResponse({'mismatch_flag': mismatch_flag})
 	

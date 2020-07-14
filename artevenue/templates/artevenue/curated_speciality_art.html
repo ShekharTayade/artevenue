@@ -1,0 +1,132 @@
+{% load static %}
+<div class = "container-fluid  text-center">
+	<div class="row mt-5">
+		<div class="col-12">
+			<h2 class="text-center">
+				SPECIALITY ART
+			</h2>
+		</div>
+	</div>
+	<div class="row text-center">
+		<div class = "col-12 col-md-6">
+			<div class = "row">
+				<div class = "col-3 col-md-3">
+					<h3 class = "curatedHeading1">
+						SUNRISE
+					</h3>
+					<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='sunrise-art' %}">
+					<div class="curated-container">
+						<picture>
+							<source media="(max-width:465px)" srcset="{% static 'img/speciality/sunrise_mobile.jpg' %}">
+							<source media="(min-width:465px)" srcset="{% static 'img/speciality/sunrise.jpg' %}">
+							<img class = "d-block spciality-art-img" src="{% static 'img/speciality/sunrise.jpg' %}" alt="Sunrise Art">
+						</picture>
+					</div>
+					</a>
+				</div>
+				<div class = "col-3 col-md-3">
+					<h3 class = "curatedHeading1">
+						SUNSET
+					</h3>
+					<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='sunset-art' %}">
+					<div class="curated-container">
+						<picture>
+							<source media="(max-width:465px)" srcset="{% static 'img/speciality/sunset_mobile.jpg' %}">
+							<source media="(min-width:465px)" srcset="{% static 'img/speciality/sunset.jpg' %}">
+							<img class = "d-block spciality-art-img" src="{% static 'img/speciality/sunset.jpg' %}" alt="Sunset Art">
+						</picture>
+					</div>
+					</a>
+				</div>
+				<div class = "col-3 col-md-3">
+					<h3 class = "curatedHeading1">
+						VASTU
+					</h3>
+					<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='paintings-according-to-vastu-shastra' %}">
+					<div class="curated-container">
+						<picture>
+							<source media="(max-width:465px)" srcset="{% static 'img/speciality/vastu_mobile.jpg' %}">
+							<source media="(min-width:465px)" srcset="{% static 'img/speciality/vastu.jpg' %}">
+							<img class = "d-block spciality-art-img" src="{% static 'img/speciality/vastu.jpg' %}" alt="Paitings Accourding To Vastu Shastra">
+						</picture>
+					</div>
+					</a>
+				</div>
+				<div class = "col-3 col-md-3">
+					<h3 class = "curatedHeading1">
+						MOVIE
+					</h3>
+					<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='movie-posters' %}">
+					<div class="curated-container">
+						<picture>
+							<source media="(max-width:465px)" srcset="{% static 'img/speciality/movie_posters_mobile.jpg' %}">
+							<source media="(min-width:465px)" srcset="{% static 'img/speciality/movie_posters.jpg' %}">
+							<img class = "d-block spciality-art-img" src="{% static 'img/speciality/movie_posters.jpg' %}" alt="Movie Posters">
+						</picture>
+					</div>
+					</a>
+				</div>
+			</div>
+		</div>
+		<div class = "col-12 col-md-6">
+			<div class = "row">
+				<div class = "col-3 col-md-3">
+					<h3 class = "curatedHeading1">
+						LINE ART
+					</h3>
+					<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='line-painting' %}">
+					<div class="curated-container">
+						<picture>
+							<source media="(max-width:465px)" srcset="{% static 'img/speciality/line_drawing_mobile.jpg' %}">
+							<source media="(min-width:465px)" srcset="{% static 'img/speciality/line_drawing.jpg' %}">
+							<img class = "d-block spciality-art-img" src="{% static 'img/speciality/line_drawing.jpg' %}" alt="Line Drawing">
+						</picture>
+					</div>
+					</a>
+				</div>
+				<div class = "col-3 col-md-3 ">
+					<h3 class = "curatedHeading1">
+						HORSE
+					</h3>
+					<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='painting-of-horse' %}">
+					<div class="curated-container">
+						<picture>
+							<source media="(max-width:465px)" srcset="{% static 'img/speciality/horse_mobile.jpg' %}">
+							<source media="(min-width:465px)" srcset="{% static 'img/speciality/horse.jpg' %}">
+							<img class = "d-block spciality-art-img" src="{% static 'img/speciality/horse.jpg' %}" alt="Paintings of Horse">
+						</picture>
+					</div>
+					</a>
+				</div>
+				<div class = "col-3 col-md-3 ">
+					<h3 class = "curatedHeading1">
+						BUDDHA
+					</h3>
+					<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='buddha-wall-art' %}">
+					<div class="curated-container">
+						<picture>
+							<source media="(max-width:465px)" srcset="{% static 'img/speciality/buddha_mobile.jpg' %}">
+							<source media="(min-width:465px)" srcset="{% static 'img/speciality/buddha.jpg' %}">
+							<img class = "d-block spciality-art-img" src="{% static 'img/speciality/buddha.jpg' %}" alt="Buddha Wall Art">
+						</picture>
+					</div>
+					</a>
+				</div>
+				<div class = "col-3 col-md-3 ">
+					<h3 class = "curatedHeading1">
+						CITYSCAPE
+					</h3>
+					<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='cityscape-wall-art' %}">
+					<div class="curated-container">
+						<picture>
+							<source media="(max-width:465px)" srcset="{% static 'img/speciality/cityscape_mobile.jpg' %}">
+							<source media="(min-width:465px)" srcset="{% static 'img/speciality/cityscape.jpg' %}">
+							<img class = "d-block spciality-art-img" src="{% static 'img/speciality/cityscape.jpg' %}" alt="Cityscape Paintings">
+						</div>
+					</div>
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

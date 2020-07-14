@@ -31,7 +31,7 @@ class CustomerReviewForm(forms.ModelForm):
 		widget=forms.Textarea(attrs={'placeholder': 'What you liked/disliked'})
 	)
 	headline = forms.CharField(max_length=100, required=True, 
-		widget=forms.Textarea(attrs={'placeholder': 'A brief title/head of your review'})
+		widget=forms.Textarea(attrs={'placeholder': 'Highligh of your feedback. What you think is best or worst.'})
 	)
 	posted_date = forms.DateField( widget=forms.HiddenInput() )
 	order_id = forms.IntegerField( widget=forms.HiddenInput() )

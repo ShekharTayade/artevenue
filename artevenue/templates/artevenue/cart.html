@@ -1,15 +1,19 @@
 {% extends 'artevenue/estore_base.html' %}
 {% load static %}
+
 {% block page-title %} 
-	<title>Shopping cart.</title>
+	<title>Arte'Venue | Shopping cart</title>
 {% endblock page-title %} 
 {% block page-description %}
-<meta name="description" content="Displaying shopping cart.">
+<meta name="description" content="Displaying Arte'VEnue shopping cart.">
 {% endblock page-description %}
 {% block page-keywords %}
-<meta name="keywords" content="Art, arvenue, shopping cart">
+<meta name="keywords" content="Art, artevenue, shopping cart">
 {% endblock page-keywords %}	
 
+{% block page-author %}  
+<meta name="author" content="Arte'venue">
+{% endblock page-author %}  
 
 {% block coursel-stylesheet %}
 {% endblock coursel-stylesheet %}
@@ -23,9 +27,23 @@
 {% block front.js %}
 {% endblock front.js %}
 
-
 {% block imagemap-resize-script %}
 {% endblock imagemap-resize-script %}
+
+{% block add_to_head %}
+{% if env == 'PROD' %}
+
+<!-- Event snippet for Show cart conversion page -->
+<script>
+  gtag('event', 'conversion', {
+      'send_to': 'AW-704394330/NYk4CL6ru8MBENro8M8C',
+      'value': 1.0,
+      'currency': 'INR'
+  });
+</script>
+
+{% endif %}
+{% endblock add_to_head %}
 
 
 <!-- Only Override the site content block -->
@@ -61,6 +79,7 @@
 			var value = JSON.stringify(obj);
 
 			var prod_id = obj['product_id'];
+			var prod_typ = obj['product_type'];
 			var qty = obj['quantity'];
 			var moulding_id = obj['moulding_id']
 			var currwidth = obj['image_width']
@@ -102,7 +121,7 @@
 					'stretch_size':stretch_size, 
 					'total_price':total_price, 'image_width':currwidth, 'image_height':currheight,
 					'discount':discount, 'promotion_id':promotion_id, 'disc_amt':disc_amt,
-					'item_unit_price':item_unit_price, 'prod_type':'STOCK-IMAGE',
+					'item_unit_price':item_unit_price, 'prod_type':prod_typ,
 					'cart_item_flag':cart_item_flag },
 				dataType: 'text', 
 				type: 'post',

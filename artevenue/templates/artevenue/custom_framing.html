@@ -2,13 +2,13 @@
 {% extends 'artevenue/estore_base.html' %}
 {% load static %}
 {% block page-title %} 
-	<title>Frame My Photo|Top Quality Online Photo Framing at Artevenue</title>
+	<title>Custom Photo Frames | Top Quality | Full Customization Available</title>
 {% endblock page-title %} 
 {% block page-description %}
-	<meta name="description" content="Frame My Photo! We print and frame photos online and deliver at your doorstep. We offer top quality artworks and online photo printing services in India.">
+	<meta name="description" content="Online photo printing and framing. Photos, artworks, posters framed and delivered to you. Just upload digital image, have it custom framed and delivered.">
 {% endblock page-description %}
 {% block page-keywords %}
-	<meta name="keywords" content="Frame My Photo, print and frame photos online, online photo printing services, framed photo prints online, online photo framing, online framing,  online photo printing and framing india, single photo frames online, multiple photo frame online,  cheapest photo print online, online photo printing services">
+	<meta name="keywords" content="custom photo frames, online photo printing and framing, frame my photo, fine art photography printing services, custom photography prints, print and frame photos online, online photo framing, online photo printing and framing india, single photo frames online, multiple photo frame online,  cheapest photo print online, online photo printing services">
 {% endblock page-keywords %}
 
 {% block page-author %}
@@ -42,27 +42,32 @@
 	<!-- Only Override the site content block -->
 	{% block sitecontent %}
 	<div class="container-fluid mt-4">
-		<div class = "row mb-3">			
-			<div class="col-12 text-center">
-				<h1>FRAME MY PHOTO</h1>
-				<h3>
-					Upload your favorite photos, we print and frame photos online
-					& deliver at your doorstep. 
-					Not just photos, you can have your artwork, posters or any 
-					digital images framed.
-				</h3>
-				
-				<h4>
-					(Ship in 1-2 days)
-				</h4>
+		<div class = "row mb-5 text-center py-3">
+			<div class="col-12">
+				<h1 class = "mb-3">
+					CUSTOM PHOTO FRAMES
+				</h1>
+				<h2>
+					We are a top destination in India for high quality<br />
+					<span style="font-style:italic;">
+					online photo printing and framing</span>
+					of your favorite photos, artworks, posters etc.<br />
+					We also offer fine art photography printing services.
+				</h2>
+				<p>
+					Just upload the digital image, choose paper or canvas print, choose 
+					the size, customize<br />
+							the frame as you like & we deliver at your doorstep.
+				</p>
 			</div>
 		</div>
-		<div id = "framing-card" class="card-deck row mb-3">
+		<div id = "framing-card" class="card-deck mb-3">
 			<div class="card col-12 col-md-6 custom-framing-box">		
 				<div class="card-body">
 					<div class = "row">
 						<div class="col-12 file-upload pb-0">
-							<form id = "img-form" method = "post" enctype='multipart/form-data'>										
+							<form id = "img-form" method = "post" 
+									enctype='multipart/form-data'>
 								{% csrf_token %}
 								<h3 class = "text-center">
 									IMAGE TO PRINT & FRAME
@@ -72,7 +77,12 @@
 								</button>
 								
 								<div class="image-upload-wrap" ondrop="enable_frame_sec()">
-									<input class="file-upload-input" type='file' onchange="readURL(this);$('#upld_btn').click();" accept="image/png, image/jpeg, image/gif, image/bmp" name="image_to_frame" class="form-control" id="user_image"/>
+									<input class="file-upload-input" type='file' 
+										onchange="readURL(this);$('#upld_btn').click();" 
+										accept="image/png, image/jpeg, image/gif, image/bmp" 
+										name="image_to_frame" 
+										class="form-control" id="user_image"
+										style = "box-sizing: border-box; width: 50%"/>
 									<div class="drag-text" onclick = "$('.file-upload-input').click();">
 										<div class = "row" id = "upload-show">
 											<div class = "col-6">
@@ -138,14 +148,14 @@
 							</div>
 						</div>
 					</div>
-					<div class = "row">
+					<div class = "row mt-2">
 						<div class="col-12">
-							<span id= 'size-msg' class = "text-muted mt-2">
+							<span id= 'size-msg' class = "text-muted">
 							</span>
 						</div>
 					</div>
 					<div class = "row" style = "text-align:left; background-color:#efefef;">
-						<div class="col-8 d-flex align-items-center justify-content-center">
+						<div class="col-7 d-flex align-items-center justify-content-center">
 							<div class= "text-muted"
 										style= "font-size: 0.65rem; text-align: left;">
 								PRODUCT DETAILS<br /> 
@@ -153,7 +163,7 @@
 								</span>
 							</div>
 						</div>
-						<div class="col-4 d-flex flex-column justify-content-center"
+						<div class="col-5 d-flex flex-column justify-content-center"
 									style= "font-size: 1.1rem; text-align: left; padding:15px;
 									 color:#11b6bd;">
 							<div id = "promo-display"  class = "text-center" style = "display:none">
@@ -315,7 +325,6 @@
 				</div>
 			</div>			
 		</div>
-
 		<hr>
 		<div class = "row">		
 			<div class="col-12 mt-3 col-md-6 d-flex justify-content-center">
@@ -338,7 +347,7 @@
 			<div class = "col-12 col-md-1 img-thumbs">
 			</div>
 			<div class = "col-12 col-md-10">
-				ABOUT THIS PRODUCT
+				ABOUT THIS PRODUCT<br />
 				<div id="accordion" class="accordion mt-3">
 					<div class=" mb-0">
 						<div class="card-header collapsed" data-toggle="collapse" href="#collapseOne">
@@ -346,8 +355,11 @@
 						</div>
 						<div id="collapseOne" class="card-body collapse" data-parent="#accordion">
 							<div style = "padding: 5px !important; color: darkgrey; font-size: 0.8rem;">
-								Printed on fine art printer, bringing out vivid colors, giving 
-								you more realistic reproduction of you digital image.
+								You can get it either on a <span style = "font-weight:600;">paper print</span>
+								or a <span style = "font-weight:600;">canvas print</span>.
+								Your image is printed with a fine art printer, 
+								bringing out vivid colors and giving you
+								you more realistic reproduction of your digital image.
 							</div>
 						</div>
 						<div class="card-header collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">
@@ -396,6 +408,7 @@
 								</tbody>
 							</table>
 						</div>
+
 						<div class="card-header collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseThree">
 							<a class="card-title">FREE SHIPPING</a>
 						</div>
@@ -411,7 +424,7 @@
 									<tr>
 										<td class="accordian-subhead">SHIPPING TIME</td>
 										<td class = "comp-frame">
-											Ships by FedEx in 1-2 business days. Usually deliveres in 3-7 days in most parts of India.
+											Ships by courier in 1-2 business days. Usually deliveres in 3-7 days in most parts of India.
 										</td>
 									</tr>
 								</tbody>
@@ -426,8 +439,18 @@
 		<hr>
 
 		<span id = "frames-in-cart">
-			{% include 'artevenue/custom_framing_items_in_cart_include.html' %}
+			<div class = "row">
+				<div class = "col-12 img-thumbs">
+					{% include 'artevenue/custom_framing_items_in_cart_include.html' %}
+				</div>
+			</div>
 		</span>
+		<div class = "row mt-3" style = "font-size:0.8rem;">
+			<div class = "col-12 col-md-1 img-thumbs">
+			</div>
+			<div class = "col-12 col-md-10">
+			</div>
+		</div>
 		<div class = "row mt-5 mb-3">			
 			<div class="col-12 mt-2" style = "text-align: center;">
 				<li class="list-inline-item clickable">
@@ -519,6 +542,21 @@
 	</div>
 	{% endblock sitecontent %}
 	
+	{% block footer-text %}
+		<div class = "text-center">
+			We are also a top destination for high quality and reliable 
+			custom photo frames
+			in India. 
+			From the comfort of your home,
+			just upload the digital images,
+			choose size, frame and customize it the way you would like. We print, 
+			frame and deliver it you. <br />
+			We are a premier online photo printing 
+			and framing shop.
+			Each of your products is crafted by skilled personnel on 
+			state-of-the-art machinery.
+		</div>
+	{% endblock footer-text %}
 	
 	{% block jscripts %}
 		<script type="text/javascript" src="{% static 'vendor/slick/slick.min.js' %}"></script>	
@@ -562,38 +600,40 @@
 				{% endif %}
 				
 				{% if user_instance.image_to_frame %}
+					console.log("ID: " + "{{user_instance.product_id}}" );
 					set_product_id({{user_instance.product_id}});
 					document.getElementById("prod-img").src = "{{user_instance.image_to_frame.url}}";
 					$('.image-upload-wrap').hide();
 					$('.file-upload-content').show();
 					enable_frame_sec();
 
-
-					var img = document.getElementById('prod-img');
-					var width = img.naturalWidth;
-					var height = img.naturalHeight;
-					var max_w = Math.floor(width / ppi);
-					var max_h = Math.floor(height / ppi);
-					// Set the aspect ratio
-					ratio = width / height
-					set_max_width(max_w);
-					if (max_w < 12){
-						w = max_w;
-					} else {
-						w = 12
-					}
-					$("#size-msg").html("Good quality printing can be done up to size of " + max_w + " inch width");
-					set_image_width(w);						
-					set_image_height(w/ratio);
-					set_size_slider(w);
-					$( "#size-slider" ).slider( "option", "value", w);
-					var currwidth = $("#size-slider").slider("value");						
-					set_user_image_id();
-					if (max_w >= MAX_WIDTH) {
-						max_w = MAX_WIDTH;
-					}
-					set_max_width(max_w);
-					print_medium_change('PAPER',false);				
+					setTimeout(function (){
+						var img = document.getElementById('prod-img');
+						var width = img.naturalWidth;						
+						var height = img.naturalHeight;
+						var max_w = Math.floor(width / ppi);
+						var max_h = Math.floor(height / ppi);
+						// Set the aspect ratio
+						ratio = width / height
+						set_max_width(max_w);
+						if (max_w < 12){
+							w = max_w;
+						} else {
+							w = 12
+						}
+						$("#size-msg").html("Good quality printing can be done up to size of " + max_w + " inch width");
+						set_image_width(w);						
+						set_image_height(w/ratio);
+						set_size_slider(w);
+						$( "#size-slider" ).slider( "option", "value", w);
+						var currwidth = $("#size-slider").slider("value");						
+						set_user_image_id();
+						if (max_w >= MAX_WIDTH) {
+							max_w = MAX_WIDTH;
+						}
+						set_max_width(max_w);
+						print_medium_change('PAPER',false);				
+					}, 500);
 					/*
 					set_mount_id('1');
 					set_mount_size('1');
@@ -655,8 +695,8 @@
 		// Global variables to store IDs of pricing components
 		var product_id = 0;
 		var print_medium_id = 'PAPER';
-		var image_width = 4;
-		var image_height = 4;
+		var image_width = 8;
+		var image_height = 8;
 		var moulding_id = '0';
 		var mount_id = '0';
 		var mount_color = '0';
@@ -668,7 +708,7 @@
 		var ppi = 150;  // Print standard
 		var user_image_id = '0';
 
-		var minsize = 4;
+		var minsize = 8;
 		var MAX_WIDTH = 40;
 		var ratio = 0;
 
@@ -1165,8 +1205,8 @@
 						dataType: 'text', 
 					success: function (data) {
 						document.getElementById("prod-img").src = "data:image/png;base64," + data;
-						document.body.scrollTop = 0; // For Safari
-						document.documentElement.scrollTop = 0;
+						document.body.scrollTop += 500; // For Safari
+						document.documentElement.scrollTop += 500;
 						},
 					error: function(xhr){
 						alert("An error occured: " + xhr.status + " " + xhr.statusText); 
@@ -1476,6 +1516,27 @@
 			acrylic_size = currwidth * currheight;
 			board_size = currwidth * currheight;
 			stretch_size = (currwidth + currheight) * 2;
+
+			var acr_id = '';
+			var brd_id = '';
+			var str_id = '';
+			var mnt_id = ';'
+			if (print_medium_id == 'CANVAS') {
+				var str_id = get_stretch_id();
+				mnt_id = '0'
+			} else {
+				if (moulding_id != '' && moulding_id != '0') {
+					var acr_id = get_acrylic_id();
+					var brd_id = get_board_id();
+					mnt_id = get_mount_id();
+				} else {
+					var acr_id = '';
+					var brd_id = '';
+					mnt_id = '';
+				}
+				var str_id = '';
+			}
+
 			
 			// Update the cart
 			$.ajax({
@@ -1484,11 +1545,11 @@
 						'width':currwidth, 'height':currheight,
 						'moulding_size' : moulding_size,
 						'print_medium_id':print_medium_id, 'print_medium_size':print_medium_size, 
-						'mount_id':mount_id, 'mount_size':mount_size,
+						'mount_id':mnt_id, 'mount_size':mount_size,
 						'mount_w_left' : mount_w_left, 'mount_w_right':mount_w_right, 
 						'mount_w_top':mount_w_top, 'mount_w_bottom' : mount_w_bottom, 
-						'acrylic_id':acrylic_id, 'acrylic_size':acrylic_size,
-						'board_id':board_id, 'board_size':board_size, 'stretch_id':stretch_id,
+						'acrylic_id':acr_id, 'acrylic_size':acrylic_size,
+						'board_id':brd_id, 'board_size':board_size, 'stretch_id':str_id,
 						'stretch_size':stretch_size, 
 						'total_price':total_price, 'image_width':currwidth, 'image_height':currheight,
 						'discount':discount, 'promotion_id':promotion_id, 'disc_amt':disc_amt,
@@ -1507,6 +1568,19 @@
 						$("#stay_btn").prop('disabled', true);
 						$("#stay_btn").hide();
 						$('#cart-msg-modal').modal('show');
+
+						/*
+						{% if env == 'PROD' %}
+						gtag('event','add_to_cart', {
+						  'value': total_price,
+						  'items':[{
+						  'id':prod_id,
+						  'location_id': '',
+						  'google_business_vertical': 'custom',
+						  }]
+						  });
+						{% endif %}
+						*/
 					}
 				},
 				error: function(xhr){

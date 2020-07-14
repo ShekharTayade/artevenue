@@ -5,19 +5,23 @@
 	<div class="row text-center">
 		<div class="col-12 col-md-12">
 			<div class="col-md-12 text-center" style = "background-color: #fafafa; padding:10px;">
-				<h2 class="text-center">ONLINE PHOTO FRAMING
+				<h2 class="text-center">CUSTOM PHOTO FRAMES
 				</h2>
+				<h4>Get your Photos, Artworks, Posters Framed and Delivered
 			</div>
 		</div>
 	</div>
 	<div class="row text-center">
-		<div class="say_pic" style = "padding:0px !important;">
-			<div id = "wrapper">
-				<img class = "d-none d-sm-block" src="{% static 'img/frame-my-pic.jpg' %}" class="img-responsive" usemap="#frame-map" alt="Online photo framing">
-				<a id = "anchor-frame" href="{% url 'user_image' %}"></a>
-				<img class = "d-block d-sm-none" src="{% static 'img/frame-my-pic-m.jpg' %}" class="img-responsive mobile" usemap="#frame-map" alt="Online photo framing">
-				<a id = "anchor-frame-mobile" href="{% url 'user_image' %}" class = "mobile"></a>
-			</div>
+		<div class = "col-12">
+		<a id = "" href="{% url 'user_image' %}">
+		<div class="curated-container">
+			<picture>
+				<source media="(max-width:465px)" srcset="{% static 'img/frame-my-pic-m.jpg' %}">
+				<source media="(min-width:465px)" srcset="{% static 'img/frame-my-pic.jpg' %}">
+				<img src="{% static 'img/frame-my-pic.jpg' %}" alt="Custom photo frames">
+			</picture>
+		</div>
+		</a>
 		</div>
 	</div>
 </div>

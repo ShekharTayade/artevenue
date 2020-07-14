@@ -82,12 +82,13 @@ def artevenuelogin(request):
 
 	
 def register(request, email=None, signup_popup = 0):
+	today = datetime.datetime.today()
 
 	## Get any sign up promotion
 	try:
 		promo_voucher = Promotion_voucher.objects.get(promotion__name = 'SIGN-UP',
-			promotion__effective_from__lte = today,
-			promotion__effective_to__gte = today)
+			promotion__effective_from__lte = today.date(),
+			promotion__effective_to__gte = today.date())
 	except Promotion_voucher.DoesNotExist:
 			promo_voucher = None
 	if promo_voucher:
@@ -181,7 +182,7 @@ def register(request, email=None, signup_popup = 0):
 	
 	
 def business_registration(request):
-
+	today = datetime.datetime.today()
     
 	if request.method == 'POST':
 
@@ -612,11 +613,12 @@ def get_orders_for_status_update(request):
 	page = request.POST.get('page', 1)
 	printpdf = request.POST.get('printpdf', 'NO')
 	order_number = request.POST.get("order_number", '')
-		
+	fetch_again = request.POST.get("fetch_again", None)
+	
 	order_list = Order.objects.exclude(
 		Q(order_status = 'PP') | Q(order_status = 'CO')
 		).select_related('order_billing', 
-		'order_shipping').order_by('-updated_date')
+		'order_shipping').order_by('-order_date')
 		
 	order_items_list = {}
 	if order_number:
@@ -627,7 +629,7 @@ def get_orders_for_status_update(request):
 	
 	count = order_list.count()
 	
-	paginator = Paginator(order_list, 5)
+	paginator = Paginator(order_list, 10)
 	orders = paginator.get_page(page)
 	try:
 		orders = paginator.page(page)
@@ -636,14 +638,19 @@ def get_orders_for_status_update(request):
 	except EmptyPage:
 		orders = paginator.page(paginator.num_pages)
 
-		
-	return render(request, 'artevenue/orders_for_status_update.html', {'count':count, 
-		'orders': orders, 'order_items_list':order_items_list})		
+	if fetch_again:		
+		return render(request, 'artevenue/orders_for_status_update_table.html', {'count':count, 
+			'orders': orders, 'order_items_list':order_items_list})		
+	else:
+		return render(request, 'artevenue/orders_for_status_update.html', {'count':count, 
+			'orders': orders, 'order_items_list':order_items_list})		
 
 	
 @staff_member_required
 @csrf_exempt
 def update_order_status(request, order_id = None, order_status =  None):
+	today = datetime.datetime.today()
+	
 	if order_id and order_status:
 		order = Order.objects.filter(order_id = order_id).update(
 			order_status = order_status, updated_date = today )
@@ -657,9 +664,6 @@ def update_order_status(request, order_id = None, order_status =  None):
 		tracking_number = request.POST.get('tracking_number', '')
 		shipment_date = request.POST.get('shipment_date', '')
 		tracking_url = request.POST.get('tracking_url', '')
-
-		print("#############################################")
-		print(shipment_date)
 
 		if shipment_date != '':
 			ship_date = datetime.datetime.strptime(shipment_date, "%Y-%m-%d")		
@@ -676,9 +680,6 @@ def update_order_status(request, order_id = None, order_status =  None):
 						'msg':'Order update not done. Tracking number ' + tracking_number + ' already exists for order number ' + str(tr.order_number)}, 
 						safe=False)			
 
-		if order_status == 'SH' :
-			email_sms_views.send_ord_update_sh(order_id)
-
 		if order_status == 'SH' and order.invoice_number == '':		# If ready for shipping, generate the invoice number
 			from artevenue.views.invoice_views import get_next_invoice_number
 			inv_num = get_next_invoice_number()
@@ -691,12 +692,15 @@ def update_order_status(request, order_id = None, order_status =  None):
 				shipper_id = shipper, shipping_method_id = shipping_method,
 				tracking_number = tracking_number, shipment_date = ship_date,
 				tracking_url = tracking_url)
-				
-			## Email to customer, in case tracking number is updated
-			if tracking_number != '' and tracking_number != order.tracking_number:
-				email_sms_views.send_tracking_no_to_cust(order_id)
-			
+							
 		msg = "Order Status Updated"			
+
+		if order_status == 'SH' :
+			email_sms_views.send_ord_update_sh(order_id)
+			
+		## Email to customer, in case tracking number is updated
+		if tracking_number != '' and tracking_number != order.tracking_number:
+			email_sms_views.send_tracking_no_to_cust(order_id)
 		
 		return JsonResponse({'status': 'SUCCESS', 
 			'msg':'Order Status Updated.'}, safe=False)
@@ -711,6 +715,7 @@ def update_order_status(request, order_id = None, order_status =  None):
 
 @login_required
 def create_user_voucher_for_promo(request, promotion_id):
+	today = datetime.datetime.today()
 
 	msg = ''
 
@@ -722,8 +727,8 @@ def create_user_voucher_for_promo(request, promotion_id):
 	## Get the voucher record
 	try:
 		promo_voucher = Promotion_voucher.objects.get(promotion__promotion_id = promotion_id,
-				promotion__effective_from__lte = today,
-				promotion__effective_to__gte = today)
+				promotion__effective_from__lte = today.date(),
+				promotion__effective_to__gte = today.date())
 	except Promotion_voucher.DoesNotExist:
 			promo_voucher = None
 	
@@ -752,9 +757,11 @@ def store_carts(request):
 @staff_member_required		
 @csrf_exempt
 def get_carts(request, printpdf=''):
+	today = datetime.datetime.today()
 	startDt = ''
 	endDt = ''	
 	page = request.POST.get('page', 1)
+	today = datetime.datetime.today()
 	
 	no_checkout_carts = request.POST.get('no_checkout_carts', '')
 	all_carts = request.POST.get('all_carts', '')
@@ -774,11 +781,12 @@ def get_carts(request, printpdf=''):
 	if to_date != '' :
 		endDt = datetime.datetime.strptime(to_date, "%Y-%m-%d")
 		
-	cart_list = Cart.objects.order_by('-created_date')
+	cart_list = Cart.objects.order_by('-updated_date').exclude(cart_status = 'AB')
+	
 	if startDt:
-		cart_list = cart_list.filter(created_date__date__gte = startDt)
+		cart_list = cart_list.filter(updated_date__date__gte = startDt)
 	if endDt:
-		cart_list = cart_list.filter(created_date__date__lte = endDt)
+		cart_list = cart_list.filter(updated_date__date__lte = endDt)
 
 	if user_email:
 		cart_list = cart_list.filter(user__email = user_email)
@@ -818,8 +826,20 @@ def get_carts(request, printpdf=''):
 			
 	count = cart_list.count()
 
+	created_count = None
+	updated_count =None
+	carts_value  = None
+	orders_count = None
+	orders_value = None
+
+	created_count = cart_list.filter(created_date__date = today.date() ).count()
+	updated_count = cart_list.filter(updated_date__date = today.date() ).count()
+	carts_value = cart_list.filter(updated_date__date = today.date() ).aggregate( c_total=Sum( 'cart_total') )
+
 	cart_list_ids = cart_list.values('cart_id')
 	orders = Order.objects.filter( cart__in = cart_list_ids)
+	orders_value = orders.filter(order_date = today.date()).aggregate( o_total=Sum( 'order_total') )
+	orders_count = orders.filter(order_date = today.date()).count()
 	
 	paginator = Paginator(cart_list, 10)
 	carts = paginator.get_page(page)
@@ -834,7 +854,10 @@ def get_carts(request, printpdf=''):
 	if printpdf == "YES":
 		html_string = render_to_string('artevenue/carts_print.html', {'count':count, 
 			'carts': carts, 'cart_items':cart_items_list, 'orders':orders,
-			'startDt':startDt, 'endDt':endDt, 'ecom_site':ecom})
+			'startDt':startDt, 'endDt':endDt, 'ecom_site':ecom,
+			'created_count': created_count, 'updated_count' : updated_count, 
+			'carts_value': carts_value, 'orders_count': orders_count, 
+			'orders_value': orders_value})
 
 		html = HTML(string=html_string, base_url=request.build_absolute_uri())
 		html.write_pdf(target= settings.TMP_FILES + str(request.user) + '_cart_pdf.pdf',
@@ -854,7 +877,10 @@ def get_carts(request, printpdf=''):
 		
 		return render(request, 'artevenue/carts_table.html', {'count':count, 
 			'carts': carts, 'cart_items':cart_items_list,  'orders':orders, 
-			'startDt':startDt, 'endDt':endDt, 'ecom_site':ecom})		
+			'startDt':startDt, 'endDt':endDt, 'ecom_site':ecom,
+			'created_count': created_count, 'updated_count' : updated_count, 
+			'carts_value': carts_value, 'orders_count': orders_count, 
+			'orders_value': orders_value})
 
 
 def referral_fee_month_process(yrmonth=''):

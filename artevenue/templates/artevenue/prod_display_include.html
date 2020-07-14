@@ -61,7 +61,7 @@
 										<!--<a href="?page={{prods.number}}&sort={{sortOrder}}&show=50" class="btn btn-sm {% if show == '50' or show == None %} btn-primary {% else %} btn-outline-secondary {% endif %}">50</a><a href="?page={{prods.number}}&sort={{sortOrder}}&show=100" class="btn btn-sm {% if show == '100' %} btn-primary {% else %} btn-outline-secondary {% endif %}">100</a><a href="?page={{prods.number}}&sort={{sortOrder}}&show=ALL" class="btn btn-sm {% if show == 'ALL' %} btn-primary {% else %} btn-outline-secondary {% endif %}">All</a><span>results/page</span>-->
 										<button type = 'button' onclick="getAllFilters(page='{{prods.number}}', sort='{{sortOrder}}',show='100', keywords='{{ikeywords}}');" class="btn btn-sm {% if show == '100' or show == 'None' %} btn-primary {% else %} btn-outline-secondary {% endif %}">100</button>
 										<button onclick="getAllFilters(page='{{prods.number}}', sort='{{sortOrder}}', show='500', keywords='{{ikeywords}}');" class="btn btn-sm {% if show == '500' %} btn-primary {% else %} btn-outline-secondary {% endif %}">500</button>
-										<button onclick="getAllFilters(page='{{prods.number}}', sort='{{sortOrder}}', show='1000', keywords='{{ikeywords}}');" class="btn btn-sm {% if show == '1000' %} btn-primary {% else %} btn-outline-secondary {% endif %}">1000</button><span>results/page</span>
+										<button onclick="getAllFilters(page='{{prods.number}}', sort='{{sortOrder}}', show='1000', keywords='{{ikeywords}}');" class="btn btn-sm {% if show == '1000' %} btn-primary {% else %} btn-outline-secondary {% endif %}">1000</button><span>artworks/page</span>
 									</div>
 
 								<!-- </form>-->
@@ -78,33 +78,43 @@
 								<div class="img-container">
 									<a id = "alink_{{prod.product_id}}" href="{% url 'stock_image_detail' prod.product_id %}">
 										{% if env == 'DEV' or env == 'TESTING' %}
-											<img data-src="{{ prod.url }}" alt="Wall art painting: {{prod.name}}, by {{prod.artist}}" class="img-fluid image-display lazyload" 
+										<picture>
+											<source media="(max-width:465px)" srcset="{{ prod.thumbnail_url }}">
+											<source media="(min-width:465px)" srcset="{{ prod.url }}">
+											<img data-src="{{ prod.url }}" alt="Wall art: {{prod.name}}, by {{prod.artist}}" class="img-fluid image-display lazyload" 
 													style = "filter: drop-shadow(0.25rem 0.25rem 0.25rem grey);" onclick="$('#img-form_{{prod.product_id}}').submit();">
+										</picture>
 										{% else %}
-											<img data-src="{% static prod.url %}" alt="Wall art painting: {{prod.name}}, by {{prod.artist}}" class="img-fluid image-display lazyload"
+										<picture>
+											<source media="(max-width:465px)" srcset="{{ prod.thumbnail_url }}">
+											<source media="(min-width:465px)" srcset="{{ prod.url }}">
+											<img data-src="{% static prod.url %}" alt="Wall art: {{prod.name}}, by {{prod.artist}}" class="img-fluid image-display lazyload"
 													style = "filter: drop-shadow(0.25rem 0.25rem 0.25rem grey);" onclick="$('#img-form_{{prod.product_id}}').submit();">
+										</picture>
 										{% endif %}		
 									</a>
 								</div>
 
-								<div class="text " style = "margin-top: 5px;">
+								<div class="text " style = "margin-top: 5px; width:150px; padding-left: 15px;">
 									<div class = "row">
-									<div class = "col-12">
-									<span class = "text-center" style="color: #11b6bd !important; font-size:0.8rem;">{{prod.name}}</span>
-									{% if prod.product_id in wishlist_prods %}
-										<span id = "fav_{{prod.product_id}}" class = "pull-right">
-											<i class = "fa fa-heart"  
-												onclick = "deleteItem('{{prod.product_id}}')" 
-												style="color:red; padding-right:5px;cursor:alias;" data-toggle="tooltip" title="Added to Favorites!"></i>
+										<div class = "col-12">
+										<span class = "text-center" style="color: #11b6bd !important; font-size:0.8rem;">
+											{{prod.name}}
 										</span>
-									{% else %}
-										<span  id = "fav_{{prod.product_id}}" class = "pull-right">
-											<i class = "fa fa-heart-o"  
-												onclick = "addToFav({{prod.product_id}}, {% if prod.max_width > 16 %} 16 {%else%} {{prod.max_width}} {%endif%}, {{prod.aspect_ratio}}, 0, '', 0, 0, 0);"
-												style="color:red; padding-right:5px;cursor:alias;" data-toggle="tooltip" title="Add to Favourites!"></i>
-										</span>
-									{% endif %}			
-									</div>
+										{% if prod.product_id in wishlist_prods %}
+											<span id = "fav_{{prod.product_id}}" class = "pull-right">
+												<i class = "fa fa-heart"  
+													onclick = "deleteItem('{{prod.product_id}}')" 
+													style="color:red; padding-right:5px;cursor:alias;" data-toggle="tooltip" title="Added to Favorites!"></i>
+											</span>
+										{% else %}
+											<span  id = "fav_{{prod.product_id}}" class = "pull-right">
+												<i class = "fa fa-heart-o"  
+													onclick = "addToFav({{prod.product_id}}, {% if prod.max_width > 16 %} 16 {%else%} {{prod.max_width}} {%endif%}, {{prod.aspect_ratio}}, 0, '', 0, 0, 0);"
+													style="color:red; padding-right:5px;cursor:alias;" data-toggle="tooltip" title="Add to Favourites!"></i>
+											</span>
+										{% endif %}			
+										</div>
 									</div>
 									<div style = "color:#888 !important;">{{prod.artist}}</div>
 									<div style = "margin-top:2px;">

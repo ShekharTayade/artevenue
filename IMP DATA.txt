@@ -49,6 +49,15 @@ PSFTP:
 4. run command - mput *.*    to caopy all file
 
 
+GIT:
+~~~~~~~~~~~
+Add to Remote -
+git add .
+git commit -m "<comments>"
+git push -u origin master
+
+
+
 DATABASE REFERESH:
 ~~~~~~~~~~~~~~~~~~~
 Drop all tables -
@@ -95,7 +104,7 @@ rahul@artevenue.com / Rahul@54vm
 	
 
 Support -
-	support@artevenue.com / @78jpn&54vm   (support@54vm)
+	support@artevenue.com / Swe23#$xr2tsa   (@78jpn&54vm)   (support@54vm)
 	
 Factory:
 	factory@artevenue.com / factory@jpn78 		
@@ -124,7 +133,7 @@ Insta:	media@artevenue.com / av$10M@12m	(Arte_ins_$54vm)
 Arte'Venue Google Account:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Email: info.artevenue@gmail.com 
-Pwd: av$10M@12m (Arte_$54vm) (art_venue@321)
+Pwd: Vm54&jpn78   (av$10M@12m) (Arte_$54vm) (art_venue@321)
 
 Backup code for signing when phone not available:
 6976 0989	
@@ -171,6 +180,9 @@ Flipkart Seller
 shekhar@artevenue.com / Arch8262$1
 
 
+
+
+
 AMAZON SELLER (MONTAGE ART & FRAMING)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 rahul@artevenue.com
@@ -180,6 +192,8 @@ Arch8262~1
 
 TextLocal - SMS service
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
 log in: Shekhar / Arch8262~1
 API Key: 6ka0OAoLF88-zLQpYYVbjBdSx1uNfps6CvnodVU9o0
 
@@ -187,3 +201,29 @@ API Key: 6ka0OAoLF88-zLQpYYVbjBdSx1uNfps6CvnodVU9o0
 LSI Graph
 ~~~~~~~~~~~~~~~~~
 login: Shekhar@artevenue.com / art@54vm
+
+
+
+TRAI REGISTRATION(VODAPHONE) FOR SMS:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+url: https://www.vilpower.in/
+login: shekhar@artevenue.com
+pwd: Arch8262$1
+
+
+
+KOTAK CARD:
+~~~~~~~~~~~~
+4147 6716 0228 9393
+Saroj Devi Dugar
+06/22 - 925
+
+
+SEMRUSH
+~~~~~~~~~~~
+shekhar@artevenue.com / art@54vm
+
+
+Mailchimp
+~~~~~~~~~~
+artevenue / Mailsfrom@jpn78

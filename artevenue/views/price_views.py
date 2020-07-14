@@ -237,8 +237,10 @@ def get_per_sqinch_price(prod_id, prod_type):
 				per_sqin_canvas = p.price
 			
 	elif prod_type == 'USER-IMAGE':
-		per_sqin_paper = Decimal(1.3)
-		per_sqin_canvas = Decimal(2.7)
+		#per_sqin_paper = Decimal(1.3)
+		#per_sqin_canvas = Decimal(2.7)
+		per_sqin_paper = Decimal(3)
+		per_sqin_canvas = Decimal(6.2)
 	
 	return ({'per_sqin_paper':per_sqin_paper, 'per_sqin_canvas' : per_sqin_canvas})
 

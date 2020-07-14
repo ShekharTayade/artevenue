@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from django.conf import settings
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
-from django.db.models import Count, Q, F
+from django.db.models import Count, Q, F, When, Case
 from django.contrib.admin.views.decorators import staff_member_required
 
 from datetime import datetime
@@ -111,7 +111,6 @@ def category_stock_images(request, cat_id = '', page = 1):
 					f = f | Q(key_words__icontains = s)
 				if majorkey == 'KEY-WORDS':
 					ikeywords = s_keys[s] 
-					print("Keywords: " + ikeywords)
 					keywords = ikeywords.split()
 					#f = f | Q(key_words__icontains = keywords)
 					keyword_filter = True
@@ -123,7 +122,6 @@ def category_stock_images(request, cat_id = '', page = 1):
 					show =  str(s_keys[s])
 			
 			t_f = t_f & f
-		print (t_f)
 		products = products.filter( t_f )	
 
 	# Apply keyword filter (through ajax or search)
@@ -222,6 +220,7 @@ def category_stock_images(request, cat_id = '', page = 1):
 		'width':width, 'height':height, 'page_range':page_range} )
 
 def show_categories(request):
+	env = settings.EXEC_ENV
 
 	sortOrder = request.GET.get("sort")
 	show = request.GET.get("show")
@@ -229,7 +228,7 @@ def show_categories(request):
 	categories_list = Stock_image_category.objects.annotate(Count(
 		'stock_image_stock_image_category')).filter(
 		stock_image_stock_image_category__count__gt = 0).exclude(name = '').exclude(
-		name = '#N/A').order_by('name')
+		name = '#N/A').order_by('-stock_image_stock_image_category__count')
 
 	all_cnt = Stock_image.objects.filter(is_published = True).count()
 
@@ -258,7 +257,7 @@ def show_categories(request):
 	'''
 
 	return render(request, "artevenue/show_all_categories.html", {'categories':categories_list,
-	'cnt': categories_list.count(), 'all_cnt':all_cnt})
+	'cnt': categories_list.count(), 'all_cnt':all_cnt, 'env': env})
 				
 @csrf_exempt	
 def search_products_by_keywords(request):
@@ -319,7 +318,6 @@ def search_products_by_keywords(request):
 					f = f | Q(key_words__icontains = s)
 			
 			t_f = t_f & f
-		print (t_f)
 
 		products = products.filter( t_f )	
 
@@ -404,6 +402,7 @@ def stock_image_detail(request, prod_id = '', iuser_width='', iuser_height=''):
 	
 	printmedium = Print_medium.objects.all()
 
+	'''
 	##############################################
 	## Get the similar products
 	##############################################
@@ -449,7 +448,45 @@ def stock_image_detail(request, prod_id = '', iuser_width='', iuser_height=''):
 	if similar_products:
 		if similar_products.count() > 8:
 			similar_products = similar_products[:8]
+	'''
+	##############################################
+	## Get the similar products
+	##############################################
+	# First 10 characters of product title to match on similar title
+	first10 = product.name[:10]
 
+	similar_products = Stock_image.objects.filter(  
+			artist = product.artist).exclude(product_id = prod_id)
+
+	## First filter for products in the same category
+	prods_in_cat = Stock_image_stock_image_category.objects.filter(
+		stock_image_category_id = product_category.stock_image_category).values('stock_image_id')		
+	similar_products_cat = similar_products.filter(
+		product_id__in = prods_in_cat)
+
+	if similar_products_cat.count() > 8:
+		## Filter for products with same artist
+		similar_products_artist = similar_products_cat.filter(  
+			artist = product.artist)
+		if similar_products_artist.count() > 8:
+			## Filter for products with similar name (title), match on first 10 chars
+			similar_products_name = similar_products_artist.filter(  
+				name__istartswith = first10)	
+			if similar_products_name.count() > 8:
+				similar_products = similar_products_name
+			else:
+				similar_products = similar_products_artist
+		else:
+			similar_products = similar_products_cat
+
+	similar_products = similar_products.order_by('name', 'artist')
+	if similar_products.count() > 8:
+		similar_products = similar_products.annotate(
+			relevancy=Count(Case(When(name__istartswith=first10, then=1)))
+		).order_by('-relevancy')[:8]			
+		#similar_products = similar_products.order_by('name', 'artist')[:8]
+	
+	
 	price = Publisher_price.objects.filter(print_medium_id = 'PAPER') 
 
 
@@ -964,7 +1001,6 @@ def all_stock_images(request):
 					f = f | Q(key_words__icontains = s)
 				if majorkey == 'KEY-WORDS':
 					ikeywords = s_keys[s] 
-					print("Keywords: " + ikeywords)
 					keywords = ikeywords.split()
 					#f = f | Q(key_words__icontains = keywords)
 					keyword_filter = True
@@ -1061,10 +1097,6 @@ def all_stock_images(request):
 		products = products[200001:]
 
 	sliced_count = products.count()
-	print(result_limit)
-
-
-
 
 	if show == None :
 		show = 100
@@ -1114,7 +1146,7 @@ def all_stock_images(request):
 		
 @csrf_exempt		
 def curated_collections(request, cat_nm=None, page = None,  prod_id=None, ):
-	cat_nm = cat_nm.replace("-", " ")
+	#cat_nm = cat_nm.replace("-", " ")
 
 	if page is None:
 		page = request.GET.get("page_num", 1)
@@ -1142,7 +1174,7 @@ def curated_collections(request, cat_nm=None, page = None,  prod_id=None, ):
 
 	if cat_nm:
 		try:
-			product_cate = Curated_category.objects.get(name = cat_nm);
+			product_cate = Curated_category.objects.get(url_suffix = cat_nm);
 			cat_id = product_cate.category_id
 		except Curated_category.DoesNotExist:
 			product_cate = {}
@@ -1150,7 +1182,7 @@ def curated_collections(request, cat_nm=None, page = None,  prod_id=None, ):
 		except Curated_category.MultipleObjectsReturned:
 			product_cate = {}
 			cat_id = 0
-
+		'''
 		try:
 			cat_p = Stock_image_category.objects.get(name = cat_nm);
 			cat_id_p = cat_p.category_id	## Only used for setting category display priority
@@ -1158,7 +1190,7 @@ def curated_collections(request, cat_nm=None, page = None,  prod_id=None, ):
 			cat_id_p = 0
 		except Stock_image_category.MultipleObjectsReturned:
 			cat_id_p = 0
-		
+		'''
 	else:
 		cat_id = 0
 		product_cate = None
@@ -1173,6 +1205,7 @@ def curated_collections(request, cat_nm=None, page = None,  prod_id=None, ):
 	show = request.GET.get("show")
 	
 	if prod_id:
+		'''
 		## remove earlier priority, if any
 		p_c = Stock_image_stock_image_category.objects.filter(
 			stock_image_category_id = cat_id_p,
@@ -1184,7 +1217,7 @@ def curated_collections(request, cat_nm=None, page = None,  prod_id=None, ):
 		## set priority for current product
 		prod_ups = Stock_image.objects.filter(product_id = prod_id).update(
 			category_disp_priority = -2)
-	
+		'''
 	prod_categories = Stock_image_category.objects.filter(store_id=settings.STORE_ID, trending = True )
 	
 	curated_coll = Curated_collection.objects.filter(curated_category_id = cat_id,
@@ -1287,7 +1320,6 @@ def curated_collections(request, cat_nm=None, page = None,  prod_id=None, ):
 					f = f | Q(key_words__icontains = s)
 				if majorkey == 'KEY-WORDS':
 					ikeywords = s_keys[s] 
-					print("Keywords: " + ikeywords)
 					keywords = ikeywords.split()
 					#f = f | Q(key_words__icontains = keywords)
 					keyword_filter = True
@@ -1332,7 +1364,8 @@ def curated_collections(request, cat_nm=None, page = None,  prod_id=None, ):
 			im_arr.append(i['image_type'] )
 	prod_filter_values['IMAGE-TYPE'] = im_arr
 
-
+	products = products.order_by('category_disp_priority')
+	
 	#image_type_values = products.values('colors').distinct()
 	im_arr = ['Red', 'Orange',  'Yellow', 'Green', 'Blue', 'Purple', 'Pink', 'Brown', 'black', 'White']
 	prod_filter_values['COLORS'] = im_arr
@@ -1461,12 +1494,17 @@ def image_by_image_code(request):
 			'page_range':page_range})
 
 def get_stock_images(request, cat_nm = None, page = None, curated_coll_id = None):
+
 	if cat_nm:
-		if cat_nm != 'Still-Life' and cat_nm != 'X-Ray':
-			cat_nm = cat_nm.replace("-", " ")
+		#if cat_nm != 'Still-Life' and cat_nm != 'X-Ray':
+		#	cat_nm = cat_nm.replace("-", " ")
 		try:
-			product_cate = Stock_image_category.objects.filter(name = cat_nm).first()
-			cat_id = product_cate.category_id
+			product_cate = Stock_image_category.objects.filter(url_suffix = cat_nm).first()
+			if product_cate :				
+				cat_id = product_cate.category_id
+			else:
+				cat_id = 0
+				product_cate = None					
 		except Stock_image_category.DoesNotExist:
 			cat_id = 0
 			product_cate = None
@@ -1590,7 +1628,6 @@ def get_stock_images(request, cat_nm = None, page = None, curated_coll_id = None
 		f = f | Q(key_words__icontains = c)
 	t_f = t_f & f 
 	
-	print (t_f)
 	products = products.filter( t_f )
 
 	# Apply keyword filter (through ajax or search)
@@ -1620,7 +1657,7 @@ def get_stock_images(request, cat_nm = None, page = None, curated_coll_id = None
 	
 	price = Publisher_price.objects.filter(print_medium_id = 'PAPER') 
 	
-	prod_filters = ['ORIENTATION', 'ARTIST', 'IMAGE-TYPE', 'COLORS']	
+	prod_filters = ['ORIENTATION', 'IMAGE-TYPE', 'COLORS', 'ARTIST' ]	
 	prod_filter_values ={}
 	orientation_values = products.values('orientation').distinct()
 	

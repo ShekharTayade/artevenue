@@ -1,50 +1,27 @@
 {% extends 'artevenue/estore_base.html' %}
 {% load static %}
+{% load utils %}
 {% block page-title %} 
-
-	<title>Amazing Wall Art Paintings and Art prints in {{product_category.name}} category</title>
-	<meta name="description" content="Largest collection of {{product_category.name}} paintings in India. Find the beautiful wall painting for bedroom, living room or any home wall.">
-	<meta name="keywords" content="wall art painting, wall painting for bedroom, wall painting for living room, paintings for home walls, paintings for home decor, buy online paintings, abstract paintings, abstract art, canvas paintings, art posters,  modern art, {{product_category.name}} paintings">
-	
-	<!--
-	{% if product_category.category_id == 5 %}
-		<title>Modern Abstract Art Prints Online | Abstract Prints</title>
-		<meta name="description" content="Buy Abstract Artworks Online with abstract watercolor prints. Arte’Venue has various Modern art prints with a large choice of Blue Abstract Prints for sale.">
-		<meta name="keywords" content="abstract prints abstract artworks online buy abstract art online abstract art posters abstract print design abstract watercolor prints blue abstract prints abstract painting prints modern abstract art prints">	
-	{% elif product_category.category_id == 2 %}
-		<title>Floral Art Prints for Sale | Floral Prints Framed</title>
-		<meta name="description" content="Decorate your walls with the best Modern Floral Art Print and Floral Triptych Wall Art. Order online for the Best Floral Art Prints on Arte’Venue.">
-		<meta name="keywords" content="modern floral art print floral art prints for sale abstract floral print best floral art prints floral print pictures floral prints framed floral triptych wall art">
-	{% elif product_category.category_id == 3 %}
-		<title>Landscape Vintage Posters | Landscape Art Prints for Sale</title>
-		<meta name="description" content="Bring home Fine Art Landscape Photography Prints with a variety of Landscape Framed Prints for you to choose from. Buy your Landscape Prints from Arte’Venue.">
-		<meta name="keywords" content="fine art landscape photography prints landscape art prints landscape art prints for sale landscape framed prints landscape painting prints landscape poster prints">	
-	{% elif product_category.category_id == 7 %}
-		<title>Coastal Art with Coastal Prints Online | Coastal Artwork</title>
-		<meta name="description" content="Dive into the different Coastal Art Prints at Arte’Venue. Shop Coastal Prints Online from styles like Abstract Coastal Art and Coastal Artwork as well.">
-		<meta name="keywords" content="abstract coastal art coastal art coastal art prints coastal artwork coastal print coastal prints online">	
-	{% elif product_category.category_id == 11 %}
-		<title>Quirky Animal Prints | Watercolour Animal Prints</title>
-		<meta name="description" content="Bring home liveliness with Colorful Animal Prints and Baby Animal Posters. Buy a variety of styles like Animal Illustration Prints and Geometric Animal Prints.">
-		<meta name="keywords" content="animal illustration prints animal print posters baby animal posters baby animal prints for nursery colourful animal prints forest animal prints framed animal prints geometric animal prints quirky animal prints sea animal prints vintage animal posters vintage animal prints watercolour animal prints woodland animal prints">	
-	{% elif product_category.category_id == 32 %}
-		<title>Motivation Framed Art | Inspirational Wall Art for Office</title>
-		<meta name="description" content="Decorate your walls with Inspirational Office Art and Inspiration Quotes Artwork. Buy from Arte’Venue’s online gallery featuring Motivational Artwork for Office.">
-		<meta name="keywords" content="inspirational artwork inspirational framed art inspirational office art inspirational quotes artwork inspirational wall art for office motivational art motivational artwork motivational artwork for office motivational framed art ">	
-	{% elif product_category.category_id == 74 %}
-		<title>Children's Art Print with Kids Art for Sale | Kids Prints</title>
-		<meta name="description" content="The joy and love of having Kids Framed Art and Children Art Prints on your wall is second to none. Buy our Kids Framed Art and add youthfulness to your walls.">
-		<meta name="keywords" content="inspirational artwork inspirational framed art inspirational office art inspirational quotes artwork inspirational wall art for office motivational art motivational artwork motivational artwork for office motivational framed art ">	
-	{% elif product_category.category_id == 74 %}
-		<title>Children's Art Print with Kids Art for Sale | Kids Prints</title>
-		<meta name="description" content="The joy and love of having Kids Framed Art and Children Art Prints on your wall is second to none. Buy our Kids Framed Art and add youthfulness to your walls.">
-		<meta name="keywords" content="childrens art prints kids art for sale kids art prints kids framed art kids prints">
+	<title>
+		{% if product_category.page_title %} 
+			{{product_category.page_title}} 
+		{% else %}
+			Beautiful 
+			{% if product_category.url_suffix|endswith:'paintings' or product_category.url_suffix|endswith:'painting'  or product_category.url_suffix|startswith:'paintings' or product_category.url_suffix|startswith:'painting'%}
+				Wall Art Prints of 													 
+				{{ product_category.url_suffix|replace_dash|title }},
+			{% else %}
+				Art Prints from 
+				{{ product_category.url_suffix|replace_dash|title }} Category,
+			{% endif %} 15% Off | Top Quality | Licensed
+		{% endif %}
+	</title>
+	{% if product_category.page_description %} 
+	<meta name="description" content="{{product_category.page_description}}">
 	{% else %}
-		<title>Artwork from '{{product_category.name}}' category.</title>
-		<meta name="description" content="Decorate your walls with great artwork from a large collection in {{product_category.name}} category.">
-		<meta name="keywords" content="Art, Abstract, Art prints, Wall Art, wall decor, Buy Art, Buy Art prints, Print photos online, Print Art online, Custom Framing, Online Framing, Online Art, Online Art prints">
-	{% endif %} -->
-	
+	<meta name="description" content="Largest collection | {% if product_category.url_suffix|endswith:'paintings' or product_category.url_suffix|endswith:'painting'  or product_category.url_suffix|startswith:'paintings' or product_category.url_suffix|startswith:'painting'%} art prints of {{ product_category.url_suffix|replace_dash|title }}{% else %}{{ product_category.url_suffix|title }}{% endif %} for home walls and decor. Wall art from across the world.">
+	{% endif %}
+	<meta name="keywords" content="{{product_category.url_suffix|replace_dash}}, {{product_category.keywords}},paintings for home walls, home decor">	
 {% endblock page-title %} 
 {% block page-description %}
 {% endblock page-description %}
@@ -110,8 +87,8 @@
 	{
 	  "@context": "http://schema.org",
 	  "@type": "Painting",
-	  "name": "{{product.name}}",
-	  "genre": "{{product_category.stock_image_category.name}}"
+	  "name": "{{prod.name}}",
+	  "genre": "{{product_category.url_suffix}}"
 	}
 	{% endif %}
 	{% endfor %}
@@ -158,7 +135,12 @@
 									{% for p in prod_categories %}
 										<ul class="list-unstyled">
 											{% if p.category_id %}
-												<li><a href="{% url 'art_by_category' cat_nm=p.name page=page%}" class="nav-link">{{p.name|title}}</a></li>
+												{% if p.url_suffix %}												
+													<li><a href="{% url 'art_by_category' cat_nm=p.url_suffix %}" class="nav-link">{{p.name|title}}</a></li>
+												{% else %}
+													<li><a href="{% url 'art_by_category' cat_nm=p.name %}" class="nav-link">{{p.name|title}}</a></li>
+												{% endif %}
+												
 											{% else %}
 												<li><a href="{% url 'art_by_category' %}" class="nav-link">{{p.name|title}}</a></li>
 											{% endif %}
@@ -182,7 +164,7 @@
 							</div>-->
 							{% for pf in prod_filters %}
 							{% if pf == 'ARTIST' or pf == 'SIZE' %}
-							<div class="card-body" style = "max-height:200px; width:auto; overflow:auto; margin-bottom:10px;">
+							<div class="card-body" style = "max-height:175px; width:auto; overflow:auto; margin-bottom:10px;">
 							{% else %}
 							<div class="card-body" style = "width:auto; overflow:auto; margin-bottom:10px;">
 							{% endif  %}
@@ -327,22 +309,50 @@
 
 				<div class="col-sm-12 col-lg-9">
 					<div class="box-cat">
+						{% autoescape off %}
 						{% if ikeywords %}
-							<h1>Wall Art Paintings & Artworks for Your Search "{{ikeywords}}"</h1>
-							<h3>Wall painting for bedroom, living room and other spaces.
-								Don't miss the most important factor - paintings for 
-								home decor. Choose paintings for home walls and give 
-								that beatiful look to the space.
+							<h1>Art Prints for Your Search "{{ikeywords}}"</h1>
+							<h3><span style = "font-style: italic;">
+								Wall art</span> is a must when it comes to 
+								paintings for home decor, office or any other space.
+							    Choose from our largest collection of beautiful artworks. 
 							</h3>
 						{% else %}
-							<h1>Wall Art Paintings & Art Prints {% if product_category %} from {{ product_category.name }} Category {% endif %}</h1>
-							<p>{% if product_category.description %} {{product_category.description}}{% endif %}</p>
-							<h3>{{product_category.name}} wall painting and prints for bedroom, living room and other spaces.
-								Don't miss the most important factor - paintings for 
-								home decor. Choose paintings for home walls and give 
-								that beatiful look to the space.
+							<h1>
+							{% if product_category %} 
+								{% if product_category.header %}
+									{{product_category.header}}
+								{% else %}
+									{% if product_category.url_suffix|endswith:'paintings' or product_category.url_suffix|endswith:'painting'  or product_category.url_suffix|startswith:'paintings' or product_category.url_suffix|startswith:'painting'%}
+										ART PRINTS OF 
+										<span style = "font-weight: 600;">
+										{{ product_category.url_suffix|replace_dash|upper }}
+										</span>
+									{% else %}
+										<span style = "font-weight: 600;">
+										ART PRINTS FROM {{ product_category.url_suffix|replace_dash|upper }} CATEGORY
+										</span>
+									{% endif %}
+								{% endif %}
+							{% endif %}
+							</h1>
+							<h3>
+							{% if product_category.description %} 
+								{{product_category.description}}
+							{% else %}
+								Largest and beautiful collection of wall art of from across the world 
+								for home decor, office and interiors. Get it as paper or canvas
+								print and customize size and frame to suit your interiors.
+								Go ahead and pick a wall art to give your home walls a classy look.
+							{% endif %}
+							</h3>
+							<h3>
+							{% if product_category.second_description %} 
+								{{product_category.second_description}}
+							{% endif %}
 							</h3>
 						{% endif %}
+						{% endautoescape %}
 					</div>
 					 
 
@@ -354,7 +364,7 @@
 				{% include 'artevenue/wishlist-add-message.html' %}
 				{% include 'artevenue/message-modal_ok.html' %}
 				{% if product_category.category_id %}
-					<form  hidden id="cat-form" action = "{% url 'art_by_category' cat_nm=product_category.name %}">
+					<form  hidden id="cat-form" action = "{% url 'art_by_category' cat_nm=product_category.url_suffix %}">
 						<input id = "id_page_num" name = "page_num">
 						<input id = "id_sort" name = "sort">
 						<input id = "id_show" name = "show">
@@ -390,8 +400,18 @@
 			</div>
 		</div>
 	{% endblock sitecontent %}
-
 	
+	{% block footer-text %}
+		{% if product_category.url_suffix|endswith:'paintings' or product_category.url_suffix|endswith:'painting'  or product_category.url_suffix|startswith:'paintings' or product_category.url_suffix|startswith:'painting'%}
+			We have the largest collection of art prints of  
+			{{ product_category.url_suffix|replace_dash }}.
+		{% else %}
+			We have the largest collection of art prints from {{ product_category.url_suffix|replace_dash }} category.
+		{% endif %}
+		We offer complete satisfaction gurantee, free returns and free delivery. So look no further.
+	{% endblock footer-text %}
+
+
 	{% block jscripts %}
 
 	<script>
@@ -841,5 +861,7 @@
 		}
 	</script>
 	{% endblock jscripts %}
+	{% block tawkto %}
+	{% endblock tawkto %}
 			
 	

@@ -3,30 +3,33 @@
 	<!-- Featured Products  Header -->
 	{% if ecom_site.show_featured_section %}
 	<div class="row">
-		<div class="col-12 py-5" style = "background-color: #fafafa;">
+		<div class="col-12 py-5 text-center" style = "background-color: #fafafa;">
 			<!--<h1 class="mb-2 text-center">{{ecom_site.featured_header|upper}} </h1>-->
-			<h1 class="text-center">
-				TOP QUALITY LICENSED ART PRINTS OF BEAUTIFUL PAINTINGS
+			<h1>
+				TOP QUALITY WALL ART 
 			</h1> 
+			<h4>Where Quality Meets Affordability</h4>
 
-			<h2 class = "text-center mt-4" style = "font-style: italic; font-weight:500;">
-				WALL ART PAINTING?
+			<h2 class = "mt-4" >				
+				BUY PAINTINGS ONLINE? <br/>
+				ART PRINTS ARE YOUR BEST BET
 			</h2>
-			<h3 class = "text-center">
-				As you decide to buy paintings online, Art print is elegant, affordable and wise
-				<br />choice when it comes to <span style = "font-style: italic;"> 
-				paintings for home walls </span>. <br />
-				Breathe life into your walls!
-			</h3>
-
-			<h3 class = "text-center">
-				We know interior is incomplete without </br/>
-				<span style = "font-style: italic;">paintings for home decor</span>, <br />
-				so we bring to you the largest and beautiful collection to complete </br>
-				you home decor.<br />
-				Go ahead and shop from over 2.6 lakh artworks </br/>
-				neatly categories and curated for you.
-			</h3>
+			<div class = "d-none d-md-block">
+				<h3 class = "mt-3">
+							As real as it gets. It is elegant, affordable and wise.<br />
+				   Enrich your experience in choosing the right kind of wall art from our huge collection of<br/>
+						over 2.6 lakh artworks, carefully curated to meet your demand.<br/>
+					 Be it home decor, office space or any empty wall, we have variety to pick from.
+				</h3>
+			</div>
+			<div class = "d-block d-md-none">
+					<h3 class = "mt-3" style="line-height:1.4;">
+						As real as it gets. It is elegant, affordable and wise.<br />
+			   Enrich your experience in choosing the right kind of wall art from our huge collection of
+					over 2.6 lakh artworks, carefully curated to meet your demand.<br/>
+				 Be it home decore, office space or any empty wall, we have variety to pick from.
+					</h3>
+			</div>
 		</div>
 	</div>
 	<div class="mt-5 py-2">
@@ -49,9 +52,15 @@
 		<div class="item">  
 				{% with 'img/'|add:c.url as image_static %}
 				<div class="front"  style="margin:0px 2px 0px 2px !important;">
+					{% if c.url_suffix %}				
+					<a href="{% url 'art_by_category' cat_nm=c.url_suffix %}"> 
+						<img src="{% static image_static %}" alt="Wall art painting in {{c.name}} category" class="img-fluid img-container-cat">
+					</a>
+					{% else %}
 					<a href="{% url 'art_by_category' cat_nm=c.name %}"> 
 						<img src="{% static image_static %}" alt="Wall art painting in {{c.name}} category" class="img-fluid img-container-cat">
 					</a>
+					{% endif %}
 				</div>
 				{% endwith %}
 				<div class="mt-2 trending-cat text text-center">

@@ -5,7 +5,7 @@ from datetime import datetime
 import datetime
 from django.db import IntegrityError, DatabaseError, Error
 
-from review.models import Customer_review_stock_image
+from review.models import Customer_review_stock_image, Customer_review_stock_image_pics
 from artevenue.models import Ecom_site, Product_view
 
 from django.http import HttpResponse
@@ -62,9 +62,14 @@ def customer_review(product_id=None, cart_item_id=None, wishlist_item_id=None, u
 		total_reviews = rating_cnt['rating_cnt']
 	
 	reviews = Customer_review_stock_image.objects.filter(featured = True,
-		approved_date__isnull = False)[:3]
+		approved_date__isnull = False)[:4]
+
+	review_pics = Customer_review_stock_image_pics.objects.filter(
+			customer_review_stock_image__in = reviews )
+
 	
 	return { 'overall_rating':overall_rating, 'total_reviews':total_reviews,
 		'reviews' : reviews, 'product_id': product_id, 'cart_item_id':cart_item_id, 
 		'wishlist_item_id':wishlist_item_id, 'user_width':user_width, 
-		'user_height':user_height}
+		'user_height':user_height, 'review_pics':review_pics}
+

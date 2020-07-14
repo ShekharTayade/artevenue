@@ -59,7 +59,7 @@
         "name": "How do I track my order?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "All the orders are shipped primariy through FedEx. You will receive a tracking number through which you can track your order. You can also track your order online on our website at https:/www.artevenue.com/my-orders (if you have logged) and https:/www.artevenue.com/find-orders (if you have not logged)."
+          "text": "All the orders are shipped primariy through courier. You will receive a tracking number through which you can track your order. You can also track your order online on our website at https:/www.artevenue.com/my-orders (if you have logged in) and https://artevenue.com/find-orders (if you have not logged in)."
         }
       }, {
         "@type": "Question",
@@ -93,14 +93,81 @@
 						<div class = "row mt-5">
 							<div class = "col-12">
 								Welcome to our support center. You will find here the frequently
-								asked questions and their anwers.If none of these answer your
+								asked questions and their anwers. If none of these answer your
 								question then please feel free to <a href="https://www.artevenue.com/contact-us">
 								get in touch</a> with us <a href="https://www.artevenue.com/contact-us">here</a>.
 							</div>
 						</div>
 						<div class = "row mt-5">
 							<div class = "col-12">
-								<h2>Ordering</h2>
+								<h2 class="coupan-header">Artwork Details</h2>
+								<strong>What type of artworks do you sell?</strong>
+								<p>We currently sell licensed art prints of the paintings
+								and photography art. Everytime we sell an art print, we pay
+								license fee to the artist/publishing house</p>
+								
+								<strong>What about original fine art?</strong>
+								<p>Our platform (ArteVenue.com) is getting ready to
+								sell original paintings online. We do have stock of
+								original paintings in our stores in Bangalore.</p>
+
+								<strong>What do you print art on?</strong>
+								<p>For every art print that we sell, we have an option 
+									choose print surface - paper or canvas print.
+								</p>
+
+								<strong>Can I customize the size of art print?</strong>
+								<p>Yes. Ours is the only website that offers complete 
+								customization.</p>
+								<p>You can choose size inch-by-inch between the minimum
+								and maximum print size allowed by artist.
+								The typical print size you can chose is between 8 inch
+								and 60 inch.</p>
+								<p>You can choose from various frame options, choose the mount
+								size and color.</p>
+								<p> Our website shows you exactly how your artwork looks like after 
+								you customize it.</p>
+								<p> You can also use a unique "Wall Color and Size Tool" to 
+								select the size, change the wall color and 
+								see approximately how the artwork will look like in a room
+								view. 
+								</p>
+								
+								<strong>What is the quality of materials used?</strong>
+								<div id="collapseTwo" class="card-body collapse show" data-parent="#accordion">
+									<table class = "table table-borderless">
+										<tbody>
+											<tr>
+												<td class="accordian-subhead">Frame</td>
+												<td class = "comp-frame">
+													Made of Polystyrene, which is light weight, strong and durable. It has classy finish.
+												</td>
+											</tr>
+											<tr>
+												<td class="accordian-subhead">Paper</td>
+												<td class = "comp-frame">
+													NovaJet Matte Coated Premium Paper 230 (MCP 230). Bright white, smooth finish matte, top-coated with an ink-receptive layer. Ideal for printing fine art reproduction.
+												</td>
+											</tr>
+											<tr>													
+												<td class="accordian-subhead">Canvas</td>
+												<td class = "comp-frame">
+													NovaJet Artistic Matte Canvas 410 (AMC 410). Water-resistant canvas, top-coated with an ink-receptive layer. Ideal for printing fine art reproductions.
+												</td>
+											</tr>
+											<tr>													
+												<td class="accordian-subhead">Glass</td>
+												<td class = "comp-frame">
+													Clear Acrylic: Added protection, durability and clear visibility. Please note that canvas art prints are not covered with glass or acrylic. 
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+
+
+								<hr>
+								<h2 class="coupan-header">Ordering</h2>
 								<strong>How do I place an order?</strong>
 
 								<p>	Add the product(s) you wish to order in your shopping 
@@ -115,7 +182,7 @@
 									represent what I will be sent?</strong>
 
 								<p>We strive for a high degree of image accuracy. 
-									You can expect a 90-100% accuracy to the image
+									You can expect a 95-100% accuracy to the image
 									viewed on our site.
 								</p>
 
@@ -124,11 +191,11 @@
 
 								<p>ArteVenue.com checks the dimensions of all 
 									images on our site, but due to industry 
-									standards sizes can vary slightly up to 2”. 
+									standards sizes can vary slightly by a few mm. 
 								</p>
 								
 								<strong>What are the resolution requirements for 
-								digital upload orders?</strong>
+								digital upload for custom framing orders?</strong>
 
 								<p>Our minimum resolution for digital uploads is 
 									150 DPI. Since resolution reduces as you enlarge 
@@ -146,26 +213,48 @@
 								<p>You can upload a .jpg, or .png, under 30MB 
 									and we'll print and frame it for you! 
 								</p>
-								
+
+								<hr>
+								<h2 class="coupan-header">Payments</h2>
+								<strong>What type of payments do you accept?</strong>
+								<p>We accept all major credit/debit cards, Netbanking,
+									UPI, and Wallet payments.</p>									
+								<strong>What will happen if the payment gets deducted and I
+								get an error or I don't receive the order confirmation?
+								</strong>
+								<p>There is nothing to worry. If the payment is deducted then
+								the order will get processed. Sometimes there is lag between
+								banks and payment gateway and our system or other system issues. 
+								But we do reconcile the data and the order will get processed.</p>
+								<p>You can always reach out to us on email, phone or chat.
+									Here are the ways to 
+									<a href = "{% url 'contact_us' %}">contact us</a>
+								</p>
 								
 								<hr>
-								<h2>Shipping & Delivery</h2>
+								<h2 class="coupan-header">Shipping & Delivery</h2>
 								<strong>What type of packaging do you use?</strong>
 
-								<p>Your art print is rolled with butter paper 
+								<p>With frame: Your artwork has following packaging - 
+									protective covering over frame corners, shrink wrap over frame,
+									additional hard board covering over frame edges, bubble/
+									foam wrap, outer hard board covering, outer shrink wrap.
+								<br />Without frame: Your artwork is rolled with butter paper 
 									to protect it against dust and then inserted 
 									in a tube to keep from any kind of damage 
 									during transit.
 								</p>
-								<strong>When will my art arrive?</strong>
-
-								<p>You can estimate your art's arrival between 
-									5-10 days depending on the delivery point.
+								<p> In our years of shipping experience, there have been minimal
+								damages during transit.</p>
+								
+								<strong>When will my artwork arrive?</strong>
+								<p>We ship your artwork by courier in 1-2 days. It usually takes about 
+									3-10 days depending on the delivery point. We
+									are based in Bangalore.
 								</p>
 
 								<strong>How do I track my order?</strong>
-
-								<p>All the orders are shipped through FedEx. 
+								<p>All the orders are shipped through courier. 
 									You will receive a tracking number through which 
 									you can track your order.
 								</p>
@@ -175,12 +264,15 @@
 								</p>
 								
 								<strong>How much will shipping cost?</strong>
-								<p>Shipping is free.</p>
-
-					
+								<p>Shipping anywhere in India is free.</p>				
 								
+								<strong>Do you ship internationally?</strong>
+								<p>Currently we ship within India for free. For internatioal shipping
+								please get in touch with us and we can help with
+								international shipping.</p>
+
 								<hr>
-								<h2>Returns and Cancellation</h2>
+								<h2 class="coupan-header">Returns and Cancellation</h2>
 								<strong>What is your return & cancellation policy?</strong>
 								<strong>Order Cancellation:</strong>
 								<p>Our artwork is customized as per your order. The production process 
@@ -222,6 +314,29 @@
 								<p>Please refer to section 5 of <a href = "{% url 'terms_conditions' %}">terms of use</a> 
 									for detailed procedures and policies.
 								</p>
+
+								<hr>
+								<h2 class="coupan-header">Selling on ArteVenue.com</h2>
+								<strong>I am an artist, can I sell on your website?</strong>
+								<p>We will be happy for you to join us as artist. Our platform
+								is being made ready to allow artists to sign up online and upload
+								their artworks and information. While our platform gets ready, you
+								can join us in offline mode. You will find all the information 
+								<a href="https://mailchi.mp/1d53785c3814/artevenue-for-artists-sign-for-free-now-12552588" target = "_blank"> 
+									here 
+								</a>.
+								</p>									
+								<strong>As an artist what benefits do I get?</strong>
+								<ul>
+									<li>There is no fee to sign up as artist</li>
+									<li>Artist will get her/his own webpage on our platform</li>
+									<li>Artists can showcase their profile on the webpage 
+										and get their own gallery
+									</li>
+									<li>Artist will be able to sell original paintings as well as art prints</li>
+									<li>Online access to artist account, information and sales</li>
+									<li>We don't charge any fee unless there is a sale</li>
+								</ul>
 							</div>
 						</div>
 					</div>

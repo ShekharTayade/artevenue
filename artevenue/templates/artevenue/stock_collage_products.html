@@ -1,14 +1,13 @@
 {% extends 'artevenue/estore_base.html' %}
 {% load static %}
 {% block page-title %} 
-	<title>Sets of Wall Art Paintings for Your Home Walls</title>
+	<title>Curated Wall Art Collage Sets</title>
 {% endblock page-title %} 
 {% block page-description %}
-<meta name="description" content="Hand-picked sets of 2 or 3 wall art paintings. Customize size, frame, print surface, mount or buy it just as a wall poster.">
+<meta name="description" content="Choose from the these specially curated, beautiful of wall art collage sets of 2 or 3 art prints. Get it as paper or canvas wall art, customize size and more.">
 {% endblock page-description %}
 {% block page-keywords %}
-<meta name="keywords" content="Art sets, set of 2, set of 3, Set pf paintings, Wall Art painting, Buy online paintings, Buy set of 2 art, Buy set of 3 art,
-	, paintings with frame, Online Framing, Online Art, Online Art prints">
+<meta name="keywords" content="wall art collage sets, art print sets, canvas wall art collage, set of paintings, buy set 2 paintings">
 {% endblock page-keywords %}
 {% block page-author %}
 <meta name="author" content="Arte'venue">
@@ -32,8 +31,6 @@
 
 {% block gmap-script %}
 {% endblock gmap-script %}
-
-
 
 
 	<!-- Only Override the site content block -->
@@ -196,17 +193,17 @@
 								<button type = "button" class="btn btn-secondary btn-sm pull-left" onclick = "getAllFilters('1', '{{sortOrder}}', '{{show}}', '{{keywords}}');"><i class="fa fa-pencil"></i> Apply</button>
 								<button type = "button" class="btn btn-sm btn-outline-secondary pull-right" onclick = "clearFilter('SIZE')"><i class="fa fa-times-circle"></i> Clear</button>
 							</div>
-							</div>
 						</div>
+					</div>
 				</div>
 				<!-- /.col-md-3-->	
 				<div class="col-12 col-md-9 col-lg-9">
 					<div class = "row">
 						<div class = "col-12">
 							<div class="box-cat">
-								<h1>Sets of Art Prints</h1>
-								<h4>Hand-picked sets of 2 or 3 artworks. Customize
-									size, frame, print surface, mount or buy it just as a wall poster.
+								<h1>Wall Art Collage Sets</h1>
+								<h4>Pick from these tastefully curated art print sets of 2 or 3 artworks. Customize
+									as paper or canvas wall art, choose size, frame, & mount or buy just as a wall posters.
 								</h4>
 							 </div>
 						</div>
@@ -217,6 +214,7 @@
 				{% include 'artevenue/wishlist-add-message.html' %}
 				{% include 'artevenue/message-modal_ok.html' %}
 				
+				</div>
 			</div>
 		</div>
 	{% endblock sitecontent %}

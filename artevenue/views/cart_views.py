@@ -35,6 +35,7 @@ env = settings.EXEC_ENV
 
 @csrf_exempt
 def show_cart(request):
+	today = datetime.date.today()
 
 	## First of all validate the promotions. Revert promotion discounts
 	## if the promotion has expired while item is in the cart.
@@ -177,7 +178,8 @@ def show_cart(request):
 		'MEDIA_ROOT':settings.MEDIA_ROOT, 'MEDIA_URL':settings.MEDIA_URL, 
 		'cart_without_disc':cart_without_disc, 'promo_removed':promo_removed,
 		'v_code': v_code,'env': env })
-	
+
+'''	
 def show_wishlist(request):
 
 	if request.is_ajax():
@@ -187,10 +189,12 @@ def show_wishlist(request):
 		template = "artevenue/show_wishlist.html"
 	
 	return render(request, template, {})
+'''
 
 @csrf_protect
 @csrf_exempt	
 def add_to_cart(request):
+	today = datetime.datetime.today()
 	err_flg = False
 	prod_id = request.POST.get('prod_id', '')
 	prod_type = request.POST.get('prod_type', '')
@@ -525,7 +529,7 @@ def add_to_cart(request):
 						image_width = image_width,
 						image_height = image_height,
 						created_date = cart_prods.created_date,
-						updated_date =  today,
+						updated_date =  datetime.datetime.now(),
 						stock_image_id = prod.product_id
 						
 					)
@@ -555,7 +559,7 @@ def add_to_cart(request):
 						image_width = image_width,
 						image_height = image_height,
 						created_date = cart_prods.created_date,
-						updated_date =  today,
+						updated_date =  datetime.datetime.now(),
 						user_image_id = prod.product_id
 						
 					)
@@ -585,7 +589,7 @@ def add_to_cart(request):
 						image_width = image_width,
 						image_height = image_height,
 						created_date = cart_prods.created_date,
-						updated_date =  today,
+						updated_date =  datetime.datetime.now(),
 						stock_collage_id = prod.product_id
 					)
 				elif prod.product_type_id == 'ORIGINAL-ART':
@@ -614,7 +618,7 @@ def add_to_cart(request):
 						image_width = image_width,
 						image_height = image_height,
 						created_date = cart_prods.created_date,
-						updated_date =  today,
+						updated_date =  datetime.datetime.now(),
 						original_art_id = prod.product_id
 						
 					)				
@@ -647,8 +651,8 @@ def add_to_cart(request):
 							stretch_size = stretch_size,
 							image_width = image_width,
 							image_height = image_height,
-							created_date = today,
-							updated_date =  today,
+							created_date = datetime.datetime.now(),
+							updated_date =  datetime.datetime.now(),
 							stock_image_id = prod.product_id
 						)
 					elif prod.product_type_id == 'USER-IMAGE':
@@ -675,8 +679,8 @@ def add_to_cart(request):
 							stretch_size = stretch_size,
 							image_width = image_width,
 							image_height = image_height,
-							created_date = today,
-							updated_date =  today,
+							created_date = datetime.datetime.now(),
+							updated_date =  datetime.datetime.now(),
 							user_image_id = prod.product_id
 						)
 					elif prod.product_type_id == 'STOCK-COLLAGE':
@@ -703,8 +707,8 @@ def add_to_cart(request):
 							stretch_size = stretch_size,
 							image_width = image_width,
 							image_height = image_height,
-							created_date = today,
-							updated_date =  today,
+							created_date = datetime.datetime.now(),
+							updated_date =  datetime.datetime.now(),
 							stock_collage_id = prod.product_id
 						)
 					elif prod.product_type_id == 'ORIGINAL-ART':
@@ -731,8 +735,8 @@ def add_to_cart(request):
 							stretch_size = stretch_size,
 							image_width = image_width,
 							image_height = image_height,
-							created_date = today,
-							updated_date =  today,
+							created_date = datetime.datetime.now(),
+							updated_date =  datetime.datetime.now(),
 							original_art_id = prod.product_id
 						)
 					
@@ -768,8 +772,8 @@ def add_to_cart(request):
 				cart_tax  = item_tax,
 				cart_total = total_price,
 				cart_status = 'AC',
-				created_date = today,
-				updated_date = today
+				created_date = datetime.datetime.now(),
+				updated_date = datetime.datetime.now()
 			)
 			newusercart.save()
 			
@@ -798,8 +802,8 @@ def add_to_cart(request):
 						stretch_size = stretch_size,
 						image_width = image_width,
 						image_height = image_height,
-						created_date = today,
-						updated_date =  today,
+						created_date = datetime.datetime.now(),
+						updated_date =  datetime.datetime.now(),
 						stock_image_id = prod.product_id
 					)
 				elif prod.product_type_id == 'USER-IMAGE':
@@ -826,8 +830,8 @@ def add_to_cart(request):
 						stretch_size = stretch_size,
 						image_width = image_width,
 						image_height = image_height,
-						created_date = today,
-						updated_date =  today,
+						created_date = datetime.datetime.now(),
+						updated_date =  datetime.datetime.now(),
 						user_image_id = prod.product_id
 					)
 				elif prod.product_type_id == 'STOCK-COLLAGE':
@@ -854,8 +858,8 @@ def add_to_cart(request):
 						stretch_size = stretch_size,
 						image_width = image_width,
 						image_height = image_height,
-						created_date = today,
-						updated_date =  today,
+						created_date = datetime.datetime.now(),
+						updated_date =  datetime.datetime.now(),
 						stock_collage_id = prod.product_id
 					)
 				elif prod.product_type_id == 'ORIGINAL-ART':
@@ -882,8 +886,8 @@ def add_to_cart(request):
 						stretch_size = stretch_size,
 						image_width = image_width,
 						image_height = image_height,
-						created_date = today,
-						updated_date =  today,
+						created_date = datetime.datetime.now(),
+						updated_date =  datetime.datetime.now(),
 						original_art_id = prod.product_id
 					)
 				
@@ -922,8 +926,10 @@ def add_to_cart(request):
 		
 @csrf_exempt		
 def update_cart_item(request):
-	json_data = json.loads(request.body.decode("utf-8"))
+	today = datetime.datetime.today()
 
+	json_data = json.loads(request.body.decode("utf-8"))
+	
 	# Get existing cart items
 	cart_item = Cart_item_view.objects.select_related('product', 'promotion').filter( 
 		cart_item_id = json_data['cart_item_id'], cart_id = json_data['cart_id'],
@@ -1178,6 +1184,8 @@ def update_cart_item(request):
 	
 @csrf_exempt	
 def delete_cart_item(request):	
+	today = datetime.datetime.today()
+
 	cart_item_id = request.POST.get('cart_item_id','')
 	sub_total = request.POST.get('sub_total','')
 	cart_total = request.POST.get('cart_total','')
@@ -1381,7 +1389,6 @@ def delete_cart_item(request):
 	
 @csrf_exempt
 def apply_voucher(request):	
-
 	cart_id = int(request.POST.get('cart_id', '0'))
 	voucher_code = request.POST.get('voucher_code', '')
 	cart_total = Decimal(request.POST.get('cart_total', '0'))
@@ -1416,6 +1423,7 @@ def apply_voucher(request):
 				'cart_disc_amt':cart_disc_amt})	
 
 def apply_voucher_py(request, cart_id, voucher_code, cart_total):
+	today = datetime.date.today()
 
 	status = "SUCCESS"	
 	if voucher_code == '':
@@ -1553,7 +1561,7 @@ def apply_voucher_py(request, cart_id, voucher_code, cart_total):
 				cart_tax  = cart.cart_tax,
 				cart_total = new_cart_total,
 				created_date = cart.created_date,
-				updated_date =  today,
+				updated_date =  datetime.datetime.now(),
 				cart_status = cart.cart_status
 			)
 			c.save()
@@ -2273,6 +2281,8 @@ def add_to_cart_new(request):
 
 def apply_voucher_py_new(request, cart_id, voucher_code, cart_total, car_sub_total=0,
 		voucher_use_check=True):
+		
+	today = datetime.date.today()
 	## If it's an egift, it's cash, so we just deduct the amount from cart total after
 	## tax.
 	## If it's a voucher, then we deduct it from cart sub total and then apply tax.
@@ -2280,7 +2290,6 @@ def apply_voucher_py_new(request, cart_id, voucher_code, cart_total, car_sub_tot
 	##voucher_use_check is used to determine if a new product is being added on existing
 	## cart with voucher. If so, call this method from add_to_cart_new with 
 	## this argument as false, so this method won't check if the voucher is applied to the cart.
-	
 	status = "SUCCESS"	
 	if voucher_code == '':
 		return JsonResponse({"status":"INVALID-CODE"})
@@ -2509,7 +2518,7 @@ def apply_voucher_py_new(request, cart_id, voucher_code, cart_total, car_sub_tot
 				cart_tax  = cart_tax,
 				cart_total = new_cart_total,
 				created_date = cart.created_date,
-				updated_date =  today,
+				updated_date =  datetime.datetime.now(),
 				cart_status = cart.cart_status
 			)
 			c.save()
@@ -2527,9 +2536,9 @@ def apply_voucher_py_new(request, cart_id, voucher_code, cart_total, car_sub_tot
 						user = voucher_user.user,
 						effective_from = voucher_user.effective_from,
 						effective_to = voucher_user.effective_to,
-						used_date = today,
+						used_date = datetime.datetime.now(),
 						created_date = voucher_user.created_date,
-						updated_date = today
+						updated_date = datetime.datetime.now()
 					)
 					v.save()
 
@@ -2546,6 +2555,7 @@ def apply_voucher_py_new(request, cart_id, voucher_code, cart_total, car_sub_tot
 ## Check and remove discounts is any promotion has expired and 
 ## update the cart.		
 def validatePromotions(request):
+	today = datetime.date.today()
 	usercart = {}
 	usercartitems = {}
 	change_flag = False
@@ -2643,7 +2653,7 @@ def validatePromotions(request):
 							item_disc_amt = disc_amt,
 							item_tax  = item_tax,
 							item_total = total_price,
-							updated_date = today
+							updated_date = datetime.datetime.now()
 						)
 					if orderitems:
 						## Update order item, if any
@@ -2656,7 +2666,7 @@ def validatePromotions(request):
 									item_disc_amt = disc_amt,
 									item_tax  = item_tax,
 									item_total = total_price,
-									updated_date = today
+									updated_date = datetime.datetime.now()
 								)
 						elif u.product_type == 'USER-IMAGE':
 							oi = Order_user_image.objects.filter(cart_item_id = u.cart_item_id).update(
@@ -2667,7 +2677,7 @@ def validatePromotions(request):
 									item_disc_amt = disc_amt,
 									item_tax  = item_tax,
 									item_total = total_price,
-									updated_date = today
+									updated_date = datetime.datetime.now()
 								)
 						elif u.product_type == 'STOCK-COLLAGE':
 							oi = Order_stock_collage.objects.filter(cart_item_id = u.cart_item_id).update(
@@ -2678,7 +2688,7 @@ def validatePromotions(request):
 									item_disc_amt = disc_amt,
 									item_tax  = item_tax,
 									item_total = total_price,
-									updated_date = today
+									updated_date = datetime.datetime.now()
 								)
 						elif u.product_type == 'ORIGINAL-ART':
 							oi = Order_original_art.objects.filter(cart_item_id = u.cart_item_id).update(
@@ -2689,7 +2699,7 @@ def validatePromotions(request):
 									item_disc_amt = disc_amt,
 									item_tax  = item_tax,
 									item_total = total_price,
-									updated_date = today
+									updated_date = datetime.datetime.now()
 								)
 					cart_sub_total = usercart.cart_sub_total - u.item_sub_total + item_sub_total
 					cart_disc_amt = usercart.cart_disc_amt - u.item_disc_amt + disc_amt
@@ -2700,7 +2710,7 @@ def validatePromotions(request):
 							cart_disc_amt = cart_disc_amt,
 							cart_tax  = cart_tax,
 							cart_total = cart_total,
-							updated_date = today
+							updated_date = datetime.datetime.now()
 						)
 						
 					if order:
@@ -2713,7 +2723,7 @@ def validatePromotions(request):
 								order_disc_amt = order_discount_amt,
 								order_tax  = tax,
 								order_total = order_total,
-								updated_date = today
+								updated_date = datetime.datetime.now()
 							) 
 	return change_flag
 	
@@ -2907,3 +2917,134 @@ def update_cart_voucher_amounts(request, cart_id):
 def get_ip_addr(request):
 	ipaddr = client_ip(request)
 	return ipaddr
+
+
+def remove_voucher(request, cart_id):
+	msg = ''
+	status = "SUCCESS"
+
+	try:
+		cart = Cart.objects.get(cart_id = cart_id, cart_status = "AC")
+	except Cart.DoesNotExist:
+		return JsonResponse({"status":'FAILURE', 'msg': 'No such cart'})
+
+	cart_sub_total = 0
+	cart_tax = 0
+	cart_total = 0
+	######################################################################
+	## Check for any voucher applied & proceed only if voucher is applied
+	######################################################################
+	if cart.voucher_id:
+		cart_items = Cart_item_view.objects.filter(cart_id = cart_id)
+
+		## Get taxes
+		taxes = get_taxes()
+		
+		## Cart level totals
+		cart_qty = 0
+		cart_unit_price = 0
+		cart_sub_total = 0
+		cart_disc_amt = 0 
+		cart_tax = 0
+		cart_total = 0
+		for ci in cart_items:
+			#####################################
+			#         Get the item price
+			#####################################
+			price = get_prod_price(ci.product_id, 
+					prod_type=ci.product_type_id,
+					image_width=ci.image_width, image_height=ci.image_height,
+					print_medium_id = ci.print_medium_id,
+					acrylic_id = ci.acrylic_id,
+					moulding_id = ci.moulding_id,
+					mount_size = ci.mount_size,
+					mount_id = ci.mount_id,
+					board_id = ci.board_id,
+					stretch_id = ci.stretch_id)
+			total_price = price['item_price']
+			msg = price['msg']
+			cash_disc = price['cash_disc']
+			percent_disc = price['percent_disc']
+			item_unit_price = price['item_unit_price']
+			disc_amt = price['disc_amt']
+			disc_applied = price['disc_applied']
+			promotion_id = price['promotion_id']
+			#####################################
+			# END::::    Get the item price
+			#####################################				
+			
+			## Get applicable tax rate
+			if ci.product_type_id == 'STOCK-IMAGE':
+				tax_rate = taxes['stock_image_tax_rate']
+			if ci.product_type_id == 'USER-IMAGE':
+				tax_rate = taxes['user_image_tax_rate']
+			if ci.product_type_id == 'STOCK-COLLAGE':
+				tax_rate = taxes['stock_collage_tax_rate']
+			if ci.product_type_id == 'ORIGINAL-ART':
+				tax_rate = taxes['original_art_tax_rate']
+
+			# Calculate tax and sub_total
+			# total price below includes the promotion discount, if any
+			item_unit_price = item_unit_price * ci.quantity
+			item_sub_total = round( (total_price*ci.quantity) / (1 + (tax_rate/100)), 2 )
+			item_tax = round(total_price - item_sub_total, 2)
+			item_total = round(item_sub_total + item_tax)
+			
+			## Cummulative totals to be updated at cart level
+			cart_qty = cart_qty + 1
+			cart_unit_price = cart_unit_price + item_unit_price 
+			cart_sub_total = cart_sub_total + item_sub_total
+			cart_disc_amt =  cart_disc_amt + disc_amt
+			cart_tax = cart_tax + item_tax
+			cart_total = cart_total + item_total
+
+			#######################################################################
+			##Update the cart item now (this will remove any applied voucher disc)
+			#######################################################################
+			try:
+				if ci.product_type_id == 'STOCK-IMAGE':
+					c = Cart_stock_image.objects.filter(cart_item_id = ci.cart_item_id).update(
+						item_unit_price = item_unit_price,
+						item_sub_total = item_sub_total, item_tax = item_tax,
+						item_disc_amt = disc_amt, item_total = item_total)
+				if ci.product_type_id == 'USER-IMAGE':
+					c = Cart_user_image.objects.filter(cart_item_id = ci.cart_item_id).update(
+						item_unit_price = item_unit_price,
+						item_sub_total = item_sub_total, item_tax = item_tax,
+						item_disc_amt = disc_amt, item_total = item_total)
+				if ci.product_type_id == 'STOCK-COLLAGE':
+					c = Cart_stock_collage.objects.filter(cart_item_id = ci.cart_item_id).update(
+						item_unit_price = item_unit_price,
+						item_sub_total = item_sub_total, item_tax = item_tax,
+						item_disc_amt = disc_amt, item_total = item_total)
+				if ci.product_type_id == 'ORIGINAL-ART':
+					c = Cart_original_art.objects.filter(cart_item_id = ci.cart_item_id).update(
+						item_unit_price = item_unit_price,
+						item_sub_total = item_sub_total, item_tax = item_tax,
+						item_disc_amt = disc_amt, item_total = item_total)
+			except IntegrityError as e:
+				return JsonResponse({"status":'FAILURE', 'msg': 'System Error while updating item in the cart'})
+				
+		###################################
+		## Update the amounts at cart level
+		###################################
+		## cart disc amt is the discount through each item promotion and 
+		## referral disc
+		cart_disc_amt = cart_disc_amt + cart.referral_disc_amount
+			
+		try:
+			crt = Cart.objects.filter(cart_id = cart_id).update(
+				voucher_id = None,
+				voucher_disc_amount = 0,
+				cart_unit_price = cart_unit_price,
+				cart_sub_total = cart_sub_total,
+				cart_disc_amt =  cart_disc_amt,
+				cart_tax = cart_tax,
+				cart_total = cart_total
+			)
+		except IntegrityError as e:
+			return JsonResponse({"status":'FAILURE', 'msg': 'System Error while updating the cart values'})
+
+	return JsonResponse({"status":status, 'msg': msg})		
+		
+		

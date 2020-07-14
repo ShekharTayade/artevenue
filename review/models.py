@@ -1,8 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.conf import settings
+from PIL import Image, ExifTags
+from io import BytesIO
+import os
 
-from artevenue.models import Stock_image, Order, Product_type, Country
+from artevenue.models import Stock_image, Order, Product_type, Country, Order_stock_image
 
 class Customer_review_stock_image( models.Model):
 	REVIEW_RATING = (
@@ -27,6 +30,7 @@ class Customer_review_stock_image( models.Model):
 	comments = models.CharField(max_length=2000, blank=False, default='')
 	posted_date = models.DateTimeField(auto_now_add=True, null=False)
 	approved_date = models.DateTimeField(null=True)
+	allow_to_use = models.BooleanField(null=False, default=True)
 	order_id = models.ForeignKey(Order, on_delete=models.CASCADE, null = True)
 	created_date = models.DateTimeField(auto_now_add=True, null=False)
 	updated_date = models.DateTimeField(auto_now_add=True, null=False)
@@ -37,6 +41,14 @@ class  Customer_review_stock_image_pics( models.Model):
 		on_delete=models.CASCADE, null=False)
 	photo = models.ImageField(upload_to='user_photos/%Y/%m/%d/', blank=True, default="")
 	user_photo_thumbnail = models.ImageField(upload_to='user_photos/%Y/%m/%d/', blank=True, default="")
+	disp_seq = models.IntegerField(null=True, blank=True)
+
+	def save(self, *args, **kwargs):
+		if self.photo:			
+			self.create_thumbnail()
+			
+		super(Customer_review_stock_image_pics, self).save()	
+
 	def create_thumbnail(self):
 		# If there is no image associated with this.
 		# do not create thumbnail
@@ -44,7 +56,7 @@ class  Customer_review_stock_image_pics( models.Model):
 			return
 
 		# Set our max thumbnail size in a tuple (max width, max height)
-		THUMBNAIL_SIZE = (75, 75)
+		THUMBNAIL_SIZE = (150, 250)
 		PIL_TYPE = ''
 		if self.photo.name.lower().endswith(".jpg"):
 			PIL_TYPE = 'jpeg'
@@ -66,13 +78,12 @@ class  Customer_review_stock_image_pics( models.Model):
 
 		# Open original photo which we want to thumbnail using PIL's Image
 		image = Image.open(self.photo)
-
+			
 		# use our PIL Image object to create the thumbnail, which already
 		image.thumbnail(THUMBNAIL_SIZE, Image.ANTIALIAS)
 
 		# Save the thumbnail
-		#temp_handle = StringIO()
-		temp_handle = BytesIO()
+		temp_handle = BytesIO()		
 		image.save(temp_handle, PIL_TYPE)
 		temp_handle.seek(0)
 		
@@ -81,6 +92,13 @@ class  Customer_review_stock_image_pics( models.Model):
 		suf = SimpleUploadedFile(os.path.split(self.photo.name)[-1],
 								 temp_handle.read(), content_type=DJANGO_TYPE)
 		# Save SimpleUploadedFile into image field
-		self.photo_thumbnail.save(
+		self.user_photo_thumbnail.save(
 			'%s_thumbnail.%s' % (os.path.splitext(suf.name)[0], FILE_EXTENSION),
 			suf, save=False)
+		
+
+class  Customer_review_stock_image_order_item( models.Model):
+	customer_review_stock_image = models.ForeignKey(Customer_review_stock_image, 
+		on_delete=models.CASCADE, null=False)
+	order_stock_image = models.ForeignKey(Order_stock_image, 
+		on_delete=models.CASCADE, null=False)

@@ -4,7 +4,7 @@ from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.template.context_processors import csrf
 from django.db import IntegrityError, DatabaseError, Error
 from decimal import Decimal
-from django.db.models import F
+from django.db.models import F, Q
 from django.conf import settings
 from django.core.mail import send_mail, EmailMultiAlternatives, EmailMessage
 from django.templatetags.static import static
@@ -32,6 +32,7 @@ cc = "support@artevenue.com"
 SMS_API_KEY = settings.SMS_API_KEY
 
 def send_customer_emails():
+	today = datetime.datetime.today()
 	# Select orders where customer emails not sent
 	err_flag = False
 	mail_cnt = 0
@@ -81,6 +82,7 @@ def send_customer_emails():
 	
 
 def send_factory_emails():
+	today = datetime.datetime.today()
 	# Select orders where customer emails not sent	
 	err_flag = False
 	mail_cnt = 0
@@ -126,6 +128,7 @@ def send_factory_emails():
 	return (mail_cnt)
 
 def send_egift_emails():
+	today = datetime.datetime.today()
 	# Select orders where customer emails not sent	
 	err_flag = False
 	mail_cnt = 0
@@ -150,7 +153,7 @@ def send_egift_emails():
 			voucher = Voucher.objects.get(voucher_id = egift.voucher_id)
 			voucher_user = Voucher_user.objects.filter(voucher = voucher, 
 				used_date__isnull = True).first()
-			print(voucher.voucher_code)
+
 			img_path = settings.EGIFT_DESIGNS + egift.egift_card_design.url
 
 			card_img=Image.open(img_path)
@@ -196,7 +199,6 @@ def send_egift_emails():
 			)
 			card_img.save(img_save_location)
 		
-			print("eGift Order No: " + str(egift.gift_rec_id))
 			#get email id of receiver
 			to = egift.receiver_email
 
@@ -240,7 +242,7 @@ def send_egift_emails():
 		voucher = Voucher.objects.get(voucher_id = egift.voucher_id)
 		voucher_user = Voucher_user.objects.filter(voucher = voucher, 
 			used_date__isnull = True).first()
-		print(voucher.voucher_code)
+
 		egift_card_design = Egift_card_design.objects.get(design_id = egift.egift_card_design_id)
 		img_path = settings.EGIFT_DESIGNS + egift.egift_card_design.url
 
@@ -323,6 +325,7 @@ def send_egift_emails():
 
 
 def send_business_account_approval_email(request, id):
+	today = datetime.datetime.today()
 	
 	accnt = get_object_or_404(Business_profile, pk=id)
 	
@@ -341,6 +344,7 @@ def send_business_account_approval_email(request, id):
 	return
 	
 def new_customer_emails():
+	today = datetime.datetime.today()
 	users = User_sms_email.objects.filter( welcome_email_sent = False )
 	mail_cnt = 0
 	for u in users:
@@ -370,6 +374,7 @@ def new_customer_emails():
 
 
 def send_contact_us_emails():
+	today = datetime.datetime.today()
 	# Select orders where customer emails not sent	
 	err_flag = False
 	mail_cnt = 0
@@ -397,6 +402,7 @@ def send_contact_us_emails():
 	return (mail_cnt)
 	
 def send_carts_with_order_without_payment():	
+	today = datetime.datetime.today()
 
 	cart_list = Cart.objects.filter(cart_status = 'AC').order_by('-updated_date')
 	cart_list_cust = Cart.objects.filter(cart_status = 'AC', user__isnull = False).order_by('-updated_date')
@@ -437,6 +443,7 @@ def send_carts_with_order_without_payment():
 
 
 def send_orders_no_payment():	
+	today = datetime.datetime.today()
 
 	order_billing = Order_billing.objects.filter(order__order_status = 'PP')
 	ord_bill_ids = order_billing.values('order_id')
@@ -463,6 +470,7 @@ def send_orders_no_payment():
 
 	
 def offer_for_users_with_unused_coupan():
+	today = datetime.datetime.today()
 
 	v_user_ids = Cart.objects.filter(voucher_id = 8).values('user_id')
 	v_ord_users = Order.objects.filter(user_id__in = v_user_ids, voucher_id = 8).values('user_id').exclude(order_status = 'PP')
@@ -484,6 +492,7 @@ def offer_for_users_with_unused_coupan():
 
 
 def offer_25():
+	today = datetime.datetime.today()
 	user = User.objects.all()
 
 	for u in user:
@@ -521,6 +530,7 @@ def offer_25():
 	
 	
 def send_corona_alert():
+	today = datetime.datetime.today()
 	
 	users = User.objects.all()
 	
@@ -538,6 +548,7 @@ def send_corona_alert():
 		emsg.send()	
 
 def send_tracking_no_to_cust(order_id=None):
+	today = datetime.datetime.today()
 	if order_id == None:
 		return
 	try:
@@ -567,6 +578,7 @@ def send_tracking_no_to_cust(order_id=None):
 	emsg.send()	
 	
 def send_ord_update_sh(order_id):
+	today = datetime.datetime.today()
 	if order_id == None:
 		return
 		
@@ -595,7 +607,50 @@ def send_ord_update_sh(order_id):
 	emsg.send()	
 	
 
+def send_customer_review_emails():
+	
+	today = datetime.datetime.today().date()
+	dt = today + datetime.timedelta(days=-10)
+	dt_g = today + datetime.timedelta(days=-30)
+	
+	orders = Order_sms_email.objects.filter(
+			(Q(order__order_status = 'SH') | Q(order__order_status = 'IN') | Q(order__order_status = 'CO')),
+			customer_review_email_sent = False,
+			updated_date__date__lte = dt,
+			updated_date__gt = dt_g
+			)
+	
+	
+	order_ids = orders.values('order_id')
+	order_items_list = Order_items_view.objects.select_related('product').filter(order_id__in = order_ids,
+		product__product_type_id = F('product_type_id'))
 
+	mail_cnt = 0
+	for o in orders:
+		subject = "A Review Request | Arte'Venue Order No: " + o.order.order_number
+		html_message = render_to_string('review/cust_review_request_email.html', 
+				{'order':o, 'order_items_list': order_items_list})
+		plain_message = strip_tags(html_message)
+		from_email = 'support@artevenue.com'
+		to = [o.order.order_billing.email_id]
+		cc = ['']
+
+		emsg = EmailMultiAlternatives(subject, plain_message, from_email, to, cc)
+		emsg.attach_alternative(html_message, "text/html")
+		emsg.send()	
+		
+		Oc = Order_sms_email.objects.filter( 
+			(Q(order__order_status = 'SH') | Q(order__order_status = 'IN') | Q(order__order_status = 'CO')),
+			customer_review_email_sent = False,
+			updated_date__date__lte = dt,
+			updated_date__gt = dt_g,
+			order_id = o.order_id
+			).update( customer_review_email_sent = True )
+
+		mail_cnt = mail_cnt + 1
+	
+	return(mail_cnt)
+	
  
 def sendSMS(apikey, numbers, sender, message):
     data =  urllib.parse.urlencode({'apikey': apikey, 'numbers': numbers,

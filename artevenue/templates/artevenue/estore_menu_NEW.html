@@ -3,35 +3,29 @@
 <nav class="navbar navbar-expand-lg" style = "padding:0px; border-bottom: 1px solid #eee; margin: 5px 1rem 0px;">
 
 	<div class = "d-none d-md-block">
-
-	<a href="{% url 'index' %}" class="navbar-brand"  style = "padding-top: 2px;">
-		<img src="{% static 'img/av_logo_circle2.png' %}" alt="Arte'Venue Logo" class="d-none d-md-inline-block" style="width:90px; ">
-		<img src="{% static 'img/av_logo_circle2_m1.png' %}" alt="Arte'Venue Logo" class="d-inline-block d-md-none"  style="width:175px;">
-		<!--<img src="{% static 'img/artevenue_logo_new.png' %}" alt="Arte'Venue Art Prints, Painting, and Artworks" class="d-inline-block d-md-none"  style="width:122px; height:30px;">-->
-		<span class="sr-only">{{ecom_site.store_name}} - go to homepage</span>
-	</a>
-
+		<a href="{% url 'index' %}" class="navbar-brand"  style = "padding-top: 2px;">
+			<img src="{% static 'img/av_logo_circle2.png' %}" alt="Arte'Venue Logo" class="d-none d-md-inline-block" style="width:90px; min-height:90px;">
+			<span class="sr-only">{{ecom_site.store_name}} - go to homepage</span>
+		</a>
 	</div>
 
 	<div class = "w-100 d-flex  d-md-none d-flex justify-content-between">
 		<a href="{% url 'index' %}" class="navbar-brand"  style = "padding-top: 2px;">
-			<img src="{% static 'img/av_logo_circle2.png' %}" alt="Arte'Venue Logo" class="d-none d-md-inline-block" style="width:90px; ">
-			<img src="{% static 'img/av_logo_circle2_m1.png' %}" alt="Arte'Venue Logo" class="d-inline-block d-md-none"  style="width:175px;">
-			<!--<img src="{% static 'img/artevenue_logo_new.png' %}" alt="Arte'Venue Art Prints, Painting, and Artworks" class="d-inline-block d-md-none"  style="width:122px; height:30px;">-->
+			<img src="{% static 'img/av_logo_circle2_m1.png' %}" alt="Arte'Venue Logo" class="d-inline-block d-md-none"  style="width:175px; min-height:47px;">
 			<span class="sr-only">{{ecom_site.store_name}} - go to homepage</span>
 		</a>
 
 		<span class = "navbar-toggler" style = "padding-top: 15px;">
 			<a href="{% url 'show_cart' %}" class="cart_top" 
 				style="">
-				<img src="{% static 'img/cart_icon_new.png' %}" width=20 alt="Show cart icon">
+				<img src="{% static 'img/cart_icon_new.png' %}" width=20 height=20 alt="Show cart icon">
 				<span id="itemsincart_m">{% if usercart %} {{usercart.quantity}} {%else%} 0 {%endif %}
 				</span>
 			</a>
 		</span>
 		<button data-toggle="collapse" data-target="#navigation" 
 			class="navbar-toggler" style="padding: 0px;">
-			<img src="{% static 'img/bars.png' %}" width=30 alt="Website Menu on Mobile">
+			<img src="{% static 'img/bars.png' %}" width=30 alt="Menu" height=23>
 			<span class="sr-only">Toggle navigation</span>
 		</button>
 	</div>  
@@ -44,7 +38,8 @@
 				<form role="search" class="form-inline d-none d-md-block search_form" action = "{% url 'art_by_category' %}">
 					<input type="text" placeholder="Ex. Van Gogh, Blue, Abstract etc." id ="keywords" name="keywords" class="form-control w-100" required>
 					<button class="btn btn-outline-success" type="submit" style = "background-color: #000; border-radius: 0;">
-						<img src="{% static 'img/search_head_white.png' %}" alt = "Search Button">
+						<!--<img src="{% static 'img/search_head_white.png' %}" alt = "Search Button" width=20 height=20>-->
+						<i class="fa fa-search" style="color:#fff;"></i>
 					</button>
 				</form>
 				</li>
@@ -97,7 +92,7 @@
 				{% endif %}
 				<li id="basket-overview" class="list-inline-item clickable">
 					<a href="{% url 'show_cart' %}" class="cart_top d-xl-block d-lg-block d-none">
-						<img src="{% static 'img/cart_icon_new.png' %}" width=20 alt="Show cart icon">
+						<img src="{% static 'img/cart_icon_new.png' %}" width=20 alt="Show cart icon" height=20>
 						<span id="itemsincart">{% if usercart %} {{usercart.quantity}} {%else%} 0 {%endif %}</span>
 					</a>
 				</li>
@@ -129,10 +124,6 @@
 					</li>
 				{% else %}
 					<li class="list-inline-item clickable" >
-						<!--<a href="{% url 'register' %}" style = "padding-right:0px !important; color: #77899e;"> 
-							<img src = "{% static 'img/user.png' %}" alt="User" width=15>
-							Sign Up 
-						</a>-->
 						<a data-toggle="modal" data-target="#signup_popup-modal" style = "padding-left:5px !important; border-left:1px solid #aeaeae; color: #77899e;">
 							<img src = "{% static 'img/user.png' %}" alt="User Icon" width=15>
 							Sign Up
@@ -140,6 +131,12 @@
 						<a data-toggle="modal" data-target="#login-modal" style = "padding-left:5px !important; border-left:1px solid #aeaeae; color: #77899e;">Login</a>
 					</li>
 				{% endif %}
+				<li class= "list-inline-item clickable">
+					<a href="{% url 'show_wishlist' %}"  style = "padding-left:5px !important; border-left:1px solid #aeaeae; color: #77899e;">
+						<img src="{% static 'img/favorite.png' %}" width=15 alt = "Favicon"> Favourites
+					</a>
+				</li>
+				
 				{% if ecom_site.phone_support_available %}
 				<li class="list-inline-item clickable">
 					<a class = "clickable" data-toggle="modal" data-target="#phone-help" style = "color: #77899e;">
@@ -157,7 +154,7 @@
 						<a href="#" data-toggle="dropdown" data-hover="dropdown" 
 							id = "art_id"
 							class="dropdown-toggle nav-link"
-							onmouseover="$('#art_id').click();">
+							style = "text-decoration:underline;">
 							{{main.name}}
 							<i class="fa fa-caret" style="color:#11b6bd; margin:-5px;"></i>
 						</a>
@@ -167,13 +164,17 @@
 								<div class="row">									
 									{% for level1 in level1_menuitems %}
 									{% if forloop.counter == 1 %}
-										<div class="col-12">
+										<div class="col-12 mb-2 text-center"  style = "font-size: 0.7rem; font-weight:700;">
 											TOP CATEGORIES
 										</div>
 									{% endif %}
 									{% if level1.name != '' %} 
 									<div class="col-6 col-md-3 col-lg-2 text-center">
-										<a style = "color: #082a4c !important;" href="{% url 'art_by_category' level1.name|replace:' ,-' %}" class="nav-link">
+										{% if level1.url_suffix %}
+											<a style = "color: #082a4c !important;" href="{% url 'art_by_category' level1.url_suffix %}" class="nav-link">
+										{% else %}
+											<a style = "color: #082a4c !important;" href="{% url 'art_by_category' level1.name %}" class="nav-link">
+										{% endif %}
 											{% if forloop.counter < 7 %}
 												{% if level1.url %}
 													{% with 'img/'|add:level1.url as image_static %}
@@ -196,14 +197,14 @@
 
 									{% endif %}
 									{% if forloop.counter == 7 %}
-										<div class="col-12 mb-2 mt-1">
+										<div class="col-12 mb-2 mt-1  text-center" style = "font-size: 0.7rem; font-weight:700;">
 											MORE CATEGORIES
 										</div>
 									{% endif %}
 									{% endfor level1_menu %}
 
-									<div class="col-12">
-										<a style = "color: #082a4c; !important; text-decoration:underline; font-size: 0.9rem;" href="{% url 'show_all_categories' %}" class="nav-link">ALL CATEGORIES <i class = "fa fa-chevron-right"></i></a>
+									<div class="col-12 text-center">
+										<a class = "btn btn-artevenue" style = "color: #082a4c; !important; text-decoration:underline; font-size: 0.7rem; font-weight:700;" href="{% url 'show_all_categories' %}" class="nav-link">ALL CATEGORIES <i class = "fa fa-chevron-right"></i></a>
 									</div>
 
 								</div>
@@ -215,12 +216,64 @@
 					
 
 				{% endfor %}
-				<li class= "mt-2 mb-2 mt-md-0 mb-md-0"><a href="{% url 'stock_collage_products' %}">Art Sets</a></li>
-				<!--<li class= "mt-2 mt-md-0"><a href="">Art by Room</a></li>-->
-				<li class= "mt-2 mb-2 mt-md-0 mb-md-0"><a href="{% url 'user_image' %}">Photo Framing</a></li>
-				<li class= "mt-2 mb-2 mt-md-0 mb-md-0"><a href="{% url 'offers' %}">Offers</a></li>
-				<li class= "mt-2 mb-2 mt-md-0 mb-md-0"><a href="{% url 'business_registration' %}">Business</a></li>
-				<!--<li class= "mt-2 mt-md-0"><a href="">Artist</a></li>-->
+				<li class= "mt-2 mb-2 mt-md-0 mb-md-0">
+					<a href="{% url 'stock_collage_products' %}"
+							style = "text-decoration:underline;">
+						Art Sets
+					</a>
+				</li>
+
+				<div class="dropdown menu-large mt-2 mb-2 mt-md-0 mb-md-0">
+					<span class="dropdown-toggle room-ideas-menu" data-toggle="dropdown">Art By Room
+					<span class="caret"></span></span>
+					<ul class="dropdown-menu textmenu">
+						<li>
+							<a class = "nav-link" style = "color: #082a4c !important;" href = "{% url 'curated_collections' cat_nm='paintings-for-living-room'%}">
+								Living Room
+							</a>
+						</li>
+						<li>
+							<a class = "nav-link mt-2" style = "color: #082a4c !important;" href = "{% url 'curated_collections' cat_nm='wall-art-for-bathroom'%}">
+								Bed Room
+							</a>
+						</li>
+						<li>
+							<a class = "nav-link mt-2" style = "color: #082a4c !important;" href = "{% url 'curated_collections' cat_nm='kitchen-wall-art'%}">
+								Kitchen
+							</a>
+						</li>
+						<li>
+							<a class = "nav-link mt-2" style = "color: #082a4c !important;" href = "{% url 'curated_collections' cat_nm='art-prints-for-stairway'%}">
+								Stairway
+							</a>
+						</li>
+						<li>
+							<a class = "nav-link mt-2" style = "color: #082a4c !important;" href = "{% url 'curated_collections' cat_nm='art-prints-for-study'%}">
+								Study
+							</a>
+						</li>
+					</ul>
+				</div>
+				
+				<li class= "mt-2 mb-2 mt-md-0 mb-md-0">
+					<a href="{% url 'user_image' %}"
+						style = "text-decoration:underline;">
+						Custom Photo Frames
+					</a>
+				</li>				
+				
+				<li class= "mt-2 mb-2 mt-md-0 mb-md-0">
+					<a href="{% url 'offers' %}"
+						style = "text-decoration:underline;">
+						Offers
+					</a>
+				</li>
+				<li class= "mt-2 mb-2 mt-md-0 mb-md-0">
+					<a href="{% url 'business_registration' %}"
+						style = "text-decoration:underline;">
+						Business Sales
+					</a>
+				</li>
 			</ul>	
 		</div>
 	</div>	
@@ -230,9 +283,6 @@
 	</div>		
 </nav>
 
-{% include 'artevenue/signup_modal.html' %}
-
-
 <!-- Search open up -->
 <div id="search" class="d-block d-md-none">
 	<div class="container">
@@ -240,7 +290,9 @@
 			<div class="input-group" style = "width:100% !important; float:right;">
 				<input type="text" placeholder="Ex. Van Gogh, Blue, Abstract etc." id ="keywords" name="keywords" class="form-control" required>
 				<div class="input-group-append">
-					<button type="submit" class="btn btn-primary"><i class="fa fa-search"></i></button>
+					<button type="submit" class="btn btn-primary">
+						<i class="fa fa-search"></i>
+					</button>
 				</div>
 			</div>
 		</form>
@@ -282,18 +334,6 @@
 					</div>
 				</div>
 			
-				<!--Have a question or need some help?
-				<ul>
-					<li>How to choose artworks and size</li>
-					<li>How to customize artworks</li>
-					<li>Ordering, shipping</li>
-					<li>Ask our designers</li>
-					<li>Anything else....</li>
-				</ul>
-				<hr>
-				We are here to help!<br />
-				<small>Timing: {{ecom_site.phone_support_start_time}} to {{ecom_site.phone_support_end_time}}</small>
-				-->
 			</div>
 		</div>
 	</div>
@@ -394,6 +434,8 @@
 	</div>	
 </div>
 
+{% include 'artevenue/signup_modal.html' %}
+
 
 <div id="changepassword-modal" tabindex="-1" role="dialog" aria-labelledby="Login" aria-hidden="true" class="modal fade">
 	<div class="modal-dialog modal-sm">
@@ -421,10 +463,3 @@
 		</div>
 	</div>
 </div>
-
-
-<script>
-	// calculating margin-left to align it to center;
-	//var width = $('.justified').width();
-	//$('.justified').css('margin-left', (width / 2 /2)+'px');
-</script>
