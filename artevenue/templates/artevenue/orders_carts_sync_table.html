@@ -1,0 +1,197 @@
+{% load static %}
+{% load utils %}
+	<div class="row">
+
+		<p class="text-muted">
+			{% if count > 0 %} 
+				{{ count }} order(s) found {% if startDt != '' %} between {{startDt|date:'d-M-Y'}} and {{endDt|date:'d-M-Y'}} {% endif %} 
+			{% else %} 
+				No orders found {% if startDt %} between {{startDt|date:'d-M-Y'}} and {{endDt|date:'d-M-Y'}} {% endif %}
+			{% endif %}
+		</p>
+	</div>	
+	{% for o in orders %}
+	<h3 style = "color:blue"}>Order Number : {{o.order_number}}
+	</h3>
+	<h4>Dated : {{o.order_date|date:"d m Y"}}  | Status: {{ o.get_order_status_display }}
+	</h4>
+	<h3 style = "color:blue"}>Cart ID: {{o.cart.cart_id}}
+	</h3>
+	<h3>Customer Name: <strong>{{o.order_shipping.full_name}}</strong></h3>
+		
+	<div class = "row">
+		<div class = "col-12">
+			<div class="table table-responsive">
+				<table id = "ordTbl" class="table table-responsive">
+					<tbody>
+						<tr>
+							<td>ITEM</td>
+							<td>ORDER</td>
+							<td>CART</td>
+						</tr>
+						{% for i in order_items %}
+						{% if i.order_id == o.order_id %}
+						<tr>
+							<td>
+								<span style = "padding-left:0px; font-weight:700;" >
+									{% if i.product.product_type_id|cut:' ' == 'USER-IMAGE' %}  
+										Customer Image; Prod Id: {{i.product.product_id}}
+									{% elif i.product.product_type_id|cut:' ' == 'STOCK-COLLAGE' %}
+										SET; Prod Id: {{i.product.product_id}}
+									{% else %}
+										{{i.product.name}};  
+										Image Code: {{i.product.part_number}} / Prod Id: {{i.product.product_id}}
+									{% endif %}
+										
+								</span>
+							</td>
+							<td>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<img src = "{% if i.product_type_id|cut:' ' == 'USER-IMAGE' %} https://artevenue.com{{MEDIA_URL}}{{i.product.image_to_frame_thumbnail}} {% else %} {% if env == 'DEV' or env == 'TESTING' %} {{ i.product.thumbnail_url }} {% else %} {% static i.product.thumbnail_url %} {% endif %} {% endif %}" style = "width:75px; height:75px; object-fit:contain;">
+							</td>
+							<td>
+								{% with width=i.moulding.width_inner_inches|add_width_frame_mount:i.mount_size %}
+								<small>
+								{% if i.product_type_id == 'STOCK-COLLAGE' %}
+									EACH ITEM: <br/>
+								{% endif %}
+								{% if i.product_type_id == 'ORIGINAL-ART' %}
+									<li>{{i.product.description}}</li>
+								{% else %}													
+									<li>Print on {{i.print_medium_id|title}}</li>
+								{% endif %}
+								{% if i.moulding_id %}
+									<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+									<li>Frame: {{i.moulding.name }} ({{i.moulding.width_inches}} inch, Polystyrene)</li>
+									{% if i.mount_id %}
+										<li>Mount: {{i.mount_size }}", Color: {{i.mount.name|title }} </li>
+									{% endif %}
+									<li>Total Size: 
+										{{ i.image_width|add_width:width|add_width:width }}" X {{i.image_height|add_width:width|add_width:width }}"</li>
+								{% else %}
+									<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+								{% endif %}
+								{% if i.acrylic_id and i.print_medium_id == 'PAPER' %}
+									<li>Acrylic covered</li>
+								{% endif %}
+								{% if i.stretch_id and not i.moulding_id %}
+									<li>Canvas Stretched</li>
+								{% endif %}
+								</small>
+								{% endwith %}
+							</td>
+							
+							<td>
+								{% with width=i.cart_item.moulding.width_inner_inches|add_width_frame_mount:i.cart_item.mount_size %}
+								<small>
+								{% if i.cart_item.product_type_id == 'STOCK-COLLAGE' %}
+									EACH ITEM: <br/>
+								{% endif %}
+								{% if i.cart_item.product_type_id == 'ORIGINAL-ART' %}
+									<li>{{i.cart_item.product.description}}</li>
+								{% else %}													
+									<li>Print on {{i.cart_item.print_medium_id|title}}</li>
+								{% endif %}
+								{% if i.cart_item.moulding_id %}
+									<li>Image Size : {{ i.cart_item.image_width }}" X {{i.cart_item.image_height }}"</li>
+									<li>Frame: {{i.cart_item.moulding.name }} ({{i.cart_item.moulding.width_inches}} inch, Polystyrene)</li>
+									{% if i.mount_id %}
+										<li>Mount: {{i.cart_item.mount_size }}", Color: {{i.cart_item.mount.name|title }} </li>
+									{% endif %}
+									<li>Total Size: 
+										{{ i.cart_item.image_width|add_width:width|add_width:width }}" X {{i.cart_item.image_height|add_width:width|add_width:width }}"</li>
+								{% else %}
+									<li>Image Size : {{ i.cart_item.image_width }}" X {{i.cart_item.image_height }}"</li>
+								{% endif %}
+								{% if i.cart_item.acrylic_id and i.cart_item.print_medium_id == 'PAPER' %}
+									<li>Acrylic covered</li>
+								{% endif %}
+								{% if i.cart_item.stretch_id and not i.cart_item.moulding_id %}
+									<li>Canvas Stretched</li>
+								{% endif %}
+								</small>
+								{% endwith %}
+							</td>
+						</tr>
+						<tr>
+							<td>
+							</td>
+							<td>
+								<small>Qty: {{i.quantity}}; </small>
+								<small>Unit: {{i.item_unit_price}}; </small>
+								<small>Disc: {{i.item_disc_amt|floatformat}}; </small>
+								<small>Sub: {{i.item_sub_total|floatformat}}; </small>
+								<small>Tax: {{i.item_tax|floatformat}}; </small>
+								Total: {{i.item_total|floatformat}};
+							</td>
+							<td>
+								<small>Qty: {{i.cart_item.quantity}}; </small>
+								<small>Unit: {{i.cart_item.item_unit_price}}; </small>
+								<small>Disc: {{i.cart_item.item_disc_amt|floatformat}}; </small>
+								<small>Sub: {{i.cart_item.item_sub_total|floatformat}}; </small>
+								<small>Tax: {{i.cart_item.item_tax|floatformat}}; </small>
+								Total: {{i.cart_item.item_total|floatformat}};
+							</td>
+						</tr>
+							
+						{% endif %}
+						 						
+						{% endfor %}
+						
+					</tbody>
+					<tfoot>
+						<tr>
+							<th colspan="5"><small>Shipping & Handing</small></th>
+							<th colspan="2" style = "text-align:right">
+								<small>{{o.shipping_cost|floatformat}}</small>
+							</th>
+							<th></th>
+						</tr>
+						<tr>
+							<th colspan="5">Order Total</th>
+							<th colspan="2" style = "text-align:right">
+								<i class = "fa fa-inr"> </i> {{o.order_total|floatformat}}
+							</th>
+							<th></th>
+						</tr>
+					</tfoot>
+				</table>
+			</div>
+		
+		</div>		
+		
+	</div>
+	
+	<div class = "mb-5" style="padding-bottom:2px; background-color:blue;" >
+	</div>
+	{% endfor orders %}
+	
+	
+	{% if orders.number %}
+	<div class="box">
+		<div class="row">
+			<div class="col-md-12 col-lg-12 products-showing">
+				<div class = "text-center">
+					{% if orders.has_previous %}
+						<button type = "button" class="btn btn-sm btn-primary" onclick="get_orders('1');"><i class="fa fa-chevron-left"></i> First</button>  
+						<button type = "button" class="btn btn-sm btn-primary"  onclick="get_orders('{{ orders.previous_page_number }}');">Prev</button>
+					{% else %}
+						<button type = "button" class="btn btn-sm btn btn-secondary disabled" href="#"><i class = "fa fa-chevron-left"></i> First</button>
+						<button type = "button" class="btn btn-sm btn btn-secondary disabled"  href="#">Prev</button>
+					{% endif %}
+					Showing Page {{ orders.number }} of {{ orders.paginator.num_pages }}
+					{% if orders.has_next %}
+						<button type = "button" class="btn btn-sm btn-primary" onclick="get_orders('{{ orders.next_page_number }}');">Next</button>
+						<button type = "button" class="btn btn-sm btn-primary" onclick="get_orders('{{ orders.paginator.num_pages }}');">Last <i class = "fa fa-chevron-right"></i></button>
+					{% else %}
+						<button type = "button" class="btn btn-sm btn-secondary disabled" href="#">Next</button>
+						<button type = "button" class="btn btn-sm btn-secondary disabled" href="#">Last <i class = "fa fa-chevron-right"></i></button>
+					{% endif %}				
+				</div>
+			</div>
+		</div>
+	</div>
+	{% endif %}

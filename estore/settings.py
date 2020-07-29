@@ -256,7 +256,7 @@ EGIFT_DESIGNS = os.path.join(BASE_DIR, 'artevenue/static/img/')
 GOOGLE_RECAPTCHA_SECRET_KEY = '6Le2ZqAUAAAAALbzG6uSjImGZ2hHY_B6r_Cug74i'
 
 WEBMASTER_VERIFICATION = {
-    'bing': '<bing verification code>',
+    'bing': 'C0A40BC9E7C942FC76951D60DC9355A9',
     'google': '<google verification code>',
     'majestic': '<majestic verification code>',
     'yandex': '<yandex verification code>',

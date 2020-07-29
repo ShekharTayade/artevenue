@@ -138,18 +138,27 @@
 								</table>
 							</div>
 							<div class = "row">
-							<div class = "col-12 col-md-6">
-								<div class = "text-muted" style = "font-size:0.85rem; font-weight:500;">Apply Discount Coupon or eGift code:</div>
-								<form>
-									<div class="input-group">
-										<input id = "v_code" type="text" class="form-control"><span class="input-group-append">
-										<button onclick = "applyVoucher( '{{usercart.cart_id}}', $('#v_code').val(),'{{usercart.cart_total}}');" type="button" class="btn btn-primary"><i class="fa fa-gift"></i></button></span>
+								<div class = "col-12 col-md-6">
+									<div class = "text-muted" style = "font-size:0.85rem; font-weight:500;">Apply Discount Coupon or eGift code:</div>
+									<form>
+										<div class="input-group">
+											<input id = "v_code" type="text" class="form-control"><span class="input-group-append">
+											<button onclick = "applyVoucher( '{{usercart.cart_id}}', $('#v_code').val(),'{{usercart.cart_total}}');" type="button" class="btn btn-primary"><i class="fa fa-gift"></i></button></span>
+										</div>
+										<div id="coupan-text"></div>
+										<!-- /input-group-->
+									</form>
+									<div style = "color:red" id="voucher-msg"></div>
+								</div>
+								{% if usercart %}
+								<div class = "col-12 col-md-6 mt-3">
+									<div class = "pull-right" style = "font-size:0.9rem; color:#11b6bd; text-decoration:underline;">
+										<i class = "fa fa-trash" onclick="$('#cart-del').modal('show');"> 
+											Clear Cart 
+										</i>
 									</div>
-									<div id="coupan-text"></div>
-									<!-- /input-group-->
-								</form>
-								<div style = "color:red" id="voucher-msg"></div>
-							</div>
+								</div>
+								{% endif %}
 							</div>
 							<!--convert python data to json -->
 							{% for j in usercartitems %}

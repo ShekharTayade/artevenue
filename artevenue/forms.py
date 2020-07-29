@@ -241,6 +241,10 @@ class userForm(forms.ModelForm):
 			'email', 'last_login')
 			
 class shipping_addressForm(forms.ModelForm):
+	shipping_address_id = forms.CharField(
+		widget=forms.HiddenInput(),
+		required=False
+	) 
 	store = forms.CharField(
 		widget=forms.HiddenInput(),
 		required=False
@@ -289,7 +293,7 @@ class shipping_addressForm(forms.ModelForm):
 
 	class Meta:
 		model = User_shipping_address
-		fields = ('store', 'full_name', 'company', 'address_1', 'address_2',
+		fields = ('shipping_address_id', 'store', 'full_name', 'company', 'address_1', 'address_2',
 		'land_mark', 'city', 'state', 'pin_code', 'country',
 		'phone_number', 'email_id', 'pref_addr', 'user')
 

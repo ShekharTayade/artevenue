@@ -74,7 +74,7 @@
 								{% endif %}
 
 							</div>
-							<div class="table table-responsive">
+							<div class="table table-responsive" style = "font-size: 14px;">
 								<table id = "ordTbl" class="table table-responsive table-striped">
 									<thead>
 										<tr>
@@ -109,7 +109,7 @@
 												</div>
 											</td>
 											<td>
-												<small>
+												<span  style = "font-size: 11px;">
 												{% with width=i.moulding.width_inner_inches|add_width_frame_mount:i.mount_size %}
 												{% if i.product_type_id == 'ORIGINAL-ART' %}
 													<li>{{i.product.description}}</li>
@@ -136,7 +136,7 @@
 													<li>Canvas Stretched</li>
 												{% endif %}
 												{% endwith %}
-												</small>
+												</span>
 
 											</td>
 											<td style = "text-align:right">

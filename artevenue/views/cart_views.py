@@ -1259,7 +1259,8 @@ def delete_cart_item(request):
 				if os:
 					os.delete()
 				ob = Order_billing.objects.filter(order_id = order.order_id).first()
-				if os:
+				
+				if ob:
 					ob.delete()
 					
 				order.delete()
@@ -3047,4 +3048,77 @@ def remove_voucher(request, cart_id):
 
 	return JsonResponse({"status":status, 'msg': msg})		
 		
+
+@csrf_exempt	
+def delete_cart(request, cart_id=None):	
+	today = datetime.datetime.today()
+
+	if not cart_id:
+		cart_id = request.POST.get('cart_id','')
+		
+	if not cart_id:
+		return JsonResponse({'msg':'Cart not found, cart # ' + cart_id}, safe=False)
+	
+	# Get the cart and cart items
+	cart = Cart.objects.filter(cart_id = cart_id).first()
+	cart_items = Cart_item_view.objects.filter(cart_id = cart_id)
+	
+	if not cart:
+		return JsonResponse({'msg':'Cart not found, cart # ' + cart_id}, safe=False)
+	elif cart.cart_status == 'CO':
+		return JsonResponse({'msg':'Can not delete this cart. Order is placed.'}, safe=False)
+	
+	# Get related order
+	order = Order.objects.filter( cart = cart ).first()
+	order_item = {}
+	
+	if order:
+		order_item = Order_items_view.objects.filter(order = order)
+
+	msg = "SUCCESS"
+
+	# Delete Order Items from respective product types
+	if order_item:
+		for i in order_item:
+			if i.product_type_id == 'STOCK-IMAGE':
+				oi = Order_stock_image.objects.get(order_item_id = i.order_item_id)
+			if i.product_type_id == 'USER-IMAGE':
+				oi = Order_user_image.objects.get(order_item_id = i.order_item_id)
+			if i.product_type_id == 'STOCK-COLLAGE':
+				oi = Order_stock_collage.objects.get(order_item_id = i.order_item_id)
+			if i.product_type_id == 'ORIGINAL-ART':
+				oi = Order_original_art.objects.get(order_item_id = i.order_item_id)
+		
+			oi.delete()			
+	
+	# Delete Cart Items from respective product types
+	if cart_items:
+		for c in cart_items:
+			if c.product_type_id == 'STOCK-IMAGE':
+				ci = Cart_stock_image.objects.get(cart_item_ptr_id = c.cart_item_id)
+			if c.product_type_id == 'USER-IMAGE':
+				ci = Cart_user_image.objects.get(cart_item_ptr_id = c.cart_item_id)
+			if c.product_type_id == 'STOCK-COLLAGE':
+				ci = Cart_stock_collage.objects.get(cart_item_ptr_id = c.cart_item_id)
+			if c.product_type_id == 'ORIGINAL-ART':
+				ci = Cart_original_art.objects.get(cart_item_ptr_id = c.cart_item_id)
+
+			ci.delete()	
+			
+	if order:
+		# Delete order shipping and billing address
+		os = Order_shipping.objects.filter(order_id = order.order_id).first()
+		if os:
+			os.delete()
+		ob = Order_billing.objects.filter(order_id = order.order_id).first()
+		
+		if ob:
+			ob.delete()
+			
+		order.delete()
+
+	if cart:
+		cart.delete()
+
+	return JsonResponse({'msg':'SUCCESS'}, safe=False)
 		

@@ -60,6 +60,52 @@
 		{% include 'artevenue/show-product.html' %}
 
 		{% include 'artevenue/message-modal_ok.html' %}		
+
+		<!-- Cart Delete cofirm Modal -->
+		<div id="cart-del" tabindex="-1" role="dialog" aria-labelledby="Cart Delete Confirm" aria-hidden="true" class="modal fade">
+			<div class="modal-dialog modal-sm">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h3 class="modal-title"><span id = "modal-hedline">Alert</span></h3>
+						<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
+					</div>
+					<div class="modal-body">
+						<div class="row">
+							<div class="col-12">
+								<div class = "mb-4">
+									<h4><span id = "msg">REMOVE ALL ARTWORKS AND CLEAR YOUR CART?</span></h4>
+								</div>
+								<p>
+									Are you sure that you want to remove all items in your cart
+									and emtpy your cart?
+									<ul>
+										<li>Please click "CLEAR CART" button to remove the cart.</li>
+										<li>Please click "CANCEL" button to cancel.</li>
+									</ul>
+								</p>
+							</div>
+							<div class="col-6 pull-left">
+								<button class="btn btn-danger" 
+									onclick="deleteCart();">
+									<i class="fa fa-remove"></i>
+									CLEAR CART
+								</button>
+							</div>					
+							<div class="col-6 pull-right">
+								<button class="btn btn-primary" 
+									onclick="$('#cart-del').modal('hide');">
+									<i class="fa fa-cancel"></i>
+									CANCEL
+								</button>
+							</div>					
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- END: Message modal -->		
+
 	{% endblock sitecontent %}
 
 	
@@ -173,6 +219,30 @@
 				});
 			}
 			
+		}
+		function deleteCart(){
+			var cart_id = '{{usercart.cart_id}}';
+			$.ajax({
+				url: "{% url 'delete_cart' %}", 
+				data: {'cart_id':cart_id}, 
+				dataType: 'text', 
+				type: 'post',
+				success: function (data) {
+					data = JSON.parse(data);
+					cart_qty = data.msg;
+					//Update items in cart
+					if (data = "SUCCESS") {
+						// Update the display
+						$('#cart-del').modal('hide');
+						show_cart();
+					} else {
+						alert(data);
+					}
+				},
+				error: function(xhr){
+					alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+				}
+			});	
 		}
 
 		function show_cart(){

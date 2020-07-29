@@ -757,6 +757,7 @@ class Curated_category(models.Model):
 	page_description = models.CharField(max_length = 165, blank=True, default='')
 	second_description = models.CharField(max_length = 2000, null=True)
 	header = models.CharField(max_length = 1000, null=True)
+	parent_curated_category = models.ForeignKey('self', models.DO_NOTHING, null=True)
 
 	def __str__(self):
 		return str(self.category_id) + '-' + self.name
@@ -1280,6 +1281,7 @@ class Order (models.Model):
 		('SH', 'Ready for Shipping'),
 		('IN', 'In Transit'),
 		('CO', 'Delivered'),
+		('CN', 'Cancelled'),
 	)
 
 	order_id = models.AutoField(primary_key=True, null=False)
@@ -1399,7 +1401,7 @@ class Order_original_art(Order_items):
 class Order_items_view (models.Model):
 	order_item_id = models.AutoField(primary_key=True, null=False)
 	order = models.ForeignKey(Order,on_delete=models.PROTECT, null=False)
-	cart_item = models.ForeignKey(Cart_item, on_delete=models.PROTECT, null=False)
+	cart_item = models.ForeignKey(Cart_item_view, on_delete=models.PROTECT, null=False)
 	product = models.ForeignKey(Product_view, models.PROTECT, null=False)
 	promotion = models.ForeignKey(Promotion, models.PROTECT, null=True)
 	quantity = models.IntegerField(null=False)

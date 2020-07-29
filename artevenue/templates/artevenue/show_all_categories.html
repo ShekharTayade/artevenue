@@ -41,73 +41,69 @@
 					
 					<div class = "row mt-2">
 						<div class="col-12">
-							<span style="font-size:0.7rem;">{{cnt}} categories, containing {{all_cnt|intcomma_indian}} artworks</span>
+							<span class = "pull-left" style="font-size:0.7rem;">{{cnt}} categories, {{all_cnt|intcomma_indian}} artworks</span>
+							<span  class = "pull-right" style="font-size:0.7rem; cursor: pointer;"
+								onclick= "$('#sort-modal').modal('show');">
+								Sort 
+								<i class="fa fa-angle-down"></i>
+								<i class="fa fa-angle-up"></i>
+							</span>
 						</div>
 					</div>
 					<hr style="margin:0.3rem 0;">
-					<div class = "cat-div row">
-						{% for c in categories %}
-							{% if c.url_suffix %}
-								<a href="{% url 'art_by_category' c.url_suffix %}">
-							{% else %}
-								<a href="{% url 'art_by_category' c.name %}">
-							{% endif %}
-							<div class="col-4 col-md-6 col-lg-2" style="border: 1px solid #cfcfcf; padding:15px 5px 5px 5px; margin-bottom:0px; border-radius:5px;">
-								<span style = "margin-left: auto; margin-right: auto;">
-										{% if c.background_image %}
-											{% with c.background_image as image_static %}												
-											<img 
-											data-src = "{% static image_static %}" alt="{{c.name|title}} Category"
-											class="img-fluid lazyload"
-											style = "filter: drop-shadow(0.25rem 0.25rem 0.25rem grey);
-													display: block; margin-left: auto; margin-right: auto;"
-											width=70>
-											{% endwith %}
-										{% endif %}
-										<p class = "text-center" style="color: #11b6bd !important; font-size:0.9rem; font-weight: 700; margin-bottom:0px; padding-top:5px;">
-											{{c.name|title|default:'Unspecified'|default_if_none:'Unspecified'}}
-										</p>
-										<p class = "text-center" style="font-size:0.6rem;">
-											{{c.stock_image_stock_image_category__count|intcomma_indian}} artworks
-										</p>
-									</a>
-								</span>
-							</div>
-
-
-
-						<!-- <div class="col-lg-3 col-md-4 col-4 cat-div">
-								<div class="d-flex flex-column align-items-center justify-content-center">
-									{% if c.url_suffix %}
-										<a href="{% url 'art_by_category' c.url_suffix %}">
-									{% else %}
-										<a href="{% url 'art_by_category' c.name %}">
-									{% endif %}
-									{% if c.name|length < 10 %}
-										<img data-src = "{% static c.url_suffix %}"
-										class="img-fluid lazyload"
-										style = "filter: drop-shadow(0.25rem 0.25rem 0.25rem grey);">
-									{% endif %}
-									<p class = "cat-count mb-0">
-										{{c.stock_image_stock_image_category__count}}
-									</p>
-									<p class = "cat-nm mt-2 mb-0">
-										{{c.name|title|default:'Unspecified'|default_if_none:'Unspecified'}}
-									</p>
-									</a>
-								</div>
-						</div> -->
-						
-						{% endfor categories %}
-					</div>				
+					{% include 'artevenue/show_all_categories_include.html' %}
 				</div>
 			</div>
+			
+			<div id="sort-modal" tabindex="-1" role="dialog" aria-labelledby="Message_OK" aria-hidden="true" class="modal fade">
+				<div class="modal-dialog modal-sm">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h3 class="modal-title"><span id = "modal-hedline">Sort By</span></h3>
+							<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
+						</div>
+						<div class="modal-body">
+							<div class="">
+								<div class = "text-center">
+									<button class="btn btn-outline mb-2" 
+										onclick="sort('N');">
+										Category Name
+									</button>
+									<button class="btn btn-outline mb-2" 
+										onclick="sort('C');">
+										Count of Artworks
+									</button>
+								</div>					
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>			
+			
 		</div>
 	{% endblock sitecontent %}
 
-	
+		
 	{% block jscripts %}
-
+	<script>
+		function sort(sortorder){
+			$('#sort-modal').modal('hide');
+		
+			$.ajax({
+				url: '{% url "show_all_categories" %}', 
+				data: {'sortorder': sortorder},
+				dataType: 'text', 
+				type: 'GET',
+				success: function (data) {
+					$('#cate').html(data);
+				},
+				error: function(xhr){
+					alert("An error occured: " + xhr.status + " " + xhr.statusText + " Apologies for the inconvenience!! Please contact support team and we will be happy to help sort it out."); 
+					return;
+				}					
+			});
+		}
+	</script>	
 	{% endblock jscripts %}
 			
 	

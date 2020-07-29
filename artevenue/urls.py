@@ -53,14 +53,19 @@ urlpatterns = [
 	url(r'^store-invoices/$', views.store_invoices, name='store_invoices'),	
 	url(r'^ajax/get_invoices/$', views.get_invoices, name='get_invoices'),	
 
+	url(r'^cart_order_match_report/$', views.cart_order_match_report, name='cart_order_match_report'),
+	url(r'^ajax/get_cart_order_match/$', views.get_cart_order_match, name='get_cart_order_match'),	
+
 	url(r'^store-carts/$', views.store_carts, name='store_carts'),	
 	url(r'^ajax/get_carts/$', views.get_carts, name='get_carts'),	
 
-	url(r'^homelane-products/$', views.homelane_products, name='homelane_products'),
-	url(r'^amazon-products/$', views.amazon_products, name='amazon_products'),	
+	#url(r'^homelane-products/$', views.homelane_products, name='homelane_products'),
+	#url(r'^amazon-products/$', views.amazon_products, name='amazon_products'),	
+	
+	
 	url(r'^sign-up/$', views.register, name='register'),
 	path('sign-up/<int:signup_popup>', views.register, name='register'),
-
+	
 	url(r'^newsletter-subscription/$', views.newsletter_subscription_confirmation, name='newsletter_subscription'),
 
 
@@ -120,6 +125,9 @@ urlpatterns = [
 	path('curated-art-prints/<int:cat_id>/<int:prod_id>', views.curated_collections, name='curated_collections'),
 	url(r'^image-by-image-code/$', views.image_by_image_code, name='image_by_image_code'),
 
+	#url(r'^abstract-paintings/$', views.category_landing_page, name='category_landing_page'),
+
+
 	url(r'^custom-photo-frames/$', views.user_image, name='user_image'),
 	url(r'^ajax/get_user_image_id/$', views.get_user_image_id, name='get_user_image_id'),
 	url(r'^ajax/upload_user_image/$', views.upload_user_image, name='upload_user_image'),
@@ -136,6 +144,7 @@ urlpatterns = [
 	url(r'^ajax/delete_cart_item/$', views.delete_cart_item, name='delete_cart_item'),
 	url(r'^ajax/update_cart_item/$', views.add_to_cart_new, name='update_cart_item'),
 	url(r'^ajax/apply_voucher/$', views.apply_voucher, name='apply_voucher'),
+	url(r'^ajax/delete_cart/$', views.delete_cart, name='delete_cart'),
 
 	url(r'^ajax/show_mouldings/$', views.show_mouldings, name='show_mouldings'),
 
@@ -183,10 +192,10 @@ urlpatterns = [
 	url(r'^store-order-summary/$', views.store_order_summary, name='store_order_summary'),	
 	url(r'^ajax/get_order_summary/$', views.get_order_summary, name='get_order_summary'),	
 	
-	url(r'^manage-amazon-orders/$', views.amazon_orders_manage, name='amazon_orders_manage'),
-	url(r'^amazon-enter-new-order/$', views.amazon_enter_new_order, name='amazon_enter_new_order'),
-	url(r'^ajax/amazon_order_details/$', views.amazon_order_details, name='amazon_order_details'),	
-	url(r'^ajax/get_amz_orders/$', views.get_amz_orders, name='get_amz_orders'),	
+	#url(r'^manage-amazon-orders/$', views.amazon_orders_manage, name='amazon_orders_manage'),
+	#url(r'^amazon-enter-new-order/$', views.amazon_enter_new_order, name='amazon_enter_new_order'),	
+	#url(r'^ajax/amazon_order_details/$', views.amazon_order_details, name='amazon_order_details'),	
+	#url(r'^ajax/get_amz_orders/$', views.get_amz_orders, name='get_amz_orders'),	
 	
 	url(r'^ajax/get_ready_products/$', views.get_ready_products, name='get_ready_products'),	
 

@@ -1114,6 +1114,9 @@ section .section-title {
 }	
 
 
+.sub-slider a {
+	color:inherit;
+}
 
 .coupon {
     max-width: 300px;

@@ -236,6 +236,7 @@ def my_account(request):
 	user_ProfileForm = {}
 	business_code = ''
 	curruser = get_object_or_404(User, username = request.user)
+
 	
 	try:
 		chn = Channel_partner.objects.get(user = curruser)
@@ -257,6 +258,10 @@ def my_account(request):
 		curruser_profile = None
 
 	if request.method == 'POST':
+	
+		import pdb
+		pdb.set_trace()
+	
 		if request.POST.get('u_form', 'NONE') != 'NONE':
 			user_form = userForm( request.POST, instance=request.user )
 			if user_form.is_valid():
@@ -602,7 +607,8 @@ def get_store_orders(request):
 	else:
 		return render(request, 'artevenue/orders_table.html', {'count':count, 
 			'orders': orders, 'order_items_list':order_items_list, 
-			'startDt':startDt, 'endDt':endDt, 'MEDIA_URL':settings.MEDIA_URL})		
+			'startDt':startDt, 'endDt':endDt, 'MEDIA_URL':settings.MEDIA_URL,
+			'count': count})		
 
 @staff_member_required
 def orders_for_status_update(request):
@@ -629,7 +635,7 @@ def get_orders_for_status_update(request):
 	
 	count = order_list.count()
 	
-	paginator = Paginator(order_list, 10)
+	paginator = Paginator(order_list, 25)
 	orders = paginator.get_page(page)
 	try:
 		orders = paginator.page(page)

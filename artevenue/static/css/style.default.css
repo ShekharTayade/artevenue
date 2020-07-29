@@ -2097,7 +2097,7 @@ h6,
   /*font-family: 'Cormorant Garamond', serif;*/
   /*font-family: "DomaineDisplay",Georgia,"Times New Roman",Times,serif !important;*/
   font-family: 'Lato', sans-serif;
-  font-weight: 400;
+  /*font-weight: 400;*/
   line-height: 1.2;
   color: inherit;
   letter-spacing: 1px;
@@ -2106,13 +2106,13 @@ h6,
 h1,
 .h1 {
   font-size: 1.1rem;
-  font-weight:700;
+  font-weight:400;
 }
 
 h2,
 .h2 {
     font-size: 1.0rem !important;
-	font-weight:500;
+	font-weight:300;
 }
 
 h3,

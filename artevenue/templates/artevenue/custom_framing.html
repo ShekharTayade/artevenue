@@ -1171,7 +1171,7 @@
 						$("#in_stretched").prop("checked", true);
 						set_stretch_id('1');
 					} else {
-						$("#in_stretched").prop("checked", false);
+						$("#in_stretched").prop("checked", true);
 						$("#in_stretched").prop("disabled", false);
 						set_stretch_id('1');
 					}
@@ -1520,7 +1520,7 @@
 			var acr_id = '';
 			var brd_id = '';
 			var str_id = '';
-			var mnt_id = ';'
+			var mnt_id = '';
 			if (print_medium_id == 'CANVAS') {
 				var str_id = get_stretch_id();
 				mnt_id = '0'
@@ -1633,6 +1633,26 @@
 			board_size = currwidth * currheight;
 			stretch_size = (currwidth + currheight) * 2;
 			
+			var acr_id = '';
+			var brd_id = '';
+			var str_id = '';
+			var mnt_id = '';
+			if (print_medium_id == 'CANVAS') {
+				var str_id = get_stretch_id();
+				mnt_id = '0'
+			} else {
+				if (moulding_id != '' && moulding_id != '0') {
+					var acr_id = get_acrylic_id();
+					var brd_id = get_board_id();
+					mnt_id = get_mount_id();
+				} else {
+					var acr_id = '';
+					var brd_id = '';
+					mnt_id = '';
+				}
+				var str_id = '';
+			}
+
 			// Update the cart
 			$.ajax({
 				url: "{% url 'add_to_cart' %}", 
@@ -1640,11 +1660,11 @@
 						'width':currwidth, 'height':currheight,
 						'moulding_size' : moulding_size,
 						'print_medium_id':print_medium_id, 'print_medium_size':print_medium_size, 
-						'mount_id':mount_id, 'mount_size':mount_size,
+						'mount_id':mnt_id, 'mount_size':mount_size,
 						'mount_w_left' : mount_w_left, 'mount_w_right':mount_w_right, 
 						'mount_w_top':mount_w_top, 'mount_w_bottom' : mount_w_bottom, 
-						'acrylic_id':acrylic_id, 'acrylic_size':acrylic_size,
-						'board_id':board_id, 'board_size':board_size, 'stretch_id':stretch_id,
+						'acrylic_id':acr_id, 'acrylic_size':acrylic_size,
+						'board_id':brd_id, 'board_size':board_size, 'stretch_id':str_id,
 						'stretch_size':stretch_size, 
 						'total_price':total_price, 'image_width':currwidth, 'image_height':currheight,
 						'discount':discount, 'promotion_id':promotion_id, 'disc_amt':disc_amt,

@@ -87,8 +87,8 @@
 	{
 	  "@context": "http://schema.org",
 	  "@type": "Painting",
-	  "name": "{{prod.name}}",
-	  "genre": "{{product_category.url_suffix}}"
+	  "name": "{{product.name}}",
+	  "genre": "{{product_category.stock_image_category.name}}"
 	}
 	{% endif %}
 	{% endfor %}
@@ -325,13 +325,9 @@
 								{% else %}
 									{% if product_category.url_suffix|endswith:'paintings' or product_category.url_suffix|endswith:'painting'  or product_category.url_suffix|startswith:'paintings' or product_category.url_suffix|startswith:'painting'%}
 										ART PRINTS OF 
-										<span style = "font-weight: 600;">
 										{{ product_category.url_suffix|replace_dash|upper }}
-										</span>
 									{% else %}
-										<span style = "font-weight: 600;">
 										ART PRINTS FROM {{ product_category.url_suffix|replace_dash|upper }} CATEGORY
-										</span>
 									{% endif %}
 								{% endif %}
 							{% endif %}

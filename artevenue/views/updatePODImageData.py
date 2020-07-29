@@ -593,4 +593,47 @@ def category_priority():
 					category_disp_priority = 1 )
 				print("Updated..." + str(i))
 	
+
+def upload_curated_sub_cat():
+
+	cfile = Path('sub_category_abstract_collections_plus.csv')
+	if not cfile.is_file():
+		print("sub_category_abstract_collections_plus.csv file did not downloaded")
+		return
+	file = open('sub_category_abstract_collections_plus.csv')	
+	cr = csv.reader(file, delimiter=',')
 	
+
+	#### Start processing
+	cnt = 0
+
+	for row in cr:
+		if cnt == 0:	## Skipping first header row
+			cnt = cnt + 1
+			continue
+		cnt = cnt + 1
+
+		print(cnt)
+
+		try:
+			prod_id = row[1]
+		except IndexError:
+			error = 'LIST INDEX ERROR:- '.join(row),
+			err_flag = True			
+			print( error)
+	
+		try:
+			p = Stock_image.objects.get(product_id = prod_id)
+		except Stock_image.DoesNotExist:
+			print(prod_id)
+			p = None
+			
+		if p:
+
+			c = Curated_collection(
+				curated_category_id = row[0],
+				product = p,
+				product_type_id = 'STOCK-IMAGE'
+			)
+			c.save()
+		

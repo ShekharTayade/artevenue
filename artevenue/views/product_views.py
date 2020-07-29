@@ -219,44 +219,42 @@ def category_stock_images(request, cat_id = '', page = 1):
 		'page':page, 'wishlistitems':wishlistitems, 'wishlist_prods':wishlist_prods,
 		'width':width, 'height':height, 'page_range':page_range} )
 
-def show_categories(request):
+@csrf_exempt
+def show_categories(request, sortorder=None):
 	env = settings.EXEC_ENV
-
-	sortOrder = request.GET.get("sort")
-	show = request.GET.get("show")
+	if not sortorder:
+		sort_order = request.GET.get("sortorder", '')
 	# Get all the categories along with count of images in each
-	categories_list = Stock_image_category.objects.annotate(Count(
-		'stock_image_stock_image_category')).filter(
-		stock_image_stock_image_category__count__gt = 0).exclude(name = '').exclude(
-		name = '#N/A').order_by('-stock_image_stock_image_category__count')
+
 
 	all_cnt = Stock_image.objects.filter(is_published = True).count()
 
-	'''
-	if show == None or show == '50':
-		perpage = 50 #default
-		show = '50'
+	if sort_order:
+		if sort_order == 'N':
+			categories_list = Stock_image_category.objects.annotate(Count(
+				'stock_image_stock_image_category')).filter(
+				stock_image_stock_image_category__count__gt = 0).exclude(
+				name = '').exclude(name = '#N/A').exclude(
+				name = 'Passion').exclude(name = 'Nude').order_by('name')
+		if sort_order == 'C':
+			categories_list = Stock_image_category.objects.annotate(Count(
+				'stock_image_stock_image_category')).filter(
+				stock_image_stock_image_category__count__gt = 0).exclude(
+				name = '').exclude(name = '#N/A').exclude(
+				name = 'Passion').exclude(name = 'Nude').order_by('-stock_image_stock_image_category__count')
 	else:
-		if show == '100':
-			perpage = 100
-		else:
-			if show == '1000':
-				perpage = 10000
-				
-	paginator = Paginator(categories_list, perpage) 
-	page = request.GET.get('page')
-	categories = paginator.get_page(page)
+		categories_list = Stock_image_category.objects.annotate(Count(
+			'stock_image_stock_image_category')).filter(
+			stock_image_stock_image_category__count__gt = 0).exclude(
+			name = '').exclude(name = '#N/A').exclude(
+			name = 'Passion').exclude(name = 'Nude').order_by('-stock_image_stock_image_category__count')
 
-	#=====================
-	index = categories.number - 1 
-	max_index = len(paginator.page_range)
-	start_index = index - 5 if index >= 5 else 0
-	end_index = index + 5 if index <= max_index - 5 else max_index
-	page_range = list(paginator.page_range)[start_index:end_index]
-	#=====================
-	'''
-
-	return render(request, "artevenue/show_all_categories.html", {'categories':categories_list,
+	if request.is_ajax():
+		template = "artevenue/show_all_categories_include.html"
+	else:
+		template = "artevenue/show_all_categories.html"
+	
+	return render(request, template, {'categories':categories_list,
 	'cnt': categories_list.count(), 'all_cnt':all_cnt, 'env': env})
 				
 @csrf_exempt	
@@ -1494,7 +1492,7 @@ def image_by_image_code(request):
 			'page_range':page_range})
 
 def get_stock_images(request, cat_nm = None, page = None, curated_coll_id = None):
-
+	
 	if cat_nm:
 		#if cat_nm != 'Still-Life' and cat_nm != 'X-Ray':
 		#	cat_nm = cat_nm.replace("-", " ")
@@ -1759,8 +1757,15 @@ def get_stock_images(request, cat_nm = None, page = None, curated_coll_id = None
 	end_index = index + 5 if index <= max_index - 5 else max_index
 	page_range = list(paginator.page_range)[start_index:end_index]
 	#=====================
-	
-	template = "artevenue/art_by_category.html"
+
+	if cat_id == 2:
+		template = "artevenue/art_by_floral_category.html"
+	elif cat_id == 3:
+		template = "artevenue/art_by_landscape_category.html"
+	elif cat_id == 5:
+		template = "artevenue/art_by_abstract_category.html"
+	else:
+		template = "artevenue/art_by_category.html"
 
 	env = settings.EXEC_ENV
 	

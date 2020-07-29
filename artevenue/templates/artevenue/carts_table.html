@@ -10,7 +10,7 @@
 									{% endif %}
 								</p>
 							</div>	
-							<div class="row">
+							<div class="row" style = "font-size: 14px;">
 								<div class = "col-12">
 									<strong>TODAY:</strong>
 								</div>
@@ -172,9 +172,8 @@
 												</td>
 												<td>
 													<button data-toggle="collapse" data-target="#details_{{i.cart_item_id}}">Details</button>
-													<div id = "details_{{i.cart_item_id}}" class="collapse">
+													<div id = "details_{{i.cart_item_id}}" class="collapse" style = "font-size:11px;">
 														{% with width=i.moulding.width_inner_inches|add_width_frame_mount:i.mount_size %}
-														<small>
 														{% if i.product_type == 'STOCK-COLLAGE' %}
 															EACH ITEM: <br/>
 														{% endif %}
@@ -200,7 +199,6 @@
 														{% if i.stretch_id and not i.moulding_id %}
 															<li>Canvas Stretched</li>
 														{% endif %}
-														</small>
 														{% endwith %}
 													</div>													
 												</td>

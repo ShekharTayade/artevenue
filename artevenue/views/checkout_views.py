@@ -1220,7 +1220,7 @@ def checkout_step3_order_review(request):
 		################# ORDER REVIEW
 		order_items = Order_items_view.objects.filter(order = order).first()
 		usercart = Cart.objects.filter(cart_id = order.cart_id, cart_status = "AC").first()
-		if not usercart():
+		if not usercart:
 			return render(request, "artevenue/checkout_step1_address_new.html", {'msg':'We are sorry, somthing went wrong! Please start over from your cart. Apologies for the inconvenience.', 'order_total':order.order_total,
 							'sub_total':order.sub_total, 'tax':order.tax,'shipping_addr':o, 'billing_addr':b,  'order_shipping_cost':order.shipping_cost,
 							'disc_amt':order.order_discount_amt, 'country_arr':country_arr, 'state_arr':state_arr, 

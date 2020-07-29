@@ -297,6 +297,14 @@ def payment_done(request):
 	
 	try:
 		order = Order.objects.get(order_id = order_id)
+		
+		if order:
+			if order.order_status != 'PP':
+				print("==============================================")
+				print("Payment info sent again by Payment gateway, doing nothing.")
+				print("==============================================")
+				return
+				
 		order_items = Order_items_view.objects.filter(order = order)
 		o = Order.objects.filter(order_id = order_id).update(
 			order_status = 'PC', order_date = today.date(),
@@ -338,7 +346,9 @@ def payment_done(request):
 			customer_sms_sent = False,
 			factory_sms_sent = False,
 			created_date = today,	
-			updated_date = today
+			updated_date = today,
+			customer_review_email_sent = False,
+			customer_review_sms_sent = False
 		)
 		o_email.save()
 		

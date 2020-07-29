@@ -236,6 +236,9 @@ def get_addr_pin_city_state(request):
 	cstate = {}
 	country = {}
 
+	import pdb
+	pdb.set_trace()
+
 	if ipin_code :
 		pin_codeObj = Pin_code.objects.filter(pin_code = ipin_code)
 		pin_code = pin_codeObj.values("pin_code").distinct()

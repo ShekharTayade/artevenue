@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.db import IntegrityError, DatabaseError, Error
 from django.contrib.auth.models import User
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-from django.db.models import Count, Q, Max, Sum
+from django.db.models import Count, Q, Max, Sum, F
 from datetime import datetime
 import datetime
 
@@ -16,6 +16,8 @@ from django.contrib.auth.models import User
 from artevenue.decorators import is_manager
 from artevenue.models import Order, Order_items_view, Ecom_site, Business_referral_fee, UserProfile
 from artevenue.models import Business_profile
+from artevenue.models import Cart, Cart_item_view
+
 
 today = datetime.datetime.today()
 ecom_site = Ecom_site.objects.get(store_id=settings.STORE_ID )
@@ -267,3 +269,86 @@ def my_client_order_report(request, client_id=None):
 		total_order_value = 0
 	return render(request, 'artevenue/my_client_order_report.html', {
 			'orders':orders, 'total_order_value':total_order_value, 'msg': msg}	)
+
+
+@is_manager			
+def cart_order_match_report(request):
+	return render(request, 'artevenue/cart_order_sync_report.html')
+
+
+@csrf_exempt
+@is_manager			
+def get_cart_order_match(request):
+	startDt = ''
+	endDt = ''	
+	page = request.POST.get('page', 1)
+	printpdf = request.POST.get('printpdf', 'NO')
+	
+	from_date = request.POST.get("fromdate", '')
+	if from_date != '' :
+		startDt = datetime.datetime.strptime(from_date, "%Y-%m-%d").date()
+		
+	to_date = request.POST.get("todate", '')
+	if to_date != '' :
+		endDt = datetime.datetime.strptime(to_date, "%Y-%m-%d").date()
+	
+	## Orders
+	orders = Order.objects.filter(order_date__gte = startDt,
+		order_date__lte = endDt).exclude(order_number = '').order_by(
+		'-order_date')
+
+	count = orders.count()
+	
+	order_ids = orders.values('order_id')
+	order_items = Order_items_view.objects.select_related(
+		'product', 'promotion').filter(
+		order__in = orders, product__product_type_id = F('product_type_id')).order_by(
+		'-order__order_date', 'order_id', 'product__product_id')
+	
+	order_cart_items_ids = order_items.values('cart_item_id')
+	
+	cart_ids = orders.values('cart_id')
+	carts = Cart.objects.filter( cart_id__in = cart_ids )
+	cart_items = Cart_item_view.objects.select_related(
+		'product', 'promotion').filter( cart__in = carts,
+		product__product_type_id = F('product_type_id') ).order_by(
+		'product__product_id')
+
+	n_cart_items = Cart_item_view.objects.select_related(
+		'product', 'promotion').filter( cart__in = carts,
+		product__product_type_id = F('product_type_id') ).exclude(
+		cart_item_id__in = order_cart_items_ids).order_by(
+		'product__product_id')
+	
+	if printpdf == "YES":
+		html_string = render_to_string('artevenue/orders_carts_sync_table.html', {
+			'orders':order, 'order_items':order_items, 'carts': carts, 
+			'cart_items': cart_items, 'startDt': startDt, 'endDt': endDt, 'count': count})
+
+		html = HTML(string=html_string, base_url=request.build_absolute_uri('/'))
+		
+		html.write_pdf(target= settings.TMP_FILES + str(request.user) + '_ord_pdf.pdf',
+			stylesheets=[
+						CSS(settings.CSS_FILES +  'style.default.css'), 
+						CSS(settings.CSS_FILES +  'custom.css'),
+						CSS(settings.VENDOR_FILES + 'bootstrap/css/bootstrap.min.css') 
+						],
+						presentational_hints=True);
+		
+		fs = FileSystemStorage(settings.TMP_FILES)
+		with fs.open(str(request.user) + '_ord_cart_match.pdf') as pdf:
+			response = HttpResponse(pdf, content_type='application/pdf')
+			response['Content-Disposition'] = 'attachment; filename="' + str(request.user) + '_ord_cart_match.pdf"'
+			return response
+
+		return response		
+	else:
+		return render(request, 'artevenue/orders_carts_sync_table.html', {
+		'orders':orders , 'order_items':order_items, 'carts': carts, 
+			'cart_items': cart_items, 'n_cart_items': n_cart_items,
+			'startDt': startDt, 'endDt': endDt, 'count': count} )
+		
+		'''
+		'orders':order, 'order_items':order_items, 'carts': carts, 'cart_items': cart_items,
+		'startDt': startDt, 'endDt': endDt}	)
+		'''

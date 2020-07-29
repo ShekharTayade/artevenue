@@ -28,6 +28,9 @@
 {% block imagemap-resize-script %}
 {% endblock imagemap-resize-script %}
 
+{% block google-recaptcha-3 %}
+{% endblock google-recaptcha-3 %}
+
 
 	<!-- Only Override the site content block -->
 	{% block sitecontent %}
@@ -318,10 +321,8 @@
 		{% include "artevenue/fix-error-message.html" %}
 
 	{% endblock sitecontent %}
-
 	
-	{% block jscripts %}
-	
+	{% block jscripts %}	
 	<script>
 		$( document ).ready(function() {
 			{% if businessprofile_form %}

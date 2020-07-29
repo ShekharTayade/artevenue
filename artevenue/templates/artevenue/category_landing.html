@@ -1,93 +1,82 @@
-
-{% extends 'artevenue/estore_base.html' %}
-{% load static %}
-{% block page-title %} 
-	<title>Custom Photo Frames | Top Quality | Full Customization Available</title>
-{% endblock page-title %} 
-{% block page-description %}
-	<meta name="description" content="Online photo printing and framing. Photos, artworks, posters framed and delivered to you. Just upload digital image, have it custom framed and delivered.">
-{% endblock page-description %}
-{% block page-keywords %}
-	<meta name="keywords" content="custom photo frames, online photo printing and framing, frame my photo, fine art photography printing services, custom photography prints, print and frame photos online, online photo framing, online photo printing and framing india, single photo frames online, multiple photo frame online,  cheapest photo print online, online photo printing services">
-{% endblock page-keywords %}
-
-{% block page-author %}
-	<meta name="author" content="Arte'Venue">
-{% endblock page-author %}
-
-{% block jqueryui-stylesheet %}
-<link rel="stylesheet" href="{% static 'vendor/jquery-ui-1.12.1/jquery-ui.min.css' %}">
-{% endblock jqueryui-stylesheet %}
-
-{% block jqueryui-script %}
-<script src="{% static '/vendor/jquery-ui-1.12.1/jquery-ui.min.js' %}"></script>
-{% endblock jqueryui-script %}
-
-{% block imagemap-resize-script %}
-{% endblock imagemap-resize-script %}
-
-
-{% block add_to_head %}
-	<link rel="stylesheet" type="text/css" href="{% static 'vendor/slick/slick.css' %}"/>
-	<link rel="stylesheet" type="text/css" href="{% static 'vendor/slick/slick-theme.css' %}"/>	
-	<link rel="stylesheet" href="{% static  'css/custom_framing.css' %}">
-{% endblock add_to_head %}
-
-{% block cropper %}
-	<link  href="{% static 'vendor/cropper.js/cropper.css' %}" rel="stylesheet">
-	<script src="{% static 'vendor/cropper.js/cropper.js' %}"></script>
-{% endblock cropper %}
-
-
-	<!-- Only Override the site content block -->
-	{% block sitecontent %}
-	<div class="container-fluid mt-4">
-		<div class = "row mb-5 text-center py-3">
-			<div class="col-12">
-				<h1 class = "mb-3">
-					ABSTRACT ART
-				</h1>
-				<h2>
-				</h2>
-				<h2>
+{% load static %}		
+		<div class="row text-center">
+			<div class="col-12 col-md-12">
+				<h2>OUR BEST SELLING ABSTRACT ART PRINTS FOR HOME DECOR AND MORE
 				</h2>
 			</div>
 		</div>
-	</div>
-	{% endblock sitecontent %}
-	
-	{% block footer-text %}
-		<div class = "text-center">
+		<div class="row text-center">
+			<div class = "col-4 col-md-3 mt-4">
+				<div class="" style = "">
+					<!-- <div class="curatedHeading2 curatedHeading2-1 mb-1">
+						The Ways of Nature
+					</div> -->
+					<h3>
+						FLORAL
+					</h3>
+					<a class="btn-link" href="{% url 'curated_collections' cat_nm='Landscape' page=1 prod_id=212229 %}">
+					<div class="curated-container">
+						<img src="{% static 'img/best_sellers/landscape.jpg' %}" class="img-fluid" alt="Art Prints in Landscape Category">
+						<!--<div class = "btn">LANDSCAPE</div>-->
+					</div>
+					</a>
+				</div>
+			</div>	
+			<div class = "col-4 col-md-3 mt-4">
+				<div class="" style = "">
+					<!-- <div class="curatedHeading2 curatedHeading2-1 mb-1">
+						The Ways of Nature
+					</div> -->
+					<h3>
+						EXPRESSIONIST
+					</h3>
+					<a class="btn-link" href="{% url 'curated_collections' cat_nm='Landscape' page=1 prod_id=212229 %}">
+					<div class="curated-container">
+						<img src="{% static 'img/best_sellers/landscape.jpg' %}" class="img-fluid" alt="Art Prints in Landscape Category">
+						<!--<div class = "btn">LANDSCAPE</div>-->
+					</div>
+					</a>
+				</div>
+			</div>				
+			<div class = "col-4 col-md-3 mt-4">
+				<h3>
+					BLACK & WHITE
+				</h3>
+				<a class="btn-link" href="{% url 'curated_collections' cat_nm='Floral' page=1 prod_id=264553 %}">
+				<div class="curated-container">
+					<img src="{% static 'img/best_sellers/floral.jpg' %}" class="img-fluid" alt="Art Print Collection of Flower Paintings">
+					<!--<div class = "btn">FLORAL</div>-->
+				</div>
+				</a>
+			</div>
+			<div class = "col-4 col-md-3 mt-4">
+				<h3>
+					LANDSCAPE
+				</h3>
+				<a class="btn-link" href="{% url 'curated_collections' cat_nm='Kids' page=1 prod_id=121677 %}">
+				<div class="curated-container">
+					<img src="{% static 'img/best_sellers/kids.jpg' %}" class="img-fluid" alt="Kids Wall Art Collection">
+					<!--<div class = "btn">KIDS</div>-->
+				</div>
+				</a>
+			</div>	
+			<div class = "col-4 col-md-3 mt-4">
+				<h3>
+					GEOMETRIC
+				</h3>
+				<a class="btn-link" href="{% url 'curated_collections' cat_nm='Coastal' page=1 prod_id=244172 %}">
+				<div class="curated-container">
+					<img src="{% static 'img/best_sellers/coastal.jpg' %}" class="img-fluid" alt="Collection of Sea Art Prints">
+					<!--<div class = "btn">COASTAL</div>-->
+				</div>
+				</a>
+			</div>
+		</div>	
+
+		<hr>
+		<div class="row text-center">
+			<div class = "col-12">
+				ALL ABSTRACT ART
+			</DIV>
 		</div>
-	{% endblock footer-text %}
-	
-	{% block jscripts %}
-		<script type="text/javascript" src="{% static 'vendor/slick/slick.min.js' %}"></script>	
-		<script type="text/javascript">
-			
-			$(document).ready(function(){
-				$(".showcase-prod-slider").slick({
-					dots: true,
-					infinite: false,
-					mobileFirst: true,
-					slidesToShow: 4,
-					slidesToScroll: 4,
-				});
-
-				{% if not user.is_authenticated %}
-
-					val = sessionStorage.getItem("SignUpPopupShown");
-					if ( val == null){
-						setTimeout(function() {
-							$("#signup-ask-modal").modal('show');
-							sessionStorage.setItem("SignUpPopupShown", "yes");
-						}, 10000);
-					}
-				{% endif %}
-				
-			});
-			
-		</script>	
-
-	{% endblock jscripts %}
-	
+						

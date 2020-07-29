@@ -54,18 +54,22 @@
 				<div class="front"  style="margin:0px 2px 0px 2px !important;">
 					{% if c.url_suffix %}				
 					<a href="{% url 'art_by_category' cat_nm=c.url_suffix %}"> 
-						<img src="{% static image_static %}" alt="Wall art painting in {{c.name}} category" class="img-fluid img-container-cat">
+						<img src="{% static image_static %}" alt="Wall art prints in {{c.name}} category" class="img-fluid img-container-cat">
 					</a>
 					{% else %}
 					<a href="{% url 'art_by_category' cat_nm=c.name %}"> 
-						<img src="{% static image_static %}" alt="Wall art painting in {{c.name}} category" class="img-fluid img-container-cat">
+						<img src="{% static image_static %}" alt="Wall art prints in {{c.name}} category" class="img-fluid img-container-cat">
 					</a>
 					{% endif %}
 				</div>
 				{% endwith %}
 				<div class="mt-2 trending-cat text text-center">
 					<p>
+					{% if c.url_suffix %}				
+						<a href="{% url 'art_by_category' cat_nm=c.url_suffix %}">{{ c.name|title }}</a>
+					{% else %}
 						<a href="{% url 'art_by_category' cat_nm=c.name %}">{{ c.name|title }}</a>
+					{% endif %}
 					</p>
 				</div>
 				
