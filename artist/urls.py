@@ -17,17 +17,23 @@ sitemaps = {
 
 urlpatterns = [
 	
-	url(r'^create_artist_group/$', views.create_artist_group, name='create_artist_group'),
-	url(r'^artist_signup/$', views.register_as_artist, name='artist_signup'),
-	path('artist_registration_confirmation/<int:id>', views.artist_registration_confirmation, name='artist_registration_confirmation'),
-	path('artist/<str:profile_name>', views.artist_webpage, name='artist_profile'),
-	path('create_artist_profile/<int:id>', views.create_artist_profile, name='create_artist_profile'),
+	url(r'^create-artist-group/$', views.create_artist_group, name='create_artist_group'),
+	url(r'^artist-signup/$', views.register_as_artist, name='artist_signup'),
+	path('artist-registration-confirmation/<int:id>', views.artist_registration_confirmation, name='artist_registration_confirmation'),
+	path('artist/<str:url_name>', views.artist_webpage, name='artist_profile'),
+	url(r'^artist-profile/$', views.create_artist_profile, name='create_artist_profile'),
+	url(r'^ajax/upload-artist-photo/$', views.upload_artist_photo, name='upload_artist_photo'),
+	url(r'^ajax/validate-url-name/$', views.validate_url_name, name='validate_url_name'),
+	url(r'^ajax/save-artist-profile/$', views.save_artist_profile, name='save_artist_profile'),
 
 	path('product-original-art/<int:prod_id>/', views.original_art_detail, name='original_art_detail'),	
 
 	url(r'^original-art-by-category/$', views.get_original_arts, name='original_art_by_category'),
 	path('original-art-by-category/<str:cat_nm>/', views.get_original_arts, name='original_art_by_category'),
 	path('original-art-by-category/<str:cat_nm>/<int:page>', views.get_original_arts, name='original_art_by_category'),
+
+	url(r'^upload-art/$', views.upload_art, name='upload_art'),
+	url(r'^save-art/$', views.save_art, name='save_art'),
 
 
 	#url(r'^original-art-by-category/$', views.get_original_arts, name='original_art_by_category'),

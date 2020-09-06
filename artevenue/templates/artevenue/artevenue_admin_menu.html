@@ -5,16 +5,24 @@
 	
 	<div id="mySidenav" class="sidenav">
 		<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-		<a href="{% url 'store_order_summary' %}">Order Summary Report</a>
-		<a href="{% url 'store_orders' %}">Order Details Report</a>
+		<a href="{% url 'store_carts' %}">View Carts Created</a>
+		<li class="dropdown-divider"></li>		
+		<li style="color: #fff; font-weight:600;">Production & Dispatch</li>		
+		<a href="{% url 'order_dashboard' %}">Order Dashboard</a>
+		<a href="{% url 'start_production' %}">Start Production</a>
+		<a href="{% url 'make_ready_for_shipping' %}">Make Ready for Shipping</a>
+		<a href="{% url 'order_shipping' %}">Order Shipping</a>
+		<a href="{% url 'order_delivery' %}">Order delivery</a>
+		<a href="{% url 'get_orders_for_status_update' %}">Update Order Status</a>
 		<a href="{% url 'store_invoices' %}">Invoices</a>
 		<li class="dropdown-divider"></li>		
+		<li style="color: #fff; font-weight:600;">Orders</li>
+		<a href="{% url 'order_management' %}">Order Management</a>
+		<a href="{% url 'store_order_summary' %}">Order Summary Report</a>
+		<a href="{% url 'store_orders' %}">Order Details Report</a>
+		<li class="dropdown-divider"></li>
+		<li style="color: #fff; font-weight:600;">Business Sales</li>
 		<a href="{% url 'pending_business_accounts' %}">Approve Business Accounts</a>
-		<a href="{% url 'get_orders_for_status_update' %}">Update Order Status</a>
-		<li class="dropdown-divider"></li>
-		<a href="{% url 'image_by_image_code' %}">Find Images by Code</a>
-		<li class="dropdown-divider"></li>
-		<a href="{% url 'store_carts' %}">View Carts Created</a>
 		<li class="dropdown-divider"></li>
 		<a href="{% url 'cart_order_match_report' %}">Orders-Carts Match Report</a>
 		<!--

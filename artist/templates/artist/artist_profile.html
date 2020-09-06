@@ -37,7 +37,11 @@
 						<!-- <span id = "artist"> Click browse button to select an image</span> -->
 						<div class = "btn btn-default btn-file" style = "border:2px solid gainsboro;">
 							<input name="image_to_frame" class="form-control" id="user_image" onchange = "$('#upld_btn').click()" type="file" accept="image/png, image/jpeg, image/gif, image/bmp" required>
+							{% if artist.profile_photo %}
+							<img src = "{{ artist.profile_photo.url }}"><br /> Update Photo<input hidden name="user_id" syle = "display:none;" class="form-control" id="user_id" value = "{{request.user}}">
+							{% else %}
 							<img src = "{% static 'img/upload_icon1.png' %}"><br /> Upload<input hidden name="user_id" syle = "display:none;" class="form-control" id="user_id" value = "{{request.user}}">
+							{% endif %}
 						</div>
 						<button hidden id= "upld_btn" class="btn btn-primary" type = "submit" > <i class = "fa fa-upload"></i> Upload </button>
 						</form>
@@ -65,6 +69,38 @@
 				<textarea >Input your profile here. You have 2000 characters limit.</textarea>
 			</div>
 		</div>
+		<div class="row mt-3">
+			<div class="col-12">
+				EVENTS: <br />
+				Enter the list of up to 5 of top events that your have participated in as an artist and your art was showcased.
+			</div>
+		</div>
+		<div class="row ">
+			<div class="col-12">
+				<input class = "form-control id = "e_1" name = "event_1" max-width = "400">
+				<input class = "form-control id = "e_2" name = "event_2" max-width = "400">
+				<input class = "form-control id = "e_3" name = "event_3" max-width = "400">
+				<input class = "form-control id = "e_4" name = "event_4" max-width = "400">
+				<input class = "form-control id = "e_5" name = "event_5" max-width = "400">
+			</div>
+		</div>
+		<div class="row mt-3">
+			<div class="col-12">
+				ACHIEVEMENTS: <br />
+				Enter the list of up to 5 awards or recognitions you have received or your achievements in the field of art.
+			</div>
+		</div>
+		<div class="row ">
+			<div class="col-12">
+				<input class = "form-control id = "a_1" name = "award_1" max-width = "400">
+				<input class = "form-control id = "a_2" name = "award_2" max-width = "400">
+				<input class = "form-control id = "a_3" name = "award_3" max-width = "400">
+				<input class = "form-control id = "a_4" name = "award_4" max-width = "400">
+				<input class = "form-control id = "a_5" name = "award_5" max-width = "400">
+			</div>
+		</div>
+
+
 		<div class="row mt-3 mb-5"  style = "background-color:#11b6bd; color:#fff; padding:10px;">
 			<div class="col-12">
 				<div class = "text-left">

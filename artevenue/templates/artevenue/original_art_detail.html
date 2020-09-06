@@ -256,13 +256,32 @@
 									</span>
 								</div>							
 								<div class = "">
-									<button class="btn btn-artevenue" 
+									<button class="btn btn-artevenue" {% if product.available_qty < 1 %} disabled {% endif %}
 										onclick="addProdToCart({{product.product_id}}, 1)">
 										<i class="fa fa-shopping-cart"></i>
 										<strong>ADD TO CART</strong>
 									</button>
 								</div>
 							</div>
+							{% if product.stock_image_id %}
+							<hr>
+							<div class = "row">
+								<div class = "col-12 text-center">
+										<span style = "font-size: 0.75rem;">
+											We have top quality art prints of this painting available from 
+											<i class = "fa fa-inr">{% get_price product.max_width product.aspect_ratio per_sqinch_paper 10 %}</i>
+											(size 10" X {{10|get_height:product.aspect_ratio}}" unframed),
+											multiple sizes, complete customization available
+										</span>
+								</div>
+								<div class = "col-12 text-center">
+									<a class = "btn btn-secondary btn-sm"
+										href = "{% url 'stock_image_detail' product.product_id %}"> Buy Art Print
+									</a>
+								</div>
+							</div>
+							<hr>
+							{% endif %}
 							<div class = "row mt-3" style="display:none;">
 								<div class = "col-12">
 									<div class = "form-group">

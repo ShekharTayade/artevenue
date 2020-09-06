@@ -1,0 +1,102 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% block page-title %} 
+<title>Arte'Venue - Order Management</title>
+{% endblock page-title %} 
+{% block page-description %}
+<meta name="description" content="Arte'Venue | Order Management">
+{% endblock page-description %}
+{% block page-keywords %}
+<meta name="keywords" content="Art, artevenue, order management">
+{% endblock page-keywords %}
+
+
+{% block coursel-stylesheet %}
+{% endblock coursel-stylesheet %}
+
+{% block jqueryui-script %}
+{% endblock jqueryui-script %}
+
+{% block coursel-script %}
+{% endblock coursel-script %}
+
+{% block front.js %}
+{% endblock front.js %}
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+{% block google-recaptcha-3 %}
+{% endblock google-recaptcha-3 %}
+
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+        <div class="container">
+			<div class="row">
+				<!-- breadcrumb-->
+				<div class="col-sm-12">
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+							<li aria-current="page" class="breadcrumb-item active">Order Management</li>
+						</ol>
+					</nav>
+				</div>
+			</div>
+			<div class="row mb-5">
+				<div class="col-12 tex-center">
+					<h1 class="text-center">ORDER MANAGEMENT</h1>
+					<ul>
+						<li> <strong>Order Payment Processing:</strong> 
+							Process the order when payment is not getting processed through website.
+							Customer has made the payment through a payment link or otherwise.<br />
+							Once the order payment is processed, order will be confirmed and 
+							order confirmation emails will be sent to customer and factory.
+						</li>
+						<li> <strong>Order Cancellation:</strong> 
+							Cancel the order. It mark the status of an order as cancelled.
+						</li>
+				</div>
+			</div>
+	
+			<form id = "ord_submit" method = "get" action = "{% url 'manage_order_details' %}">
+				<div class="row text-center mb-5">
+					<div class = "col-12 col-md-6">
+						<div class="form-group">
+							<label>Order Number</label>
+							<input id = "order_num" name = "order_num" class = "form-control">
+						</div>
+					</div>
+					<div class = "col-12 col-md-6">
+						<div class="form-group">
+							<label>Cart ID</label>
+							<input id = "cart_id" name = "cart_id" class = "form-control">
+						</div>
+					</div>
+					<div class = "col-12">
+						<button class = "btn btn-primary">
+							Get Order Details
+						</button>
+					</div>
+					{% if msg %}
+					<div class = "col-12" style = "color: red;">
+						{{ msg }}
+					</div>
+					{% endif %}
+				</div>			
+			</form>
+		</div>
+		{% include "artevenue/fix-error-message.html" %}
+
+	{% endblock sitecontent %}
+	
+	{% block jscripts %}	
+	<script>
+		$( document ).ready(function() {
+		});	
+	</script>
+	{% endblock jscripts %}
+			
+	{% block tawkto %} 
+	{% endblock tawkto %} 	

@@ -3,6 +3,8 @@ Digital Ocean:
 Droplet: ArteVenue
 IP: 139.59.78.215
 
+email: shekhar@artevenue / Arch8262~2
+
 root pwd - 54vmartevenue100m
 User - Id: artevenue 	Pwd: projuser_art
 
@@ -104,7 +106,7 @@ rahul@artevenue.com / Rahul@54vm
 	
 
 Support -
-	support@artevenue.com / Arte@165&54   (@78jpn&54vm)   (support@54vm)
+	support@artevenue.com / Arte_@165_54   (Arte@165&54)   (@78jpn&54vm)   (support@54vm)
 	
 Factory:
 	factory@artevenue.com / factory@jpn78 		
@@ -133,7 +135,7 @@ Insta:	media@artevenue.com / av$10M@12m	(Arte_ins_$54vm)
 Arte'Venue Google Account:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Email: info.artevenue@gmail.com 
-Pwd: Vm54&jpn78   (av$10M@12m) (Arte_$54vm) (art_venue@321)
+Pwd: @7jP8_5vm4  (Vm54&jpn78)   (av$10M@12m) (Arte_$54vm) (art_venue@321)
 
 Backup code for signing when phone not available:
 6976 0989	
@@ -227,3 +229,31 @@ shekhar@artevenue.com / art@54vm
 Mailchimp
 ~~~~~~~~~~
 artevenue / Mailsfrom@jpn78
+
+
+
+Digital Ocean
+~~~~~~~~~~~~~~~~~~
+
+2-factor Auth
+Backup Codes:
+63e85f6f
+6aba859e
+fef83d23
+9ff9c12f
+61babeda
+9fb3ab8e
+240d0bf0
+094c11e5
+6c31425e
+4098cfd2
+a3c27550
+c2354642
+0ca9daff
+23c7adff
+fe9cc256
+3165dc24
+12264111
+49ac6111
+0db5a2c8
+a45f8cd8

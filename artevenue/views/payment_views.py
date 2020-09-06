@@ -299,11 +299,11 @@ def payment_done(request):
 		order = Order.objects.get(order_id = order_id)
 		
 		if order:
-			if order.order_status != 'PP':
+			if order.order_status != 'PP' and order.order_status != 'CN' :
 				print("==============================================")
-				print("Payment info sent again by Payment gateway, doing nothing.")
+				print("Payment info sent again by Payment gateway, do nothing. #" + order.order_number)
 				print("==============================================")
-				return
+				return render(request, "artevenue/estore_base.html",{'env': env})
 				
 		order_items = Order_items_view.objects.filter(order = order)
 		o = Order.objects.filter(order_id = order_id).update(

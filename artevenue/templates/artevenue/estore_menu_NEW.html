@@ -66,13 +66,18 @@
 							{{user.username}}<i class = "fa fa-chevron-down"></i>
 						</a>
 						<ul class="dropdown-menu dropdown-menu-login" >
+							{% if not livuser %}
 							<li style = "margin-top:8px;"><a href="{% url 'logout' %}"  style = "color: #77899e;">Logout</a></li>
+							{% endif %}
 							<li style = "margin-top:8px;"> <a href="{% url 'password_change' %}"  style = "color: #77899e;">Change Password</a></li>   
 							<li class= "dropdown-divider" style = "margin-top:5px;" ></li>
 							<li style = "margin-top:8px;"><a href="{% url 'my_account' %}"  style = "color: #77899e;">My Account</a></li>
 							<li style = "margin-top:8px;"><a href="{% url 'my_orders' %}"  style = "color: #77899e;">My Orders</a></li>
 							{% if business_user %}
 								<li style = "margin-top:8px;"><a href="{% url 'my_business_report_wrap' %}" style = "color: #77899e;">My Business Report</a></li>
+								{% if livadmin %}
+								<li style = "margin-top:8px;"><a href="{% url 'livspace_accounts_of_designers' %}" style = "color: #77899e;">Accnts of Designers</a></li>
+								{% endif %}
 							{% endif %}
 						</ul>
 
@@ -111,13 +116,18 @@
 							{{user.username}}<i class = "fa fa-chevron-down"></i>
 						</a>
 						<ul class="dropdown-menu dropdown-menu-login" >
+							{% if not livuser %}
 							<li style = "margin-top:8px;"><a href="{% url 'logout' %}"  style = "color: #77899e;">Logout</a></li>
+							{% endif %}
 							<li style = "margin-top:8px;"> <a href="{% url 'password_change' %}"  style = "color: #77899e;">Change Password</a></li>   
 							<li class= "dropdown-divider" style = "margin-top:5px;" ></li>
 							<li style = "margin-top:8px;"><a href="{% url 'my_account' %}"  style = "color: #77899e;">My Account</a></li>
 							<li style = "margin-top:8px;"><a href="{% url 'my_orders' %}"  style = "color: #77899e;">My Orders</a></li>
 							{% if business_user %}
 								<li style = "margin-top:8px;"><a href="{% url 'my_business_report_wrap' %}" style = "color: #77899e;">My Business Report</a></li>
+								{% if livuser %}
+								<li style = "margin-top:8px;"><a href="{% url 'livspace_accounts_of_designers' %}" style = "color: #77899e;">Accounts of Designers</a></li>
+								{% endif %}
 							{% endif %}
 						</ul>
 
@@ -219,7 +229,7 @@
 				<li class= "mt-2 mb-2 mt-md-0 mb-md-0">
 					<a href="{% url 'stock_collage_products' %}"
 							style = "text-decoration:underline;">
-						Art Sets
+						Wall Art Sets
 					</a>
 				</li>
 
@@ -233,7 +243,7 @@
 							</a>
 						</li>
 						<li>
-							<a class = "nav-link mt-2" style = "color: #082a4c !important;" href = "{% url 'curated_collections' cat_nm='wall-art-for-bathroom'%}">
+							<a class = "nav-link mt-2" style = "color: #082a4c !important;" href = "{% url 'curated_collections' cat_nm='bedroom-wall-art'%}">
 								Bed Room
 							</a>
 						</li>
@@ -255,6 +265,29 @@
 					</ul>
 				</div>
 				
+				<div class="dropdown menu-large mt-2 mb-2 mt-md-0 mb-md-0">
+					<span class="dropdown-toggle room-ideas-menu" data-toggle="dropdown">Original Paintings
+					<span class="caret"></span></span>
+					<ul class="dropdown-menu textmenu">
+						<li>
+							<a class = "nav-link" style = "color: #082a4c !important;" href = "{% url 'original_art_by_category'%}">
+							Art By Category
+							</a>
+						</li>
+						<li>
+							<a class = "nav-link mt-2" style = "color: #082a4c !important;" href = "{% url 'original_art_by_category'%}">
+								All Art Collection
+							</a>
+						</li>
+						<li>
+							<a class = "nav-link mt-2" style = "color: #082a4c !important;" href = "">
+								Artists
+							</a>
+						</li>
+					</ul>
+				</div>
+				
+
 				<li class= "mt-2 mb-2 mt-md-0 mb-md-0">
 					<a href="{% url 'user_image' %}"
 						style = "text-decoration:underline;">
@@ -262,6 +295,7 @@
 					</a>
 				</li>				
 				
+				{% if not livuser %}
 				<li class= "mt-2 mb-2 mt-md-0 mb-md-0">
 					<a href="{% url 'offers' %}"
 						style = "text-decoration:underline;">
@@ -274,6 +308,8 @@
 						Business Sales
 					</a>
 				</li>
+				{% endif %}
+				
 			</ul>	
 		</div>
 	</div>	

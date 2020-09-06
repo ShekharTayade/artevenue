@@ -1,0 +1,261 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load utils %}
+{% load widget_tweaks %}
+{% block page-title %} 
+<title>Arte'Venue - Start Production</title>
+{% endblock page-title %} 
+{% block page-description %}
+<meta name="description" content="Arte'Venue | Start production of items in orders">
+{% endblock page-description %}
+{% block page-keywords %}
+<meta name="keywords" content="Art, artevenue, orders">
+{% endblock page-keywords %}
+
+
+{% block coursel-stylesheet %}
+{% endblock coursel-stylesheet %}
+
+{% block jqueryui-script %}
+{% endblock jqueryui-script %}
+
+{% block coursel-script %}
+{% endblock coursel-script %}
+
+{% block front.js %}
+{% endblock front.js %}
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+{% block google-recaptcha-3 %}
+{% endblock google-recaptcha-3 %}
+
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+        <div class="container mb-5">
+			<div class="row">
+				<!-- breadcrumb-->
+				<div class="col-12">
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+							<li aria-current="page" class="breadcrumb-item active">Start Production</li>
+						</ol>
+					</nav>
+				</div>
+			</div>
+
+			{% if msg %}
+			<div class="row">
+				<div class="col-12 text-center" style = "background-color: #add8e6; color:red; padding:5px; font-weight:600;">
+					{{msg}}
+				</div>
+			</div>
+			{% endif %}							
+			<div class="row">
+				<div class="col-12 text-center" style = "background-color: #add8e6; padding:5px;">
+					<strong><span id = "ord_cnt" style = "font-size:1.1rem;">{{ord_cnt|default_if_none:'0'}}</span></strong>
+					order(s) ready to start production.				
+				</div>
+			</div>
+			{% for o in new_orders %}
+			<div class = "box mb-3" id = "box_{{o.order_id}}" style = "padding-top:0px; background-color:#f9f9f9;">
+				<div class="row d-flex d-align-items-center" style = "background-color:#f6f6f6; padding:10px;">
+					<div class="col-4" style = "color:#11b6bd;">
+						<h3> <strong>ORDER NO: {{o.order_number}}, Dt: {{o.order_date|date:'d/M/y'}}</strong> <small>(Cart Id: {{o.cart_id}})</small></h3>
+						<h4>
+							<strong>Customer: {{o.order_billing.full_name}}</strong>
+							{% if o.order_billing.Company %}
+								, {{o.order_billing.Company}}
+							{% endif %}
+						</h4>
+					</div>
+					<div class = "col-4">
+						<div class = "form-group">
+							Order Status: {{o.get_order_status_display}}									
+							<div class="invalid-feedback">
+							  {{ error }}
+							</div>
+						</div>
+						<div class="row">
+							<div class = "col-12">
+								<a class = "btn btn-secondary" href = "{% url 'print_pf_labels' o.order_id %}" target = "_blank">
+									Printing & Framing Label
+								</a>
+							</div>
+						</div>
+					</div>
+					<div class="col-4">
+						<button class = "btn btn-primary pull-right"
+								onclick="start_production('{{o.order_id}}', '{{o.order_number}}');">
+							Start Production
+						</button>
+					</div>					
+				</div>
+				<div class="row mt-3">
+				{% for oi in orderitems %}
+					{% if o.order_id == oi.order_id %}
+							<div class = "col-6">
+								<div class="row">
+									<div class = "col-12">
+										<span style = "font-weight:600;" >
+										{% if oi.product.product_type_id|cut:' ' == 'USER-IMAGE' %}  
+											Customer Image; Prod Id: {{oi.product.product_id}}
+										{% elif oi.product.product_type_id|cut:' ' == 'STOCK-COLLAGE' %}
+											Image Codes:
+											{% for c in collage %}
+											{% if c.stock_collage_id == oi.product_id %}
+												{{c.stock_image.part_number}}, 
+											{% endif %}
+											{% endfor %}										
+											<!--Prod Id: {{oi.product.product_id}}-->
+										{% else %}
+											{{oi.product.name}};<br />  
+											Image Code: {{oi.product.part_number}}
+										{% endif %}													
+										</span>		
+									</div>
+								</div>
+								<div class="row">									
+									<div class = "col-5">
+										<img src = "{% if oi.product_type_id|cut:' ' == 'USER-IMAGE' %} https://artevenue.com{{MEDIA_URL}}{{oi.product.image_to_frame_thumbnail}} {% else %} {% if env == 'DEV' or env == 'TESTING' %} {{ oi.product.thumbnail_url }} {% else %} {% static oi.product.thumbnail_url %} {% endif %} {% endif %}" style = "width:75px; height:75px; object-fit:contain; float: left;">
+									</div>
+									<div class = "col-7">
+										{% with width=oi.moulding.width_inner_inches|add_width_frame_mount:oi.mount_size %}
+										{% if oi.product_type_id == 'STOCK-COLLAGE' %}
+											EACH ITEM: <br/>
+										{% endif %}
+										{% if oi.product_type_id == 'ORIGINAL-ART' %}
+											<li>{{oi.product.description}}</li>
+										{% else %}													
+											<li>Print on {{oi.print_medium_id|title}}</li>
+										{% endif %}
+										{% if oi.moulding_id %}
+											<li>Image Size : {{ oi.image_width }}" X {{oi.image_height }}"</li>
+											<li>Frame: {{oi.moulding.name }} ({{oi.moulding.width_inches}} inch, Polystyrene)</li>
+											{% if oi.mount_id %}
+												<li>Mount: {{oi.mount_size }}", Color: {{oi.mount.name|title }} </li>
+											{% endif %}
+											<li>Total Size: 
+												{{ oi.image_width|add_width:width|add_width:width }}" X {{oi.image_height|add_width:width|add_width:width }}"</li>
+										{% else %}
+											<li>Image Size : {{ oi.image_width }}" X {{oi.image_height }}"</li>
+										{% endif %}
+										{% if oi.acrylic_id and oi.print_medium_id == 'PAPER' %}
+											<li>Acrylic covered</li>
+										{% endif %}
+										{% if oi.stretch_id and not oi.moulding_id %}
+											<li>Canvas Stretched</li>
+										{% endif %}
+										{% endwith %}
+										<br />
+									</div>
+								</div>
+							</div>
+					{% endif %}
+				{% endfor %}
+				</div>
+				<div class="row mt-2">
+					<div class="col-12 col-md-6">
+						<button data-toggle="collapse" data-target="#s_{{o.order_id}}">Shipping Address:</button>
+						<div id = "s_{{o.order_id}}" class="collapse" style = "font-size:11px;">						
+							{{o.order_shipping.full_name}} 
+							{% if o.order_shipping.Company %}
+								, {{o.order_shipping.Company}}
+							{% endif %}
+							<br />
+							{{o.order_shipping.address_1}}
+							{% if o.order_shipping.address_2 %}
+								{{o.order_shipping.address_2 }}
+							{% endif %}
+							{% if o.order_shipping.address_1 or o.order_shipping.address_2 %}
+								<br />
+							{% endif %}
+							{% if o.order_shipping.land_mark %}
+								{{o.order_shipping.land_mark}}
+								<br />
+							{% endif %}
+							
+							{{o.order_shipping.city}} {{o.order_shipping.state}} {{o.order_shipping.pin_code_id}}
+							<br />
+							Ph: {{o.order_shipping.phone_number}} Email: {{o.order_shipping.email_id}}
+						</div>
+					</div>
+					<div class="col-12 col-md-6">
+						<button data-toggle="collapse" data-target="#b_{{o.order_id}}">Billing Address:</button>
+						<div id = "b_{{o.order_id}}" class="collapse" style = "font-size:11px;">						
+							{{o.order_billing.full_name}} 
+							{% if o.order_billing.Company %}
+								, {{o.order_billing.Company}}
+							{% endif %}
+							{% if o.order_billing.gst_number %}
+								, GST No.:{{o.order_billing.gst_number}}
+							{% endif %}
+							
+							<br />
+							{{o.order_billing.address_1}}
+							{% if o.order_billing.address_2 %}
+								{{o.order_billing.address_2 }}
+							{% endif %}
+							{% if o.order_billing.address_1 or o.order_billing.address_2 %}
+								<br />
+							{% endif %}
+							{% if o.order_billing.land_mark %}
+								{{o.order_billing.land_mark}}
+								<br />
+							{% endif %}
+							
+							{{o.order_billing.city}} {{o.order_billing.state}} {{o.order_billing.pin_code_id}}
+							<br />
+							Ph: {{o.order_billing.phone_number}} Email: {{o.order_billing.email_id}}
+						</div>
+					</div>
+				</div>
+			</div>	
+			{% endfor %}
+			
+		</div>
+		{% include 'artevenue/message-modal_ok.html' %}		
+
+	{% endblock sitecontent %}
+	
+	{% block jscripts %}	
+	<script>
+		$( document ).ready(function() {
+		});	
+	</script>
+	<script>
+		function start_production(order_id, order_number){
+			if (confirm("You are starting the production for order number: " + order_number )){				
+				$.ajax({
+						url: "{% url 'set_in_production' %}", 
+						data: {'order_id':order_id}, 
+						dataType: 'text', 
+					success: function (data) {
+						data = JSON.parse(data);
+						sts = data.status;
+						if (sts = "SUCCESS") {
+							$("#box_" + order_id ).hide();
+							var cnt = parseInt( $("#ord_cnt").html());
+							if ( isNaN(cnt) || cnt == 1){
+								i = 0;
+							} else {
+								i = cnt - 1;
+							}
+							$("#ord_cnt").html(i);
+						} else {
+							alert("Sorry! an error occured in updating the order.");
+						}
+					},
+					error: function(xhr){
+						alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+					}
+				});			
+			}
+		}
+	</script>
+	{% endblock jscripts %}
+			
+	{% block tawkto %} 
+	{% endblock tawkto %} 		

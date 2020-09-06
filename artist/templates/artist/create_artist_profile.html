@@ -20,7 +20,7 @@
 
 {% block add_to_head %}
    <script src="//cdn.tinymce.com/4/tinymce.min.js"></script>
-   <script>tinymce.init({ selector:'textarea' });</script>
+   <script>tinymce.init({ selector:'textarea'});</script>
 {% endblock add_to_head %}
 
 	<!-- Only Override the site content block -->
@@ -28,68 +28,197 @@
 
 	
     <div class="container">
-		<div class="row mt-3">
-			<div class = "col-4" style = "border:1px solid #ced4da; border-radius: 0.25rem; padding:15px;">
+		<div class="row mt-3 mb-3">
+			<div class = "col-12 text-center">
+				<h1><strong>YOUR PROFILE</strong></h1>
+			</div>
+		</div>
+		<div class="row">
+			<div class = "col-12 col-md-6 mt-3" style = "border:1px solid #ced4da; border-radius: 0.25rem; padding:15px;">
 				<div class = "row">
-					<div class = "col-5">
+					<div class = "col-12 col-md-7 mt-2 text-center">
 						<form id = "img-form" method = "post" enctype='multipart/form-data'>										
 							{% csrf_token %}
-						<!-- <span id = "artist"> Click browse button to select an image</span> -->
-						<div class = "btn btn-default btn-file" style = "border:2px solid gainsboro;">
-							<input name="image_to_frame" class="form-control" id="user_image" onchange = "$('#upld_btn').click()" type="file" accept="image/png, image/jpeg, image/gif, image/bmp" required>
-							<img src = "{% static 'img/upload_icon1.png' %}"><br /> Upload<input hidden name="user_id" syle = "display:none;" class="form-control" id="user_id" value = "{{request.user}}">
-						</div>
-						<button hidden id= "upld_btn" class="btn btn-primary" type = "submit" > <i class = "fa fa-upload"></i> Upload </button>
+							<div class = "btn btn-default btn-file" style = "border:2px solid gainsboro;">
+								<input id = 'artist-photo' name="artist-photo" class="form-control" id="artist_photo" onchange = "$('#upld_btn').click()" type="file" accept="image/png, image/jpeg, image/gif, image/bmp" required>
+								<img id="a-photo" src = "{% if artist.profile_photo %} {{artist.profile_photo.url}} {% else %} {% static 'img/artist.jpg' %} {% endif %}">
+								<br /> Click to Upload
+								<input hidden name="artist_id" syle = "display:none;" class="form-control" id="artist_id" value = "{{artist.artist_id}}">
+							</div>
+							<button hidden id= "upld_btn" class="btn btn-primary" type = "submit" > 
+								<i class = "fa fa-upload"></i> Upload 
+							</button>
 						</form>
 					</div>
-					<div class = "col-7">
-						<span style = "color:#696969;">Upload your profile picture</span>
+					<div class = "col-12 col-md-5 mt-2 text-center">
+						<label><strong>UPLOAD YOUR PROFILE PHOTO</strong></label><br /><br />
+						Square image of 200 X 200 pixel, or 2 inch X 2 inch image size.<br />
+						If you upload different size photo, we will resize it to 200 pixel width.
 					</div>
 				</div>
-				<!-- <img class="img-thumbnail img-display pull-right" src="{% if artist.profile_photo %} {{artist.profile_photo.url}} {% endif %}" alt="Photo"> -->
 			</div>
-			<div class="col-5">
-				<input id='profile_name' name='profile_name' maxlength="500" class = "form-control"
-					placeholder="Name as you wish to display" value = "{{artist.profile_name}}" required>
-				<input id='profile_tagline' name='profile_tagline' maxlength="500" class = "form-control"
-					placeholder="A tag line you may want to include" value = "{{artist.profile_tagline}}">
+			<div class="col-12 col-md-6 mt-3">
+				<div class = "row">
+					<div class = "col-12">												
+						<div class = "form-group">
+							<label><strong>DISPLAY NAME:</strong></label><br />
+							<span style = "font-size: 0.8rem;">Your name as you would like it to appear on your webpage</span>
+							<input id='profile_name' name='profile_name' maxlength="200" class = "form-control"
+							placeholder="Name as you wish to display in your gallery" 
+							value = "{%if artist.profile_name %} {{artist.profile_name}} {% else %} {{artist.user.first_name}} {{artist.user.last_name}} {% endif %}" required>
+							<small>200 character max</small>
+						</div>
+					</div>
+				</div>
+				<div class = "row box">
+					<div class = "form-group">
+						<div class = "col-12 text-center">												
+							<label><strong>YOUR WEBPAGE URL:</strong></label>
+						</div>
+						<div class = "col-12">												
+							<div class = "form-group" style = "display: flex; align-items: center;">
+								<label>
+									https://artevenue.com/artist/ 
+								</label>
+								<input id='url_name' name='url_name' maxlength="50" class = "form-control"
+									placeholder="" value = "{{artist.url_name}}" onchange="validate_url(this);" />
+							</div>
+						</div>
+						<div class = "col-12">												
+							<span style = "font-size: 0.75rem;">
+								It can include only alphabets, numbers, '_' (underscore), and '-' (dash).
+								Blank spaces, special characters (like $ or @) are not allowed.
+							</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<hr>
+		<div class="row mt-3">
+			<div class = "col-12">
+				<label><strong>TAG LINE:</strong></label><br />
+				<span style = "font-size: 0.75rem;">Leave it blank if you don't to show this on your webpage. 500 character max</span>
+				<div class = "form-group">
+					<input id='tag_line' name='tag_line' maxlength="500" class = "form-control"
+						placeholder="A tag line you may want to include" value = "{{artist.profile_tagline}}">
+					
+				</div>
+			</div>
+		</div>
+		<hr>
+		<div class="row mt-3">
+			<div class="col-12">
+				<label><strong>A FEW WORDS ABOUT YOURSELF:</strong></label><br/>
+					<span style = "font-size: 0.75rem;">You can enter upto 2000 characters, however we recommend that 
+					you keep it up to 1000 charcaters long.<br/>
+					Most customers buy art for their interior decoration. A short and to-the-point profile
+					would catch more attension from customers.
+					</span>
 			</div>
 		</div>
 		<div class="row mt-3">
 			<div class="col-12">
-				PROFILE:
+				<textarea max-width= "2000" id = "about-me" name = "profile" placeholder = "Enter your profile here. You have 2000 characters limit.">
+				{{artist.artist_profile}}
+				</textarea>
 			</div>
 		</div>
+		<hr>
 		<div class="row mt-3">
 			<div class="col-12">
-				<textarea >Input your profile here. You have 2000 characters limit.</textarea>
+				<label><strong>ACHIEVEMENTS:</strong></label> <br />
+				<span style = "font-size: 0.75rem;">Enter the list of up to 5 awards or recognitions you have received or your achievements in the field of art.<br />
+				(Leave it blank, in case you dont' want to show this section on your webpage)
+				</span>
 			</div>
 		</div>
+		<div class="row ">
+			<div class="col-12 col-md-6">
+				<div class = "form-group">
+					<input class = "form-control" id = "a1" name = "award_1" max-width = "400">
+				</div>
+			</div>
+			<div class="col-12 col-md-6">
+				<div class = "form-group">
+					<input class = "form-control" id = "a2" name = "award_2" max-width = "400">
+				</div>
+			</div>
+			<div class="col-12 col-md-6">
+				<div class = "form-group">
+					<input class = "form-control" id = "a3" name = "award_3" max-width = "400">
+				</div>
+			</div>
+			<div class="col-12 col-md-6">
+				<div class = "form-group">
+					<input class = "form-control" id = "a4" name = "award_4" max-width = "400">
+				</div>
+			</div>
+			<div class="col-12 col-md-6">
+				<div class = "form-group">
+					<input class = "form-control" id = "a5" name = "award_5" max-width = "400">
+				</div>
+			</div>
+		</div>
+		<hr>
+		<div class="row mt-3">
+			<div class="col-12">
+				<label><strong>EVENTS:</strong></label><br />
+				<span style = "font-size: 0.75rem;">Enter the list of up to 5 of top events that your have participated in as an artist and your art was showcased.<br />
+				(Leave it blank, in case you dont' want to show this section on your webpage)</span>
+			</div>
+		</div>
+		<div class="row ">
+			<div class="col-12 col-md-6">
+				<div class = "form-group">
+					<input class = "form-control" id = "e1" name = "event_1" max-width = "400">
+				</div>
+			</div>
+			<div class="col-12 col-md-6">
+				<div class = "form-group">
+					<input class = "form-control" id = "e2" name = "event_2" max-width = "400">
+				</div>
+			</div>
+			<div class="col-12 col-md-6">
+				<div class = "form-group">
+					<input class = "form-control" id = "e3" name = "event_3" max-width = "400">
+				</div>
+			</div>
+			<div class="col-12 col-md-6">
+				<div class = "form-group">
+					<input class = "form-control" id = "e4" name = "event_4" max-width = "400">
+				</div>
+			</div>
+			<div class="col-12 col-md-6">
+				<div class = "form-group">
+					<input class = "form-control" id = "e5" name = "event_5" max-width = "400">
+				</div>
+			</div>
+		</div>
+		<hr>
 		<div class="row mt-3 mb-5"  style = "background-color:#11b6bd; color:#fff; padding:10px;">
-			<div class="col-12">
-				<div class = "text-left">
-					<a href = "" style = "color:#fff;">											
-						<i class = "fa fa-save fa-lg">
-						</i>
-						SAVE
-					</a>
-				</div>
-				<div class = "text-center">
-					<a href = "" style = "color:#fff;">					
-						PREVIEW
-						<i class = "fa fa-eye fa-lg">
-						</i>
-					</a>
-				</div>
-				<div class = "text-right">
-					<a href = "" style = "color:#fff;">					
-						NEXT
-						<i class = "fa fa-caret-square-o-right fa-lg">
-						</i>
-					</a>
-				</div>
+			<div class="col-4 col-md-4 text-center">
+				<button type = "button" class = "btn btn-primary" href = "" style = "color:#fff;" onclick="save_profile('SAVE');">				
+					SAVE
+				</button>
+			</div>
+			<div class="col-4 col-md-4 text-center">
+				<button type = "button" class = "btn btn-primary" href = "" style = "color:#fff;" onclick="save_profile('PREVIEW');">					
+					PREVIEW
+				</button>
+			</div>
+			<div class="col-4 col-md-4 text-center">
+				<button type = "button" class = "btn btn-primary" href = "" style = "color:#fff;" onclick="save_profile('NEXT');">
+					NEXT STEP
+				</button>
+				<form hidden id = "f-upload-art" action = "{% url 'upload_art' %}">
+					<button type = "submit" id = "next_btn" class = "btn btn-primary" form = "f-upload-art">Upload Art</button>
+				</form>
 			</div>
 		</div>
+
+		{% include 'artevenue/message-modal_ok.html' %}		
+
     </div>
 
 	
@@ -97,7 +226,167 @@
 
 	
 	{% block jscripts %}
+	<script>
+		// Returns text statistics for the specified editor by id
+		function getStats(id) {
+			var body = tinymce.get(id).getBody(), text = tinymce.trim(body.innerText || body.textContent);
+
+			return {
+				chars: text.length,
+				words: text.split(/[\w\u2019\'-]+/).length
+			};
+		}	
 		
+		function char_count() {
+			// Check if the user has entered less than 1000 characters
+			if (getStats('content').chars > 2000) {
+				$("#msg").html("Please enter only up to 2000 characters.");
+				$("#msg-modal").modal('show');
+				return false;
+			} else {
+				return true;
+			}
+		}
+	</script>
+
+	<script>
+	var artist_photo;
+	
+		$("#img-form").submit(function(e) {
+			e.preventDefault();
+			var fileInput = document.getElementById('artist-photo');
+			var file = fileInput.files[0];
+			var formData = new FormData();
+			formData.append('file', file);
+
+			document.getElementById("a-photo").style.objectFit ="none";
+			document.getElementById("a-photo").src ="{% static 'img/ajax-loader.gif' %}";
+			
+			$.ajax({
+				url: '{% url "upload_artist_photo" %}', 
+				data:formData,
+				processData: false,
+				contentType: false,
+				type: 'post',				
+				success: function (data) {
+					document.getElementById("a-photo").style.objectFit ="contain";
+					document.getElementById("a-photo").src = "data:image/png;base64," + data;
+					artist_photo = document.getElementById("a-photo").src;					
+				},
+				error: function(xhr){
+					$("#msg").html("An error occured: " + xhr.status + " " + xhr.statusText + " Please make sure that you are uploading a proper ,jpg, .gif or .png image."); 
+					$("#msg-modal").modal('show');
+					return;
+				}
+			});	
+			return false;
+		});
+		
+		
+		function validate_url(ele){
+			$.ajax({
+				url: '{% url "validate_url_name" %}', 
+				data:{'url_name': ele.value,'artist_id': '{{artist.artist_id}}' },
+				type: 'post',				
+				success: function (data) {
+					if (data.ret_msg != 'SUCCESS') {
+						$("#msg").html(data.ret_msg);
+						$("#msg-modal").modal('show');
+					}
+				},
+				error: function(xhr){
+					$("#msg").html("An error occured: " + xhr.status + " " + xhr.statusText + " Please make sure that you are uploading a proper ,jpg, .gif or .png image."); 
+					$("#msg-modal").modal('show');
+					return;
+				}
+			});
+		
+		
+		}
+		
+	</script>
+
+	<script>
+		function save_profile(mode){
+			var profile_name = $("#profile_name").val();
+			var url_name = $("#url_name").val(); 
+			var tag_line = $("#tag_line").val();
+			var profile = tinyMCE.activeEditor.getContent();
+			var a1 = $("#a1").val();
+			var a2 = $("#a2").val();
+			var a3 = $("#a3").val();
+			var a4 = $("#a4").val();
+			var a5 = $("#a5").val();
+
+			var e1 = $("#e1").val();
+			var e2 = $("#e2").val();
+			var e3 = $("#e3").val();
+			var e4 = $("#e4").val();
+			var e5 = $("#e5").val();
+			
+			if (profile_name == '') {
+				$("#msg").html("Your display name can't be blank");
+				$("#msg-modal").modal('show');
+				return;
+			} 
+			
+			if (url_name == '') {
+				$("#msg").html("Your webpage url name can't be blank");
+				$("#msg-modal").modal('show');
+				return;
+			} else {
+				u = validURL( url_name);
+				if (u == false){
+					$("#msg").html("The webpage URL you entered is invalid. It can only contain alphabets, number, '-' & '_' and no blanks spaces are allowed.");
+					$("#msg-modal").modal('show');
+					return;
+				}
+			}
+			
+			/*
+			if (profile == '') {
+				$("#msg").html("Please include a few words about your self");
+				$("#msg-modal").modal('show');
+				return;
+			}
+			*/
+			$.ajax({
+				url: '{% url "save_artist_profile" %}', 
+				data:{'artist_id': '{{artist.artist_id}}', 'mode':mode, 'profile_name': profile_name, 'url_name': url_name, 'tag_line':tag_line, 'profile':profile, 'a1':a1, 'a2':a2, 'a3':a3, 'a4':a4, 'a5':a5, 'e2':e2, 'e1':e1, 'e3':e3, 'e4':e4, 'e5':e5 }, 
+				type: 'post',				
+				success: function (data) {
+					if (data.ret_msg == 'SUCCESS'){
+						$("#msg").html("Your profile is saved");
+						$("#msg-modal").modal('show');
+						if (mode == 'NEXT') {
+							$("#next_btn").click();
+						}
+					} else {
+						$("#msg").html(data.ret_msg);
+						$("#msg-modal").modal('show');
+					}
+				},
+				error: function(xhr){
+					$("#msg").html("An error occured: " + xhr.status + " " + xhr.statusText + " Please make sure that you are uploading a proper ,jpg, .gif or .png image."); 
+					$("#msg-modal").modal('show');
+					return;
+				}
+			});
+		
+		}
+	
+	
+	</script>
+	
+	<script>
+	function validURL(str) {
+	  var pattern = /^[a-zA-Z0-9_-]+$/;
+	  return pattern.test(str);
+	}	
+	</script>
+
 	{% endblock jscripts %}
 			
+	
+	
 	

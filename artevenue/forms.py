@@ -5,6 +5,9 @@ from artevenue.models import Business_profile, Contact_us, User_image
 from artevenue.models import Pin_code, Referral, Order, UserProfile, Channel_partner
 from artevenue.models import User_shipping_address, User_billing_address
 from artevenue.models import Profile_group, Egift, Channel_order_amz
+
+from artevenue.models import Cart, Order_items_view, Cart_item_view
+
 from artevenue.validators import validate_artevenue_email, validate_contact_name
 from artevenue.validators import validate_image_size, validate_india_mobile_no
 from django.core.validators import validate_slug, MinLengthValidator
@@ -44,14 +47,14 @@ class businessuserForm(UserCreationForm):
         
 class businessprofile_Form(forms.ModelForm):
 	business_code = forms.CharField(
-		widget=forms.TextInput(attrs={'placeholder': 'Enter your business code (8 char max)'}),
+		widget=forms.TextInput(attrs={'placeholder': '(OPTIONAL) Enter your business code (8 char max)'}),
 		required=False,
 		max_length=8,
 		error_messages={'unique':"This code has already been used. Please choose another code."},
-		help_text = "This is the code that you can give to your clients to earn the referral fee. It is unique to you and must be quoted by clients when they sign up with Arte'Venue."
+		help_text = " All orders placed using your login are eligible for referral fee by default. But in case your clients place orders with us directly, this is the code that you can give to them, so you earn the referral fee on those orders. It is unique to you and must be quoted by clients when they sign up with Arte'Venue."
 	) 
 	channel_partner = forms.CharField(
-		widget=forms.TextInput(attrs={'placeholder': 'Channel partner code (8 char max)'}),
+		widget=forms.TextInput(attrs={'placeholder': '(OPTIONAL) Channel partner code (8 char max)'}),
 		required=False,
 		max_length=8,
 		help_text = "If you are working with Arte'Venue Channel Partner, please enter their code here."
@@ -241,10 +244,6 @@ class userForm(forms.ModelForm):
 			'email', 'last_login')
 			
 class shipping_addressForm(forms.ModelForm):
-	shipping_address_id = forms.CharField(
-		widget=forms.HiddenInput(),
-		required=False
-	) 
 	store = forms.CharField(
 		widget=forms.HiddenInput(),
 		required=False
@@ -293,7 +292,7 @@ class shipping_addressForm(forms.ModelForm):
 
 	class Meta:
 		model = User_shipping_address
-		fields = ('shipping_address_id', 'store', 'full_name', 'company', 'address_1', 'address_2',
+		fields = ('store', 'full_name', 'company', 'address_1', 'address_2',
 		'land_mark', 'city', 'state', 'pin_code', 'country',
 		'phone_number', 'email_id', 'pref_addr', 'user')
 
@@ -503,3 +502,4 @@ class userProfileForm(forms.ModelForm):
 		model = UserProfile
 		fields = ('id', 'user_id', 'phone_number', 'date_of_birth', 'gender', 
 			'subject_interests', 'business_profile_id')
+			

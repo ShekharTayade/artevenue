@@ -1,0 +1,376 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load utils %}
+{% load widget_tweaks %}
+{% block page-title %} 
+<title>Arte'Venue - Process Order</title>
+{% endblock page-title %} 
+{% block page-description %}
+<meta name="description" content="Arte'Venue | Order Processing ">
+{% endblock page-description %}
+{% block page-keywords %}
+<meta name="keywords" content="Art, artevenue, orders">
+{% endblock page-keywords %}
+
+
+{% block coursel-stylesheet %}
+{% endblock coursel-stylesheet %}
+
+{% block jqueryui-script %}
+{% endblock jqueryui-script %}
+
+{% block coursel-script %}
+{% endblock coursel-script %}
+
+{% block front.js %}
+{% endblock front.js %}
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+{% block google-recaptcha-3 %}
+{% endblock google-recaptcha-3 %}
+
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+        <div class="container mb-5">
+			<div class="row">
+				<!-- breadcrumb-->
+				<div class="col-12">
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+							<li class="breadcrumb-item"><a href="{% url 'order_management' %}">Order Management</a></li>
+							<li aria-current="page" class="breadcrumb-item active">Order Details</li>
+						</ol>
+					</nav>
+				</div>
+			</div>
+
+			{% if msg %}
+			<div class="row">
+				<div class="col-12 text-center" style = "background-color: #add8e6; color:red; padding:5px; font-weight:600;">
+					{{msg}}
+				</div>
+			</div>
+			{% endif %}							
+			
+			<form method = "post" id = "order_manage_form" name = "ord_form">
+				{% csrf_token %}
+				<div class="row">
+					<input name="order_id" id = "order_id" value = "{{order.order_id}}" 
+						class = "form-control" hidden>
+					<div class="col-12 col-md-6">
+						<h3 class = "text-center"> <strong>ORDER</strong></h3>
+						<div class = "row">
+							<div class = "col-12 col-md-4">
+								<div class="form-group">
+									<label>Order Number:</label>
+									<input name="order_number" id = "order_number" value = "{{order.order_number}}" 
+										class = "form-control" readonly>
+								</div>
+							</div>
+							<div class = "col-12 col-md-4">
+								<div class="form-group">
+									<label>Order Date:</label>
+									<input name="order_date" id = "order_date" value = "{{order.order_date|date:'d M y'}}" 
+										class = "form-control" readonly>
+								</div>
+							</div>						
+							<div class = "col-12 col-md-4">
+								<div class="form-group">
+									<label>Status:</label>
+									<input name="order_status" id = "order_status" value = "{{order.get_order_status_display}}" 
+										class = "form-control" readonly>
+								</div>
+							</div>						
+						</div>
+					</div>
+					<div class="col-12 col-md-6">
+						<h3 class = "text-center"> <strong>CART</strong></h3>
+						<div class = "row">
+							<div class = "col-12 col-md-4">
+								<div class="form-group">
+									<label>Cart ID:</label>
+									<input name="cart_id" id = "cart_id" value = "{{cart.cart_id}}" 
+										class = "form-control" readonly>
+								</div>
+							</div>
+							<div class = "col-12 col-md-4">
+								<div class="form-group">
+									<label>Created Date:</label>
+									<input name="created_date" id = "created_date" value = "{{cart.created_date|date:'d M y'}}" 
+										class = "form-control" readonly>
+								</div>
+							</div>
+							<div class = "col-12 col-md-4">
+								<div class="form-group">
+									<label>Updated Date:</label>
+									<input name="updated_date" id = "updated_date" value = "{{cart.updated_date|date:'d M y'}}" 
+										class = "form-control" readonly>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-12 col-md-6">
+						<strong>Shipping Address:</strong><br />
+						{{order.order_shipping.full_name}} 
+						{% if order.order_shipping.Company %}
+							, {{order.order_shipping.Company}}
+						{% endif %}
+						<br />
+						{{order.order_shipping.address_1}}
+						{% if order.order_shipping.address_2 %}
+							{{order.order_shipping.address_2 }}
+						{% endif %}
+						{% if order.order_shipping.address_1 or order.order_shipping.address_2 %}
+							<br />
+						{% endif %}
+						{% if order.order_shipping.land_mark %}
+							{{order.order_shipping.land_mark}}
+							<br />
+						{% endif %}
+						
+						{{order.order_shipping.city}} {{order.order_shipping.state}} {{order.order_shipping.pin_code_id}}
+						<br />
+						Ph: {{order.order_shipping.phone_number}} Email: {{order.order_shipping.email_id}}
+					</div>
+					<div class="col-12 col-md-6">
+						<strong>Billing Address:</strong><br />
+						{{order.order_billing.full_name}} 
+						{% if order.order_billing.Company %}
+							, {{order.order_billing.Company}}
+						{% endif %}
+						{% if order.order_billing.gst_number %}
+							, GST Norder.:{{order.order_billing.gst_number}}
+						{% endif %}
+						
+						<br />
+						{{order.order_billing.address_1}}
+						{% if order.order_billing.address_2 %}
+							{{order.order_billing.address_2 }}
+						{% endif %}
+						{% if order.order_billing.address_1 or order.order_billing.address_2 %}
+							<br />
+						{% endif %}
+						{% if order.order_billing.land_mark %}
+							{{order.order_billing.land_mark}}
+							<br />
+						{% endif %}
+						
+						{{order.order_billing.city}} {{order.order_billing.state}} {{order.order_billing.pin_code_id}}
+						<br />
+						Ph: {{order.order_billing.phone_number}} Email: {{order.order_billing.email_id}}
+					</div>
+				</div>
+				
+				
+				<div class = "row mt-3">
+					<div class = "col-6 text-center" style = "display: table-cell; font-weight:700; border-bottom: 1px solid #cfcfcf;">
+						ORDER ITEMS				
+					</div>		
+					<div class = "col-6 text-center" style = "display: table-cell; font-weight:700; border-bottom: 1px solid #cfcfcf;">
+						CART ITEMS
+					</div>	
+				</div>
+				<div class = "row mt-2" style = "border-bottom: 2px solid #cfcfcf;">
+					<div class = "col-6" >
+						{% for oi in orderitems %}
+							<span style = "font-weight:700;" >
+							{% if oi.product.product_type_id|cut:' ' == 'USER-IMAGE' %}  
+								Customer Image; Prod Id: {{oi.product.product_id}}
+							{% elif oi.product.product_type_id|cut:' ' == 'STOCK-COLLAGE' %}
+								SET; Prod Id: {{oi.product.product_id}}
+							{% else %}
+								{{oi.product.name}};  
+								Image Code: {{oi.product.part_number}} / Prod Id: {{oi.product.product_id}}
+							{% endif %}													
+							</span>		
+							<br />
+							<img src = "{% if oi.product_type_id|cut:' ' == 'USER-IMAGE' %} https://artevenue.com{{MEDIA_URL}}{{oi.product.image_to_frame_thumbnail}} {% else %} {% if env == 'DEV' or env == 'TESTING' %} {{ oi.product.thumbnail_url }} {% else %} {% static oi.product.thumbnail_url %} {% endif %} {% endif %}" style = "width:75px; height:75px; object-fit:contain; float: left;">
+							{% with width=oi.moulding.width_inner_inches|add_width_frame_mount:oi.mount_size %}
+							<small>
+							{% if oi.product_type_id == 'STOCK-COLLAGE' %}
+								EACH ITEM: <br/>
+							{% endif %}
+							{% if oi.product_type_id == 'ORIGINAL-ART' %}
+								<li>{{oi.product.description}}</li>
+							{% else %}													
+								<li>Print on {{oi.print_medium_id|title}}</li>
+							{% endif %}
+							{% if oi.moulding_id %}
+								<li>Image Size : {{ oi.image_width }}" X {{oi.image_height }}"</li>
+								<li>Frame: {{oi.moulding.name }} ({{oi.moulding.width_inches}} inch, Polystyrene)</li>
+								{% if oi.mount_id %}
+									<li>Mount: {{oi.mount_size }}", Color: {{oi.mount.name|title }} </li>
+								{% endif %}
+								<li>Total Size: 
+									{{ oi.image_width|add_width:width|add_width:width }}" X {{oi.image_height|add_width:width|add_width:width }}"</li>
+							{% else %}
+								<li>Image Size : {{ oi.image_width }}" X {{oi.image_height }}"</li>
+							{% endif %}
+							{% if oi.acrylic_id and oi.print_medium_id == 'PAPER' %}
+								<li>Acrylic covered</li>
+							{% endif %}
+							{% if oi.stretch_id and not oi.moulding_id %}
+								<li>Canvas Stretched</li>
+							{% endif %}
+							</small>
+							{% endwith %}
+							<br />
+							<small>Qty: {{oi.quantity}}; </small>
+							<small>Unit: {{oi.item_unit_price}}; </small>
+							<small>Disc: {{oi.item_disc_amt|floatformat}}; </small>
+							<small>Sub: {{oi.item_sub_total|floatformat}}; </small>
+							<small>Tax: {{oi.item_tax|floatformat}}; </small>
+							Total: {{oi.item_total|floatformat}};
+							<br />
+							<div class = "row">
+								<div class = "col-6 text-center">
+									<button type = "button" class = "btn btn-sm">Modify Item</button>
+								</div>
+								<div class = "col-6  text-center">
+									<button type = "button" class = "btn btn-sm">Delete Item</button>
+								</div>
+							</div>
+							<br />
+							<br />
+							<br />
+						{% endfor %}
+					</div>
+					<div class = "col-6" style = "display: table-cell">
+						{% for i in cartitems %}
+							<span style = "font-weight:700;" >
+							{% if i.product.product_type_id|cut:' ' == 'USER-IMAGE' %}  
+								Customer Image; Prod Id: {{i.product.product_id}}
+							{% elif i.product.product_type_id|cut:' ' == 'STOCK-COLLAGE' %}
+								SET; Prod Id: {{i.product.product_id}}
+							{% else %}
+								{{i.product.name}};  
+								Image Code: {{i.product.part_number}} / Prod Id: {{i.product.product_id}}
+							{% endif %}													
+							</span>		
+							<br />
+							<img src = "{% if i.product_type_id|cut:' ' == 'USER-IMAGE' %} https://artevenue.com{{MEDIA_URL}}{{i.product.image_to_frame_thumbnail}} {% else %} {% if env == 'DEV' or env == 'TESTING' %} {{ i.product.thumbnail_url }} {% else %} {% static i.product.thumbnail_url %} {% endif %} {% endif %}" style = "width:75px; height:75px; object-fit:contain; float: left;">
+							{% with width=i.moulding.width_inner_inches|add_width_frame_mount:i.mount_size %}
+							<small>
+							{% if i.product_type_id == 'STOCK-COLLAGE' %}
+								EACH ITEM: <br/>
+							{% endif %}
+							{% if i.product_type_id == 'ORIGINAL-ART' %}
+								<li>{{i.product.description}}</li>
+							{% else %}													
+								<li>Print on {{i.print_medium_id|title}}</li>
+							{% endif %}
+							{% if i.moulding_id %}
+								<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+								<li>Frame: {{i.moulding.name }} ({{i.moulding.width_inches}} inch, Polystyrene)</li>
+								{% if i.mount_id %}
+									<li>Mount: {{i.mount_size }}", Color: {{i.mount.name|title }} </li>
+								{% endif %}
+								<li>Total Size: 
+									{{ i.image_width|add_width:width|add_width:width }}" X {{i.image_height|add_width:width|add_width:width }}"</li>
+							{% else %}
+								<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+							{% endif %}
+							{% if i.acrylic_id and i.print_medium_id == 'PAPER' %}
+								<li>Acrylic covered</li>
+							{% endif %}
+							{% if i.stretch_id and not i.moulding_id %}
+								<li>Canvas Stretched</li>
+							{% endif %}
+							</small>
+							{% endwith %}
+							<br />
+							<small>Qty: {{i.quantity}}; </small>
+							<small>Unit: {{i.item_unit_price}}; </small>
+							<small>Disc: {{i.item_disc_amt|floatformat}}; </small>
+							<small>Sub: {{i.item_sub_total|floatformat}}; </small>
+							<small>Tax: {{i.item_tax|floatformat}}; </small>
+							Total: {{i.item_total|floatformat}};
+							<br />
+							<div class = "row">
+								<div class = "col-6 text-center">
+									<button type = "button" disabled class = "btn btn-sm">Modify Item</button>
+								</div>
+								<div class = "col-6  text-center">
+									<button type = "button" disabled class = "btn btn-sm">Delete Item</button>
+								</div>
+							</div>
+							<br />
+							<br />
+							<br />
+						{% endfor %}
+					</div>
+
+				</div>
+				<div class = "row mt-3">
+					<div class = "col-12 col-md-4 text-center">
+						<input type = "submit" class = "btn btn-primary" 
+							name="process_order" value="PROCESS PAYMENT" 
+							{% if msg %} disabled {% endif %}>
+						<p>When payment is not getting processed through
+						the website, use this to manually process the payment for this order.
+						Order will be confirmed and order emails will be sent.</p>
+					</div>
+					<div class = "col-12 col-md-4 text-center">
+						<a class = "btn btn-primary"  href= "{% url 'order_modification' order.order_id %}"
+							{% if msg %} disabled {% endif %}>
+							MODIFY ORDER
+						</a>
+						<p>Make modifications to the order, order items.</p>
+					</div>
+					<div class = "col-12 col-md-4 text-center">
+						<input type = "submit"  class = "btn btn-primary" 
+							name="cancel_order" value="CANCEL ORDER"
+							{% if msg %} disabled {% endif %}>
+						<p>This will mark order as cancelled. Any refund due will have to done separately.</p>
+					</div>
+				</div>
+			</form>
+		</div>
+		{% include 'artevenue/message-modal_ok.html' %}		
+
+	{% endblock sitecontent %}
+	
+	{% block jscripts %}	
+	<script>
+		$( document ).ready(function() {
+		});	
+	</script>
+	<script>
+		$('#order_manage_form').submit(function() {
+			var val = document.activeElement.getAttribute('value');
+			
+			
+			switch(val) {
+				case 'PROCESS PAYMENT':
+					{% if order.order_status != 'PP' %}
+						$('#msg').html("Payment for this order is not pending. Please check the order status.");
+						$('#msg-modal').modal('show');					
+						return false;
+					{% endif %}
+					if (confirm('Are you sure you want to mark this order as payment received?') == false) {
+						return false;
+					}				
+					break;
+				case 'CANCEL ORDER':
+					{% if order.order_status == 'CN' %}
+						$('#msg').html("This order has already been cancelled. Please check the order status.");
+						$('#msg-modal').modal('show');					
+						return false;
+					{% endif %}
+					if (confirm('Are you sure you want to cancel this order?') == false) {
+						return false;
+					}				
+					break;
+			}			
+			
+			return true;
+		});
+	</script>
+	{% endblock jscripts %}
+			
+	

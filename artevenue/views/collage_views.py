@@ -489,20 +489,35 @@ def stock_collage_detail(request, prod_id = '', iuser_width='', iuser_height='')
 	
 def createInitialData(product_id=None):
 
-	collages = Stock_collage.objects.all()
+	collages = Stock_collage.objects.filter(product_id__gte = 52)
 	if product_id:
 		collages = collages.filter(product_id = product_id)
 
-	na = [12]
+	na = [12, 62, 64, 74, 76, 77]  #Set of 4
 	
 	for i in collages:
 		print("Processing Collage ID: " + str(i.product_id))
 		coll = Collage_stock_image.objects.filter(stock_collage = i).exclude(stock_collage_id__in = na)
 		t_price = 0
 		img = []
+		aspect_ratio = 1
+		key_words = ''
+		colors = ''
+		max_height = 40
+		max_width = 40
+		min_width = 8
+		orientation = 'Square'
+		
 		
 		for c in coll:
 			print("Processing Image ID: " + str(c.stock_image_id))
+			aspect_ratio = c.stock_image.aspect_ratio
+			key_words = key_words + '|' + c.stock_image.key_words
+			colors = ''
+			max_height = c.stock_image.max_height
+			max_width = c.stock_image.max_width
+			min_width = 8
+			orientation = c.stock_image.orientation
 			
 			height = 10 / c.stock_image.aspect_ratio
 			price = get_prod_price(c.stock_image_id, 
@@ -517,6 +532,7 @@ def createInitialData(product_id=None):
 					board_id = 1,
 					stretch_id = '')
 			
+						
 			request = HttpRequest()
 			img.append( get_FramedImage_by_id(request, c.stock_image_id, 18, '#fff', 
 								1, 10, 'STOCK-IMAGE') )
@@ -574,5 +590,31 @@ def createInitialData(product_id=None):
 		
 		#####Update the uprice & rls in Stock_collage
 		stk = Stock_collage.objects.filter(product_id = i.product_id).update( price = t_price,
-			url = img_file, thumbnail_url = img_thumbnail_file)
+			url = img_file, thumbnail_url = img_thumbnail_file,
+					aspect_ratio = aspect_ratio,
+					key_words = key_words, colors = colors,  max_height = max_height,
+					max_width = max_width, min_width = min_width, orientation = orientation,
+					set_of = len(img)
+				)
+		
+def updateAR(product_id=None):
+
+	collages = Stock_collage.objects.filter(product_id__gt = 52)
+	if product_id:
+		collages = collages.filter(product_id = product_id)
+
+	na = [12, 62, 64, 74, 76, 77]  #Set of 4
+
+	for i in collages:
+		print("Processing Collage ID: " + str(i.product_id))
+		coll = Collage_stock_image.objects.filter(stock_collage = i).exclude(stock_collage_id__in = na).first()
+		if coll:
+			ar = coll.stock_image.aspect_ratio
+		
+		#####Update the uprice & rls in Stock_collage
+		stk = Stock_collage.objects.filter(product_id = i.product_id).update(
+					aspect_ratio = ar
+		)
+
+
 		

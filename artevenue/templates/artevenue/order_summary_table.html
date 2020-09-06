@@ -1,6 +1,22 @@
 {% load static %}
 {% load utils %}
-						
+
+	<div class = "row mb-3">
+		<div class = "col-6 col-md-4">
+			<strong>Number of Orders: {{ ord_cnt | floatformat}}</strong>
+		</div>
+		<div class = "col-6 col-md-4">
+			{% if totals.order_total__sum %}
+			<strong>Total Over Value: {{totals.order_total__sum|default_if_none:'0'|floatformat|indian_number_format}}</strong>
+			{% endif %}
+		</div>
+		<div class = "col-6 col-md-4">
+			{% if totals.order_total__avg %}
+			<strong>Avg Order Value: {{ totals.order_total__avg|default_if_none:'0'|floatformat|indian_number_format}}</strong>
+			{% endif %}		
+		</div>
+	</div>
+	
 	<div class="table table-responsive">
 		<table id = "ordTbl" class="table table-responsive table-striped">
 			<thead>

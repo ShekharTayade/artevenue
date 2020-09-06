@@ -6,7 +6,7 @@ from django.db.models import Count
 from django.contrib.auth.models import User
 
 from artevenue.models import Ecom_site, Main_slider, New_arrival, Promotion, Menu, Stock_image_category
-from artevenue.models import New_arrival_images, Promotion_images, Cart, Business_profile
+from artevenue.models import New_arrival_images, Promotion_images, Cart, Business_profile, UserProfile
 from django.http import HttpResponse
 from django.conf import settings
 
@@ -56,6 +56,7 @@ def admin_menu(request):
 def menubar(request, auth_user):
 
 	ecom = get_object_or_404 (Ecom_site, store_id=settings.STORE_ID )
+	
 	if request:
 		if request.user:
 			business_user = False
@@ -93,26 +94,48 @@ def menubar(request, auth_user):
 				request.session.create()
 				sessionid = request.session.session_key		
 	usercart = {}
-	
-	try:
-		if request:
-			if request.user:
-				if request.user.is_authenticated:
-					userid = User.objects.get(username = request.user)
+	livuser = False
+	livadmin = False
+
+	if request:
+		if request.user:
+			if request.user.is_authenticated:
+				userid = User.objects.get(username = request.user)
+				try:
 					usercart = Cart.objects.get(user_id = userid, cart_status = "AC")
-				else:
-					if sessionid:
+				except Cart.DoesNotExist:
+					usercart = {}
+				try:
+					livprofile = UserProfile.objects.get(user_id = userid)
+				except UserProfile.DoesNotExist:
+					livprofile = None
+				if livprofile:
+					if livprofile.business_profile_id:
+						if livprofile.business_profile_id == 17 and livprofile.user_id != 84:
+							livuser = True	
+
+				## Check for Livspace admin
+				try:
+					bp = Business_profile.objects.get( user=userid)
+					if bp.business_code == 'LIV1':
+						livadmin = True
+				except Business_profile.DoesNotExist:
+						livadmin = False
+					
+			else:
+				if sessionid:
+					try:
 						usercart = Cart.objects.get(session_id = sessionid, cart_status = "AC")
-	
-	except Cart.DoesNotExist:
-			usercart = {}
-	
+					except Cart.DoesNotExist:
+						usercart = {}
+						
 	return {'ecom_site':ecom, 'level0_menuitems':level0_menuitems, 
 			'level1_menuitems':level1_menuitems,
 			'level2_menuitems':level2_menuitems,
 			'usercart':usercart, 'request':request,
 			'level1_menuitems_original_art':level1_menuitems_original_art,
-			'user': request.user, 'auth_user' : auth_user, 'business_user':business_user}
+			'user': request.user, 'auth_user' : auth_user, 'business_user':business_user, 'livuser': livuser,
+			'livadmin': livadmin}
 
 
 @register.inclusion_tag('artevenue/artevenue_text.html')	

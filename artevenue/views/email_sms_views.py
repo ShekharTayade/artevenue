@@ -8,6 +8,8 @@ from django.db.models import F, Q
 from django.conf import settings
 from django.core.mail import send_mail, EmailMultiAlternatives, EmailMessage
 from django.templatetags.static import static
+from smtplib import SMTPException
+
 
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
@@ -549,17 +551,18 @@ def send_corona_alert():
 
 def send_tracking_no_to_cust(order_id=None):
 	today = datetime.datetime.today()
+	sts = True
 	if order_id == None:
-		return
+		return False
 	try:
 		order = Order.objects.get(order_id = order_id)
 	except Order.DoesNotExist:
-		return
+		return False
 	except Order.MultipleObjectsReturned:
-		return
+		return False
 
 	if order.tracking_number is None or order.tracking_number == '':
-		return
+		return False
 
 	order_ids = Order.objects.filter(order_id = order_id).values('order_id')
 	order_items_list = Order_items_view.objects.select_related('product').filter(order_id__in = order_ids,
@@ -573,21 +576,28 @@ def send_tracking_no_to_cust(order_id=None):
 	to = [order.order_billing.email_id]
 	cc = ['']
 
-	emsg = EmailMultiAlternatives(subject, plain_message, from_email, to, cc)
-	emsg.attach_alternative(html_message, "text/html")
-	emsg.send()	
+	try:
+		emsg = EmailMultiAlternatives(subject, plain_message, from_email, to, cc)
+		emsg.attach_alternative(html_message, "text/html")
+		emsg.send()	
+	except SMTPException as e:
+		print('There was an error sending an email: ', e)
+		return False
+	
+	return True
 	
 def send_ord_update_sh(order_id):
 	today = datetime.datetime.today()
+	sts = True
 	if order_id == None:
-		return
+		return False
 		
 	try:
 		order = Order.objects.get(order_id = order_id)
 	except Order.DoesNotExist:
-		return
+		return False
 	except Order.MultipleObjectsReturned:
-		return
+		return False
 
 	order_ids = Order.objects.filter(order_id = order_id).values('order_id')
 	order_items_list = Order_items_view.objects.select_related('product').filter(order_id__in = order_ids,
@@ -602,19 +612,24 @@ def send_ord_update_sh(order_id):
 	to = [order.order_billing.email_id]
 	cc = ['']
 
-	emsg = EmailMultiAlternatives(subject, plain_message, from_email, to, cc)
-	emsg.attach_alternative(html_message, "text/html")
-	emsg.send()	
-	
+	try:
+		emsg = EmailMultiAlternatives(subject, plain_message, from_email, to, cc)
+		emsg.attach_alternative(html_message, "text/html")
+		emsg.send()	
+	except SMTPException as e:
+		print('There was an error sending an email: ', e)
+		return False
+
+	return True
 
 def send_customer_review_emails():
 	
 	today = datetime.datetime.today().date()
-	dt = today + datetime.timedelta(days=-10)
+	dt = today + datetime.timedelta(days=-15)
 	dt_g = today + datetime.timedelta(days=-30)
 	
 	orders = Order_sms_email.objects.filter(
-			(Q(order__order_status = 'SH') | Q(order__order_status = 'IN') | Q(order__order_status = 'CO')),
+			(Q(order__order_status = 'IN') | Q(order__order_status = 'CO')),
 			customer_review_email_sent = False,
 			updated_date__date__lte = dt,
 			updated_date__gt = dt_g
@@ -640,7 +655,7 @@ def send_customer_review_emails():
 		emsg.send()	
 		
 		Oc = Order_sms_email.objects.filter( 
-			(Q(order__order_status = 'SH') | Q(order__order_status = 'IN') | Q(order__order_status = 'CO')),
+			(Q(order__order_status = 'IN') | Q(order__order_status = 'CO')),
 			customer_review_email_sent = False,
 			updated_date__date__lte = dt,
 			updated_date__gt = dt_g,
@@ -666,3 +681,30 @@ def testSMS(num):
 	resp =  sendSMS(SMS_API_KEY, num,
 		'ARTVNE', 'This is a test SMS from artevenue.com')
 	print (resp)
+
+
+def order_status_communication_email():
+	mail_cnt = 0
+	import pdb
+	pdb.set_trace()
+	## Send ready for shipping status
+	from artevenue.models import Order_status_communication
+	orders = Order_status_communication.objects.filter(ready_to_ship_email_sent=False)
+	for o in orders:
+		sts = send_ord_update_sh(o.order_id)
+		if sts:
+			o = Order_status_communication.objects.filter(order_id = o.order_id).update(
+				ready_to_ship_email_sent = True)
+			mail_cnt = mail_cnt + 1
+
+	## Send tracking info
+	from artevenue.models import Order_status_communication
+	orders = Order_status_communication.objects.filter(tracking_info_email_sent=False)
+	for o in orders:
+		sts = send_tracking_no_to_cust(o.order_id)
+		if sts:
+			o = Order_status_communication.objects.filter(order_id = o.order_id).update(
+				ready_to_ship_email_sent = True)
+			mail_cnt = mail_cnt + 1
+			
+	return 	mail_cnt

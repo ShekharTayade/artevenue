@@ -31,25 +31,24 @@
 						<input hidden name = "shipping_cost" value = "{{order.shipping_cost}}">
 
 						<input hidden class="form-control" name="firstname" 
-							id="firstname" value="{{ posted.firstname|default:'' }}" 
-							required/>
+							id="firstname" value="{{ posted.firstname|default_if_none:'' }}" 
+							required />
 						<input hidden class="form-control" name="lastname" 
 							id="lastname" value="{{ posted.lastname }}"/>						
 
 						<input hidden type = "email" class="form-control" 
 							name="email" id="email" 
-							value="{{ posted.email }}" 
-							required/>
+							value="{{ posted.email|default_if_none:' ' }}" 
+							required />
 
 						<input hidden class="form-control" name="phone" 
-							pattern = "^[6-9]\d{9}$" 
-							value="{{ posted.phone|default:'' }}" 
+							value="{{ posted.phone|default_if_none:' '}}" 
 							required />
 						
-						<input hidden name="productinfo" required value="{{ posted.productinfo|default:'' }}" />
-						<input hidden name="surl" value="{{ posted.surl }}" size="64" required/>
-						<input hidden name="furl" value="{{ posted.furl }}" size="64" requied/>
-						<input hidden type="hidden" name="service_provider" value="{{posted.service_provider}}" size="64" required/>
+						<input hidden name="productinfo" required value="{{ posted.productinfo|default_if_none:' ' }}" />
+						<input hidden name="surl" value="{{ posted.surl }}" size="64" required />
+						<input hidden name="furl" value="{{ posted.furl }}" size="64" required />
+						<input hidden type="hidden" name="service_provider" value="{{posted.service_provider}}" size="64" required />
 						<input hidden name="curl" value="{{ posted.furl }}" />
 						<input hidden name="udf1" value="{{ posted.udf1 }}" />
 						<input hidden name="udf2" value="{{ posted.udf2 }}" />
@@ -150,6 +149,31 @@
 									form="order_confirm_form">
 								Make Payment<i class="fa fa-chevron-right"></i>
 							</button>
+						</div>
+						<div class="box-footer row">
+							<div class="col-12 mb-3">
+								<div>Pay Using Any of These Modes</div>
+							</div>
+							<div class="col-3">
+								<img src = "{% static 'img/payment_icons/credit_debit_card.png' %}"
+									alt = "Credit/Debit Cards" width=50 style="margin-left:auto; margin-right:auto;display: block;"> 
+									<p class = "text-center">Credit, Debit Cards</p>
+							</div>
+							<div class="col-3">
+								<img src = "{% static 'img/payment_icons/net_banking.png' %}"
+									alt = "Credit/Debit Cards" width=50  style="margin-left:auto; margin-right:auto;display: block;"> 
+								<p class = "text-center">Net Banking</p>
+							</div>
+							<div class="col-3">
+								<img src = "{% static 'img/payment_icons/upi.png' %}"
+									alt = "Credit/Debit Cards" width=50  style="margin-left:auto; margin-right:auto;display: block;"> 
+								<p class = "text-center">UPI</p>
+							</div>
+							<div class="col-3">
+								<img src = "{% static 'img/payment_icons/wallet.png' %}"
+									alt = "Credit/Debit Cards" width=50 style="margin-left:auto; margin-right:auto;display: block;"> 
+								<p class = "text-center">Wallets</p>
+							</div>
 						</div>
 					</form>
 				</div>

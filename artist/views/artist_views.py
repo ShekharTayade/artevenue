@@ -8,6 +8,7 @@ from django.db import IntegrityError, DatabaseError, Error
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Count, Q, F
+from django.http import HttpResponse, JsonResponse
 
 from artist.models import Artist_group, Artist_sms_email, Artist, Artist_original_art
 from artevenue.models import Country, State, City, Pin_code, Ecom_site, Original_art
@@ -19,9 +20,13 @@ from artist.forms import artistGroupForm, artistRegisterForm, artistUserForm, ar
 from artevenue.forms import registerForm
 
 from artevenue.views import price_views, frame_views
+from artevenue.decorators import is_artist
 
 from django.contrib import messages
 import datetime
+import re
+
+
 
 ecom = Ecom_site.objects.get(pk=settings.STORE_ID)
 wall_colors = ['255,255,255', '255,255,224', '242,242,242', '230,242,255', '65,182,230', '64,224,208', '204,255,204', '128,128,0', '255,255,179', '255,205,72', '255,215,0', '255,230,230', '137,46,58', '255,0,0']
@@ -101,17 +106,22 @@ def artist_registration_confirmation(request, id):
 	return render(request, "artist/artist_registration_confirmation.html", {'artist':artist} )
 
 
-@login_required
-def create_artist_profile(request, id):
-
+@is_artist
+def create_artist_profile(request):
+		
 	try:
-		artist = Artist.objects.get(user_id=id)
+		userObj = User.objects.get(username = request.user)
+		artist = Artist.objects.get(user = userObj)
 	except Artist.DoesNotExist:
-		artist = {}
+		artist = None
+	except User.DoesNotExist:
+		userObj = None
+		artist = None
+		
 	return render(request, "artist/create_artist_profile.html", {'artist':artist} )
 
 @login_required
-def artist_webpage(request, profile_name, cat_id = '', page = 1):
+def artist_webpage(request, url_name, cat_id = '', page = 1):
 	ikeywords = request.GET.get('keywords', '')
 	keywords = ikeywords.split()
 	keyword_filter = False # Turned on only if a keyword filter is present (through the AJAX call)
@@ -122,9 +132,7 @@ def artist_webpage(request, profile_name, cat_id = '', page = 1):
 		page = 1 # default
 
 	try:
-
-		#name = profile_name.replace("_", " ")
-		artist = Artist.objects.get(url_name__icontains=profile_name)
+		artist = Artist.objects.get(url_name__iexact=url_name)
 		form = artistProfileForm(instance=artist)
 	except Artist.DoesNotExist:
 		artist = {}
@@ -594,3 +602,319 @@ def original_art_detail(request, prod_id = ''):
 		'prods':similar_products, 'price':price, 'wishlist_prods':wishlist_prods,
 		'wall_colors':wall_colors} )
 
+@csrf_exempt
+def upload_artist_photo(request):
+	today = datetime.date.today()
+	img_str = ''
+	if request.method == 'POST':
+		from PIL import Image, ExifTags
+		from io import BytesIO
+		import base64
+
+		file = request.FILES.get('file')
+		session_id = request.session.session_key
+		user = None
+		
+		if request.user.is_authenticated:
+			try:
+				user = User.objects.get(username = request.user)
+				artist = Artist.objects.get(user = user)
+			except User.DoesNotExist:
+				user = None
+			except Artist.DoesNotExist:
+				artist = None
+		else:
+			HttpResponse(img_str)
+
+		if artist :
+			artist.profile_photo = file
+			artist.updated_date = today
+			artist.save()
+			
+			im=Image.open(artist.profile_photo)
+			
+			exifData = {}
+			exif_data = im._getexif()
+			if exif_data:
+				for tag, value in exif_data.items():
+					decodedTag = ExifTags.TAGS.get(tag, tag)
+					exifData[decodedTag] = value		
+			
+				if exifData :
+					if 'Orientation' in exifData:
+						if exifData['Orientation'] == 6:
+							im.rotate(90)
+						if exifData['Orientation'] == 3:
+							im.rotate(180)
+						if exifData['Orientation'] == 8:
+							im.rotate(270)
+				
+			buffered = BytesIO()
+			im.save(buffered, format='JPEG')
+			img_data = buffered.getvalue()
+			img_str = base64.b64encode(img_data)						
+
+	return HttpResponse(img_str)
+
+@csrf_exempt
+def validate_url_name(request):
+	
+	url = request.POST.get('url_name', '')
+	artist_id = request.POST.get('artist_id', '')
+	
+	if url == '':
+		return JsonResponse( {'ret_msg': "Url name can't be blank"})
+		
+	if url:		
+		if re.search("^[a-zA-Z0-9_-]+$", url) is None:
+			return JsonResponse( {'ret_msg': "The webpage URL you entered is invalid. It can only contain alphabets, number, '-' & '_' and no blanks spaces are allowed."})
+
+	artist = Artist.objects.filter(url_name = url).exclude(artist_id = artist_id)
+	
+	if artist:
+		return JsonResponse( {'ret_msg': "This URL is already taken. Please choose another URL."})
+	
+	a = Artist.objects.filter(artist_id = artist_id).update(url_name = url)
+	
+	return JsonResponse({'ret_msg': "SUCCESS"})
+
+@csrf_exempt
+@is_artist
+def save_artist_profile(request):
+	if request.method == 'POST':
+		artist_id = request.POST.get("artist_id", "")
+		mode = request.POST.get("mode", "")
+		profile_name = request.POST.get("profile_name", "")
+		url_name = request.POST.get("url_name", "")
+		tag_line = request.POST.get("tag_line", "")
+		profile = request.POST.get("profile", "")
+		a1 = request.POST.get("a1", "")
+		a2 = request.POST.get("a2", "")
+		a3 = request.POST.get("a3", "")
+		a4 = request.POST.get("a4", "")
+		a5 = request.POST.get("a5", "")
+
+		e1 = request.POST.get("e1", "")
+		e2 = request.POST.get("e2", "")
+		e3 = request.POST.get("e3", "")
+		e4 = request.POST.get("e4", "")
+		e5 = request.POST.get("e5", "")
+		
+		achievements = ''
+		if a1:
+			achievements = achievements + a1
+		if a2:
+			achievements = achievements + '<br />'+ a2
+		if a3:
+			achievements = achievements + '<br />'+ a3
+		if a4:
+			achievements = achievements + '<br />'+ a4
+		if a5:
+			achievements = achievements + '<br />'+ a5
+
+		events = ''
+		if e1:
+			events = events + e1
+		if e2:
+			events = events + '<br />'+ e2
+		if e3:
+			events = events + '<br />'+ e3
+		if e4:
+			events = events + '<br />'+ e4
+		if e5:
+			events = events + '<br />'+ e5
+
+		e1 = request.POST.get("#e1", "")
+		e2 = request.POST.get("#e2", "")
+		e3 = request.POST.get("#e3", "")
+		e4 = request.POST.get("#e4", "")
+		e5 = request.POST.get("#e5", "")			
+
+		if request.user.is_authenticated:
+			try:
+				artist = Artist.objects.get(artist_id = artist_id)
+			except Artist.DoesNotExist:
+				artist = None
+
+			if mode == 'NEXT':
+				if not profile_name:
+					return JsonResponse({'ret_msg': "Your display name can't be blank"})					
+				if not url_name:
+					return JsonResponse({'ret_msg': "Your url name can't be blank. this become part of the url of your webpage on our website."})
+				if not profile:
+					return JsonResponse({'ret_msg': "Please include a few words about yourself. This will be displayed on your webpage."})					
+
+			
+			artist.profile_name = profile_name
+			artist.url_name = url_name
+			artist.artist_profile = profile
+			artist.profile_tagline = tag_line
+			artist.artist_showcase1_name = 'ACHIEVEMENTS'
+			artist.artist_showcase1 = achievements
+			artist.artist_showcase2_name = 'EVENTS'
+			artist.artist_showcase2 = events
+			
+			artist.save()
+		else:
+			return JsonResponse({'ret_msg': "FAILURE"})
+
+		return JsonResponse({'ret_msg': "SUCCESS"})
+	else:
+		return JsonResponse({'ret_msg': "FAILURE"})		
+	
+
+@is_artist
+def upload_art(request, part_number=None):
+	today = datetime.date.today()
+	artist = {}
+	artwork = {}
+	if request.user.is_authenticated:
+		try:
+			user = User.objects.get(username = request.user)
+			artist = Artist.objects.get(user = user)
+		except User.DoesNotExist:
+			user = None
+		except Artist.DoesNotExist:
+			artist = None
+	if artist is None:
+		return render(request, "artist/upload_artwork.html", {})
+
+	medium_list = Original_art.MEDIUM
+	surface_list = Original_art.SURFACE
+	img_type_list = Original_art.IMAGE_TYPE
+	category_list = Stock_image_category.objects.all().order_by('name')
+
+	if request.POST:
+		if "SAVE_DRAFT" in request.POST:
+			save_draft = True
+		else:
+			save_draft = False
+			
+		if "SUBMIT_ARTWORK" in request.POST:
+			submit_artwork = True
+		else:
+			submit_artwork = False
+	else:
+		submit_artwork = False
+		save_draft = False
+
+	import pdb
+	pdb.set_trace()
+		
+		
+	if save_draft or submit_artwork :
+		product_id = request.POST.get("product_id", "")
+		file = request.FILES.get('file')
+		art_type = request.POST.get("art_type", "")
+		title = request.POST.get("title", "")
+		category = request.POST.get("category", "")
+		art_width = request.POST.get("art_width", "")
+		art_height = request.POST.get("art_height", "")
+		medium = request.POST.get("medium", "")
+		surface_description = request.POST.get("surface_description", "")
+		art_print_option = request.POST.get("art_print_option", "")
+		original_art_price = request.POST.get("original_art_price", "")
+		keywords = request.POST.get("keywords", "")
+		
+	else:	
+		if part_number:
+			artwork = Artist_art_view.objects.filter(part_number = part_number)
+		
+	return render(request, "artist/upload_artwork.html", {'artist':artist, 'medium_list': medium_list, 'artwork': artwork,
+		'surface_list': surface_list, 'img_type_list': img_type_list, 'product_id': product_id, 'category_list': category_list})
+	
+
+def save_art(request):
+	today = datetime.date.today()
+	art = {}
+	if request.method == 'POST':
+		from PIL import Image, ExifTags
+		from io import BytesIO
+		import base64
+
+		file = request.FILES.get('file')
+		session_id = request.session.session_key
+		user = None
+		
+		if request.user.is_authenticated:
+			try:
+				user = User.objects.get(username = request.user)
+				artist = Artist.objects.get(user = user)
+			except User.DoesNotExist:
+				user = None
+			except Artist.DoesNotExist:
+				artist = None
+		else:
+			return render(request, "artist/show_original_art.html", {'art':art})
+
+		if artist :
+		
+			art = Original_art()
+			
+			IMAGE_TYPE = (
+				('ART', 'Art Work'),
+				('PHT', 'Photograph'),
+			)
+			MEDIUM = (
+				('OIL', 'Oil'),
+				('ACR', 'Acrylic'),
+				('WTR', 'Water Color'),
+				('GOU', 'Gouache'),
+				('INK', 'Ink'),
+				('PEN', 'Pen'),
+				('PST', 'Pastel'),
+				('PNC', 'Pencil'),
+				('COL', 'Charcoal'),
+			)
+			SURFACE = (
+				('CVS', 'Canvas'),
+				('PPR', 'Paper'),
+				('FAB', 'Fabric'),	
+				('GLS', 'Glass'),	
+				('WOD', 'Wood'),	
+			)
+			#product_id = 
+			art.product_type = 'ORIGINAL-ART'
+			art.name = name
+			description = description
+			price = price
+			available_on = None
+			part_number = part_number
+			is_published = False
+			seo_description = None
+			seo_title  = None
+			charge_taxes = True
+			featured = False
+			has_variants = False
+			aspect_ratio = aspect_ratio
+			image_type = image_type
+			orientation = orientation
+			max_width = max_width
+			max_height = max_height
+			min_width = min_width
+			publisher = '0001'
+			artist = artist.artist_id
+			colors = color
+			key_words = key_words
+			url = url
+			thumbnail_url = thumbnail_url
+			high_resolution_url = high_resolution_url
+			art_width = art_width
+			art_height = art_height
+			art_medium = art_medium
+			art_surface = art_surface
+			art_surface_desc = art_surface_desc
+			category_disp_priority = None
+			art_print_allowed = art_print_allowed
+			original_art_price = original_art_price
+			available_qty = available_qty
+			sold_qty = none
+			stock_image = stock_image	
+	#	artist.profile_photo = file
+		art.save()
+		
+		im=Image.open(artist.profile_photo)
+			
+
+	return render(request, "artist/show_original_art.html", {'art':art})
+	

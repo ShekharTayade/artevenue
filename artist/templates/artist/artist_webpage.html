@@ -26,18 +26,19 @@
 		<div class="row mt-3">
 			<div class="col-12">
 				{% if artist.profile_photo %}
-				<!-- <div class = "col-4" style = "border:1px solid #ced4da; border-radius: 0.25rem; padding:15px;"> -->
-					<img class="img-thumbnail img-artist pull-right" src="{{artist.profile_photo.url}}" alt="">
+					<img class="img-thumbnail img-artist pull-right" src="{{artist.profile_photo.url}}" alt="" width=200 align="left">
 				{% endif %}				
 				{% if artist.profile_name %}
 					<span class = "arist-name">
 						{{artist.profile_name}}
 					</span>
 				{% endif %}
+				<br />
 				{% if artist.profile_tagline %}
-					<br /><strong style = "font-style:italic; text-align:justify;">{{artist.profile_tagline}}</strong><br /><br />
+					<strong style = "font-style:italic; text-align:justify;">{{artist.profile_tagline|safe}}</strong>
 				{% endif %}
-				<span id = "tiny-profile" style="text-align:justify;">{{artist.artist_profile|linebreaks|safe}}</span>
+				<br /><br />
+				<span style="text-align:justify;">{{artist.artist_profile|safe}}</span>
 			</div>
 		</div>
 		{% if artist.artist_showcase1_name %}
@@ -50,7 +51,7 @@
 		</div>
 		<div class="row">
 			<div class="col-12 mt-2">
-				{{artist.artist_showcase1|linebreaks|safe}}
+				{{artist.artist_showcase1|safe}}
 			</div>
 		</div>
 		{% endif %}
@@ -64,7 +65,7 @@
 		</div>
 		<div class="row">
 			<div class="col-12 mt-2">
-				{{artist.artist_showcase2|linebreaks|safe}}
+				{{artist.artist_showcase2|safe}}
 			</div>
 		</div>
 		{% endif %}
@@ -78,7 +79,7 @@
 		</div>
 		<div class="row">
 			<div class="col-12 mt-2">
-				{{artist.artist_showcase3|linebreaks|safe}}
+				{{artist.artist_showcase3|safe}}
 			</div>
 		</div>
 		{% endif %}
@@ -152,10 +153,15 @@
 			</div>
 			<!-- END of Products -->
 			{% endif %}
+			{% empty %}
+			<div class="col-12 mt-3">
+				None of my artworks are available at this time
+			</div>
 			{% endfor prods %}
 
 		</div>
 
+		{% if prods %}
 		<div class="box-cat info-bar">
 			<div class="row">
 				<div class="col-md-12 col-lg-12">
@@ -191,7 +197,7 @@
 				</div>
 			</div>
 		</div>		
-		
+		{% endif %}
     </div>
 
 	
@@ -199,23 +205,6 @@
 
 	
 	{% block jscripts %}
-	<script>
-	  tinymce.init({
-		selector: '#id_artist_profile',
-		menubar: false,
-		  plugins: [
-			'advlist autolink lists link image charmap print preview anchor',
-			'searchreplace visualblocks code fullscreen',
-			'insertdatetime media table paste code help wordcount'
-		  ],
-		  toolbar: 'undo redo | formatselect | ' +
-		  ' bold italic backcolor | alignleft aligncenter ' +
-		  ' alignright alignjustify | bullist numlist outdent indent |' +
-		  ' removeformat | help',
-		  content_css: [
-			'//fonts.googleapis.com/css?family=Lato:300,300i,40		
-	  });
-	</script>
 	{% endblock jscripts %}
 			
 	

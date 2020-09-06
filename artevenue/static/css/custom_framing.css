@@ -167,3 +167,8 @@
 .edit-img:hover{
 	color:#11b6bd;	
 }
+
+.ord-curr-val {
+	font-size: 1rem;
+	font-weight: 700;
+}	

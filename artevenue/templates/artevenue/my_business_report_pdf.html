@@ -1,6 +1,7 @@
 <!doctype html>
 {% load utils %}
 {% load static %}
+{% load indian_numbers_tags %}
 <html>
   <head>
     <meta charset="utf-8">
@@ -10,93 +11,108 @@
   </head>
 
   <body>
-		<h1>My Business Report <small>( Ref Code: {{business_code}} )</small></h1>
-		
-		{% if not results %}
-		<div class = "row mt-3 mb-5">
-			<div class = "col-12">
-				<h3>You are yet to get off the mark!</h3>
-				Please start using the business referral code and have your 
-				clients place the orders. Great benefits await you.
-			</div>
-		</div>
-		{% endif %}
-		<div class = "row mt-3 mb-5">
-			<div class = "col-12">
-				<table class = "table table-bordered table-responsive">
-					<thead>
-						<tr>
-							<th>No. of Signed Up Clients</th>
-							<th>No. of Clients with Orders</th>
-							<th>Order Value</th>
-							<th>Referral Fee Earned</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td class = "text-center">
-								<span style = "font-weight:600;">
-									{{client_total|default_if_none:'0'}}
-								</span>
-							</td>
-							<td class = "text-center">
-								<span style = "font-weight:600;">
-									{{clients_with_orders|default_if_none:'0'}}
-								</span>
-							</td>
-							<td class = "text-center">
-								<span style = "font-weight:600;">
-									{{total_order_value|default_if_none:'0'|floatformat}}
-								</span>
-							</td>
-							<td class = "text-center">
-								<span style = "font-weight:600;">
-									{{total_ref_fee|default_if_none:'0'|floatformat}}
-								</span>
-							</td>
-							
-						</tr>
-					</tbody>
-				</table>
-			</div>
-		</div>
-		<div class = "row mt-3 mb-5">
-			<div class = "col-12">
-				<table class = "table table-bordered table-responsive">
-					<thead>
-						<tr>
-							<th>Client</th>
-							<th>Ord #</th>
-							<th>Ord Dt</th>
-							<th>Ord Amt</th>
-							<th>Referral Fee</th>
-							<th>Paid Date</th>
-							<th>Reference</th>
-						</tr>
-					</thead>
-					<tbody>
-						{% for r in results %}
-						<tr>
-							<td>{{r.client}}</td>
-							<td>{{r.order_number}}</td>							
-							<td>{{r.order_date|date:'d M Y'}}</td>
-							<td>{{r.ord_val|floatformat}}</td>
-							<td>{{r.ref_fee|floatformat}}</td>
-							<td>{{r.fee_paid_dt|date:'d M Y'}}</td>
-							<td>{{r.fee_paid_ref}}</td>
-						</tr>
-						{% empty %}
-						<tr>
-							<td colspan = '3'>
-								{{msg}}
-							</td>
-						</tr>
-						{% endfor %}
-					</tbody>
-				</table>
-			</div>
+	<img src="{% static 'img/artevenue_logo_new.png' %}" alt="{{ecom_site.store_name}}"  style="width:110px; height:25px;">
+	<small style = "color: #665d6f; font-family:Helvetica, sans-serif !important; float:right;">www.ArteVenue.com</small>
+	<hr>
+
+	<h1>{{curruser.first_name | upper}} {{curruser.last_name | upper}}<small>(Ref Code: {{business_code}})</small></h1>
+	<h5>Business Report From {{startDt|date:'d-M-Y'}} to {{endDt|date:'d-M-Y'}} </h5>
+	{% if not results %}
+	<div class = "row mt-3 mb-5">
+		<div class = "col-12">
+			<h3>You are yet to get off the mark!</h3>
+			Please start using the business referral code and have your 
+			clients place the orders. Great benefits await you.
 		</div>
 	</div>
+	{% endif %}
+	<table class = "table ">
+		<thead>
+			<tr>
+				{% if livaccnt %}							
+				<th width = "25%" style = "text-align: center;">No. of Designers</th>
+				<th width = "25%" style = "text-align: center;">No. of Designers with Orders</th>
+				{% else %}
+				<th width = "25%" style = "text-align: center;">No. of Signed Up Clients</th>
+				<th width = "25%" style = "text-align: center;">No. of Clients with Orders</th>
+				{% endif %}
+				<th width = "25%" style = "text-align: right;">Order Value(w/o Tax)</th>
+				<th width = "25%" style = "text-align: right;">Referral Fee Earned</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td  style = "text-align: center;">
+					<span style = "font-weight:600;">
+						{{client_total|default_if_none:'0'}}
+					</span>
+				</td>
+				<td style = "text-align: center;">
+					<span style = "font-weight:600;">
+						{{clients_with_orders|default_if_none:'0'}}
+					</span>
+				</td>
+				<td style = "text-align: right;">
+					<span style = "font-weight:600;">
+						{{total_order_value|floatformat|intcomma_indian|default_if_none:'-'}}
+					</span>
+				</td>
+				<td style = "text-align: right;">
+					<span style = "font-weight:600;">
+						{{total_ref_fee|floatformat|intcomma_indian|default_if_none:'-'}}
+					</span>
+				</td>
+				
+			</tr>
+		</tbody>
+	</table>
+	<table class = "table table-bordered table-responsive">
+		<thead>
+			<tr>
+				<th width = "10%" style = "text-align: center;">Ord #</th>
+				<th width = "10%" style = "text-align: center;">Ord Dt</th>
+				{% if livaccnt %}							
+				<th width = "20%">Deginer</th>
+				{% else %}
+				<th width = "20%" style = "text-align: center;">Client</th>
+				{% endif %}
+				<th width = "10%" style = "text-align: right;">Ord Amt</th>
+				<th width = "10%" style = "text-align: right;">Ord Amt(w/o Tax)</th>
+				<th width = "10%" style = "text-align: right;">Referral Fee</th>
+				<th width = "10%" style = "text-align: center;">Paid Date</th>
+				<th width = "20%" style = "text-align: center;">Reference</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for r in results %}
+			<tr>
+				<td style = "text-align: center;">{{r.order_number}}</td>							
+				<td style = "text-align: center;">{{r.order_date|date:'d-M-Y'}}</td>
+				<td style = "text-align: center;">{{r.client}}</td>
+				<td style = "text-align: right;">{{r.ord_val|floatformat|intcomma_indian}}</td>
+				<td style = "text-align: right;">{{r.ord_sub|floatformat|intcomma_indian}}</td>
+				<td style = "text-align: right;">{{r.ref_fee|floatformat|intcomma_indian}}</td>
+				<td style = "text-align: center;">{{r.fee_paid_dt|date:'d M Y'}}</td>
+				<td style = "text-align: center;">{{r.fee_paid_ref}}</td>
+			</tr>
+			{% empty %}
+			<tr>
+				<td colspan = '3'>
+					{{msg}}
+				</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	
+	<br>
+	<br>
+	<hr>
+	<small>PLEASE NOTE: <br>
+			* The referral fee processing happens during first week of a month for the orders placed and paid for
+			during previous months. The referral fee reflects after this proceesing is done. <br>
+			* The referral fee is applicable on the order value before tax.
+	</small>
   </body>
 </html>
 	

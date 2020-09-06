@@ -68,7 +68,7 @@ def add_to_wishlist(request):
 		mount_w_top = None
 		mount_w_bottom = None
 	acrylic_id = request.POST.get('acrylic_id', '0')
-	if acrylic_id == '0' or acrylic_id == 'None':
+	if acrylic_id == '0' or acrylic_id == 'None' or acrylic_id == '':
 		acrylic_id = None
 	if acrylic_id:
 		#acrylic_size = Decimal(request.POST.get('acrylic_size', '0'))
@@ -77,7 +77,7 @@ def add_to_wishlist(request):
 		acrylic_size = None
 	
 	board_id = request.POST.get('board_id', '')
-	if board_id == '0' or board_id == 'None':
+	if board_id == '0' or board_id == 'None' or board_id == '':
 		board_id = None
 	if board_id:
 		#board_size = Decimal(request.POST.get('board_size', '0'))
@@ -86,7 +86,7 @@ def add_to_wishlist(request):
 		board_size = None
 
 	stretch_id = request.POST.get('stretch_id', '0')
-	if stretch_id == '0' or stretch_id == 'None':
+	if stretch_id == '0' or stretch_id == 'None' or stretch_id == '' :
 		stretch_id = None
 	if stretch_id:
 		#stretch_size = Decimal(request.POST.get('stretch_size', '0'))
@@ -941,7 +941,7 @@ def move_item_to_cart(request, wishlist_item_id = None):
 	request.POST['promotion_id'] = wishlistitem.promotion_id or ''
 	
 	err_flg = False
-	res = json.loads( add_to_cart(request).content )
+	res = json.loads( add_to_cart_new(request).content )
 	
 	if not res['err_flg'] :
 		if wishlistitem.product_type_id == 'STOCK-IMAGE':
@@ -959,10 +959,11 @@ def move_item_to_cart(request, wishlist_item_id = None):
 		if items_count == 1:
 			wishlist.delete()
 		else:
-			wl = wishlist.update(quantity = quantity - wishlistitem.quantity, 
-				wishlist_sub_total = wishlist_sub_total - wishlistitem.item_sub_total,
-				wishlist_tax = wishlist_tax - wishlistitem.item_tax,
-				wishlist_total = wishlist_total - wishlistitem.item_total)
+			wl = Wishlist.objects.filter(wishlist_id = wishlistitem.wishlist_id).update(
+				quantity = wishlist.quantity - wishlistitem.quantity, 
+				wishlist_sub_total = wishlist.wishlist_sub_total - wishlistitem.item_sub_total,
+				wishlist_tax = wishlist.wishlist_tax - wishlistitem.item_tax,
+				wishlist_total = wishlist.wishlist_total - wishlistitem.item_total)
 				
 	else:
 		err_flg = True
@@ -1016,7 +1017,7 @@ def move_all_to_cart(request, wishlist_items = None):
 		request.POST['promotion_id'] = wi.promotion_id or ''
 	
 		err_flg = False
-		res = json.loads( add_to_cart(request).content )
+		res = json.loads( add_to_cart_new(request).content )
 	
 	if not res['err_flg'] :
 		for wi in wishlistitems:

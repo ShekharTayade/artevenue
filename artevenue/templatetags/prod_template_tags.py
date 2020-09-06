@@ -6,7 +6,8 @@ import datetime
 from django.db import IntegrityError, DatabaseError, Error
 
 from artevenue.models import Ecom_site, Main_slider, New_arrival, Promotion, Stock_image_category, Moulding_image
-from artevenue.models import New_arrival_images, Promotion_images, Stock_image
+from artevenue.models import New_arrival_images, Promotion_images, Stock_image, UserProfile
+from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.conf import settings
 
@@ -15,7 +16,7 @@ today = datetime.date.today()
 register = template.Library()
 
 @register.inclusion_tag('artevenue/main_slider.html')
-def show_main_slider_section():
+def show_main_slider_section(request):
 	
 	ecom = get_object_or_404 (Ecom_site, store_id=settings.STORE_ID )
 	
@@ -45,8 +46,23 @@ def show_main_slider_section():
 				slide_array.append(p.image_name)
 			for n in new_arr_images:
 				slide_array.append(n.image_name)
-		
-	return {'slide_array':slide_array, 'ecom_site':ecom}
+				
+	#Check if livspace user
+	livuser = False
+	if request:
+		if request.user:
+			if request.user.is_authenticated:
+				usr = User.objects.get(username = request.user)
+				try:
+					livprofile = UserProfile.objects.get(user = usr)
+				except UserProfile.DoesNotExist:
+					livprofile = None
+				if livprofile:
+					if livprofile.business_profile_id:
+						if livprofile.business_profile_id == 17:
+							livuser = True	
+
+	return {'slide_array':slide_array, 'ecom_site':ecom, 'user': request.user, 'livuser': livuser}
 	
 @register.inclusion_tag('artevenue/featured_products.html')
 def show_featured_products_section():

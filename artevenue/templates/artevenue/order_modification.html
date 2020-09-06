@@ -1,0 +1,191 @@
+
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load moulding_url %}
+
+{% block page-title %} 
+	<title>Custom Photo Frames | Top Quality | Full Customization Available</title>
+{% endblock page-title %} 
+{% block page-description %}
+	<meta name="description" content="Online photo printing and framing. Photos, artworks, posters framed and delivered to you. Just upload digital image, have it custom framed and delivered.">
+{% endblock page-description %}
+{% block page-keywords %}
+	<meta name="keywords" content="custom photo frames, online photo printing and framing, frame my photo, fine art photography printing services, custom photography prints, print and frame photos online, online photo framing, online photo printing and framing india, single photo frames online, multiple photo frame online,  cheapest photo print online, online photo printing services">
+{% endblock page-keywords %}
+
+{% block page-author %}
+	<meta name="author" content="Arte'Venue">
+{% endblock page-author %}
+
+{% block jqueryui-stylesheet %}
+<link rel="stylesheet" href="{% static 'vendor/jquery-ui-1.12.1/jquery-ui.min.css' %}">
+{% endblock jqueryui-stylesheet %}
+
+{% block jqueryui-script %}
+<script src="{% static '/vendor/jquery-ui-1.12.1/jquery-ui.min.js' %}"></script>
+{% endblock jqueryui-script %}
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+
+{% block add_to_head %}
+	<link rel="stylesheet" type="text/css" href="{% static 'vendor/slick/slick.css' %}"/>
+	<link rel="stylesheet" type="text/css" href="{% static 'vendor/slick/slick-theme.css' %}"/>	
+	<link rel="stylesheet" href="{% static  'css/custom_framing.css' %}">
+{% endblock add_to_head %}
+
+
+
+	{% block sitecontent %}
+
+	<div id="" class = "container">
+		<div class="row">
+			<div class="col-12">
+				<!-- breadcrumb-->
+				<nav aria-label="breadcrumb">
+					<ol class="breadcrumb">
+						<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+						<li class="breadcrumb-item"><a href="{% url 'order_management' %}">Order Management</a></li>
+						<li class="breadcrumb-item active">Modify Order No: {{ order.order_number }}</li>
+					</ol>
+				</nav>
+			</div>
+		</div>
+		
+		<div class="row">
+			<div class="col-12">
+				<h1 class = "mb-3">
+					MODIFY ORDER
+				</h1>
+			</div>
+		</div>
+
+			<div class = "box mb-3" id = "box_{{order.order_id}}" style = "padding-top:0px; background-color:#f9f9f9;">
+				<div class="row d-flex d-align-items-center" style = "background-color:#f6f6f6; padding:10px;">
+					<div class="col-6" style = "color:#11b6bd;">
+						<h3> <strong>ORDER NUMBER: {{order.order_number}}, Dt: {{order.order_date|date:'d/M/y'}}</strong> <small>(Cart Id: {{order.cart_id}})</small></h3>
+						<h4>
+							<strong>Customer: {{order.order_billing.full_name}}</strong>
+							{% if order.order_billing.Company %}
+								, {{order.order_billing.Company}}
+							{% endif %}
+						</h4>
+					</div>
+					<div class = "col-6">
+						<div class = "form-group">
+							Order Status: {{order.get_order_status_display}}									
+							<div class="invalid-feedback">
+							  {{ error }}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row d-flex d-align-items-center">
+				<div class="col-12 col-md-6">
+					<div id = "s_{{order.order_id}}" style = "font-size:11px;">						
+						{{order.order_shipping.full_name}} 
+						{% if order.order_shipping.Company %}
+							, {{order.order_shipping.Company}}
+						{% endif %}
+						<br />
+						{{order.order_shipping.address_1}}
+						{% if order.order_shipping.address_2 %}
+							{{order.order_shipping.address_2 }}
+						{% endif %}
+						{% if order.order_shipping.address_1 or order.order_shipping.address_2 %}
+							<br />
+						{% endif %}
+						{% if order.order_shipping.land_mark %}
+							{{order.order_shipping.land_mark}}
+							<br />
+						{% endif %}
+						
+						{{order.order_shipping.city}} {{order.order_shipping.state}} {{order.order_shipping.pin_code_id}}
+						<br />
+						Ph: {{order.order_shipping.phone_number}} Email: {{order.order_shipping.email_id}}
+					</div>
+				</div>
+				<div class="col-12 col-md-6">
+					<div id = "b_{{order.order_id}}" style = "font-size:11px;">
+						{{order.order_billing.full_name}} 
+						{% if order.order_billing.Company %}
+							, {{order.order_billing.Company}}
+						{% endif %}
+						{% if order.order_billing.gst_number %}
+							, GST Norder.:{{order.order_billing.gst_number}}
+						{% endif %}
+						
+						<br />
+						{{order.order_billing.address_1}}
+						{% if order.order_billing.address_2 %}
+							{{order.order_billing.address_2 }}
+						{% endif %}
+						{% if order.order_billing.address_1 or order.order_billing.address_2 %}
+							<br />
+						{% endif %}
+						{% if order.order_billing.land_mark %}
+							{{order.order_billing.land_mark}}
+							<br />
+						{% endif %}
+						
+						{{order.order_billing.city}} {{order.order_billing.state}} {{order.order_billing.pin_code_id}}
+						<br />
+						Ph: {{order.order_billing.phone_number}} Email: {{order.order_billing.email_id}}
+					</div>
+				</div>
+			</div>
+			<hr>
+			<div class="row d-flex d-align-items-center">
+				<div class = "col-12 text-center">
+					<button class = "btn btn-primary">
+						Edit the Order Item(s)
+					</button>
+				</div>
+			</div>
+			{% for oi in order_items %}
+			<div class="row d-flex d-align-items-center mt-3">
+				<div class = "col-12 col-md-4">
+					<img src = "{% if oi.product_type_id|cut:' ' == 'USER-IMAGE' %} https://artevenue.com{{MEDIA_URL}}{{oi.product.image_to_frame_thumbnail}} {% else %} {% if env == 'DEV' or env == 'TESTING' %} {{ oi.product.thumbnail_url }} {% else %} {% static oi.product.thumbnail_url %} {% endif %} {% endif %}" style = "width:75px; height:75px; object-fit:contain; float: left;">
+				</div>
+				<div class = "col-12 col-md-8">
+					<div class = "row">
+						<div class="col-12">
+							PRINT SURFACE: <span class = "ord-curr-val">{{oi.print_medium_id}}</span>
+						</div>
+						<div class="col-12">
+							WIDTH: <span class = "ord-curr-val">{{oi.image_width}}</span>
+						</div>
+						<div class="col-12">
+							HEIGHT: <span class = "ord-curr-val">{{oi.image_height}}</span>
+						</div>
+						<div class="col-12 col-md-6">
+							FRAME: <span class = "ord-curr-val">{{oi.moulding_id}}</span>
+						</div>
+						<div class="col-12 col-md-6">
+							MOUNT COLOR: <span class = "ord-curr-val">{{oi.mount_id}}</span>
+						</div>
+						<div class="col-12 col-md-6">
+							MOUNT_SIZE: <span class = "ord-curr-val">{{oi.mount_size}}</span>
+						</div>
+						<div class="col-12 col-md-6">
+							STRETCHED: <span class = "ord-curr-val">{{oi.stretch_id}}</span>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class = "col-12">
+					<hr>
+				</div>
+			</div>
+			{% endfor %}
+		</div>
+	</div>
+	{% endblock sitecontent %}
+
+	
+	{% block jscripts %}
+	{% endblock jscripts %}
+	

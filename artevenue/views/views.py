@@ -5,6 +5,7 @@ from django.db import IntegrityError, DatabaseError, Error
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
+from django.db.models import Count, Q, Max, Sum
 
 from django.shortcuts import render,redirect
 from django.contrib import messages
@@ -235,9 +236,6 @@ def get_addr_pin_city_state(request):
 	city = {}
 	cstate = {}
 	country = {}
-
-	import pdb
-	pdb.set_trace()
 
 	if ipin_code :
 		pin_codeObj = Pin_code.objects.filter(pin_code = ipin_code)
@@ -601,17 +599,17 @@ def update_category_disp_priority():
 		if p.banner_image_codes:
 			ids = p.banner_image_codes.replace(' ','')
 			ids = ids.split(",")
-			cnt = 0
+			cnt = 5
 			for i in ids:
 				if i is None or i == '':
 					continue
 				print("Updating..." + " Category: " + p.name + ", Id: " + str(i) )
 				cnt = cnt + 1
 				pr = (-1) * cnt
-				prod = Stock_image.objects.filter(product_id = i).update(category_disp_priority = pr)					
+				prod = Stock_image.objects.filter(product_id = i).update(category_disp_priority = pr)
 				if prod < 1:
 					print("ID " + str(i) + " not found in category " + p.name)
-				
+
 				# check is this exists in respective curated category,
 				# if not add it
 				c = Curated_collection.objects.filter(product_id = i).first()
@@ -622,12 +620,10 @@ def update_category_disp_priority():
 						product_id = i,
 						product_type_id = 'STOCK-IMAGE'
 					)
-					
+
 					cc.save()
-					
-					
 	return
-		
+
 
 def update_curated_collections():
 	from pathlib import Path
@@ -666,5 +662,568 @@ def update_curated_collections():
 			n.save()
 	print ("Count: " + str(cnt))
 				
+
+
+@staff_member_required
+def order_management(request):
+	return render(request, "artevenue/order_management.html")
+	
+				
+@staff_member_required
+def manage_order_details(request):
+	today = datetime.datetime.today()
+	msg = None
+
+	if request.method == 'POST':		
+	
+		from artevenue.models import Order_sms_email, Voucher_used, Payment_details
+		
+		order_id = request.POST.get("order_id", "")
+		process_order = request.POST.get("process_order", "")
+		cancel_order = request.POST.get("cancel_order", "")
+
+		order = Order.objects.filter(order_id = order_id).first()
+		if order:
+			cart = Cart.objects.filter(cart_id = order.cart_id).first()
+		else:	
+			cart = None
+			
+		if order_id:
+			order = Order.objects.filter(order_id = order_id).first()
+			if order:
+				cart = Cart.objects.filter(cart_id = order.cart_id).first()
+			else:	
+				cart = None
+		else:
+			order = None
+			cart = None
+		
+		if process_order == "PROCESS PAYMENT":
+			o = Order.objects.filter(order_id = order_id).update(
+				order_status = 'PC', order_date = today.date(),
+				updated_date = today)
+			c = Cart.objects.filter(cart_id = order.cart_id).update(cart_status = 'CO',
+				updated_date = today)
+			
+			## Update referral records, if any
+			if order.referral_disc_amount:
+				if order.referral_disc_amount > 0:
+					## Get referral record
+					ref = Referral.objects.filter(id = order.referral_id)					
+					## Check if user is a referrer or referee and update accordingly 
+					for r in ref:
+						if r.referred_by == order.user:
+							ref_upd = Referral.objects.filter(id = order.referral_id).update(
+								referred_by_claimed_date = today)
+						elif r.email_id == order.user.email:
+							ref_upd = Referral.objects.filter(id = order.referral_id).update(
+								referee_claimed_date = today)			
+			
+			## Update the voucher used table, if a voucher was used
+			if order.voucher_id and order.user:
+				vu = Voucher_used( 
+					voucher_id = order.voucher_id,
+					user = order.user,
+					created_date = today,
+					updated_date = today
+				)
+				vu.save()
+			
+
+			# Update email, sms table
+			o_email = Order_sms_email(
+				order = order,
+				customer_email_sent = False,
+				factory_email_sent = False,
+				customer_sms_sent = False,
+				factory_sms_sent = False,
+				created_date = today,	
+				updated_date = today,
+				customer_review_email_sent = False,
+				customer_review_sms_sent = False
+			)
+			o_email.save()
+			
+			# Save the registration, subscription, payment, promotion code details 
+			paymnt = Payment_details(
+						first_name = order.order_billing.full_name,
+						last_name = '',
+						phone_number = order.order_billing.phone_number,
+						email_id = order.order_billing.email_id,
+						rec_id = order_id,
+						payment_date = datetime.datetime.now(),
+						amount = order.order_total,
+						payment_txn_status = 'success',
+						payment_txn_id = 'MANUAL',
+						payment_txn_amount=None,
+						payment_txn_posted_hash='',
+						payment_txn_key='',
+						payment_txn_productinfo= "Order Number " + order.order_number,
+						payment_txn_email='',
+						payment_txn_salt='',
+						payment_firstname = '',
+						payment_lastname = '',
+						payment_email = '',
+						payment_phone = '',
+						payment_address1 = '',
+						payment_address2 = '',
+						payment_city = '',
+						payment_state = '',
+						payment_country = '',
+						payment_zip_code = '',
+						trn_type = 'ORD'
+					)
+
+			paymnt.save()
+			msg = "PAYMENT FOR THIS ORDER IS PROCESSED"
+
+		elif cancel_order == "CANCEL ORDER":
+			o = Order.objects.filter(order_id = order_id).update(
+				order_status = 'CN', 
+				updated_date = today)
+			c = Cart.objects.filter(cart_id = order.cart_id).update(cart_status = 'AB',
+				updated_date = today)
+			msg = "THIS ORDER IS CANCELLED"
+
+		## Refetch order and cart to get updated status
+		order = Order.objects.filter(order_id = order_id).first()
+		if order:
+			cart = Cart.objects.filter(cart_id = order.cart_id).first()
+		else:	
+			cart = None
+			
+			
+	## GET request
+	else:
+		order_num = request.GET.get("order_num", "")
+		cart_id = request.GET.get("cart_id", "")
+		if order_num:
+			order = Order.objects.filter(order_number = order_num).first()
+			if order:
+				cart = Cart.objects.filter(cart_id = order.cart_id).first()
+			else:	
+				cart = None
+		elif cart_id:
+			cart = Cart.objects.filter(cart_id = cart_id).first()
+			order = Order.objects.filter(cart = cart).first()
+		else:
+			order = None
+			cart = None
+
+	
+	cartitems = Cart_item_view.objects.select_related('product').filter(cart = cart,
+				product__product_type_id = F('product_type_id') ).order_by('product_id')
+	orderitems = Order_items_view.objects.select_related('product').filter(order = order,
+				product__product_type_id = F('product_type_id') ).order_by('product_id')
+			
+	return render(request, "artevenue/manage_order_details.html",
+		{ 'msg': msg, 'env': env,
+		 'order': order, 'cart': cart,
+		 'orderitems': orderitems, 'cartitems': cartitems})	
+	
+@staff_member_required
+def start_production(request):
+
+	orders = Order.objects.filter(order_status = 'PC').order_by('order_date')
+	orderitems = Order_items_view.objects.select_related('product').filter(order__in = orders,
+				product__product_type_id = F('product_type_id') ).order_by('product_id')
+	
+	c_ids = orderitems.values('product_id')
+	collage = Collage_stock_image.objects.filter(stock_collage_id__in = c_ids).order_by('stock_collage_id')
+	
+	msg = ""
+	return render(request, "artevenue/orders_start_production.html",
+		{ 'msg': msg, 'env': env, 'ord_cnt': orders.count(),
+		 'new_orders': orders, 'orderitems': orderitems, 'collage': collage})	
+
+def set_in_production(request):
+	today = datetime.datetime.today()
+	sts = 'SUCCESS'
+	order_id = request.GET.get('order_id', '');
+	if order_id != None and order_id != '' :
+		try:
+			order = Order.objects.get(order_id = order_id)
+		except Order.DoesNotExist:
+			order = None
+			sts = 'FAILURE'
+		if order:
+			o = Order.objects.filter(order_id = order.order_id).update(
+				order_status = 'PR', updated_date =  today)
+	else:
+		sts = 'FAILURE'
+	return JsonResponse({"status":sts})
+
+
+@staff_member_required
+def make_ready_for_shipping(request):
+
+	orders = Order.objects.filter(order_status = 'PR').order_by('order_date')
+	orderitems = Order_items_view.objects.select_related('product').filter(order__in = orders,
+				product__product_type_id = F('product_type_id') ).order_by('product_id')
+	
+	c_ids = orderitems.values('product_id')
+	collage = Collage_stock_image.objects.filter(stock_collage_id__in = c_ids).order_by('stock_collage_id')
+	
+	msg = ""
+	return render(request, "artevenue/make_ready_for_shipping.html",
+		{ 'msg': msg, 'env': env, 'ord_cnt': orders.count(),
+		 'new_orders': orders, 'orderitems': orderitems, 'collage': collage})	
+		 
+def set_ready_for_shipping(request):
+	today = datetime.datetime.today()
+	sts = 'SUCCESS'
+	order_id = request.GET.get('order_id', '');
+	
+	if order_id != None and order_id != '' :
+		try:
+			order = Order.objects.get(order_id = order_id)
+		except Order.DoesNotExist:
+			order = None
+			sts = 'FAILURE'
+		if order:
+			o = Order.objects.filter(order_id = order.order_id).update(
+				order_status = 'SH', updated_date =  today)
+				
+			if order.invoice_number == '':		# If ready for shipping, generate the invoice number
+				from artevenue.views.invoice_views import get_next_invoice_number
+				inv_num = get_next_invoice_number()
+				ord = Order.objects.filter(order_id = order.order_id).update(
+					invoice_number = inv_num, invoice_date = today)
+			
+			# Send email to customer - Ready for shipping
+			#from artevenue.views import email_sms_views
+			#email_sms_views.send_ord_update_sh(order_id)
+			from artevenue.models import Order_status_communication
+			os = Order_status_communication.objects.filter(order_id = order.order_id).first()
+			if os:
+				oe = Order_status_communication.objects.filter(order_id = order.order_id).update(
+					ready_to_ship_sms_sent = False,
+					ready_to_ship_email_sent = False
+				)
+
+			else:
+				oe = Order_status_communication(
+					order_id = order.order_id,
+					tracking_info_sms_sent = False,
+					tracking_info_email_sent = False,
+					in_production_sms_sent = False,
+					in_production_email_sent = False,
+					ready_to_ship_sms_sent = False,
+					ready_to_ship_email_sent = False
+				)
+				oe.save()
+	else:
+		sts = 'FAILURE'
+	return JsonResponse({"status":sts})
+
+	
+@staff_member_required
+def order_shipping(request):
+	from artevenue.models import Shipper, Shipping_method
+
+	orders = Order.objects.filter(order_status = 'SH').order_by('order_date')
+	orderitems = Order_items_view.objects.select_related('product').filter(order__in = orders,
+				product__product_type_id = F('product_type_id') ).order_by('product_id')
+	
+	c_ids = orderitems.values('product_id')
+	collage = Collage_stock_image.objects.filter(stock_collage_id__in = c_ids).order_by('stock_collage_id')
+	
+	shippers = Shipper.objects.all().order_by('name')
+	shipping_methods = Shipping_method.objects.all().order_by('name')
 	
 	
+	msg = ""
+	return render(request, "artevenue/order_shipping.html",
+		{ 'msg': msg, 'env': env, 'ord_cnt': orders.count(),
+		 'orders': orders, 'orderitems': orderitems, 'collage': collage,
+		 'shippers': shippers, 'shipping_methods': shipping_methods})	
+
+def make_in_transit(request):	
+	today = datetime.datetime.today()
+	sts = 'SUCCESS'
+	order_id = request.GET.get('order_id', '');
+	order_number = request.GET.get('order_number', '');
+	shipper = request.GET.get('shipper', '');
+	method = request.GET.get('method', '');
+	track_no = request.GET.get('track_no', '');
+	track_url = request.GET.get('track_url', '');
+	ship_date = request.GET.get('ship_date', '');
+	
+	if shipper == '':
+		sts = 'FAILURE'
+		msg = 'Please select the shipper'
+	
+	if method == '':
+		sts = 'FAILURE'
+		msg = 'Please select the shipping method'
+
+	if ship_date != '':
+		shipDt = datetime.datetime.strptime(ship_date, "%Y-%m-%d")
+	else:
+		shipDt = None
+
+	if sts == 'FAILURE':
+		orders = Order.objects.filter(order_status = 'SH').order_by('order_date')
+		orderitems = Order_items_view.objects.select_related('product').filter(order__in = orders,
+					product__product_type_id = F('product_type_id') ).order_by('product_id')
+		
+		c_ids = orderitems.values('product_id')
+		collage = Collage_stock_image.objects.filter(stock_collage_id__in = c_ids).order_by('stock_collage_id')
+		
+		shippers = Shipper.objects.all().order_by('name')
+		shipping_methods = Shipping_method.objects.all().order_by('name')
+		return render(request, "artevenue/order_shipping.html",
+			{ 'msg': msg, 'env': env, 'ord_cnt': orders.count(), 'order_number': order_number,
+			 'orders': orders, 'orderitems': orderitems, 'collage': collage,
+			 'shippers': shippers, 'shipping_methods': shipping_methods})	
+		
+	if order_id != None and order_id != '' :
+		try:
+			order = Order.objects.get(order_id = order_id)
+		except Order.DoesNotExist:
+			order = None
+			sts = 'FAILURE'
+		if order:
+			o = Order.objects.filter(order_id = order.order_id).update(
+				order_status = 'IN', shipper_id = shipper,
+				shipping_method_id = method, tracking_number = track_no,
+				shipment_date = shipDt, tracking_url = track_url,
+				updated_date =  today)				
+
+			## Email to customer, in case tracking number is updated			
+			if track_no != '' :
+				from artevenue.models import Order_status_communication
+				os = Order_status_communication.objects.filter(order_id = order.order_id).first()
+				if os:
+					oe = Order_status_communication.objects.filter(order_id = order.order_id).update(
+						tracking_info_sms_sent = False,
+						tracking_info_email_sent = False
+					)
+
+				else:
+					oe = Order_status_communication(
+						order_id = order.order_id,
+						tracking_info_sms_sent = False,
+						tracking_info_email_sent = False,
+						in_production_sms_sent = False,
+						in_production_email_sent = False,
+						ready_to_ship_sms_sent = False,
+						ready_to_ship_email_sent = False
+					)
+					oe.save()
+
+	else:
+		sts = 'FAILURE'
+	return JsonResponse({"status":sts})
+
+
+def order_dashboard(request):
+	today = datetime.datetime.today()
+	filter_applied = False
+	
+	startDt = ''
+	endDt = ''	
+	page = request.POST.get('page', 1)
+	
+	order_number = request.POST.get('order_number', '')
+	order_status = request.POST.getlist('ORDER_STATUS')
+
+	f_new = False
+	f_in_production = False
+	f_ready_for_shipping = False
+	f_in_transit = False
+	for o in order_status:
+		if o == 'NEW':
+			f_new = True
+			filter_applied = True
+		if o == 'IP':
+			f_in_production = True
+			filter_applied = True
+		if o == 'RS':
+			f_ready_for_shipping = True
+			filter_applied = True
+		if o == 'IN':
+			f_in_transit = True
+			filter_applied = True
+			
+			
+	user_name = request.POST.get('user_name', '')
+	user_email = request.POST.get('user_email', '')
+	user_phone = request.POST.get('user_phone', '')
+	printpdf = request.POST.get('printpdf', '')
+	
+	if printpdf == '':
+		printpdf = request.POST.get('printpdf', 'NO')
+
+	from_date = request.POST.get("fromdate", '')
+	if from_date != '' :
+		startDt = datetime.datetime.strptime(from_date, "%Y-%m-%d")
+		filter_applied = True
+		
+	to_date = request.POST.get("todate", '')
+	if to_date != '' :
+		endDt = datetime.datetime.strptime(to_date, "%Y-%m-%d")
+		filter_applied = True
+		
+	orders = Order.objects.exclude(order_status = 'CN').exclude(
+				order_status = 'PP').exclude(order_status = 'CO').order_by('-order_date')
+
+	if order_number:
+		orders = orders.filter(order_number = order_number)
+		filter_applied = True
+	if user_email:
+		orders = orders.filter(user__email__iexact = user_email)
+		filter_applied = True
+	if user_phone:
+		orders = orders.filter(order_billing__phone_number = user_phone)
+		filter_applied = True
+	if user_name:
+		orders = orders.filter(order_billing__full_name__icontains = user_name)
+		filter_applied = True
+	if startDt:
+		orders = orders.filter(order_date__gte = startDt)
+		filter_applied = True
+	if endDt:
+		orders = orders.filter(order_date__lte = endDt)
+		filter_applied = True
+		
+	f = Q()
+	if f_new:
+		f = Q(order_status = 'PC')
+		#orders = orders.filter(order_status = 'PC')
+	if f_in_production:	
+		f = (f | Q(order_status = 'PR'))
+		#orders = orders.filter(order_status = 'PR')
+	if f_ready_for_shipping:
+		f = (f | Q(order_status = 'SH'))
+		#order = orders.filter(order_status = 'SH')
+	if f_in_transit:	
+		f = (f | Q(order_status = 'IN'))
+		#orders = orders.filter(order_status = 'IN')
+
+	orders = orders.filter(f)
+		
+	new = orders.filter(order_status = 'PC').count()
+	in_prod = orders.filter(order_status = 'PR').count()
+	ready_for_shipping = orders.filter(order_status = 'SH').count()
+	in_transit = orders.filter(order_status = 'IN').count()	
+
+	orderitems = Order_items_view.objects.select_related('product').filter(order__in = orders,
+				product__product_type_id = F('product_type_id') ).order_by('product_id')
+	c_ids = orderitems.values('product_id')
+	collage = Collage_stock_image.objects.filter(stock_collage_id__in = c_ids).order_by('stock_collage_id')
+
+	return render(request, "artevenue/order_dashboard_details.html",
+		{ 'ord_cnt': orders.count(), 'order': orders, 'order_number': order_number,
+		 'orders': orders, 'orderitems': orderitems, 'collage': collage,
+		 'startDt':startDt, 'endDt':endDt, 'user_email':user_email, 'user_phone':user_phone, 'user_name': user_name,
+		 'new':new, 'in_prod':in_prod, 'ready_for_shipping':ready_for_shipping, 'in_transit':in_transit,
+		'f_new': f_new, 'f_in_production' :f_in_production, 'f_ready_for_shipping' :f_ready_for_shipping,
+		'f_in_transit' :f_in_transit, 'filter_applied' : filter_applied
+
+		 })	
+
+def print_pf_labels (request, order_id):
+	from django.template.loader import render_to_string
+	from weasyprint import HTML, CSS
+	from django.core.files.storage import FileSystemStorage
+	from artevenue.models import Publisher
+	
+	order = Order.objects.filter(order_id = order_id).first()
+	orderitems = Order_items_view.objects.select_related('product').filter(order = order,
+				product__product_type_id = F('product_type_id') ).order_by('product_id')
+	
+	c_ids = orderitems.values('product_id')
+	collage = Collage_stock_image.objects.filter(stock_collage_id__in = c_ids).order_by('stock_collage_id')
+
+	publ = Publisher.objects.all()
+
+	html_string = render_to_string('artevenue/printing_framing_label.html', {
+		'order': order, 'orderitems': orderitems, 'collage': collage, 'MEDIA_URL':settings.MEDIA_URL,
+		'ecom_site':ecom, 'publ': publ, 'env': env})
+
+	html = HTML(string=html_string, base_url=request.build_absolute_uri())
+	html.write_pdf(target= settings.TMP_FILES + order.order_number + '_printing_framing_label.pdf',
+					presentational_hints=True);
+	
+	fs = FileSystemStorage(settings.TMP_FILES)
+	with fs.open(order.order_number + '_printing_framing_label.pdf') as pdf:
+		response = HttpResponse(pdf, content_type='application/pdf')
+		response['Content-Disposition'] = 'attachment; filename="' + order.order_number + '_printing_framing_label.pdf"'
+		return response	
+
+@staff_member_required
+def order_delivery(request):
+	from artevenue.models import Shipper, Shipping_method
+
+	orders = Order.objects.filter(order_status = 'IN').order_by('order_date')
+	orderitems = Order_items_view.objects.select_related('product').filter(order__in = orders,
+				product__product_type_id = F('product_type_id') ).order_by('product_id')
+	
+	c_ids = orderitems.values('product_id')
+	collage = Collage_stock_image.objects.filter(stock_collage_id__in = c_ids).order_by('stock_collage_id')
+	
+	shippers = Shipper.objects.all().order_by('name')
+	shipping_methods = Shipping_method.objects.all().order_by('name')
+	
+	
+	msg = ""
+	return render(request, "artevenue/order_delivery.html",
+		{ 'msg': msg, 'env': env, 'ord_cnt': orders.count(),
+		 'orders': orders, 'orderitems': orderitems, 'collage': collage,
+		 'shippers': shippers, 'shipping_methods': shipping_methods})	
+
+def set_order_delivery(request):
+	today = datetime.datetime.today()
+	sts = 'SUCCESS'
+	order_id = request.GET.get('order_id', '');
+	delivery_date = request.GET.get('delivery_date', '');
+	
+	if delivery_date != '':
+		deliveryDt = datetime.datetime.strptime(delivery_date, "%Y-%m-%d")
+	else:
+		deliveryDt = None
+
+
+	if order_id != None and order_id != '' :
+		try:
+			order = Order.objects.get(order_id = order_id)
+		except Order.DoesNotExist:
+			order = None
+			sts = 'FAILURE'
+		if order:
+			o = Order.objects.filter(order_id = order.order_id).update(
+				order_status = 'CO', delivery_date = deliveryDt, updated_date =  today)
+	else:
+		sts = 'FAILURE'
+	return JsonResponse({"status":sts})
+	
+	
+@staff_member_required
+def order_modification( request, order_id ):
+	today = datetime.datetime.today()
+	msg = None
+
+	if order_id:
+		order = Order.objects.filter(order_id = order_id).first()
+		if order:
+			cart = Cart.objects.filter(cart_id = order.cart_id).first()
+		else:	
+			cart = None
+	else:
+		order = None
+		cart = None
+
+	if order:
+		order_items = Order_items_view.objects.select_related('product').filter(order = order,
+					product__product_type_id = F('product_type_id') ).order_by('product_id')
+		c_ids = order_items.values('product_id')
+		collage = Collage_stock_image.objects.filter(stock_collage_id__in = c_ids).order_by('stock_collage_id')
+	else: 
+		order_items = None
+		collage = None
+
+	return render(request, "artevenue/order_modification.html",
+			{ 'msg': msg, 'env': env,
+			 'order': order, 'order_items': order_items, 'collage': collage,
+			 })	

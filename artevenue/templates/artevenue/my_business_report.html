@@ -1,5 +1,6 @@
 {% load static %}
-		<h1><small>Ref Code: {{business_code}}</small></h1>
+		<h1>{{curruser.first_name | upper}} {{curruser.last_name | upper}}<small>(Ref Code: {{business_code}})</small></h1>
+		<h4>Business Report From {{startDt|date:'d-M-Y'}} to {{endDt|date:'d-M-Y'}}</h4>
 		
 		{% if results.count == 0 %}
 		<div class = "row mt-3 mb-5">
@@ -12,12 +13,17 @@
 		{% endif %}
 		<div class = "row mt-3 mb-5">
 			<div class = "col-12">
-				<table class = "table table-bordered table-responsive">
+				<table class = "table table-bordered table-responsive" style = "border: none;">
 					<thead>
 						<tr>
+							{% if livaccnt %}							
+							<th>No. of Designers</th>
+							<th>No. of Designers with Orders</th>
+							{% else %}
 							<th>No. of Signed Up Clients</th>
 							<th>No. of Clients with Orders</th>
-							<th>Order Value</th>
+							{% endif %}
+							<th>Order Value(w/o Tax)</th>
 							<th>Referral Fee Earned</th>
 						</tr>
 					</thead>
@@ -51,40 +57,42 @@
 		</div>
 		<div class = "row mt-3 mb-5">
 			<div class = "col-12">
-				<table class = "table table-bordered table-responsive">
+				<table class = "table table-bordered table-responsive"  style = "border: none;">
 					<thead>
 						<tr>
-							<th>Client</th>
-							<th>Ord #</th>
-							<th>Ord Dt</th>
-							<th>Ord Amt</th>
-							<th>Referral Fee</th>
-							<th>Paid Date</th>
-							<th>Reference</th>
-							<th></th>
+							<th width = "10%">Ord #</th>
+							<th width = "10%">Ord Dt</th>
+							{% if livaccnt %}
+							<th width = "20%">Designer</th>
+							{% else %}
+							<th width = "20%">Client</th>
+							{% endif %}
+							<th width = "10%">Ord Amt</th>
+							<th width = "10%">Ord Amt(w/o Tax)</th>
+							<th width = "10%">Referral Fee</th>
+							<th width = "10%">Date Of Payment</th>
+							<th width = "20%">Reference</th>
 						</tr>
 					</thead>
 					<tbody>
 						{% for r in results %}
 						<tr>
-							<td>								
-								{{r.client}}
-							</td>
 							<td><a href = "{% url 'my_client_order_report' r.id %}" style="text-decoration:underline;">
 								{{r.order_number}}
 								</a>
 							</td>
-							<td>{{r.order_date|date:'d M Y'}}</td>
+							<td>{{r.order_date|date:'d-M-Y'}}</td>
+							<td><a href = "{% url 'my_client_order_report' r.id %}" style="text-decoration:underline;">
+								{{r.client}}
+							</td>
 							<td>{{r.ord_val|floatformat}}</td>
+							<td>{{r.ord_sub|floatformat}}</td>
 							<td>{{r.ref_fee|floatformat}}</td>
 							<td>{{r.fee_paid_dt|date:'d M Y'}}</td>
-							<td>{{r.fee_paid_ref}}</td>
-							<td>{% if r.deferred_payment %} Your payment for this order is outstanding. Referral fee will be processed after this due payment is cleared. {% endif %}</td>
-						</tr>
-						{% empty %}
-						<tr>
-							<td colspan = '3'>
-								{{msg}}
+							<td>{% if r.deferred_payment %} Your payment for this order is outstanding. Referral fee will be processed after this due payment is cleared. 
+								{% else %}
+								{{r.fee_paid_ref}}
+								{% endif %}
 							</td>
 						</tr>
 						{% endfor %}
@@ -92,13 +100,22 @@
 				</table>
 			</div>
 		</div>
-		
+		<hr>
+		<div class = "row mt-3 mb-5">
+			<div class = "col-12" style = "font-size: 0.6rem;">
+				PLEASE NOTE: <br>
+				* The referral fee processing happens during first week of a month for the orders placed and paid for
+				during previous months. The referral fee reflects after this proceesing is done. <br>
+				* The referral fee is applicable on the order value before tax.
+			</di>
+		</div>
 		<div class = "row mt-3 mb-5">
 			<div class = "col-12">
-				<form action = "{% url 'my_business_report' %}">
+				<form action = "{% url 'my_business_report' %}" method = 'POST'>
+				{% csrf_token %}
 				<input hidden name='printpdf' value = 'TRUE'>
-				<input hidden name = "fromdate" id = "fromdate_pdf" value = "$('#fromdate').val();">
-				<input hidden name = "todate" id = "todate_pdf" value = "$('#todate').val();">
+				<input hidden name = "fromdate" id = "fromdate_pdf">
+				<input hidden name = "todate" id = "todate_pdf">
 				<button class = "btn btn-primary"
 					type = "submit">
 					<i class = "fa fa-download">

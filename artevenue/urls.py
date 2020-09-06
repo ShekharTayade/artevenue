@@ -65,7 +65,17 @@ urlpatterns = [
 	
 	url(r'^sign-up/$', views.register, name='register'),
 	path('sign-up/<int:signup_popup>', views.register, name='register'),
-	
+
+
+	url(r'^livspace-login/$', views.livspace_login, name='livspace_login'),	
+	url(r'^livspace-register/$', views.livspace_register, name='livspace_register'),
+	url(r'^livspace-accounts-of-designers/$', views.livspace_accounts_of_designers, name='livspace_accounts_of_designers'),	
+	url(r'^ajax/remove-liv-accnt/$', views.remove_liv_accnt, name='remove_liv_accnt'),
+	url(r'^livspace-login-invalid/$', views.livspace_login_error, name='livspace_login_error'),
+	url(r'^livspace-login-error/$', views.livspace_login_error, name='livspace_login_error'),
+	url(r'^livspace-login-test/$', views.livspace_login_test, name='livspace_login_test'),
+		
+
 	url(r'^newsletter-subscription/$', views.newsletter_subscription_confirmation, name='newsletter_subscription'),
 
 
@@ -218,5 +228,21 @@ urlpatterns = [
 	url(r'^how-to-hang-a-painting/', views.how_to_hang, name='how_to_hang'),	
 	url(r'^how-to-select-painting-size/', views.how_to_size, name='how_to_size'),
 
+	url(r'^order-management/', views.order_management, name='order_management'),	
+	url(r'^manage-order-details/', views.manage_order_details, name='manage_order_details'),	
+	path('order-modification/<int:order_id>', views.order_modification, name='order_modification'),
+
+	url(r'^start-production/', views.start_production, name='start_production'),
+	url(r'^ajax/set-in-production/$', views.set_in_production, name='set_in_production'),
+	url(r'^make-ready-for-shipping/', views.make_ready_for_shipping, name='make_ready_for_shipping'),
+	url(r'^ajax/set-ready-for-shipping/$', views.set_ready_for_shipping, name='set_ready_for_shipping'),
+	url(r'^order-shipping/', views.order_shipping, name='order_shipping'),
+	url(r'^ajax/make-in-transit/$', views.make_in_transit, name='make_in_transit'),
+	url(r'^order-dashboard/', views.order_dashboard, name='order_dashboard'),
+	path('print-pf-labels/<int:order_id>', views.print_pf_labels, name='print_pf_labels'),
+	url(r'^order-delivery/', views.order_delivery, name='order_delivery'),
+	url(r'^ajax/set-order-delivery/$', views.set_order_delivery, name='set_order_delivery'),
+
+	
 	] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

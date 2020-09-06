@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.db import IntegrityError, DatabaseError, Error
 from django.contrib.auth.models import User
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-from django.db.models import Count, Q, Max, Sum, F
+from django.db.models import Count, Q, Max, Sum, F, Avg
 from datetime import datetime
 import datetime
 
@@ -18,6 +18,10 @@ from artevenue.models import Order, Order_items_view, Ecom_site, Business_referr
 from artevenue.models import Business_profile
 from artevenue.models import Cart, Cart_item_view
 
+from django.core.files.storage import FileSystemStorage
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from weasyprint import HTML, CSS
 
 today = datetime.datetime.today()
 ecom_site = Ecom_site.objects.get(store_id=settings.STORE_ID )
@@ -38,7 +42,7 @@ def get_order_summary(request):
 	if to_date != '' :
 		endDt = datetime.datetime.strptime(to_date, "%Y-%m-%d")
 
-	order_list = Order.objects.all().order_by('invoice_date')
+	order_list = Order.objects.exclude(order_status = 'CN').order_by('invoice_date')
 	
 	order_items_list = {}
 	if startDt:
@@ -51,7 +55,9 @@ def get_order_summary(request):
 
 	## Totals
 	totals = order_list.aggregate(Sum('unit_price'), Sum('quantity'), Sum('order_discount_amt'), 
-		Sum('shipping_cost'), Sum('sub_total'), Sum('tax'), Sum('order_total'))
+		Sum('shipping_cost'), Sum('sub_total'), Sum('tax'), Sum('order_total'), Avg('order_total'))
+
+	ord_cnt = order_list.count()
 
 
 	igst = order_list.exclude(order_billing__state__state_name__iexact=ecom_site.store_state).aggregate(igst=Sum('tax'))
@@ -78,7 +84,7 @@ def get_order_summary(request):
 		html_string = render_to_string('artevenue/order_summary_print.html', {
 			'orders': order_list, 'totals':totals, 'startDt':startDt, 'endDt':endDt,
 			'ecom_site':ecom_site, 'total_cgst':total_cgst, 'total_sgst':total_sgst,
-			'total_igst':total_igst})
+			'total_igst':total_igst, 'ord_cnt': ord_cnt})
 
 		html = HTML(string=html_string, base_url=request.build_absolute_uri('/'))
 		
@@ -101,14 +107,16 @@ def get_order_summary(request):
 		return render(request, 'artevenue/order_summary_table.html', { 
 			'orders': order_list, 'totals':totals, 'startDt':startDt, 'endDt':endDt,
 			'ecom_site':ecom_site, 'total_cgst':total_cgst, 'total_sgst':total_sgst,
-			'total_igst':total_igst})		
+			'total_igst':total_igst, 'ord_cnt': ord_cnt})
 
 
 def store_order_summary(request):
 	return render(request, 'artevenue/store_order_summary.html')
 	
+@login_required
 def my_business_report_wrap(request):
-	return render(request, 'artevenue/my_business_report_wrap.html')
+	
+	return render(request, 'artevenue/my_business_report_wrap.html', {})
 	
 
 @login_required
@@ -121,7 +129,9 @@ def my_business_report(request, user_id=None):
 	clients_with_orders = {}
 	orders = {}
 	total_order_value = 0 
-	pdf = request.GET.get('printpdf','')
+	livaccnt = False
+	
+	pdf = request.POST.get('printpdf','')
 	if pdf == 'TRUE':
 		printpdf = True
 	else:
@@ -147,6 +157,8 @@ def my_business_report(request, user_id=None):
 			curruser = User.objects.get(id = user_id)
 		bus_profile = Business_profile.objects.get(user = curruser)
 		business_code = bus_profile.business_code
+		if business_code == 'LIV1':
+			livaccnt = True
 		if bus_profile.profile_group:
 			deferred_payment = bus_profile.profile_group.deferred_payment
 	except Business_profile.DoesNotExist:
@@ -169,16 +181,19 @@ def my_business_report(request, user_id=None):
 	users = UserProfile.objects.filter( business_profile = bus_profile )
 	client_ids = UserProfile.objects.filter( business_profile = bus_profile ).values('user_id')
 	
-	orders = Order.objects.filter( Q( user_id__in = client_ids, order_status = 'PC' ) | Q(
-				user = curruser, order_status = 'PC' ) ).order_by('user_id')
-	
+	orders = Order.objects.filter( 
+			Q( user_id__in = client_ids, order_status = 'PC') | Q( user = curruser, order_status = 'PC' ) 
+			| Q( user_id__in = client_ids, order_status = 'IN') | Q( user = curruser, order_status = 'IN' )
+			| Q( user_id__in = client_ids, order_status = 'SH') | Q( user = curruser, order_status = 'SH' )
+			| Q( user_id__in = client_ids, order_status = 'PR') | Q( user = curruser, order_status = 'PR' )
+			| Q( user_id__in = client_ids, order_status = 'CO') | Q( user = curruser, order_status = 'CO' )
+			).order_by('user_id')
 	if startDt:
 		orders = orders.filter(order_date__gte = startDt)
 	if endDt:
 		orders = orders.filter(order_date__lte = endDt)
 	
-	clients = User.objects.filter(id__in = client_ids).annotate(ord_amt=Sum('order__sub_total'),
-		ord_num=Count('order__order_id'))
+	clients = User.objects.filter(id__in = client_ids)
 
 	referral = Business_referral_fee.objects.filter( order__in = orders )
 
@@ -193,47 +208,49 @@ def my_business_report(request, user_id=None):
 			total_ref_fee = total_fee['ref_fee']
 
 	results = []
-	for c in clients:
+	for o in orders:
 		row = {}
-		name = c.first_name + ' ' + c.last_name + ', ' + c.email
-		
-		order_no = ''
-		order_date = ''
-		order_val = 0
 		ref_fee = 0
 		fee_paid_dt = "-"
 		fee_paid_ref = ''
+		c_email = ''
 		def_pay = False
-		for o in orders:
+		order_no = o.order_number
+		order_date = o.order_date
+		order_val = o.sub_total		
+		def_pay = o.deferred_payment
+		for c in clients:
 			if o.user_id == c.id:
-				order_no = o.order_number
-				order_date = o.order_date
-				order_val = o.sub_total		
-				def_pay = o.deferred_payment
-				for r in referral:
-					if o == r.order:
-						ref_fee = r.fee_amount
-						fee_paid_dt = r.fee_paid_date
-						fee_paid_ref = r.fee_paid_reference
-		row['id'] = c.id
+				name = c.first_name + ' ' + c.last_name
+				c_email = c.email
+		for r in referral:
+			if o == r.order:
+				ref_fee = r.fee_amount
+				fee_paid_dt = r.fee_paid_date
+				fee_paid_ref = r.fee_paid_reference
+		row['id'] = o.order_id
 		row['client'] = name
-		row['order_number'] = order_no
-		row['order_date'] = order_date
-		row['ord_val'] = order_val
+		row['order_number'] = o.order_number
+		row['order_date'] = o.order_date
+		row['ord_val'] = o.order_total
+		row['ord_sub'] = o.sub_total
 		row['ref_fee'] = ref_fee
 		row['fee_paid_dt'] = fee_paid_dt
 		row['fee_paid_ref'] = fee_paid_ref
-		row['deferred_payment'] = def_pay
+		row['ref_fee'] = row['deferred_payment'] = def_pay
+		row['c_email'] = c_email
 		results.append(row)
 
 	if not printpdf :
 		return render(request, 'artevenue/my_business_report.html', {'client_total':client_total, 
 			'clients_with_orders': clients_with_orders, 'total_order_value':total_order_value, 
-			'msg': msg, 'results':results, 'business_code':business_code, 'total_ref_fee':total_ref_fee})
+			'msg': msg, 'results':results, 'business_code':business_code, 'total_ref_fee':total_ref_fee,
+			'livaccnt': livaccnt, 'curruser': curruser, 'startDt': startDt, 'endDt': endDt})
 	else:
 		html_string = render_to_string('artevenue/my_business_report_pdf.html', {'client_total':client_total, 
 			'clients_with_orders': clients_with_orders, 'total_order_value':total_order_value, 
-			'msg': msg, 'results':results, 'business_code':business_code, 'total_ref_fee':total_ref_fee})
+			'msg': msg, 'results':results, 'business_code':business_code, 'total_ref_fee':total_ref_fee,
+			'livaccnt': livaccnt, 'curruser': curruser, 'startDt': startDt, 'endDt': endDt})
 
 		html = HTML(string=html_string, base_url=request.build_absolute_uri())
 		html.write_pdf(target= settings.TMP_FILES + str(request.user) + '_business_rep.pdf',
@@ -261,7 +278,7 @@ def my_client_order_report(request, client_id=None):
 	if client_id == None:
 		msg = "No client specified"
 	
-	orders = Order.objects.filter(user_id = client_id)
+	orders = Order.objects.filter(user_id = client_id).exclude(order_status = 'CN')
 	order_total = orders.aggregate(ord_amt = Sum('order_total'))
 	if order_total['ord_amt']:
 		total_order_value = order_total['ord_amt']

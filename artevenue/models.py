@@ -605,8 +605,8 @@ class Stock_collage(models.Model):
 	
 class Original_art(models.Model):
 	IMAGE_TYPE = (
-		('ART', 'Art Work'),
-		('PHT', 'Photograph'),
+		('0', 'PAINTING'),
+		('1', 'PHOTOGRAPH'),
 	)
 	MEDIUM = (
 		('OIL', 'Oil'),
@@ -1316,7 +1316,7 @@ class Order (models.Model):
 	tracking_number =  models.CharField(max_length=30, blank=True, default='')
 	shipment_date = models.DateTimeField(blank=True, null=True)
 	tracking_url =  models.CharField(max_length=1000, blank=True, default='')
-
+	delivery_date = models.DateTimeField(null=True)
 	
 	def __str__(self):
 		return str(self.order_id) + ' - ' + str(self.user)
@@ -1346,10 +1346,22 @@ class Order_sms_email(models.Model):
 	updated_date = models.DateTimeField(auto_now=True, null=False)
 	customer_review_email_sent = models.BooleanField(null=False, default=False)
 	customer_review_sms_sent = models.BooleanField(null=False, default=False)
-
 	
 	def __str__(self):
 		return str(self.order)
+
+class Order_status_communication(models.Model):
+	order = models.OneToOneField(Order, on_delete=models.CASCADE, null=False)
+	in_production_sms_sent = models.BooleanField(null=False, default=False)
+	in_production_email_sent = models.BooleanField(null=False, default=False)
+	ready_to_ship_sms_sent = models.BooleanField(null=False, default=False)
+	ready_to_ship_email_sent = models.BooleanField(null=False, default=False)
+	tracking_info_sms_sent = models.BooleanField(null=False, default=False)
+	tracking_info_email_sent = models.BooleanField(null=False, default=False)
+
+	def __str__(self):
+		return str(self.order)
+
 		
 class Order_items (models.Model):
 	order_item_id = models.AutoField(primary_key=True, null=False)
@@ -1401,7 +1413,7 @@ class Order_original_art(Order_items):
 class Order_items_view (models.Model):
 	order_item_id = models.AutoField(primary_key=True, null=False)
 	order = models.ForeignKey(Order,on_delete=models.PROTECT, null=False)
-	cart_item = models.ForeignKey(Cart_item_view, on_delete=models.PROTECT, null=False)
+	cart_item = models.ForeignKey(Cart_item, on_delete=models.PROTECT, null=False)
 	product = models.ForeignKey(Product_view, models.PROTECT, null=False)
 	promotion = models.ForeignKey(Promotion, models.PROTECT, null=True)
 	quantity = models.IntegerField(null=False)
@@ -1928,6 +1940,24 @@ class Invoice_items_view (models.Model):
 		managed = False
 		db_table = 'invoice_items_view'		
 '''
+'''
+class Credit_note(models.Model):	
+	CRN_REASON = (
+		('', 'Not Specified'),
+		('R', 'Full Refund Issues for Customer Return'),
+		('D', 'Full Refund Issued for Damaged Delivery'),
+		('P', 'Partial Refund for Damaged Delivery'),
+	)    
+
+	crn_id =  models.AutoField(primary_key=True)
+	credit_note_number = models.CharField(max_length = 15, blank = True, default = '')
+	credit_note_date = models.DateTimeField(null=True)
+	order = models.ForeignKey(Order,on_delete=models.PROTECT, null=False)
+	credit_note_amount = models.DecimalField(max_digits=12, decimal_places=2,  null=False, default=0)
+	credit_note_reason = models.CharField(max_length = 2000, blank=True, default = '')
+	created_date = models.DateTimeField(auto_now_add=True, null=False)	
+	updated_date = models.DateTimeField(auto_now=True, null=False)	
+'''	
 
 class Homelane_data(models.Model):
 	homelane_key =  models.AutoField(primary_key=True)

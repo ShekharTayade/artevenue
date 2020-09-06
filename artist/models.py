@@ -44,7 +44,7 @@ class Artist (models.Model):
 	artist_showcase2 = models.CharField(max_length=2000, blank=False, default='')
 	artist_showcase3_name = models.CharField(max_length=50, blank=False, default='')
 	artist_showcase3 = models.CharField(max_length=2000, blank=False, default='')
-	profile_name = models.CharField(max_length=200, blank=False, default='') ## use for diaply (ex. Jaideep Kumar)
+	profile_name = models.CharField(max_length=200, blank=False, default='') ## use for display (ex. Jaideep Kumar)
 	url_name = models.CharField(max_length=50, blank=False, default='')  ## used for creating url (ex. 'jaideep_kumar' in https://www.artevenue.com/artist/jaideep_kumar)
 	profile_photo = models.ImageField(upload_to='artist/profile_photo/%Y/%m/%d/', blank=True, default="")
 	profile_tagline = models.CharField(max_length=500, blank=False, default='')
@@ -54,9 +54,68 @@ class Artist (models.Model):
 	default_original_art_price = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)	
 	created_date = models.DateTimeField(auto_now_add=True, null=False)	
 	updated_date = models.DateTimeField(auto_now=True, null=False)	
+	approved = models.BooleanField(null=False, default=False)
+	approval_date =  models.DateTimeField(blank=True, null=True)
 	
 	def __str__(self):
 		return self.first_name + " " + self.last_name
+
+	def save(self, *args, **kwargs):
+		if self.profile_photo:
+			self.create_thumbnail()
+			
+		super(Artist, self).save()	
+
+	def create_thumbnail(self):
+		from PIL import Image, ExifTags
+		from io import BytesIO
+		import os
+		# If there is no image associated with this.
+		# do not create thumbnail
+		if not self.profile_photo:
+			return
+
+		# Set our max thumbnail size in a tuple (max width, max height)
+		THUMBNAIL_SIZE = (200,200)
+		PIL_TYPE = ''
+		if self.profile_photo.name.lower().endswith(".jpg"):
+			PIL_TYPE = 'jpeg'
+			FILE_EXTENSION = 'jpg'
+			DJANGO_TYPE = 'image/jpeg'
+		if self.profile_photo.name.lower().endswith(".png"):
+			PIL_TYPE = 'png'
+			FILE_EXTENSION = 'png'
+			DJANGO_TYPE = 'image/png'
+		if self.profile_photo.name.lower().endswith(".gif"):
+			PIL_TYPE = 'gif'
+			FILE_EXTENSION = 'gif'
+			DJANGO_TYPE = 'image/gif'
+		if PIL_TYPE == '' :
+			extension = os.path.splitext(self.profile_photo.name)[1]
+			PIL_TYPE = extension.lower()[1:]
+			FILE_EXTENSION = PIL_TYPE
+			DJANGO_TYPE = 'image/' + PIL_TYPE[1:]
+
+		# Open original photo which we want to thumbnail using PIL's Image
+		image = Image.open(self.profile_photo)
+			
+		# use our PIL Image object to create the thumbnail, which already
+		image.thumbnail(THUMBNAIL_SIZE, Image.ANTIALIAS)
+
+		# Save the thumbnail
+		temp_handle = BytesIO()		
+		image.save(temp_handle, PIL_TYPE)
+		temp_handle.seek(0)
+		
+		# Save image to a SimpleUploadedFile which can be saved into ImageField
+		from django.core.files.uploadedfile import SimpleUploadedFile
+		suf = SimpleUploadedFile(os.path.split(self.profile_photo.name)[-1],
+								 temp_handle.read(), content_type=DJANGO_TYPE)
+		# Save SimpleUploadedFile into image field
+		self.profile_photo.save(
+			'%s_thumbnail.%s' % (os.path.splitext(suf.name)[0], FILE_EXTENSION),
+			suf, save=False)
+
 
 
 class Artist_sms_email(models.Model):
@@ -71,13 +130,23 @@ class Artist_sms_email(models.Model):
 class Artist_stock_image (models.Model):
 	artist = models.ForeignKey(Artist, on_delete=models.CASCADE)
 	product = models.ForeignKey('artevenue.Stock_image', models.PROTECT, null=False)
+	artist_listed = models.BooleanField(null=False, default=False)
+	approved = models.BooleanField(null=False, default=False)
+	approval_date = models.DateTimeField(null = True)
+	created_date = models.DateTimeField(auto_now_add=True, null=False)	
+	updated_date = models.DateTimeField(auto_now=True, null=False)	
+
 
 class Artist_original_art (models.Model):
 	artist = models.ForeignKey(Artist, on_delete=models.CASCADE)
 	product = models.ForeignKey('artevenue.Original_art', models.PROTECT, null=False)
+	artist_listed = models.BooleanField(null=False, default=False)
+	approved = models.BooleanField(null=False, default=False)
+	approval_date = models.DateTimeField(null = True)
+	created_date = models.DateTimeField(auto_now_add=True, null=False)	
+	updated_date = models.DateTimeField(auto_now=True, null=False)	
 
 # A DB view "Artist_art_view". This holds data for all product types. 
-
 class Artist_art_view(models.Model):
 	store = models.ForeignKey(Ecom_site, models.CASCADE)
 	product_id = models.AutoField(primary_key=True, null=False)

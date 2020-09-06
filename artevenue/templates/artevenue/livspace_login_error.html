@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+
+{% load static %}
+
+ 
+<html class = "gr__artevenue_com" lang="en-IN">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<!--** Pick up from DB (ecom_site_title)-->
+		
+		<meta name="{{ecom_site.html_meta_name}}" content="">
+		<!--** Pick up from DB (description)-->
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="robots" content="all,follow">
+
+		<meta name="p:domain_verify" content="70f50ce7e84f7c0bf1219c51b7012042" />
+		<meta name="msvalidate.01" content="C0A40BC9E7C942FC76951D60DC9355A9" />
+		{% block page-title %}
+		<title>Art'Venue | Login Authentication Error</title>
+		{% endblock page-title %}
+		
+		{% block page-description %}
+		<meta name="description" content="Login Authentication Error">
+		{% endblock page-description %}
+		  
+		{% block page-keywords %}
+		<meta name="keywords" content="Arte'Venue login">
+		{% endblock page-keywords %}
+		
+		{% block page-author %} 
+		<meta name="author" content="Arte'Venue">
+		{% endblock page-author %} 
+				
+		<!-- Bootstrap CSS-->
+		<link rel="stylesheet" href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}">		
+		
+		
+		<!-- Font Awesome CSS-->
+		<link rel="stylesheet" href="{% static 'vendor/font-awesome/css/font-awesome.min.css' %}">
+		<!--<link rel="stylesheet" href="{% static 'vendor/font-awesome-5.10.1-web/css/all.min.css' %}">-->
+		
+		<!-- Google fonts - Roboto -->
+		<!--<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,500,700,300,100">-->
+		<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300&display=swap" rel="stylesheet">
+		
+		<!-- Custom stylesheet -->
+		<link rel="stylesheet" href="{% static  'css/custom.css' %}">
+		<!-- theme stylesheet-->
+		<link rel="stylesheet" href="{% static 'css/style.default.css' %}" id="theme-stylesheet">
+		<!-- theme stylesheet-->
+		<link rel="stylesheet" href="{% static 'css/home-page-style.css' %}" id="theme-stylesheet">
+		
+		<!-- Favicon-->
+		<link rel="shortcut icon" href="{% static 'img/favicon.png' %}">
+
+		
+		<!-- JavaScript files-->
+		<script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+			
+		<script src="{% static 'vendor/bootstrap/js/bootstrap.min.js' %}" async></script>
+
+	</head>
+
+	<body data-gr-c-s-loaded="true" cz-shortcut-listen="true" style = "position: fixed; top: 0; left: 0; bottom: 0; right: 0; overflow: auto;">
+
+		<div class="container mb-5">
+			<div class="sign-up-box">			
+				<div class = "row">
+					<div class = "col-12 text-center">
+						<div style = "border: 1px solid #cfcfcf; padding:25px; background-color: #11b6bd; color: #fff;">
+							<strong><h1>We could not authenticate you. Please get in touch with the Livspace Admin for Arte'Venue</h1></strong>
+						</div>
+					</div>
+					<div class = "col-12 text-center" style = "padding:25px;">
+						Arte'Venue Contact: support@artevenue.com
+					</div>
+					<div class = "col-12 text-center mb-3">
+						<a style="color:black; text-decoration:none;" href="about:blank" target="">
+						  <button class = "btn btn-close">
+							&#10006;
+						  </button>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	
+</html>
+	

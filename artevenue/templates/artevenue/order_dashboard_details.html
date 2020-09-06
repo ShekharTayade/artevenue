@@ -1,0 +1,395 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load utils %}
+{% load widget_tweaks %}
+{% block page-title %} 
+<title>Arte'Venue - Order Shipping</title>
+{% endblock page-title %} 
+{% block page-description %}
+<meta name="description" content="Arte'Venue | Order Shipping">
+{% endblock page-description %}
+{% block page-keywords %}
+<meta name="keywords" content="Art, artevenue, orders">
+{% endblock page-keywords %}
+
+
+{% block coursel-stylesheet %}
+{% endblock coursel-stylesheet %}
+
+{% block jqueryui-script %}
+{% endblock jqueryui-script %}
+
+{% block coursel-script %}
+{% endblock coursel-script %}
+
+{% block front.js %}
+{% endblock front.js %}
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+{% block google-recaptcha-3 %}
+{% endblock google-recaptcha-3 %}
+
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+        <div class="container mb-5">
+			<div class="row">
+				<!-- breadcrumb-->
+				<div class="col-12">
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+							<li aria-current="page" class="breadcrumb-item active">Order Dashboard</li>
+						</ol>
+					</nav>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class = "col-12">
+					<div class="panel-group">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h4 class="panel-title" style = "background-color: #f9f9f9; 
+										padding:15px;">
+									<a data-toggle="collapse" href="#collapse1" style = "text-decoration: underline;">
+										<strong>FILTER</strong>
+									</a>
+									{% if filter_applied %}<span class="pull-right" style = "color: #11b6bd;"><i class = "fa fa-exclamation" style = "color: red;"></i> Filter(s) are applied</span>{% endif %}
+								</h4>
+							</div>
+							<form method = 'POST'>
+							{% csrf_token %}
+							<div id="collapse1" class="panel-collapse collapse">
+								<div class="panel-body">
+									<div class="row">
+										<div class = "col-6 col-md-3">
+										  <div class="form-group">
+											<label for="fromdate">Order Date From:</label>
+											<input type="date" class="form-control" id="fromdate" name="fromdate" value = "{{startDt|date:'Y-m-d'}}">
+										  </div>										
+										</div>
+										<div class = "col-6 col-md-3">
+										  <div class="form-group">
+											<label for="todate">To:</label>
+											<input type="date" class="form-control" id="todate" name="todate" value = "{{endDt|date:'Y-m-d'}}">
+										  </div>										
+										</div>
+										<div class = "col-6 col-md-2">
+										  <div class="form-group">
+											<label for="order_namber">Cust Name:</label>
+											<input class="form-control" id="user_name" name="user_name" value = "{{user_name}}">
+										  </div>										
+										</div>
+										<div class = "col-6 col-md-2">
+										  <div class="form-group">
+											<label for="order_namber">Order Number:</label>
+											<input class="form-control" id="order_number" name="order_number" value = "{{order_number}}">
+										  </div>										
+										</div>
+										<div class = "col-6 col-md-2">
+										  <div class="form-group">
+											<label for="order_namber">Cust Phone:</label>
+											<input class="form-control" name="user_phone" id="user_phone" value = "{{user_phone}}">
+										  </div>										
+										</div>
+										<div class = "col-6 col-md-3">
+										  <div class="form-group">
+											<label for="order_namber">Cust email:</label>
+											<input type="email" class="form-control" id="user_email" name="user_email" value = "{{user_email}}">
+										  </div>										
+										</div>
+										<div class = "col-8 col-md-7">
+											Order Status: 
+												<label class = "checkbox-inline">
+													<input type="checkbox" value="NEW" name ="ORDER_STATUS" id = "new" {% if f_new %} checked {% endif %}> New (In Process) 
+												</label>
+												<label class = "checkbox-inline ml-2">
+													<input type="checkbox" value="IP" name ="ORDER_STATUS" id = "in_prod" {% if f_in_production %} checked {% endif %}> In Production 
+												</label>
+												<label class = "checkbox-inline ml-2">
+													<input type="checkbox" value="RS" name ="ORDER_STATUS" id = "ready" {% if f_ready_for_shipping %} checked {% endif %}> Ready For Shipping 
+												</label>
+												<label class = "checkbox-inline ml-2">
+													<input type="checkbox" value="IN" name ="ORDER_STATUS" id = "in_transit" {% if f_in_transit %} checked {% endif %}> In Transit
+												</label>
+										</div>								
+										<div class = "col-4 col-md-2">
+											<span style = "text-decoration: underline; cursor: pointer;" onclick="clearFilters();">Clear All Filters</span> 
+											<button class = "btn btn-primary mt-2" type = "submit">Submit</button>
+										</div>
+										<div class = "col-12">
+											<hr>
+										</div>
+									</div>
+								</div>
+							</div>
+							</form>
+						</div>
+					</div>				
+				</div>
+			</div>
+			<div class="panel-group">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h4 class="panel-title" style = "background-color: #11b6bd; padding:15px;">
+							<div class = "row">
+							<div class="col-3 text-center" style = "color:#fff; font-weight:700;">
+								New (In Process): {{new|default_if_none:'0'}} 
+							</div>
+							<div class="col-3 text-center" style = "color:#fff; font-weight:700;">
+								In Production: {{in_prod|default_if_none:'0'}}
+							</div>
+							<div class="col-3 text-center" style = "color:#fff; font-weight:700;">
+								Ready For Shipping: {{ready_for_shipping|default_if_none:'0'}}
+							</div>
+							<div class="col-3 text-center" style = "color:#fff; font-weight:700;">
+								In Transit: {{in_transit|default_if_none:'0'}}
+							</div>
+							</div>
+						</h4>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-12">
+					<strong><span id = "ord_cnt" style = "font-size:1.1rem;">{{ord_cnt|default_if_none:'0'}}</span></strong>
+					order(s).
+				</div>
+			</div>
+			{% for o in orders %}
+			<div class = "box mb-5" id = "box_{{o.order_id}}" style = "padding-top:0px; background-color:#f9f9f9;">
+		
+				<div class="row d-flex d-align-items-center" style = "background-color:#f6f6f6; padding:10px;">
+					<div class="col-4" style = "color:#11b6bd;">
+						<h3> <strong>ORDER NO: {{o.order_number}}, Dt: {{o.order_date|date:'d/M/y'}}</strong> <small>(Cart Id: {{o.cart_id}})</small></h3>
+						<h4>
+							<strong>Customer: {{o.order_billing.full_name}}</strong>
+							{% if o.order_billing.Company %}
+								, {{o.order_billing.Company}}
+							{% endif %}
+							, {{o.order_billing.city}}
+						</h4>	
+					</div>
+					<div class = "col-4"  style = "color:#11b6bd;">
+						<h4>
+							<strong>Order Status: {{o.get_order_status_display}}</strong>
+						</h4>
+					</div>
+					<div class="col-4">
+						<button data-toggle="collapse" data-target="#ord_details_box_{{o.order_id}}" 
+							class = "btn btn-primary pull-right">
+							Order Details
+						</button>
+					</div>
+				</div>
+				<div id = "ord_details_box_{{o.order_id}}" class="box collapse">
+					<div class="row mt-2">
+						<div class="col-12 col-md-6">
+							Shipping Address: 
+							<div id = "s_{{o.order_id}}" style = "font-size:11px;">						
+								{{o.order_shipping.full_name}} 
+								{% if o.order_shipping.Company %}
+									, {{o.order_shipping.Company}}
+								{% endif %}
+								<br />
+								{{o.order_shipping.address_1}}
+								{% if o.order_shipping.address_2 %}
+									{{o.order_shipping.address_2 }}
+								{% endif %}
+								{% if o.order_shipping.address_1 or o.order_shipping.address_2 %}
+									<br />
+								{% endif %}
+								{% if o.order_shipping.land_mark %}
+									{{o.order_shipping.land_mark}}
+									<br />
+								{% endif %}
+								
+								{{o.order_shipping.city}} {{o.order_shipping.state}} {{o.order_shipping.pin_code_id}}
+								<br />
+								Ph: {{o.order_shipping.phone_number}} Email: {{o.order_shipping.email_id}}
+							</div>
+						</div>
+						<div class="col-12 col-md-6">
+							Billing Address: 
+							<div id = "b_{{o.order_id}}" style = "font-size:11px;">
+								{{o.order_billing.full_name}} 
+								{% if o.order_billing.Company %}
+									, {{o.order_billing.Company}}
+								{% endif %}
+								{% if o.order_billing.gst_number %}
+									, GST No.:{{o.order_billing.gst_number}}
+								{% endif %}
+								
+								<br />
+								{{o.order_billing.address_1}}
+								{% if o.order_billing.address_2 %}
+									{{o.order_billing.address_2 }}
+								{% endif %}
+								{% if o.order_billing.address_1 or o.order_billing.address_2 %}
+									<br />
+								{% endif %}
+								{% if o.order_billing.land_mark %}
+									{{o.order_billing.land_mark}}
+									<br />
+								{% endif %}
+								
+								{{o.order_billing.city}} {{o.order_billing.state}} {{o.order_billing.pin_code_id}}
+								<br />
+								Ph: {{o.order_billing.phone_number}} Email: {{o.order_billing.email_id}}
+							</div>
+						</div>
+					</div>
+				
+					<div class = "row">
+						<div class = "col-12 mt-3">
+							<div class = "col-12">
+								Tracking info: {{o.get_shipper_display}}, {{o.shipment_date| date:'d m y'}},
+								{{o.tracking_number}}, {{o.tracking_url}}
+							</div>
+						</div>
+					</div>
+					<div class = "row">
+					{% for oi in orderitems %}
+						{% if o.order_id == oi.order_id %}
+							<div class = "col-6">
+								<div class="row">
+									<div class = "col-12">
+										<span style = "font-weight:600;" >
+										{% if oi.product.product_type_id|cut:' ' == 'USER-IMAGE' %}  
+											Customer Image; Prod Id: {{oi.product.product_id}}
+										{% elif oi.product.product_type_id|cut:' ' == 'STOCK-COLLAGE' %}
+											Image Codes:
+											{% for c in collage %}
+											{% if c.stock_collage_id == oi.product_id %}
+												{{c.stock_image.part_number}}, 
+											{% endif %}
+											{% endfor %}										
+											<!--Prod Id: {{oi.product.product_id}}-->
+										{% else %}
+											{{oi.product.name}};<br />  
+											Image Code: {{oi.product.part_number}}
+										{% endif %}													
+										</span>		
+									</div>
+								</div>
+								<div class="row">									
+									<div class = "col-5">
+										<img src = "{% if oi.product_type_id|cut:' ' == 'USER-IMAGE' %} https://artevenue.com{{MEDIA_URL}}{{oi.product.image_to_frame_thumbnail}} {% else %} {% if env == 'DEV' or env == 'TESTING' %} {{ oi.product.thumbnail_url }} {% else %} {% static oi.product.thumbnail_url %} {% endif %} {% endif %}" style = "width:75px; height:75px; object-fit:contain; float: left;">
+									</div>
+									<div class = "col-7">
+										{% with width=oi.moulding.width_inner_inches|add_width_frame_mount:oi.mount_size %}
+										{% if oi.product_type_id == 'STOCK-COLLAGE' %}
+											EACH ITEM: <br/>
+										{% endif %}
+										{% if oi.product_type_id == 'ORIGINAL-ART' %}
+											<li>{{oi.product.description}}</li>
+										{% else %}													
+											<li>Print on {{oi.print_medium_id|title}}</li>
+										{% endif %}
+										{% if oi.moulding_id %}
+											<li>Image Size : {{ oi.image_width }}" X {{oi.image_height }}"</li>
+											<li>Frame: {{oi.moulding.name }} ({{oi.moulding.width_inches}} inch, Polystyrene)</li>
+											{% if oi.mount_id %}
+												<li>Mount: {{oi.mount_size }}", Color: {{oi.mount.name|title }} </li>
+											{% endif %}
+											<li>Total Size: 
+												{{ oi.image_width|add_width:width|add_width:width }}" X {{oi.image_height|add_width:width|add_width:width }}"</li>
+										{% else %}
+											<li>Image Size : {{ oi.image_width }}" X {{oi.image_height }}"</li>
+										{% endif %}
+										{% if oi.acrylic_id and oi.print_medium_id == 'PAPER' %}
+											<li>Acrylic covered</li>
+										{% endif %}
+										{% if oi.stretch_id and not oi.moulding_id %}
+											<li>Canvas Stretched</li>
+										{% endif %}
+										{% endwith %}
+										<br />
+									</div>
+								</div>
+							</div>
+						{% endif %}
+					{% endfor %}
+					</div>
+				</div>
+			</div>	
+			{% endfor %}
+			
+		</div>
+		{% include 'artevenue/message-modal_ok.html' %}		
+
+	{% endblock sitecontent %}
+	
+	{% block jscripts %}	
+	<script>
+		$( document ).ready(function() {
+		});	
+	</script>
+	<script>
+		function make_in_transit(order_id, order_number, shipper, method, track_no, ship_dt, track_url){
+			if (confirm("You are shipping this order: " + order_number + ". Please make sure tracking information is updated." )){
+				$.ajax({
+						url: "{% url 'make_in_transit' %}", 
+						data: {'order_id':order_id, 'order_number':order_number, 'shipper':shipper, 'method':method, 'track_no':track_no, 'track_url':track_url},
+						dataType: 'text', 
+					success: function (data) {
+						data = JSON.parse(data);
+						sts = data.status;
+						if (sts = "SUCCESS") {
+							$("#box_" + order_id ).hide();
+							var cnt = parseInt( $("#ord_cnt").html());
+							if ( isNaN(cnt) || cnt == 1){
+								i = 0;
+							} else {
+								i = cnt - 1;
+							}
+							$("#ord_cnt").html(i);
+						} else {
+							alert("Sorry! an error occured in updating the order.");
+						}
+					},
+					error: function(xhr){
+						alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+					}
+				});			
+			}
+		}
+		
+		
+		function get_invoice(order_number){
+			$.ajax({
+					url: "{% url 'get_invoices' %}", 
+					data: {'order_num':order_number, 'printpdf': 'YES'},
+					dataType: 'text', 
+					type: 'POST',
+				success: function (data) {
+				},
+				error: function(xhr){
+					alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+				}
+			});			
+		}
+		
+		
+		function clearFilters(){
+		
+			$("#fromdate").val('');
+			$("#todate").val('');
+			$("#order_number").val('');
+			$("#user_name").val('');
+			$("#user_phone").val('');
+			$("#user_email").val('');
+			$("#new").prop('checked', false);
+			$("#in_prod").prop('checked', false);
+			$("#ready").prop('checked', false);
+			$("#in_transit").prop('checked', false);
+			
+		}
+	</script>
+	{% endblock jscripts %}
+			
+	{% block tawkto %} 
+	{% endblock tawkto %} 		
+	

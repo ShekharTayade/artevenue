@@ -5,7 +5,6 @@ from django.conf import settings
 from django.db.models import Count, Q, Max, Sum
 
 from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.db import IntegrityError, DatabaseError, Error
 from django.contrib.auth.decorators import login_required
@@ -32,6 +31,8 @@ from artevenue.models import Country, State, City, Pin_code, Order_deferred_paym
 from django.core.files.storage import FileSystemStorage
 from django.http import HttpResponse
 from django.template.loader import render_to_string
+
+from artevenue.decorators import is_livspace_admin
 
 from weasyprint import HTML, CSS
 
@@ -79,6 +80,57 @@ def artevenuelogin(request):
 			messages.add_message(request, messages.INFO, 'Nothing')		
 		
 		return render(request, 'artevenue/estore_base.html')
+
+
+def livspace_login(request):
+	if request.method == 'POST':		
+		username = request.POST['username'] 
+		password = request.POST['password']
+		email = request.POST['email']
+		
+		user = authenticate(request, email=email, username=username, password=password)
+
+		if user is not None :            
+			login(request, user)			
+			return render(request, 'artevenue/estore_base.html')        
+		else :
+			messages.add_message(request, messages.ERROR, 'Your credentials did not match. Please try again.')		
+			return redirect('livspace_login_error')
+	else:
+		# This is required as front checks for message object and displays
+		# login dialog box only when the message objects is present
+		if not request.user.is_authenticated:
+			messages.add_message(request, messages.INFO, 'Nothing')		
+		
+		return render(request, 'artevenue/estore_base.html')
+
+
+def livspace_login_test(request):
+	if request.method == 'POST':		
+		username = request.POST['username'] 
+		password = request.POST['password']
+		email = request.POST['email']
+		
+		user = authenticate(request, email=email, username=username, password=password)
+
+		if user is not None :            
+			login(request, user)			
+			msg = "SUCCESSFUL"
+			return render(request, 'artevenue/livspace_login_test.html', {'msg':msg})
+		else :
+			messages.add_message(request, messages.ERROR, 'Your credentials did not match. Please try again.')		
+			return redirect('livspace_login_error')
+	else:
+		# This is required as front checks for message object and displays
+		# login dialog box only when the message objects is present
+		if not request.user.is_authenticated:
+			messages.add_message(request, messages.INFO, 'Nothing')		
+		
+		return render(request, 'artevenue/livspace_login_test.html')
+
+def livspace_login_error(request):
+
+	return render(request, 'artevenue/livspace_login_error.html')
 
 	
 def register(request, email=None, signup_popup = 0):
@@ -180,6 +232,87 @@ def register(request, email=None, signup_popup = 0):
 	return render(request, "artevenue/register.html", {'form':form, 
 			'promo_voucher':promo_voucher, 'msg':msg, 'business_code':business_code} )
 	
+
+@is_livspace_admin	
+def livspace_register(request, email=None, signup_popup = 0):
+	today = datetime.datetime.today()
+	msg = ''
+	
+	business_code = 'LIV1'
+	if request.method == 'POST':	
+		req = request.POST.copy()
+		req['password1'] = 'desgn@Liv'
+		req['password2'] = 'desgn@Liv'
+		form = registerForm(req)
+		bus_profile = None
+		if form.is_valid():
+			## validate the business code
+			if business_code:
+				try:
+					bus_profile = Business_profile.objects.get(business_code = business_code)
+				except Business_profile.DoesNotExist:
+					msg = "There is an issue with business referral code. Please get in touch with Arte'Venue support team."
+					bus_profile = None
+					return render(request, "artevenue/livspace_register.html", {'form':form, 
+							'msg':msg, 'business_code':business_code} )
+
+			user = form.save()
+			
+			if bus_profile:
+				u_profile = UserProfile(
+					user = user,
+					phone_number = '',
+					date_of_birth = None,
+					gender = '',
+					business_profile = bus_profile )
+					
+				u_profile.save()
+				return redirect('livspace_accounts_of_designers')
+	else:
+		form = registerForm()
+		
+	return render(request, "artevenue/livspace_register.html", {'form':form, 
+			'msg':msg, 'business_code':business_code} )
+
+@is_livspace_admin	
+def livspace_accounts_of_designers(request):
+	msg = ''
+	business_code = 'LIV1'
+	
+	try:
+		business_profile = Business_profile.objects.get(business_code = business_code)
+	except Business_profile.DoesNotExist:
+		business_profile = None
+		
+	user_profile = UserProfile.objects.filter(business_profile = business_profile).exclude(
+		user__is_active = False).exclude(
+		user_id = 84).order_by('-user__date_joined')
+	
+	return render(request, "artevenue/livspace_accounts_of_designers.html", {
+			'msg':msg, 'user_profile':user_profile} )
+
+
+@csrf_exempt
+@is_livspace_admin	
+def remove_liv_accnt(request):
+	msg = "SUCCESS"
+	if request.method == 'POST':
+
+		user_id = request.POST.get('user_id', None)	
+		try:
+			user = User.objects.get(id = user_id)
+		except User.DoesNotExist:
+			user = {}
+			msg = "FAILURE"
+		
+		if user:
+			u = User.objects.filter(id = user_id).update(
+				is_active = False)
+			msg = "SUCCESS"
+
+	return JsonResponse({'msg': msg}, safe=False)
+
+
 	
 def business_registration(request):
 	today = datetime.datetime.today()
@@ -236,7 +369,6 @@ def my_account(request):
 	user_ProfileForm = {}
 	business_code = ''
 	curruser = get_object_or_404(User, username = request.user)
-
 	
 	try:
 		chn = Channel_partner.objects.get(user = curruser)
@@ -258,10 +390,6 @@ def my_account(request):
 		curruser_profile = None
 
 	if request.method == 'POST':
-	
-		import pdb
-		pdb.set_trace()
-	
 		if request.POST.get('u_form', 'NONE') != 'NONE':
 			user_form = userForm( request.POST, instance=request.user )
 			if user_form.is_valid():
@@ -450,9 +578,9 @@ def get_orders(request):
 
 	if ordtype == 'U':
 		user = User.objects.get(username = request.user)
-		order_list = Order.objects.filter(user = request.user).order_by('order_number')
+		order_list = Order.objects.filter(user = request.user).exclude(order_status = 'CN').order_by('order_number')
 	else:
-		order_list = Order.objects.all().order_by('-updated_date')
+		order_list = Order.objects.all().exclude(order_status = 'CN').order_by('-updated_date')
 	
 	order_items_list = {}
 	if startDt:
@@ -607,8 +735,7 @@ def get_store_orders(request):
 	else:
 		return render(request, 'artevenue/orders_table.html', {'count':count, 
 			'orders': orders, 'order_items_list':order_items_list, 
-			'startDt':startDt, 'endDt':endDt, 'MEDIA_URL':settings.MEDIA_URL,
-			'count': count})		
+			'startDt':startDt, 'endDt':endDt, 'MEDIA_URL':settings.MEDIA_URL})		
 
 @staff_member_required
 def orders_for_status_update(request):
@@ -800,14 +927,14 @@ def get_carts(request, printpdf=''):
 	if	carts_opt == 'NO-CHK':
 		## Remove the carts that already have an order created against
 		for c in cart_list:
-			ord = Order.objects.filter( cart_id = c.cart_id).first()
+			ord = Order.objects.filter( cart_id = c.cart_id).exclude(order_status = 'CN').first()
 			if ord:
 				cart_list = cart_list.exclude(cart_id = c.cart_id)
 			
 	if	carts_opt == 'CHK':
 		## Remove the carts that have an order created against but no payment done
 		for c in cart_list:
-			ord = Order.objects.filter( cart_id = c.cart_id).first()
+			ord = Order.objects.filter( cart_id = c.cart_id).exclude(order_status = 'CN').first()
 			if ord:
 				if ord.order_status != 'PP':
 					cart_list = cart_list.exclude(cart_id = c.cart_id)
@@ -817,7 +944,7 @@ def get_carts(request, printpdf=''):
 	if	carts_opt == 'PAY-DONE':
 		## Remove the carts that have an order created and payment is done
 		for c in cart_list:
-			ord = Order.objects.filter( cart_id = c.cart_id).first()
+			ord = Order.objects.filter( cart_id = c.cart_id).exclude(order_status = 'CN').first()
 			if ord:
 				if ord.order_status == 'PP':
 					cart_list = cart_list.exclude(cart_id = c.cart_id)
@@ -843,11 +970,11 @@ def get_carts(request, printpdf=''):
 	carts_value = cart_list.filter(updated_date__date = today.date() ).aggregate( c_total=Sum( 'cart_total') )
 
 	cart_list_ids = cart_list.values('cart_id')
-	orders = Order.objects.filter( cart__in = cart_list_ids)
+	orders = Order.objects.filter( cart__in = cart_list_ids).exclude(order_status = 'CN')
 	orders_value = orders.filter(order_date = today.date()).aggregate( o_total=Sum( 'order_total') )
 	orders_count = orders.filter(order_date = today.date()).count()
 	
-	paginator = Paginator(cart_list, 10)
+	paginator = Paginator(cart_list, 50)
 	carts = paginator.get_page(page)
 	
 	try:
@@ -929,7 +1056,7 @@ def referral_fee_month_process(yrmonth=''):
 
 		ord_value = Order.objects.filter(order_date__gte = year_start_date,
 				order_date__lte = process_end_date,
-				user_id = b.user_id).aggregate(sum = Sum('sub_total'))
+				user_id = b.user_id).exclude(order_status = 'CN').aggregate(sum = Sum('sub_total'))
 		total_order_value =0
 		if ord_value :
 			if ord_value['sum']:
@@ -951,12 +1078,12 @@ def referral_fee_month_process(yrmonth=''):
 		#### Orders in last 1 user year for which referral fee is not processed
 		orders = Order.objects.filter( order_date__gte = year_start_date,
 			order_date__lte = process_end_date,
-			user_id = b.user_id )
+			user_id = b.user_id ).exclude(order_status = 'CN')
 		
 		for o in orders:
 		
 			##### Skip orders that have payment outstanding
-			def_pay = Order_deferred_payment,objects.filter(order = o)
+			def_pay = Order_deferred_payment.objects.filter(order = o)
 			if not def_pay:
 				continue
 

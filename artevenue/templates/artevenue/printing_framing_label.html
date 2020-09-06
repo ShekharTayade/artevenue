@@ -1,0 +1,144 @@
+<!doctype html>
+{% load utils %}
+{% load static %}
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Printing & Framing Labels</title>
+    <meta name="description" content="Artevenue Labels">
+    <meta name="Artevenue" content="">
+  </head>
+
+  <body>
+	<div style = "border : 2px solid gainsboro; padding:10px; line-height:normal !important; page-break-after: always;">
+		<img src="{% static 'img/artevenue_logo_new.png' %}" alt="{{ecom_site.store_name}}"  style="width:110px; height:25px;">
+		<small style = "color: #665d6f; font-family:Helvetica, sans-serif !important; float:right;">www.ArteVenue.com</small>
+		<hr>
+
+		<table "table table-responsive table-striped">
+			<thead>
+				<tr>
+					<th width="50%"></th>
+					<th width="50%"></th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for oi in orderitems %}
+				<tr style = "font-size: 12px;">
+					<td style = "border:1px solid #cfcfcf;">
+						<h4 style = "text-align:center;"> PRINTING LABEL</h4>
+						<table>
+							<thead>
+								<tr>
+									<th width="50%"></th>
+									<th width="50%"></th>
+								<tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>
+										<img src = "{% if oi.product_type_id|cut:' ' == 'USER-IMAGE' %} https://artevenue.com{{MEDIA_URL}}{{oi.product.image_to_frame_thumbnail}} {% else %} {% if env == 'DEV' or env == 'TESTING' %} {{ oi.product.thumbnail_url }} {% else %} {% static oi.product.thumbnail_url %} {% endif %} {% endif %}" style = "width:100px; object-fit:contain; float: left;">
+									</td>
+									<td>
+										<p><strong>Order Numer: {{order.order_number}}</strong></p>
+										<p>Ship To: {{order.order_shipping.full_name}}, {{order.order_shipping.city}}</p>
+									</td>
+								<tr>
+							</tbody>
+						</table>
+							
+						{% if oi.product.product_type_id|cut:' ' == 'USER-IMAGE' %}  
+							<strong>CUSTOMER IMAGE</strong>
+						{% elif oi.product.product_type_id|cut:' ' == 'STOCK-COLLAGE' %}
+							<strong>IMAGE CODES</strong>:
+							{% for c in collage %}
+							{% if c.stock_collage_id == oi.product_id %}
+								{{c.stock_image.part_number}}, 
+							{% endif %}
+							{% endfor %}										
+							<!--Prod Id: {{oi.product.product_id}}-->
+						{% else %}
+							<strong>TITLE:</strong> {{oi.product.name}}</strong><br />  
+							<strong>PUBLISHER:</strong> {{oi.product.publisher}}, 
+							{% for p in publ %}
+								{% if p.publisher_id == oi.product.publisher %}
+									{{p.publisher_name }}
+								{% endif %}
+							{% endfor %}
+							
+							<br>
+							<strong>IMAGE CODE:</strong> {{oi.product.part_number}}<br>
+						{% endif %}													
+						<br>
+						{% if oi.product_type_id == 'STOCK-COLLAGE' %}
+							<strong>Each Item:</strong><br>
+						{% endif %}
+						{% if oi.product_type_id == 'ORIGINAL-ART' %}
+							{{oi.product.description}}<br>
+						{% else %}													
+							<strong>PRINT ON {{oi.print_medium_id|upper}}</strong><br>
+						{% endif %}
+						<strong>IMAGE SIZE:</strong> {{ oi.image_width }}" X {{oi.image_height }}"
+					</td>
+					<td style = "border:1px solid #cfcfcf;">
+						<h4 style = "text-align:center;"> FRAMING LABEL</h4>
+						<table>
+							<thead>
+								<tr>
+									<th width="50%"></th>
+									<th width="50%"></th>
+								<tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>
+										<img src = "{% if oi.product_type_id|cut:' ' == 'USER-IMAGE' %} https://artevenue.com{{MEDIA_URL}}{{oi.product.image_to_frame_thumbnail}} {% else %} {% if env == 'DEV' or env == 'TESTING' %} {{ oi.product.thumbnail_url }} {% else %} {% static oi.product.thumbnail_url %} {% endif %} {% endif %}" style = "width:100px; object-fit:contain; float: left;">
+									</td>
+									<td>
+										<p><strong>Order Numer: {{order.order_number}}</strong></p>
+										<p>Ship To: {{order.order_shipping.full_name}}, {{order.order_shipping.city}}</p>
+									</td>
+								<tr>
+							</tbody>
+						</table>
+						{% if oi.product_type_id == 'STOCK-COLLAGE' %}
+							<strong>Each Item:</strong> <br>
+						{% endif %}
+						
+						{% with width=oi.moulding.width_inner_inches|add_width_frame_mount:oi.mount_size %}
+						{% if oi.moulding_id %}
+							<strong>IMAGE SIZE:</strong> {{ oi.image_width }}" X {{oi.image_height }}"<br>
+							<strong>FRAME: </strong>{{oi.moulding.name}}, Code:{{oi.moulding.part_number}}, Size: {{oi.moulding.width_inches}} inch<br>
+							{% if oi.mount_id %}
+								<strong>MOUNT:</strong> {{oi.mount_size }}", Color: {{oi.mount.name|title }}<br>
+							{% endif %}
+							<strong>FRAMED SIZE:</strong> 
+								{{ oi.image_width|add_width:width|add_width:width }}" X {{oi.image_height|add_width:width|add_width:width }}"<br>
+						{% else %}
+							<strong>IMAGE SIZE:</strong> {{ oi.image_width }}" X {{oi.image_height }}"<br>
+						{% endif %}
+						{% endwith %}
+						
+						{% if oi.acrylic_id and oi.print_medium_id == 'PAPER' %}
+							<strong>ACRYLIC COVERED</strong><br>
+						{% endif %}
+						{% if oi.stretch_id and not oi.moulding_id %}
+							<strong>CANVAS STRETCHED</strong><br>
+						{% endif %}
+					</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+			</tfoot>
+		</table>
+		<br>
+		<hr>
+		{{ecom_site.store_name}}
+	</div>
+
+  </body>
+</html>
+
+
+
+

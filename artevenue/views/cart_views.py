@@ -23,7 +23,7 @@ from artevenue.models import Product_view, Promotion, Order, Voucher, Voucher_us
 from artevenue.models import Cart_user_image, Cart_stock_image, Cart_stock_collage, Cart_original_art
 from artevenue.models import Order_stock_image, Order_stock_collage, Order_original_art, Order_user_image
 from artevenue.models import Referral, Egift_redemption, Egift, Order_items_view, Voucher_used
-from artevenue.models import Order_shipping, Order_billing, Collage_stock_image
+from artevenue.models import Order_shipping, Order_billing, Collage_stock_image, UserProfile
 from .product_views import *
 from .user_image_views import *
 from .tax_views import *
@@ -158,9 +158,27 @@ def show_cart(request):
 		if usercart.voucher_disc_amount:
 			cart_without_disc = cart_without_disc + usercart.voucher_disc_amount
 
+	#########################################################################
 	## If it's first order from the user. If yes, apply 'FIRST15' coupon
+	#########################################################################
+	# Check if livspace user, i doesn;t apply to livspace users
+	livuser = False
+	if request:
+		if request.user:
+			if request.user.is_authenticated:
+				usr = User.objects.get(username = request.user)
+				try:
+					livprofile = UserProfile.objects.get(user = usr)
+				except UserProfile.DoesNotExist:
+					livprofile = None
+				if livprofile:
+					if livprofile.business_profile_id:
+						if livprofile.business_profile_id == 17:
+							livuser = True	
+
+
 	v_code = None
-	if usercart and request.user.is_authenticated:
+	if usercart and request.user.is_authenticated and livuser == False:
 		if not usercart.voucher_id:
 			orders = Order.objects.filter(user = usr).exclude(order_status = 'PP')
 			if not orders:
@@ -2239,7 +2257,20 @@ def add_to_cart_new(request):
 				err_flg = True
 		## Check if it's first order for this user, if yes, apply FIRST15 voucher by default
 		else:
-			if request.user.is_authenticated:
+			livuser = False
+			if request:
+				if request.user:
+					if request.user.is_authenticated:
+						usr = User.objects.get(username = request.user)
+						try:
+							livprofile = UserProfile.objects.get(user = usr)
+						except UserProfile.DoesNotExist:
+							livprofile = None
+						if livprofile:
+							if livprofile.business_profile_id:
+								if livprofile.business_profile_id == 17:
+									livuser = True	
+			if request.user.is_authenticated and livuser == False:
 				orders = Order.objects.filter(user = userid).exclude(order_status = 'PP')
 				if not orders:
 					v_code = Voucher.objects.get(voucher_id = 8)

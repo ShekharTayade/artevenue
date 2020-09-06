@@ -62,7 +62,7 @@ def customer_review(product_id=None, cart_item_id=None, wishlist_item_id=None, u
 		total_reviews = rating_cnt['rating_cnt']
 	
 	reviews = Customer_review_stock_image.objects.filter(featured = True,
-		approved_date__isnull = False)[:4]
+		approved_date__isnull = False).order_by('-approved_date')[:4]
 
 	review_pics = Customer_review_stock_image_pics.objects.filter(
 			customer_review_stock_image__in = reviews )

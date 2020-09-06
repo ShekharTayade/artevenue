@@ -87,7 +87,9 @@
 {% endblock JSON-LD %}
 
 {% block add_to_head %}
+{% if product.product_id != '148993' and product.product_id != '220224' and product.product_id != '23309' and product.product_id != '33249' and product.product_id != '155726' and product.product_id != '164403' and  product.product_id != '198778' %}
 <meta name="robots" content="noindex">
+{% endif %}
 {% endblock %}
 
 {% load moulding_url %}
@@ -544,7 +546,7 @@
 												Free Shipping
 											</div>
 											<div class = "why-artevenue-text">
-												Don't pay to bring it home, ships in 1-2 days
+												Don't pay to bring it home, ships in 1-3 days
 											</div>
 										</div>
 									</div>
@@ -672,7 +674,8 @@
 												<tr>
 													<td class="accordian-subhead">SHIPPING TIME</td>
 													<td class = "comp-frame">
-														Ships by courier in 1-2 business days. Usually deliveres in 3-7 days in most parts of India.
+														Ships by courier in 1-3 days. Usually deliveres in 3-10 days in most parts of India.
+														It ususally takes between 3-5 days to deliver in all metro and major cities.
 													</td>
 												</tr>
 											</tbody>
@@ -710,17 +713,8 @@
 					<div class = "row mt-2">
 						<hr>
 					</div>
-					<div class = "row mt-2">
-						<div class = "col-12 col-md-1 img-thumbs">
-						</div>
-						<div class = "col-12 col-md-10">
-							{% customer_review product.product_id cart_item.cart_item_id wishlist_item.wishlist_item_id iuser_width iuser_height %}
-						</div>
-						<div class = "col-12 col-md-1 img-thumbs">
-						</div>
-					</div>
 					<!-- Similar products -->
-					<div class = "row mt-5">
+					<div class = "row mt-4">
 						{% if prods %}
 						<div class = "col-12 col-md-1 img-thumbs">
 							
@@ -735,6 +729,18 @@
 							</div>
 						</div>
 						{% endif %}
+					</div>
+					<div class = "row mt-2">
+						<hr>
+					</div>
+					<div class = "row mt-2">
+						<div class = "col-12 col-md-1 img-thumbs">
+						</div>
+						<div class = "col-12 col-md-10">
+							{% customer_review product.product_id cart_item.cart_item_id wishlist_item.wishlist_item_id iuser_width iuser_height %}
+						</div>
+						<div class = "col-12 col-md-1 img-thumbs">
+						</div>
 					</div>
 				</div>
 			</div>
@@ -1009,7 +1015,7 @@
 			}
 			
 			details_txt = txt + ', Finished Size:' + frame_width.toString() + '" X ' + frame_height.toString() + '" inch';
-			txt = 'Product Size: ' + frame_width.toString() + '" X ' + frame_height.toString() + '" inch <br />Ships in 1-2 days';
+			txt = 'Product Size: ' + frame_width.toString() + '" X ' + frame_height.toString() + '" inch <br />Ships in 1-3 days';
 			$('#prod-desc').html(txt);
 			$('#prod-details').html(details_txt);
 		}
@@ -1293,7 +1299,7 @@
 
 			
 			{% if not user.is_authenticated %}
-
+				{% if user.usename != "livspace" %}
 				val = sessionStorage.getItem("SignUpPopupShown");
 				if ( val == null){
 					setTimeout(function() {
@@ -1301,7 +1307,7 @@
 						sessionStorage.setItem("SignUpPopupShown", "yes");
 					}, 10000);
 				}
-			
+				{% endif %}
 				//setTimeout(function() {
 				//	$("#signup-ask-modal").modal('show');
 				//	}, 10000);
@@ -2057,19 +2063,19 @@
 			switch(param) {
 		  case 'FREE_SHIPPING':
 			$("#modal-hedline").html('FREE DELIVERY ANYWHERE IN INDIA');
-			$("#msg").html('<p>We produce the artwork and ship it within 1-2 days on receipt of an order.</p><p> Ususally courier delivers to most parts of India in 3-7 days.</p>');
+			$("#msg").html('<p>We produce the artwork and ship it within 1-3 days on receipt of an order.</p><p> Ususally courier delivers to most parts of India in 3-10 days.</p><p>It ususally takes between 3-5 days to deliver in all metro and major cities.</p>');
 			break;
 		  case 'CUSTOMIZATION':
 			$("#modal-hedline").html('CUSTOMIZE THE ARTWORK AS YOU LIKE');
-			$("#msg").html("<p><strong>A FIRST IN INDIA:</strong> Customize every artwork the way you would like it. You are not bound by those 'standard sizes' & frames, create it exactly as your space needs.</p> <p>Click on the 'CUSTOMIZE' tab and you can choose print size from minimum 4 inch wide to maximum allowed by the artist. Choose the frame and also choose the mount color, size.</p> <p>Before you finalize, see how it looks.</p>");
+			$("#msg").html("<p><strong>A FIRST IN INDIA:</strong> Customize every artwork the way you would like it. You are not bound by those 'standard sizes' & frames, create it exactly as your space needs.</p> <p>Click on the 'CUSTOMIZE' tab and you can choose print size from minimum 8 inch wide to maximum allowed by the artist. Choose the frame and also choose the mount color, size.</p> <p>Before you finalize, see how it looks.</p>");
 			break;
 		  case 'GUARANTEE':
 			$("#modal-hedline").html('YOUR SATISFACTION IS GUARANTEED');	  
-			$("#msg").html("<p><strong>RETURNS</strong>: If you are not satisfied, we accept the returns, no questions asked. We make arrangements to get artwork returned to us and give you the refund.</p> <p><strong>REPLACEMENT:</strong> If you receive the artwork with damages, or having quality issues, we will replace it without any additional cost to you.</p><p><small>You may go through our returns, refund policy in footer of this webpage.</small></p>");
+			$("#msg").html("<p><strong>RETURNS</strong>: If you are not satisfied, we accept the returns, no questions asked. Returns apply only to art prints. Custom photo framing items, where you upload pictures and we print & frame, are not eligible for returns.</p> <p><strong>REPLACEMENT:</strong> If you receive the artwork with damages, or having quality issues, we will replace it without any additional cost to you.</p><p><small>You may go through our returns, refund policy in footer of this webpage.</small></p>");
 			break;
 		  case 'LICENSED':
 			$("#modal-hedline").html('LICENSED ARTWORKS');			  
-			$("#msg").html("<p><strong>All our artworkss are licensed from  artists.</strong></p> <p>We don't use unauthorized or fake images.</p> <p>No copyright issues and you can enjoy the art to the fullest.</p>");
+			$("#msg").html("<p><strong>All our artworks are licensed from  artists.</strong></p> <p>We don't use unauthorized images. So quality of print is assured.</p> <p>No copyright issues and you can enjoy the art to the fullest.</p>");
 			break;
 		  case 'SECURED':
 			$("#modal-hedline").html('SECURED CHECKOUT PROCESS');
@@ -2081,7 +2087,7 @@
 			break;				
 		  case 'LARGEST':
 			$("#modal-hedline").html('LARGEST COLLECTION');
-			$("#msg").html("<p><strong>DID YOU KNOW THAT WE HAVE THE LARGEST COLLECTION OF LICENSED ARTWORKS IN INDIA?</strong></p> <p>Over 2.7 lakh artworks licensed from over 4500 artists across the world.</p> <p>Arte'Venue saves you the pain of looking around for that exact piece of art you want for your wall.");
+			$("#msg").html("<p><strong>DID YOU KNOW THAT WE HAVE THE LARGEST COLLECTION OF LICENSED ARTWORKS IN INDIA?</strong></p> <p>Over 2.7 lakh artworks licensed from over 4500 artists across the world.</p> <p>Arte'Venue saves you the pain of looking around for that exact piece of art you want for your home or office interiors.");
 			break;
 			}
 			$('#msg-modal').modal('show');

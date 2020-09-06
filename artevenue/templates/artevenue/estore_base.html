@@ -42,13 +42,11 @@
 		<meta name="p:domain_verify" content="70f50ce7e84f7c0bf1219c51b7012042" />
 		<meta name="msvalidate.01" content="C0A40BC9E7C942FC76951D60DC9355A9" />
 		{% block page-title %}
-		<title>Best Wall Art from the World | Make Interiors Amazing</title>
+		<title>Beautiful Wall Art | Top Quality is Now Affordable</title>
 		{% endblock page-title %}
 		
 		{% block page-description %}
-		<meta name="description" content="Buy Paintings online? Get top quality, licensed & elegant art prints at Arte'Venue. Stock of over 2.7 lakh artworks. Free Delivery | 15% Off | Returns.">
-										  
-
+		<meta name="description" content="Looking to buy paintings online? Arte'Venue has elegant, top quality art prints. Collection of over 2.7 lakh licensed artworks. 15% off 1st order. Free delivery.">
 		{% endblock page-description %}
 		  
 		{% block page-keywords %}
@@ -242,9 +240,11 @@
 		<script
 			type="text/javascript"
 			async defer
-			src="//assets.pinterest.com/js/pinit.js"
-		></script>	
+			src="//assets.pinterest.com/js/pinit.js">
+		</script>	
 		{% endif %}
+
+		{% announcement %}
 		
 		<!-- Header Section with top slim line, logo/search/cart and menu-->
 		{% block siteheader %}
@@ -263,7 +263,7 @@
 			<div id="content" class= "" style="background-color:#fff">
 				{% block sitecontent %}
 														
-				{% show_main_slider_section %}
+				{% show_main_slider_section request %}
 
 				{% show_trending_categories %}
 
@@ -296,9 +296,9 @@
 								
 							<p>
 								Top quality & affordable wall art for interiors at Arte'Venue.
-								Buying paintings online for your interiors? We have the 
+								Buy paintings online for the interiors? We have the 
 								largest and awesome collection of licensed art prints in India. 
-								With these top quality art prints we have made the interiors
+								With these elegant art prints we have made the interiors
 								and decor affordable.
 							</p>
 														

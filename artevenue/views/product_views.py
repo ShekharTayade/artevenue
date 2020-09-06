@@ -247,7 +247,7 @@ def show_categories(request, sortorder=None):
 			'stock_image_stock_image_category')).filter(
 			stock_image_stock_image_category__count__gt = 0).exclude(
 			name = '').exclude(name = '#N/A').exclude(
-			name = 'Passion').exclude(name = 'Nude').order_by('-stock_image_stock_image_category__count')
+			name = 'Passion').exclude(name = 'Nude').order_by('name')
 
 	if request.is_ajax():
 		template = "artevenue/show_all_categories_include.html"

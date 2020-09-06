@@ -30,8 +30,8 @@
 {% block imagemap-resize-script %}
 {% endblock imagemap-resize-script %}
 
+
 {% block add_to_head %}
-{% if env == 'PROD' %}
 <!-- Event snippet for Begin checkout conversion page -->
 <script>
   gtag('event', 'conversion', {
@@ -40,7 +40,6 @@
       'currency': 'INR'
   });
 </script>
-{% endif %}
 {% endblock add_to_head %}
 
 
@@ -89,7 +88,8 @@
 										<div class="form-group">
 											<label class = "pull-right">
 												<input type="checkbox" onclick= "sameAddr();" id = "sameaddr" name = "sameaddr"> 
-												<span style = "color: #11b6bd; font-size:0.8rem;">My Billing Address is same as Shipping Address</span>
+												<span style = "color: #11b6bd; font-size:0.8rem;">My Billing Address is same as Shipping Address</span><br />
+												<span style = "font-size:0.65rem;">(Check to enter GST number)</span>
 											</label>
 										</div>
 									</div>
@@ -116,7 +116,6 @@
 											<input id="shipping_phone_number" name="shipping_phone_number" 
 												type="text" class="form-control"  
 												placeholder = "10-digit mobile number without prefix"
-												pattern="[6-9]\d{9}"
 												maxlength = "10"
 												required
 												value = "{{shipping_addr.phone_number}}">
@@ -248,7 +247,6 @@
 											<input id="billing_phone_number" 
 											name="billing_phone_number" type="text" 
 											class="form-control"  placeholder = "10-digit mobile number without prefix"
-											pattern="[6-9]\d{9}"
 											required
 											value = "{{billing_addr.phone_number}}">
 										</div>

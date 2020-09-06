@@ -2,7 +2,7 @@
 {% load static %}
 {% block page-title %} 
 	<title>About Arte'Venue | Huge Colection of Wall Art Prints & Paintings </title>
-	<meta name="description" content="ArteVenue.com is India's One-Stop-Wall-Art-Shop. Art prints are best as wall painting for bedroom, living room or any walls.">
+	<meta name="description" content="ArteVenue.com is India's best place to buy wall art. Art prints are best as wall paintings for bedroom, living room or any walls.">
 	<meta name="keywords" content="About Arte'venue, Montage Art Pvt Ltd, Online art gallery, Largest collection of wall art, buy art prints online, buy wall art">
 {% endblock page-title %} 
 {% block page-description %}
@@ -32,21 +32,21 @@
 		</div>
 		<div class="row mb-5">
 			<div class="col-12">
-				<h1 class = "text-center">FOR WALL ART PRINTS & PAINTINGS WE ARE ONE-STOP-ART-SHOP</h1>
+				<h1 class = "text-center">ARTE'VENUE IS THE BEST PLACE FOR WALL ART </h1>
+				<h3 class = "text-center">Buy Top Quality Art Prints for Your Interiors</h3>
 			</div>
 			<div class="col-12 mt-3" style = "text-align: center;">
 				<p>
-					Online art gallery with unmatched 
-					features & collection that brings life to the art virtually. 
+					Online wall art store with unmatched 
+					features & collections that bring life to the art virtually. 
 				</p>
 			</div>
 			<div class="col-12 mt-3">
 				<blockquote>
 					<p class = "big">
 						Our mission is to provide the best in class online wall art buying 
-						experience leveraging the latest technology. Some of our
-						unique and unmatched offerings are, 
-						India's largest & licensed art collection, customize each art print to
+						experience. Some of our unmatched offerings are, 
+						India's largest & licensed collection, customize each art print to
 						suit your decor,
 						instant previews, and a 'Size Guide and Wall Color' tool that helps
 						you to decide the size and preview it on different color walls. 
@@ -64,7 +64,7 @@
 					abstract
 					paintings, landscape paintings, floral paintings, photography
 					prints and a large number of other categories.
-					You have 70+ categories & 2.75+ Lakh artworks to choose from.			
+					You have 70+ categories & 2.70+ Lakh artworks to choose from.			
 				</h3>
 				
 				<h3>For <span style = "font-style:italic;">custom photo framing</span> 
@@ -73,6 +73,98 @@
 					as per your requirements.
 				</h3>
 			</div>
+		</div>
+		<div class = "row">
+			<div class = "col-12 col-md-1">
+			</div>
+			<div class = "col-12 col-md-10">
+				<div class = "mt-5">
+					WHY BUY PAINTINGS ONLINE AT ARTE'VENUE?
+					<div class="row">
+						<div class = "col-12">
+							<span style = "font-size:0.75rem;">(Click or tap each to know more)</span>
+						</div>
+					</div>
+					<hr>
+					<div class="row">
+						<div class="col-4 mb-3 why-artevenue-div">
+							<div onclick = "show_modal('GUARANTEE');">
+								<img src="{% static 'img/why_artevenue/guarantee.png' %}"
+									alt="100% Guranteed" class = "why_artevenue">
+								<div class = "why-artevenue-head">
+									Free Returns
+								</div>
+								<div class = "why-artevenue-text">
+									Don't like it? Return it in 5 days and get the refund
+								</div>
+							</div>
+						</div>
+						<div class="col-4 mb-3 why-artevenue-div">
+							<div onclick = "show_modal('FREE_SHIPPING');">
+								<img src="{% static 'img/why_artevenue/truck.png' %}" 
+								alt = "Free Shipping of wall art painting" class = "why_artevenue">
+								<div class = "why-artevenue-head">
+									Free Shipping
+								</div>
+								<div class = "why-artevenue-text">
+									Don't pay to bring it home, ships in 1-3 days
+								</div>
+							</div>
+						</div>
+						<div class="col-4 mb-3 why-artevenue-div" >
+							<div onclick = "show_modal('CUSTOMIZATION');">
+								<img src="{% static 'img/why_artevenue/customize.png' %}" 
+								alt= "Customize the wall art painting" class = "why_artevenue">
+								<div class = "why-artevenue-head">
+									Customize it
+								</div>
+								<div class = "why-artevenue-text">
+									Every artwork can be customized - surface, size, frame and more
+								</div>
+							</div>
+						</div>
+						<div class="col-4 mb-3 why-artevenue-div" >
+							<div onclick = "show_modal('LARGEST');">
+								<img src="{% static 'img/why_artevenue/largest.png' %}" 
+								alt= "Customize the wall art painting" class = "why_artevenue">
+								<div class = "why-artevenue-head">
+									Largest Collection
+								</div>
+								<div class = "why-artevenue-text">
+									We have the largest collection in India 
+								</div>
+							</div>
+						</div>
+						<div class="col-4 mb-3 why-artevenue-div" >
+							<div onclick = "show_modal('QUALITY');">
+								<img src="{% static 'img/why_artevenue/quality.png' %}" 
+								alt= "Customize the wall art painting" class = "why_artevenue">
+								<div class = "why-artevenue-head">
+									Top Quality
+								</div>
+								<div class = "why-artevenue-text">
+									Our art prints are the best quality that you can get
+								</div>
+							</div>
+						</div>
+						<div class="col-4 mb-3 why-artevenue-div" >
+							<div onclick = "show_modal('LICENSED');">
+								<img src="{% static 'img/why_artevenue/quality.png' %}" 
+								alt= "Customize the wall art painting" class = "why_artevenue">
+								<div class = "why-artevenue-head">
+									Licensed
+								</div>
+								<div class = "why-artevenue-text">
+									All artworks are licensed from artists/publishers
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+			
+			<!--
 			<div class="col-12 mt-3" style = "background-color: #f6f6f6; padding:10px;">
 				<span style = "font-size:1rem; font-weight:700;">WHY ARTE'VENUE?</span>
 			</div>
@@ -144,6 +236,9 @@
 
 
 		</div>
+		-->
+		
+		
 		<hr>
 		<div class = "row">
 			<div class="col-12" style = "text-align: justify;">
@@ -176,6 +271,20 @@
 				</span>
 			</div>
 		</div>
+		<div class = "row" style = "padding-left: 15px;">
+			<div class="col-12 col-md-6 mt-3">
+				<img src="{% static 'img/showroom_pics/vm_3.jpeg' %}" alt="Showroom Pic 1"  width = 250> 
+			</div>
+			<div class="col-12 col-md-6 mt-3">
+				<img src="{% static 'img/showroom_pics/vm_6.jpeg' %}" alt="Showroom Pic 2" width = 250>
+			</div>
+			<div class="col-12 col-md-6 mt-3">
+				<img src="{% static 'img/showroom_pics/jp_1.jpeg' %}" alt="Showroom Pic 3" width = 250>
+			</div>
+			<div class="col-12 col-md-6 mt-3">
+				<img src="{% static 'img/showroom_pics/jp_2.jpeg' %}" alt="Showroom Pic 4" width = 250>
+			</div>
+		</div>
 		<div class = "row mt-5">
 			<div class="col-12 mt-5">
 				<h3><strong>Registered Office:</strong></h3>
@@ -203,10 +312,48 @@
 			</div>
 		</div>
 	</div>
+
+	{% include 'artevenue/message-modal_ok.html' %}
 	
 	{% endblock sitecontent %}
 
 	
 	{% block jscripts %}
+	<script>
+		function show_modal(param){
+			switch(param) {
+		  case 'FREE_SHIPPING':
+			$("#modal-hedline").html('FREE DELIVERY ANYWHERE IN INDIA');
+			$("#msg").html('<p>We produce the artwork and ship it within 1-3 days on receipt of an order.</p><p> Ususally courier delivers to most parts of India in 3-10 days.</p><p>It ususally takes between 3-5 days to deliver in all metro and major cities.</p>');
+			break;
+		  case 'CUSTOMIZATION':
+			$("#modal-hedline").html('CUSTOMIZE THE ARTWORK AS YOU LIKE');
+			$("#msg").html("<p><strong>A FIRST IN INDIA:</strong> Customize every artwork the way you would like it. You are not bound by those 'standard sizes' & frames, create it exactly as your space needs.</p> <p>Click on the 'CUSTOMIZE' tab and you can choose print size from minimum 8 inch wide to maximum allowed by the artist. Choose the frame and also choose the mount color, size.</p> <p>Before you finalize, see how it looks.</p>");
+			break;
+		  case 'GUARANTEE':
+			$("#modal-hedline").html('YOUR SATISFACTION IS GUARANTEED');	  
+			$("#msg").html("<p><strong>RETURNS</strong>: If you are not satisfied, we accept the returns, no questions asked. Returns apply only to art prints. Custom photo framing items, where you upload pictures and we print & frame, are not eligible for returns.</p> <p><strong>REPLACEMENT:</strong> If you receive the artwork with damages, or having quality issues, we will replace it without any additional cost to you.</p><p><small>You may go through our returns, refund policy in footer of this webpage.</small></p>");
+			break;
+		  case 'LICENSED':
+			$("#modal-hedline").html('LICENSED ARTWORKS');			  
+			$("#msg").html("<p><strong>All our artworks are licensed from  artists.</strong></p> <p>We don't use unauthorized images. So quality of print is assured.</p> <p>No copyright issues and you can enjoy the art to the fullest.</p>");
+			break;
+		  case 'SECURED':
+			$("#modal-hedline").html('SECURED CHECKOUT PROCESS');
+			$("#msg").html("The checkout process and payments are completely secured. We will not save your payment details. You will receive all the details on your order and payment.");
+			break;				
+		  case 'QUALITY':
+			$("#modal-hedline").html('HIGH QUALITY AT AFFORDABLE PRICES');
+			$("#msg").html("<p><strong>QUALITY:</strong> You won't be disapponted. We use professional printer, high quality frames with classy finish and materials used for fine art reproductions. We craft each artwork carefully and with state-of-the-art machines.</p> <p><strong>PRICE:</strong> Our prices are highly competitive for the quality we provide. If you don't like the price you paid, we accept returns without any questions.</p>");
+			break;				
+		  case 'LARGEST':
+			$("#modal-hedline").html('LARGEST COLLECTION');
+			$("#msg").html("<p><strong>DID YOU KNOW THAT WE HAVE THE LARGEST COLLECTION OF LICENSED ARTWORKS IN INDIA?</strong></p> <p>Over 2.7 lakh artworks licensed from over 4500 artists across the world.</p> <p>Arte'Venue saves you the pain of looking around for that exact piece of art you want for your home or office interiors.");
+			break;
+			}
+			$('#msg-modal').modal('show');
+		}
+		
+	</script>
 	{% endblock jscripts %}
 	

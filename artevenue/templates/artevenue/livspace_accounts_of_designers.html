@@ -1,0 +1,188 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block page-title %} 
+<title>Arte'venue | Livspace Designer Accounts</title>
+{% endblock page-title %} 
+ 
+{% block page-description %} 
+<meta name="description" content="Arte'venue | Livspace Designer Accounts.">
+{% endblock page-description %} 
+  
+{% block page-keywords %} 
+<meta name="keywords" content="arte'venue, livspace, designer accounts">
+{% endblock page-keywords %} 
+
+{% block page-author %}   
+<meta name="author" content="Arte'Venue">
+{% endblock page-author %} 
+
+
+{% block coursel-stylesheet %}
+{% endblock coursel-stylesheet %}
+
+{% block jqueryui-script %}
+{% endblock jqueryui-script %}
+
+{% block coursel-script %}
+{% endblock coursel-script %}
+
+{% block front.js %}
+{% endblock front.js %}
+
+{% block google-recaptcha-3 %}
+{% endblock google-recaptcha-3 %}
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+
+    <div class="container mb-5">
+        <div class="sign-up-box">
+			<div class = "row">
+				<div class = "col-12 col-md-3 sign-up-left-box">
+					<div class = "row">
+						<div class = "col-12">
+							<div class = "sign-up-left-text">
+								<h1 class = "mb-3">Livspace Accounts of Designers</h1>
+								<ul>
+									<li>List of accounts of all designers</li>
+									<li>Create a new account for a designer</li>
+									<li>Remove an account of a designer</li>
+								</ul>
+							</div>
+						</div>
+						<div class = "col-12 mt-5 mb-3 text-center">
+							<a href="{% url 'livspace_register' %}" class = "btn btn-primary">
+								<i class = "fa fa-add">
+									Create New Account
+								</i>
+							</a>
+						</div>
+					</div>
+				</div>
+				<div class = "col-12 col-md-9 sign-up-right">
+					<div class = "row">
+					<input hidden id = "d-id">
+					{% for b in user_profile %}
+					<div class = "col-12 col-md-6">
+					<div class="card mb-3" id = "a_{{b.user.id}}" style="">
+						<h5 class="card-header">NAME: <strong>{{b.user.first_name}} {{b.user.last_name}}</strong></h5>
+						<div class="card-body">
+							<div class = "row card-text">
+								<div class = "col-6">
+									USERNAME:<br/> {{b.user.username}} 
+								</div>
+								<div class = "col-6">
+									EMAIL:<br/> {{b.user.email}}
+								</div>
+								<div class = "col-6 mt-3 pull-left">
+									DATE JOINED:<br/> {{b.user.date_joined | date:'d-M-Y'}}
+								</div>
+								<div class = "col-6 mt-3">
+									<button class = "btn btn-link pull-right" 
+										onclick="$('#d-name').html('{{b.user.first_name}} {{b.user.last_name}}'); $('#d-id').val('{{b.user_id}}'); $('#accnt-del').modal('show');"
+										style="color: #000; text-decoration: underline;">
+										<i class = "fa fa-times-circle">
+											Remove
+										</i>
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+					</div>
+					{% endfor %}
+					</div>
+				</div>
+			</div>
+        </div>
+
+		<!-- Cart Delete cofirm Modal -->
+		<div id="accnt-del" tabindex="-1" role="dialog" aria-labelledby="Account Remove Confirm" aria-hidden="true" class="modal fade">
+			<div class="modal-dialog modal-md">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h3 class="modal-title"><span id = "modal-hedline">Alert</span></h3>
+						<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
+					</div>
+					<div class="modal-body">
+						<div class="row">
+							<div class="col-12">
+								<div class = "mb-4">
+									<h4><span id = "msg-r">REMOVE DESIGNER ACCOUNT OF <strong>"<span id = 'd-name'></span>"</strong>?</span></h4>
+								</div>
+								<p>
+									Are you sure that you want to remove the designer account?
+									<ul>
+										<li>This designer will not be able to login into Arte'Venue and place any orders.</li>
+										<li>All orders placed using this designer account will be available in the
+										Livspace admin account.</li>
+									</ul>
+								</p>
+							</div>
+							<div class="col-12 col-md-6 mt-3 text-center">
+								<button class="btn btn-danger" 
+									onclick="removeAccnt();">
+									<i class="fa fa-remove"></i>
+									REMOVE ACCOUNT
+								</button>
+							</div>					
+							<div class="col-12 col-md-6 mt-3 text-center">
+								<button class="btn btn-primary" 
+									onclick="$('#accnt-del').modal('hide');">
+									<i class="fa fa-check"></i>
+									RETAIN THIS ACCOUNT
+								</button>
+							</div>					
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- END: Message modal -->		
+		{% include 'artevenue/message-modal_ok.html' %}		
+			
+    </div>
+	{% endblock sitecontent %}
+	
+	
+	{% block jscripts %}
+	<script>
+		function removeAccnt(){
+			var user_id = $('#d-id').val();
+		
+			$.ajax({
+				url: "{% url 'remove_liv_accnt' %}", 
+				data: {'user_id':user_id}, 
+				dataType: 'text', 
+				type: 'post',
+				success: function (data) {
+					data = JSON.parse(data);
+					cart_qty = data.msg;
+					//Update items in cart
+					if (data = "SUCCESS") {
+						// Update the display
+						$('#accnt-del').modal('hide');
+						$('#a_' + user_id).remove();
+						$('#msg').html("Account for the designer has been removed.");
+						$('#msg-modal').modal('show');
+					} else {
+						alert("Sorry, couldn't remove the designer account. Please get in touch with Arte'Venue support team for help.");
+					}
+				},
+				error: function(xhr){
+					alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+				}
+			});	
+			
+		}
+		
+	</script>
+	{% endblock jscripts %}
+	

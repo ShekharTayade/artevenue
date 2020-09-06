@@ -57,6 +57,30 @@
 					{% endif %}
 				{% endfor %}				
 			</div>
+			<div class = "d-none d-lg-block row mt-4 ml-1 mr-1" style = "font-size:0.75rem; border: 1px solid #cfcfcf; border-radius: 5px;">
+				<div class = "col-12 d-flex flex-column align-items-center justify-content-center h-100">
+					<div class = "mb-2 d-flex flex-row align-items-center">
+						<img class = "mt-1" src = "{% static 'img/why_artevenue/top_quality.png' %}" alt= "Check Out Our Quality" width=70>
+						<span class = "ml-2 text-center"> 
+							Our Customers Are Loving Our Artwork Quality.
+							<br/>
+							<span style = "font-weight:600;">See Our Quality Up-Close!</span>
+						</span>
+					</div>
+				</div>
+			</div>
+			<div class = "d-block d-mb-none d-lg-none row m-4" style = "font-size:0.75rem; border: 1px solid #cfcfcf; border-radius: 5px;">
+				<div class = "col-12 d-flex flex-column align-items-center justify-content-center h-100">
+					<div class = "mb-2 d-flex flex-row align-items-center">
+						<img class = "mt-1" src = "{% static 'img/why_artevenue/top_quality.png' %}" alt= "Check Out Our Quality" width=100>
+						<span class = "ml-2 text-center"> 
+							Our Customers Are Loving Our Artwork Quality.
+							<br/>
+							<span style = "font-weight:600;">See Our Quality Up-Close!</span>
+						</span>
+					</div>
+				</div>
+			</div>
 		</div>
 		<div class="col-lg-3 col-md-6 mt-3" style = "color:#fff;">
 			<p class="footer-heading" style="font-size:0.85rem; font-weight:700;">IMPORTANT LINKS</p>
@@ -81,7 +105,7 @@
 					<ul class="list-unstyled"  style = "font-size:0.75rem; color:fff !important;  line-height:2;">
 						<!--<li><a href="shipping">Shipping</a></li>-->
 						<li style = "margin-top:8px;"><a style = "cursor: pointer;" onclick="$('#refund-modal').modal('show');"  style = "padding:0px; margin:0px; font-size:0.75rem;">
-						Returns, Refund</a></li>
+						Returns & Replacements</a></li>
 						<!--<li><a href="">How It Works</a></li>-->
 						<li style = "margin-top:8px;"><a href="{% url 'business_registration' %}">Business Sales</a></li>
 						<li style = "margin-top:8px;"><a href="{% url 'terms_conditions' %}">Terms of Use</a></li>
@@ -164,9 +188,7 @@
 					However, we are happy to cancel the order for you before our production process
 					begins, which is typically within an hour of you placing an order. 
 					In case you wish to cancel please call/write back to us as soon as possible, and 
-					we can let you know if the order can be cancelled.<br />
-					If the order is cancelled, we will ask you for your bank details and it will take
-					up to 7 business days to make process the refund.
+					we can let you know if the order can be cancelled.
 				</div>				
 			</div>
 		</div>
@@ -213,7 +235,7 @@
 	<div class="modal-dialog modal-md">
 		<div class="modal-content">
 			<div class="modal-header" style = "background-color:#11b6bd;color:#fff">
-				<h3 class="modal-title" >Return, Refund Policy</h3>
+				<h3 class="modal-title" >Return, Replacements & Refund Policy</h3>
 				<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
 			</div>
 			<div class="modal-body">
@@ -221,6 +243,7 @@
 					<p>Our artworks are customized for you and delivered with utmost care. Your
 					satisfaction is guaranteed. </p>
 					<p>
+					<strong>REPLACEMENTS:</strong><br />
 					In an unlikely event of damages during delivery, artwork having quailty issue or wrong artwork 
 					delivered to you, it is eligible for free replacement.
 					Customer shall inform Arte'Venue about the damaged artwork, quality issue or wrong artwork
@@ -230,8 +253,15 @@
 					</p>
 					
 					<p>
+					<strong>RETURNS:</strong><br />
+					PLEASE NOTE: Returns apply only to art print items. Custom Photo frame items (where
+					customer uploads his/her own picture and we print, frame as per order)
+					are not eligible for returns.<br/><br />
+
 					If you are not satisfied, we are happy to accept the return
-					within 5 days of delivery for full refund. Please note that, Arte'Venue will try
+					within 5 days of delivery for full refund. <br />
+										
+					Please note that, Arte'Venue will try
 					and arrange
 					for the pick up, but it is subject to our delivery partners agreeing to the return shipping
 					and customer will bear the return shipping charges. Arte'Venue will deduct 

@@ -1462,7 +1462,7 @@ body.loading .ajax-modal {
 	height:200px;
 	float:left;
 	margin-right:15px;
-	border-radius:10%;
+	border-radius:5%;
 }
 
 .artist-item {

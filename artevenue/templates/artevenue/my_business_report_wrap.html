@@ -11,7 +11,7 @@
 {% endblock page-keywords %}
 	<!-- Only Override the site content block -->
 	{% block sitecontent %}
-	<div class="container-fluid">
+	<div class="container">
 		<div class="row">
 			<!-- breadcrumb-->
 			<div class="col-12">
@@ -23,7 +23,6 @@
 				</nav>
 			</div>
 		</div>
-		<h1>My Business Report</h1>
 		<div class = "row mt-3 mb-5">
 			<div class = "col-lg-12">
 				<div class="box info-bar">
@@ -128,7 +127,8 @@
 				success: function (data) {
 					if (printpdf == "FALSE") {
 						$("#rep_table").html(data);
-						//getButtons();
+						copy_date('FROMDATE');
+						copy_date('TODATE');
 					}
 				},
 				error: function(xhr){
@@ -158,7 +158,7 @@
 			var fm_mn = fm_d.getMonth();
 			var fm_mn = fm_mn + 1; //Javascript month start from 0
 			var fm_yy = fm_d.getFullYear();			
-			var from_date = fm_yy + "-" + fm_mn + "-" + fm_dt;
+			var from_date = zeroPad(fm_yy) + "-" + zeroPad(fm_mn) + "-" + zeroPad(fm_dt);
 			$('#fromdate_pdf').val(from_date);
 		} 
 		if (type == "TODATE") {
@@ -167,7 +167,7 @@
 			var to_mn = to_d.getMonth();
 			var to_mn = to_mn + 1; //Javascript month start from 0
 			var to_yy = to_d.getFullYear();			
-			var to_date = to_yy + "-" + to_mn + "-" + to_dt;
+			var to_date = zeroPad(to_yy) + "-" + zeroPad(to_mn) + "-" + zeroPad(to_dt);
 			$('#todate_pdf').val(to_date);
 		}
 	}
