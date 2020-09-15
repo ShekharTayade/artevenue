@@ -75,7 +75,8 @@ def show_cart(request):
 			'acrylic_id', 'mount_size', 'product__name', 'image_width', 'image_height', 'stretch_id', 'board_id',
 			'product__thumbnail_url', 'cart_id', 'promotion__discount_value', 'promotion__discount_type', 'mount__color',
 			'item_unit_price', 'item_sub_total', 'item_disc_amt', 'item_tax', 'item_total', 'product_type',
-			'product__image_to_frame', 'promotion_id', 'moulding__width_inner_inches', 'product__description'
+			'product__image_to_frame', 'promotion_id', 'moulding__width_inner_inches', 'product__description',
+			'product__art_medium', 'product__art_surface'
 			).order_by('product_type')
 
 	except Cart.DoesNotExist:
@@ -178,16 +179,59 @@ def show_cart(request):
 
 
 	v_code = None
+	orig_flag = False
+	orig_cnt = 0
+	not_orig_flag = False
+	not_orig_cnt = 0
+	orig_msg = ''
+	
+	medium_list = Original_art.MEDIUM
+	surface_list = Original_art.SURFACE
+
+	## Check if user has any original art in the cart
+	for i in usercartitems:
+		if i['product_type'] == 'ORIGINAL-ART':
+			orig_cnt = orig_cnt + 1
+		else:
+			not_orig_cnt = not_orig_cnt + 1
+	
+	if orig_cnt > 0:
+		orig_flag = True
+	if not_orig_cnt > 0:
+		not_orig_flag = True
+
+	user_msg = ''
 	if usercart and request.user.is_authenticated and livuser == False:
-		if not usercart.voucher_id:
-			orders = Order.objects.filter(user = usr).exclude(order_status = 'PP')
-			if not orders:
+		orders = Order.objects.filter(user = usr).exclude(order_status = 'PP')
+		if not usercart.voucher_id and not orig_flag:
+			if not orders:			
 				voucher = Voucher.objects.get(voucher_id = 8, effective_from__lte = today, 
 						effective_to__gte = today, store_id = settings.STORE_ID)
 				if voucher:
 					v_code = voucher.voucher_code
 				else:
 					v_code = None
+		else:
+					
+			## If there is an original art in the cart and FIRST15 discount is applied, then remove the voucher from the cart
+			if orig_flag and not_orig_flag and not orders:
+				remove_voucher(request, usercart.cart_id)
+				orig_msg = "15% off is available on art prints for first order. Not applicable to original art. You may remove original art to get the discount."
+				
+			## Re-fetch cart and cart item to get latest values
+			usercart = Cart.objects.get(user = usr, cart_status = "AC")
+			usercartitems = Cart_item_view.objects.select_related('product', 'promotion').filter(
+					cart = usercart.cart_id, product__product_type_id = F('product_type_id')).values(
+				'cart_item_id', 'product_id', 'product__publisher','quantity', 'item_total', 'moulding_id',
+				'moulding__name', 'moulding__width_inches', 'print_medium_id', 'mount_id', 'mount__name',
+				'acrylic_id', 'mount_size', 'product__name', 'image_width', 'image_height', 'stretch_id', 'board_id',
+				'product__thumbnail_url', 'cart_id', 'promotion__discount_value', 'promotion__discount_type', 'mount__color',
+				'item_unit_price', 'item_sub_total', 'item_disc_amt', 'item_tax', 'item_total', 'product_type',
+				'product__image_to_frame', 'promotion_id', 'moulding__width_inner_inches', 'product__description',
+				'product__art_medium', 'product__art_surface'
+				).order_by('product_type')
+	else:
+		user_msg = "If you login and it's your first order, you can avail 15% off on all art prints"
 		
 	return render(request, template, {'usercart':usercart, 
 		'usercartitems': usercartitems, 'shipping_cost':shipping_cost, 
@@ -195,7 +239,8 @@ def show_cart(request):
 		'ref_msg':ref_msg, 'ref_status':ref_status, 'referral_disc_amount':referral_disc_amount,
 		'MEDIA_ROOT':settings.MEDIA_ROOT, 'MEDIA_URL':settings.MEDIA_URL, 
 		'cart_without_disc':cart_without_disc, 'promo_removed':promo_removed,
-		'v_code': v_code,'env': env })
+		'v_code': v_code,'env': env, 'orig_msg': orig_msg, 'medium_list':medium_list, 'surface_list': surface_list, 
+		'user_msg': user_msg })
 
 '''	
 def show_wishlist(request):
@@ -952,6 +997,9 @@ def update_cart_item(request):
 	cart_item = Cart_item_view.objects.select_related('product', 'promotion').filter( 
 		cart_item_id = json_data['cart_item_id'], cart_id = json_data['cart_id'],
 			product__product_type_id = F('product_type_id')).first()
+
+	if cart_item.product_type_id == 'ORIGINAL-ART':
+		return JsonResponse({'msg':'Orignal art can be sold only one at a time'}, safe=False)	
 
 	if not cart_item:
 		return JsonResponse({'msg':'Not cart items found for cart # ' + cart_item_id}, safe=False)	
@@ -2258,6 +2306,7 @@ def add_to_cart_new(request):
 		## Check if it's first order for this user, if yes, apply FIRST15 voucher by default
 		else:
 			livuser = False
+			
 			if request:
 				if request.user:
 					if request.user.is_authenticated:
@@ -2273,15 +2322,17 @@ def add_to_cart_new(request):
 			if request.user.is_authenticated and livuser == False:
 				orders = Order.objects.filter(user = userid).exclude(order_status = 'PP')
 				if not orders:
-					v_code = Voucher.objects.get(voucher_id = 8)
-					response = apply_voucher_py_new(request, cart.cart_id, v_code.voucher_code, 
-						cart.cart_total, cart.cart_sub_total, False)						
-					res = json.loads(response.content.decode('utf-8'))
-					if res['status'] == 'SUCCESS' or res['status'] == 'SUCCESS-':
-						print('OK')
-					else:
-						msg = "There was an issue while apply your Coupan: " + res['status']
-						err_flg = True
+					## 15% auto discount does not apply if its' an original art
+					if prod.product_type_id != 'ORIGINAL-ART':
+						v_code = Voucher.objects.get(voucher_id = 8)
+						response = apply_voucher_py_new(request, cart.cart_id, v_code.voucher_code, 
+							cart.cart_total, cart.cart_sub_total, False)						
+						res = json.loads(response.content.decode('utf-8'))
+						if res['status'] == 'SUCCESS' or res['status'] == 'SUCCESS-':
+							print('OK')
+						else:
+							msg = "There was an issue while apply your Coupan: " + res['status']
+							err_flg = True
 
 	except IntegrityError as e:
 		err_flg = True

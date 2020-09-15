@@ -60,10 +60,11 @@ def get_FramedImage(request):
 	#img_source = Image.open('artevenue/'+settings.STATIC_URL + prod_img.url)			
 	env = settings.EXEC_ENV
 	if env == 'DEV' or env == 'TESTING':
-		if prod_type == 'STOCK-IMAGE':
+		if prod_type == 'STOCK-IMAGE' and prod_img.publisher != 'ARTEVENUE':
 			response = requests.get(prod_img.url)
 			img_source = Image.open(BytesIO(response.content))
 		else :
+			#img_source = Image.open(settings.PROJECT_DIR + '/' + settings.STATIC_URL + prod_img.url)			
 			img_source = Image.open(settings.BASE_DIR + "/artevenue" + settings.STATIC_URL + prod_img.url)
 	else:
 		img_source = Image.open(settings.PROJECT_DIR + '/' + settings.STATIC_URL + prod_img.url)			
@@ -593,7 +594,7 @@ def get_FramedImage_by_id(request, prod_id, m_id, mount_color='',
 	env = settings.EXEC_ENV
 	
 	if env == 'DEV' or env == 'TESTING':
-		if prod_type == 'STOCK-IMAGE':
+		if prod_type == 'STOCK-IMAGE' and prod_img.publisher != 'ARTEVENUE':
 			response = requests.get(prod_img.url)
 			img_source = Image.open(BytesIO(response.content))
 		else :

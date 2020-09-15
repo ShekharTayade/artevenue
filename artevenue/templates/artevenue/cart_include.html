@@ -15,6 +15,31 @@
 
 
 				<div id="cart" class="col-lg-9">
+					{% if orig_msg %}
+					<div class = "row">
+						<div class = "col-12 text-center">
+							<i class = "fa fa-exclamation-circle"> </i> <span style = "font-size: 0.85rem;">{{orig_msg}}</span>
+						</div>
+					</div>
+					{% endif %}
+					{% if user_msg %}
+					<div class = "row">
+						<div class = "col-12 text-center">
+							<i class = "fa fa-exclamation-circle"> </i> <span style = "font-size: 0.85rem;">{{user_msg}}</span>
+						</div>
+					</div>
+					{% endif %}
+					{% if usercart.voucher %} 
+					<div class = "row">
+						<div class = "col-12">
+							<div id "vouch_text" style ="color: #999; font-size: 0.9rem;">
+								<i class = "fa fa-exclamation-circle" style ="color: green;"> </i> 
+								You have used coupon {{ usercart.voucher.voucher_code }}. 
+								Discount of <i class = "fa fa-inr"></i> {{usercart.voucher_disc_amount |floatformat }} is applied
+							</div>
+						</div>
+					</div>
+					{% endif %}
 					<div class="box">
 						<form method="post" id = "checkoutform" onsubmit = "return validate_checkout();" action="{% url 'checkout_step1_address' %}">
 							{% csrf_token %}
@@ -42,7 +67,7 @@
 										{% for i in usercartitems %}
 										<tr>
 											<td>
-												<img src = "{% if i.product_type == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product__image_to_frame}} {% else %} {% if env == 'DEV' or env == 'TESTING' %} {{i.product__thumbnail_url}} {% else %} {% static i.product__thumbnail_url %} {% endif %} {% endif %}" style = "width:50px; height:50px; object-fit:contain;">
+												<img src = "{% if i.product_type == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product__image_to_frame}} {% else %} {% if env == 'DEV' or env == 'TESTING' %} {% if i.product_type == 'ORIGINAL-ART' %} {% static i.product__thumbnail_url %} {% else %} {{i.product__thumbnail_url}} {% endif %} {% else %} {% static i.product__thumbnail_url %} {% endif %} {% endif %}" style = "width:50px; height:50px; object-fit:contain;">
 												<br />
 
 												<div class = "pull-left">
@@ -58,12 +83,19 @@
 														EACH ITEM: <br/>
 													{% endif %}
 													{% if i.product_type == 'ORIGINAL-ART' %}
-														<li>{{i.product__description}}</li>
+														<li>Original Art: 
+															{% for k, v in medium_list %}
+															{% if i.product__art_medium == k %}{{v}}{% endif %}
+															{% endfor %} on 
+															{% for k, v in surface_list %}
+															{% if i.product__art_surface == k %}{{v}}{% endif %}
+															{% endfor %}
+															</li>
 													{% else %}													
-														<li>Print on {{i.print_medium_id|title}}</li>
+														<li>Art Print on {{i.print_medium_id|title}}</li>
 													{% endif %}
 													{% if i.moulding_id %}
-														<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+														<li>{% if i.product_type == 'ORIGINAL-ART' %} Art Size{% else %} Image Size {% endif %}: {{ i.image_width }}" X {{i.image_height }}"</li>
 														<li>Frame: {{i.moulding__name }} ({{i.moulding__width_inches}} inch, Polystyrene)</li>
 														{% if i.mount_id %}
 															<li>Mount: {{i.mount_size }}", Color: {{i.mount__name|title }} </li>
@@ -84,7 +116,8 @@
 											</td>
 											<td style = "text-align:right;">
 												<input type="number" value="{{i.quantity}}" class="form-control" style="width:50px;"
-													onchange = 'updateItemQty("{{i.cart_item_id}}", $(this).val());'>
+													onchange = 'updateItemQty("{{i.cart_item_id}}", $(this).val());'
+													{% if i.product_type == 'ORIGINAL-ART' %} readonly {% endif %}>
 											</td>
 											<td style = "text-align:right">{{i.item_total|floatformat}}</td>
 											<td>
@@ -107,6 +140,18 @@
 														<i style = "cursor: pointer; color:#007bff;" 
 															data-toggle="tooltip" title="Edit!" class="fa fa-edit"
 															onclick = "edit_item_collage('{{i.cart_item_id}}', '{{i.product_id}}');">
+															<small> Edit</small>
+														</i>
+													</a>
+													</li>
+													<li>
+													{% endif %}
+													{% if i.product_type == 'ORIGINAL-ART'%}
+													<li>
+													<a>
+														<i style = "cursor: pointer; color:#007bff;" 
+															data-toggle="tooltip" title="Edit!" class="fa fa-edit"
+															onclick = "edit_item_original_art('{{i.cart_item_id}}', '{{i.product_id}}');">
 															<small> Edit</small>
 														</i>
 													</a>
@@ -142,8 +187,8 @@
 									<div class = "text-muted" style = "font-size:0.85rem; font-weight:500;">Apply Discount Coupon or eGift code:</div>
 									<form>
 										<div class="input-group">
-											<input id = "v_code" type="text" class="form-control"><span class="input-group-append">
-											<button onclick = "applyVoucher( '{{usercart.cart_id}}', $('#v_code').val(),'{{usercart.cart_total}}');" type="button" class="btn btn-primary"><i class="fa fa-gift"></i></button></span>
+											<input id = "v_code" type="text" class="form-control" value="{{v_code|default_if_none:''}}"><span class="input-group-append">
+											<button id = "v_btn" onclick = "applyVoucher( '{{usercart.cart_id}}', $('#v_code').val(),'{{usercart.cart_total}}');" type="button" class="btn btn-primary"><i class="fa fa-gift"></i></button></span>
 										</div>
 										<div id="coupan-text"></div>
 										<!-- /input-group-->
@@ -219,19 +264,14 @@
 										<th class="pull-right"><i class = "fa fa-inr"> </i> <span id ="cart_total" >{{usercart.cart_total|floatformat:"0"|default:"0"}}</span></th>
 									</tr>
 
-									<tr>
+									{% if usercart.cart_disc_amt > 0 %}
+									<!--<tr>
 										<td>Discount</td>
 										<th id = "disc_amt" style = "color:green" class="pull-right">
 											{{usercart.cart_disc_amt|floatformat}}
 										</th>
-									</tr>
-									<tr>
-										<td>Cart Total Before Disc</td>
-										<th id = "disc_amt" style = "" class="pull-right">
-											{{cart_without_disc|floatformat}}
-										</th>
-										 
-									</tr>									
+									</tr>-->
+									{% endif %}
 								</tbody>
 							</table>
 							<ul>
@@ -239,14 +279,6 @@
 								<li>
 								<div id "vouch_text" style ="color: #999; font-size: 0.6rem;">
 									{{ref_msg}}
-								</div>
-								</li>
-							{% endif %}
-							{% if usercart.voucher %} 
-								<li>
-								<div id "vouch_text" style ="color: #999; font-size: 0.6rem;">
-									You have used coupan {{ usercart.voucher.voucher_code }}. 
-									Discount of <i class = "fa fa-inr"></i> {{usercart.voucher_disc_amount |floatformat }} is applied
 								</div>
 								</li>
 							{% endif %}
@@ -267,7 +299,40 @@
 					<input hidden id="c_product_id" name = "product_id" value = ''>
 					<input hidden id="c_product_type" name = "product_type" value = ''>
 				</form>
+				<form id = "edit_form_original_art" hidden action = "{% url 'original_art_detail' %}" method = 'GET'>
+					<input hidden id="o_cart_item_id" name = "cart_item_id" value = ''>
+					<input hidden id="o_product_id" name = "product_id" value = ''>
+					<input hidden id="o_product_type" name = "product_type" value = ''>
+				</form>
 
+			</div>
+			<div class="box-footer row">
+				<div class="col-12 mb-3">
+					<div>Pay Using Any of These Modes</div>
+				</div>
+				<div class="col-3">
+					<img src = "{% static 'img/payment_icons/credit_debit_card.png' %}"
+						alt = "Credit/Debit Cards" width=50 style="margin-left:auto; margin-right:auto;display: block;"> 
+						<p class = "text-center">Credit, Debit Cards</p>
+				</div>
+				<div class="col-3">
+					<img src = "{% static 'img/payment_icons/net_banking.png' %}"
+						alt = "Credit/Debit Cards" width=50  style="margin-left:auto; margin-right:auto;display: block;"> 
+					<p class = "text-center">Net Banking</p>
+				</div>
+				<div class="col-3">
+					<img src = "{% static 'img/payment_icons/upi.png' %}"
+						alt = "Credit/Debit Cards" width=50  style="margin-left:auto; margin-right:auto;display: block;"> 
+					<p class = "text-center">UPI</p>
+				</div>
+				<div class="col-3">
+					<img src = "{% static 'img/payment_icons/wallet.png' %}"
+						alt = "Credit/Debit Cards" width=50 style="margin-left:auto; margin-right:auto;display: block;"> 
+					<p class = "text-center">Wallets</p>
+				</div>
+				<div class="col-12">
+					<p class = "text-center">Completely secured payments.</p>
+				</div>
 			</div>
 
 			<script>

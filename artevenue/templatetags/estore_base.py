@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 
 from artevenue.models import Ecom_site, Main_slider, New_arrival, Promotion, Menu, Stock_image_category
 from artevenue.models import New_arrival_images, Promotion_images, Cart, Business_profile, UserProfile
+from artist.models import Artist
 from django.http import HttpResponse
 from django.conf import settings
 
@@ -96,7 +97,8 @@ def menubar(request, auth_user):
 	usercart = {}
 	livuser = False
 	livadmin = False
-
+	is_artist = False
+	
 	if request:
 		if request.user:
 			if request.user.is_authenticated:
@@ -113,6 +115,12 @@ def menubar(request, auth_user):
 					if livprofile.business_profile_id:
 						if livprofile.business_profile_id == 17 and livprofile.user_id != 84:
 							livuser = True	
+				try:
+					artist = Artist.objects.get(user = userid)
+					if artist:
+						is_artist = True
+				except Artist.DoesNotExist:
+					is_artist = False
 
 				## Check for Livspace admin
 				try:
@@ -135,7 +143,7 @@ def menubar(request, auth_user):
 			'usercart':usercart, 'request':request,
 			'level1_menuitems_original_art':level1_menuitems_original_art,
 			'user': request.user, 'auth_user' : auth_user, 'business_user':business_user, 'livuser': livuser,
-			'livadmin': livadmin}
+			'livadmin': livadmin, 'is_artist': is_artist}
 
 
 @register.inclusion_tag('artevenue/artevenue_text.html')	

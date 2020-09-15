@@ -1,0 +1,198 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load utils %}
+{% load widget_tweaks %}
+{% block page-title %} 
+<title>Arte'Venue | Original Artwork Approval</title>
+{% endblock page-title %} 
+{% block page-description %}
+<meta name="description" content="Arte'Venue | Original Artwork Approval">
+{% endblock page-description %}
+{% block page-keywords %}
+<meta name="keywords" content="Art, artevenue, original artwork">
+{% endblock page-keywords %}
+
+
+{% block coursel-stylesheet %}
+{% endblock coursel-stylesheet %}
+
+{% block jqueryui-script %}
+{% endblock jqueryui-script %}
+
+{% block coursel-script %}
+{% endblock coursel-script %}
+
+{% block front.js %}
+{% endblock front.js %}
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+{% block google-recaptcha-3 %}
+{% endblock google-recaptcha-3 %}
+
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+        <div class="container mb-5">
+			<div class="row">
+				<!-- breadcrumb-->
+				<div class="col-12">
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+							<li aria-current="page" class="breadcrumb-item active">Approve Original Art</li>
+						</ol>
+					</nav>
+				</div>
+			</div>
+
+			{% if msg %}
+			<div class="row">
+				<div class="col-12 text-center" style = "background-color: #add8e6; color:red; padding:5px; font-weight:600;">
+					{{msg}}
+				</div>
+			</div>
+			{% endif %}							
+			<div class="row">
+				<div class="col-12 text-center" style = "background-color: #add8e6; padding:5px;">
+					<strong><span id = "art_cnt" style = "font-size:1.1rem;">{{artworks.count|default_if_none:'0'}}</span></strong>
+					artworks pending for approval.
+				</div>
+			</div>
+			{% for a in artworks %}
+			<div class = "box mb-3" id = "box_{{a.product.part_number}}" style = "padding-top:0px; background-color:#f9f9f9;">
+				<div class="row d-flex d-align-items-center" style = "background-color:#f6f6f6; padding:10px;">
+					<div class="col-12" style = "color:#11b6bd;">
+						<h3> <strong>ARTWORK ID: {{a.product.part_number}}</strong> <span style = "font-size: 0.75rem;">, Upload Dt: {{a.created_date|date:'d/M/y'}}</span></h3>
+						<h4>
+							<strong>Artist Name: {{a.artist.profile_name}}</strong>
+							{% if a.artist.city %}
+								<br />{{a.artist.city}}, {{ a.artist.state}} <br />
+							{% endif %}
+						</h4>
+					</div>
+					<div class="col-12 col-md-6" style = "color:#11b6bd;">
+						<h4>
+							{% if a.artist.user.email %}
+							Email: {{a.artist.user.email}} <br />
+							{% endif %}
+							{% if a.artist.phone_number %}
+							Phone: {{a.artist.phone_number}}
+							{% endif %}
+						</h4>
+					</div>
+					<div class="col-12 col-md-6" style = "color:#11b6bd;">
+						<h4>
+							{% if a.artist.url_name %}
+							<a href = "https://www.artevenue.com/artist/{{a.artist.url_name}}">
+								https://www.artevenue.com/artist/{{a.artist.url_name}}
+							</a>
+							{% endif %}
+						<h4>
+					</div>
+				</div>
+				<div class="row mt-3">
+					<div class = "col-12 col-md-6">
+						{% if a.product.high_resolution_url %} 
+						<img src = "{% static a.product.high_resolution_url %}" alt="Artist Artwork Image" 
+							width=250 style="">
+						{% else %}
+						<img src = "{% static 'img/custom_framing/upload_icon.png' %}" alt="Upload Image Icon" 
+							width=100 style="top: 25%; position: absolute;left: 25%;">
+						<h3>High resolution artwork image not uploaded</h3>
+						{% endif %}
+					</div>
+					<div class = "col-12 col-md-6">
+						<div class = "row">
+							<div class = "col-6">
+								Title: {{a.product.name}}
+							</div>
+							<div class = "col-6">
+								Price: {{a.product.original_art_price|floatformat}}
+							</div>
+							<div class = "col-6 pull-left">
+								Medium: {{a.product.get_art_medium_display}}
+							</div>
+							<div class = "col-6 pull-right">
+								TYPE: {% if a.product.image_type == '0' %} PAINTING {% else %} PHOTOGRAPH {% endif %}
+							</div>
+							<div class = "col-12">
+								Surface: {{a.product.get_art_surface_display}} {% if a.product.art_surface_description %}, {{a.product.art_surface_description}}{%endif %} 
+							</div>
+							<div class = "col-6 pull-left">
+								Size: {{a.product.art_width}}" X {{a.product.art_height}}"
+							</div>
+							<div class = "col-6 pull-left">
+								Sell Mode: {% if a.sell_mode == 'O' %} Original Art Only  {% endif %}{% if a.sell_mode == 'A' %}  Art Print Only  {% endif %}{% if a.sell_mode == 'B' %} Original and Art Print {% endif %}
+							</div>
+							<div class = "col-12 pull-left">
+								Art Print Max Size: {{a.product.max_width}}" X {{a.product.max_height}}"
+							</div>
+						</div>
+						<div class="row mt-3 text-center">
+							<div class = "col-12 col-md-6">
+								<button class = "btn btn-secondary" 
+									onclick =" approve('{{a.id}}', 'D', '{{a.product.part_number}}');" >
+									Disapprove
+								</button>
+							</div>
+							<div class = "col-12 col-md-6">
+								<button class = "btn btn-primary"
+									onclick =" approve('{{a.id}}', 'A', '{{a.product.part_number}}');" >
+									Approve
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			{% endfor %}
+		</div>
+		{% include 'artevenue/message-modal_ok.html' %}		
+
+	{% endblock sitecontent %}
+	
+	{% block jscripts %}	
+	<script>
+		$( document ).ready(function() {
+		});	
+	</script>
+	<script>
+		function approve(id, action, part_number){
+			if (action == 'A'){
+				var act = 'approve';
+			} else {
+				var act = 'disapprove';
+			}
+			if (confirm("Are you want to " + act +  ": " + part_number + "?" )){				
+				$.ajax({
+						url: "{% url 'set_original_artwork_approval' %}", 
+						data: {'id':id, 'action': action, 'part_number': part_number }, 
+						dataType: 'text', 
+					success: function (data) {
+						data = JSON.parse(data);
+						sts = data.status;
+						if (sts = "SUCCESS") {
+							$("#box_" + part_number ).hide();
+							var cnt = parseInt( $("#artcnt").html());
+							if ( isNaN(cnt) || cnt == 1){
+								i = 0;
+							} else {
+								i = cnt - 1;
+							}
+							$("#art_cnt").html(i);
+						} else {
+							alert("Sorry! an error occured in updating the order.");
+						}
+					},
+					error: function(xhr){
+						alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+					}
+				});			
+			}
+		}
+	</script>
+	{% endblock jscripts %}
+			
+	{% block tawkto %} 
+	{% endblock tawkto %} 		

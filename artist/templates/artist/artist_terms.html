@@ -1,0 +1,270 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load utils %}
+{% load widget_tweaks %}
+{% block page-title %} 
+<title>Arte'Venue | Artist Page</title>
+{% endblock page-title %} 
+{% block page-description %}
+<meta name="description" content="Arte'Venue | Artist's Page - Update profile, Artworks, View Sales">
+{% endblock page-description %}
+{% block page-keywords %}
+<meta name="keywords" content="Art, artevenue, original artwork,  artist sales">
+{% endblock page-keywords %}
+
+
+{% block coursel-stylesheet %}
+{% endblock coursel-stylesheet %}
+
+{% block jqueryui-script %}
+{% endblock jqueryui-script %}
+
+{% block coursel-script %}
+{% endblock coursel-script %}
+
+{% block front.js %}
+{% endblock front.js %}
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+{% block google-recaptcha-3 %}
+{% endblock google-recaptcha-3 %}
+
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+        <div class="container mb-5">
+			<div class="row">
+				<!-- breadcrumb-->
+				<div class="col-12">
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+							<li class="breadcrumb-item"><a href="{% url 'artist_page' %}">Artist's Page</a></li>
+							<li aria-current="page" class="breadcrumb-item active">Imp Terms of Usage for Artists</li>
+						</ol>
+					</nav>
+				</div>
+			</div>
+
+			{% if msg %}
+			<div class="row">
+				<div class="col-12 text-center" style = "background-color: #add8e6; color:red; padding:5px; font-weight:600;">
+					{{msg}}
+				</div>
+			</div>
+			{% endif %}	
+			<div class="row">
+				<div class="col-12">
+					<h1 class = "text-center"><strong>TERMS OF USE</strong></h1>
+				</div>
+				<div class="col-12 mt-3">
+					<small><span class = "pull-right">Last Update: 10 Sep 2020 </span></small>
+				</div>
+				<div class="col-12 mt-3" style = "text-align: justify;">								
+					<ol id = "tnc_list">
+						<li><strong>JOINING AS AN ARTIST</strong>
+							<ol style = "list-style-type: upper-roman;">
+								<li>By joining Arte'Venue as an artist you provide license to Arte'Venue to sell all your 
+									listed artworks via Arte'Venue platform.</li>
+								<li>The Arte'Venue platform primarily comprises of it's website, and may addtionally 
+									include its' social media accounts, it's account on other marketplaces.
+								</li>
+								<li>Arte'Venue makes it's platform available for artists to list their artwork free of cost. 
+									Any platform fee to be charged for joining and listing artworks remains at the discretion 
+									of Arte'Venue.
+								</li>
+							</ol>
+						</li>
+						<li><strong>ARTIST ARTWORKS</strong>
+							<ol style = "list-style-type: upper-roman;">
+								<li><strong>PLEASE NOTE: When artist allows sell of original artwork, the artwork needs to be
+									unframed. Arte'Venue can't accept the framed artworks.</strong> This is due the fact that 
+									Arte'Venue allows framing option to it's customers.
+								</li>
+								<li>The minimum price (before tax) of an original art for sale if Rs 3,000. Arte'Venue can't
+									list an original artwork for sell that are priced less than Rs. 3,000. Artist can 
+									list only art prints for sell in case their original artwork is less than Rs 3,000.
+								</li>
+								<li>When artists submit artworks for Arte'Venue review, they confirms that they own 
+									artworks, and have the copy right. Artists will not upload any artwork that is not
+									created by them and don't own a copy right.
+								</li>
+								<li>In case of copy right issues, complains of copy right/ownership of any artwork,
+									artists will be soley responsible and bear the complete consequences.
+								<li>Arte'Venue has a right to reject to list any artwork for sell on it's website. This is to 
+									maintain the high quality of artwork the website and other reasons that Arte'Venue
+									deems fit.
+								</li>
+								<li>Arte'Venue will use the artist's artwork image to print when it receives an order
+									from it's customers.
+								</li>
+								<li>You provide Arte'Venue a right to frame the artwork and art prints based on the customer 
+									orders.
+								</li>
+								<li>Artist provides a right to Arte'Venue to use the artist's artwork images in it's social media posts,
+									advertisement, other advertisements and promotion events.
+								</li>
+								<li>Arte'Venue will not use artist's artwork images for any other purpose not listed here.
+								</li>
+							</ol>
+						</li>
+						
+						<li><strong>PLATFORM FEE</strong>
+							<ol style = "list-style-type: upper-roman;">
+								<li>Arte'Venue charges the platform fee only when there is a sale.
+								</li>
+								<li>Arte'Venue calculates the platform fee during the first week of a month for the orders received
+									in previous months.
+								</li>
+								<li>Following is platform fee charged by Arte'Venue
+									<table class = "table table-responsive">
+										<thead>
+											<tr>
+												<th>Item</th>
+												<th>Size</th>
+												<th>Platform Fee</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td>Original Art</td>
+												<td>Any Size</td>
+												<td>30% of item sale value (before tax)
+											</tr>
+											<tr>
+												<td rowspan="2">Art Print</td>
+												<td>Upto 300 square inch print size</td>
+												<td>80% of item sale value (before tax)</td>
+											<tr>
+												<td>Print size greater than 300 square inch</td>
+												<td>70% of item sale value (before tax)</td>
+											</tr>
+										</tbody>
+									</table>
+								</li>
+								<li>Arte'Venue reserves the right to change the platform fee. If it does, artists will be given a notice.
+									Artists have the choice to delist their art for sell at any point in time.
+								</li>
+								<li><strong>Platform Fee Includes</strong>
+									<ol style = "list-style-type: upper-roman;">
+										<li>Printing cost</li>
+										<li>Framing cost</li>
+										<li>All required materials for printing, framing and packing</li>
+										<li>All labour costs</li>
+										<li>Cost shipping to customer</li>	
+										<li>Marketing costs - Digital marketing, Offline marketing</li>
+										<li>All operational and management costs in managing orders and delivery</li>
+										<li>All platform costs for running and mainting and enhancing the website</li>
+									</ol>
+								</li>
+							</ol>
+						</li>
+						<li><strong>SHIPPING OF ORIGINAL ARTWORKS</strong>
+							<ol style = "list-style-type: upper-roman;">
+								<li>As soon as an order is received, Arte'Venue will send an email to artist on their registered
+									email ID. The original artwork will have to be shipped by artists to Arte'Venue's factory.
+									at address: <br />
+									<p><strong>{{ ecom_site.store_name }}</strong><br />
+									{{ ecom_site.store_address1 }}<br />
+									{% if ecom_site.store_address2 %}
+									{{ ecom_site.store_address2 }}<br />
+									{% endif %}
+									{{ ecom_site.store_city }}<br />
+									{{ ecom_site.store_zip }} &nbsp;{{ ecom_site.store_country }}									
+									<h3><i class="fa fa-phone"></i> Phone Support</h3>
+									<p><strong>{{ecom_site.support_phonenumber }}</strong></p>
+									<h3><i class="fa fa-envelope"></i> Email Support</h3>
+									<p><strong>support@artevenue.com</strong></p>
+								</li>
+								<li>Resposiblity of shipping of original artwork and ensuring that Arte'Venue receives it 
+									within 7 days is solely with the artist.
+								</li>
+								<li>Arte'Venue has years of experience and uses proven packing materials and
+									processes that ensures that artworks are delivered to customer in without damages in transit.
+									However, in rare event if the original artwork is received by the customer in
+									damaged condition, then Arte'Venue will accept the return and return the same artwork to
+									the artist. Arte'Venue doesn't bear resposiblity of the damages in transit and cant' be
+									held resposible. 
+								</li>
+								<li>If an art print is received by customer in damanged condition, then Arte'Venue will 
+									again product it and send to the customer. 
+								</li>
+							</ol>
+						</li>
+						<li><strong>PAYMENTS TO ARTISTS</strong>
+							<ol style = "list-style-type: upper-roman;">
+								<li>Arte'Venue processes the artists payments in the first week of a month for the orders
+									received in previous month.
+								</li>
+								<li>An example of original artwork sale - if an artist's orignal artworks are sold in September 2020 for 
+									a total value of Rs. 50,000 (before tax), then in the first week of October 2020,
+									Arte'Venue will make payment of Rs. 35,000 (Rs 15,000 i.e., 30% of orignal artwork value 
+									dedcuted by Arte'Venue as platform fees) to the artist.
+								</li>
+								<li> An example of art print sale - if an art print worth Rs 10,000 (before tax) and size 
+									greater than 300 square inch is sold in
+									September 2020, then in first week of Oct 2020, Arte'Venue will make payment of
+									Rs. 3,000 (Rs. 7,000, i.e. 70% of art print value deducted by Arte'Venue as platform fee) 
+									to the artist.
+								</li>
+							</ol>
+						</li>
+						<li><strong>CANCELLATION FEE</strong>
+							<ol style = "list-style-type: upper-roman;">
+								<li>When an order gets cancelled for the reasons mentioned in this clause below, 30% of order 
+									value(before tax)
+									will be charged to the artist as cancellation fee and the artwork will be returned to
+									artist in the condition it was received in. Cancellation fee applies when an order 
+									gets due to any of these situations
+									<ol style = "list-style-type: upper-roman;">
+										<li>If Arte'Venue does not receive the artwork within 7 days from the date of order.</li>
+										<li>Arte'Venue receives artwork in damaged condition.</li>
+										<li>Arte'Venue receives a framed artwork.</li>
+									</ol>										
+								</li>
+								<li>Arte'Venue allows it's customers to cancel order. When a customer cancels an order, it is
+									treated as no sale and artist is not eligible for any proceeds from the sale. If it was 
+									an original artwork, and was shipped by artists, it will be returned to the artists by 
+									Arte'Venue.
+								</li>
+							</ol>
+						</li>
+						<li><strong>PROCESS TO UPLOAD AND LIST ARTWORKS</strong>
+							<ol style = "list-style-type: upper-roman;">
+								<li>Artist uploads the artwork image and enters data such as type, title, medium, surface, size, 
+									price and other details.
+								</li>
+								<li>When done, artist submits the artwork for Arte'Venue review</li>
+								<li>Arte'Venue reviews the artwork image, entered data, price and other details. When Arte'Venue
+									finds it fit for listing, your artwork will get listed for sell.
+								</li>
+								<li>Every time artist makes a change to the artwork image, and the related data, the artwork 
+									again needs to be submitted to Arte'Venue for review.
+								</li>
+								<li> Artist can delist any artwork at any point in time.
+								</li>
+							</ol>
+						</li>
+					</ol>
+				</div>
+			</div>
+			<div class="row mt-5">
+				<div class="col-12">
+					<h4 class = "text-center">
+						(<a href = "https:/www.ArteVenue.com">ArteVenue.com</a> platform is developed and owned by Montage Art Pvt Ltd. All rights reserved.)
+					</h4>
+				</div>
+			</div>
+		</div>
+	{% endblock sitecontent %}
+	
+	{% block jscripts %}	
+	<script>
+		$( document ).ready(function() {
+		});	
+	</script>
+	{% endblock jscripts %}
+			
+	{% block tawkto %} 
+	{% endblock tawkto %} 

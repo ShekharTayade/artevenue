@@ -66,6 +66,11 @@
 							{{user.username}}<i class = "fa fa-chevron-down"></i>
 						</a>
 						<ul class="dropdown-menu dropdown-menu-login" >
+							{% if is_artist %}
+							<li style = "margin-top:8px;"> <a href="{% url 'artist_page' %}"  style = "color: #77899e;">Artist's Page</a></li> 
+							<li class= "dropdown-divider" style = "margin-top:5px;" ></li>
+							{% endif %}
+
 							{% if not livuser %}
 							<li style = "margin-top:8px;"><a href="{% url 'logout' %}"  style = "color: #77899e;">Logout</a></li>
 							{% endif %}
@@ -116,6 +121,11 @@
 							{{user.username}}<i class = "fa fa-chevron-down"></i>
 						</a>
 						<ul class="dropdown-menu dropdown-menu-login" >
+							{% if is_artist %}
+							<li style = "margin-top:8px;"> <a href="{% url 'artist_page' %}"  style = "color: #77899e;">Artist's Page</a></li> 
+							<li class= "dropdown-divider" style = "margin-top:5px;" ></li>
+							{% endif %}
+							
 							{% if not livuser %}
 							<li style = "margin-top:8px;"><a href="{% url 'logout' %}"  style = "color: #77899e;">Logout</a></li>
 							{% endif %}
@@ -226,12 +236,14 @@
 					
 
 				{% endfor %}
+				<!--
 				<li class= "mt-2 mb-2 mt-md-0 mb-md-0">
 					<a href="{% url 'stock_collage_products' %}"
 							style = "text-decoration:underline;">
 						Wall Art Sets
 					</a>
 				</li>
+				-->
 
 				<div class="dropdown menu-large mt-2 mb-2 mt-md-0 mb-md-0">
 					<span class="dropdown-toggle room-ideas-menu" data-toggle="dropdown">Art By Room
@@ -270,30 +282,26 @@
 					<span class="caret"></span></span>
 					<ul class="dropdown-menu textmenu">
 						<li>
-							<a class = "nav-link" style = "color: #082a4c !important;" href = "{% url 'original_art_by_category'%}">
-							Art By Category
+							<a class = "nav-link" style = "color: #082a4c !important;" href = "{% url 'show_all_original_art_categories'%}">
+							Browse Categories
 							</a>
 						</li>
 						<li>
 							<a class = "nav-link mt-2" style = "color: #082a4c !important;" href = "{% url 'original_art_by_category'%}">
-								All Art Collection
-							</a>
-						</li>
-						<li>
-							<a class = "nav-link mt-2" style = "color: #082a4c !important;" href = "">
-								Artists
+								All Original Art
 							</a>
 						</li>
 					</ul>
 				</div>
 				
-
+				<!--
 				<li class= "mt-2 mb-2 mt-md-0 mb-md-0">
 					<a href="{% url 'user_image' %}"
 						style = "text-decoration:underline;">
 						Custom Photo Frames
 					</a>
 				</li>				
+				-->
 				
 				{% if not livuser %}
 				<li class= "mt-2 mb-2 mt-md-0 mb-md-0">

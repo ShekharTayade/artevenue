@@ -489,7 +489,7 @@ def stock_collage_detail(request, prod_id = '', iuser_width='', iuser_height='')
 	
 def createInitialData(product_id=None):
 
-	collages = Stock_collage.objects.filter(product_id__gte = 52)
+	collages = Stock_collage.objects.filter(product_id__gte = 78)
 	if product_id:
 		collages = collages.filter(product_id = product_id)
 

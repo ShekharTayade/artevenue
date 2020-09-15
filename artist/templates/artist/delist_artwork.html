@@ -1,0 +1,428 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load utils %}
+
+{% block page-title %}
+<title>Artwork Delisted | Arte'Venue</title>
+{% endblock page-title %}
+
+{% block page-description %}
+<meta name="description" content="Artwork Sell Delisted.">
+{% endblock page-description %}
+
+{% block page-keywords %}  
+<meta name="keywords" content="platform for artist, upload artwork">
+{% endblock page-keywords %}  
+
+{% block page-author %}  
+<meta name="author" content="Arte'venue">
+{% endblock page-author %}  
+
+{% block add_to_head %}
+	<link rel="stylesheet" href="{% static  'css/custom_framing.css' %}">
+{% endblock add_to_head %}
+
+{% block cropper %}
+{% endblock cropper %}
+
+
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+
+	
+    <div class="container mb-5">
+		<div class="row mt-3 mb-3">
+			<div class = "col-12 text-center">
+				<h1><strong>ARTWORK SELL HAS BEEN DELISTED</strong></h1>
+			</div>
+		</div>
+		<div class="row mt-3 mb-3">
+			<div class = "col-12 text-center" style = "">
+				<strong>
+					This artwork sale has been stopped (de-listed).
+					<br />
+					However, this artwork will available for you to start selling again, should you decide
+					to start again.
+				</strong>
+			</div>
+		</div>
+		<form id = "upload-art-form">
+		{% csrf_token %}
+		<div class="row">
+			<div class = "col-12 col-md-6 mt-3" style = "color: #11b6bd;">
+				<label><strong>ARTWORK ID:
+					<span id ="art_id" style = "font-style: italic;">
+					{% if artwork.part_number %} {{artwork.part_number}} {% else %} (System Generated) {% endif %} <span style = "color:red;">DE-LISTED</span>
+					</span>
+					</strong>
+				</label>
+			</div>
+		</div>
+		<div class="row">
+			<div class = "col-12 col-md-7 mt-2">
+				<div class = "row box">
+					<div class = "col-12 col-md-8 mt-2 text-center">
+						<div class="image-upload-wrap">
+							<div class="drag-text">
+								<div class = "row" id = "upload-show">
+									{% if artwork.high_resolution_url %} 
+									<div class = "col-12">
+										<img src = "{% static artwork.high_resolution_url %}" alt="Artist Artwork Image" 
+											width=250 style="">
+									</div>
+									{% else %}									 
+									<div class = "col-6">
+										<img src = "{% static 'img/custom_framing/upload_icon.png' %}" alt="Upload Image Icon" 
+											width=100 style="top: 25%; position: absolute;left: 25%;">
+									</div>
+									<div class = "col-6">
+										<h3>No arwork image found
+									</div>
+									{% endif %}
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-12 col-md-5 mt-3">
+				<div class = "row box">
+					<div class = "col-12">
+						<label><strong>ART TYPE:</strong></label>
+					</div>
+					<div class = "col-12">
+						<span id="art_type_select" title='Choose print surface'
+							data-placement="right">
+							{% for k,v in img_type_list %}
+							<span id= "{{v}}" class = "p_size {% if k == artwork.image_type %} p_clicked {% endif %};">
+								{{v}}
+							</span>
+							{% endfor %}
+						</span>
+						<input hidden id = "art_type" name = "art_type" value = "{{artwork.image_type}}">
+					</div>
+					<div class = "col-12 mt-3">
+						<label><strong>TITLE:</strong></label>
+					</div>
+					<div class = "col-12 ">
+						<input id='title' name='title' maxlength="200" class = "form-control" readonly
+							placeholder="Title or Name of this Artwork/Photograph" value = "{{artwork.name}}" required>
+					</div>
+					<div class = "col-12 mt-3">
+						<label><strong>ART CATEGORY:</strong></label>
+					</div>
+					<div class = "col-12 ">
+						<span style = "font-size: 0.8rem;">Your artwork will be listed in selected category </span>
+						<div class = "form-group">
+							<SELECT id='category' name='category' class = "form-control" readonly>
+								{% for c in category_list %}
+								<OPTION id='{{c.category_id}}' name='{{c.category_id}}' value = '{{c.category_id}}' 
+									{% if c.category_id == category  %} selected {% endif %}>
+									{{c.name}}
+								</OPTION>
+								{% endfor %}
+							</SELECT>					
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class = "row box" id = "art-size">
+			<div class = "col-12">
+				<label><strong>ARTWORK SIZE</strong></label>
+			</div>
+			<div class = "col-12">
+				<div class = "form-group">
+					<strong>Applies only to Paintings</strong>
+				</div>				
+			</div>
+			<div class = "col-12 col-md-6">
+				<div class = "form-group">
+					<label><strong>ORIGINAL PAINTING WIDTH: (in inches)</strong>
+					<input id='art_width' name='art_width'  type = "number" min = "8" class = "form-control"
+						placeholder="" value = "{{artwork.art_width}}" readonly>
+					</label>
+				</div>
+			</div>
+			<div class = "col-12 col-md-6">
+				<div class = "form-group">
+					<label><strong>ORIGINAL PAINTING HEIGHT: (in inches)</strong>
+					<input id='art_height' name='art_height' type = "number"  min = "8" class="form-control"
+						placeholder="" value = "{{artwork.art_height}}" readonly>
+					</label> 
+				</div>
+			</div>
+			<div class = "col-12">
+				<hr>
+			</div>
+			<div class = "col-12">
+				<div class = "form-group">
+					<strong>Applies only to Art Prints</strong> (automatically calculated based on image you upload)
+				</div>				
+			</div>
+			<div class = "col-12 col-md-6">
+				<div class = "form-group">
+					<label><strong>MAXIMUM ART PRINT WIDTH: (in inches)</strong>
+					<input id='art_print_width' name='art_print_width'  type = "number" min = "8" class = "form-control"
+						placeholder="" value = "{{artwork.max_width}}" readonly>
+					</label> <br />
+				</div>
+			</div>
+			<div class = "col-12 col-md-6">
+				<div class = "form-group">
+					<label><strong>MAXIMUM ART PRINT HEIGHT: (in inches)</strong>
+					<input id='art_print_height' name='art_print_height' type = "number"  min = "8" class="form-control"
+						placeholder="" value = "{{artwork.max_height}}" readonly>
+					</label> <br />	
+				</div>
+			</div>
+		</div>
+		
+		<div class="row mt-5 box">
+			<div class = "col-12 col-md-3">
+				<label><strong>MEDIUM:</strong></label><br />
+				<span style = "font-size: 0.8rem;"></span>
+				<div class = "form-group">
+					<SELECT id='medium' name='medium' class = "form-control" readonly>
+						{% for k, v in medium_list %}
+						<OPTION id='{{k}}' name='{{k}}' value = "{{k}}" {% if k == artwork.art_medium %} selected {% endif %}>
+							{{v}}
+						</OPTION>
+						{% endfor %}
+					</SELECT>					
+				</div>
+			</div>
+			<div class = "col-12 col-md-3">
+				<label><strong>SURFACE:</strong></label><br />
+				<span style = "font-size: 0.8rem;"></span>
+				<div class = "form-group">
+					<SELECT id='surface' name='surface' class = "form-control" readonly>
+						{% for k, v in surface_list %}
+						<OPTION id='{{k}}' name='{{k}}'  value = "{{k}}" {% if k == artwork.art_surface %} selected {% endif %}>
+							{{v}}
+						</OPTION>
+						{% endfor %}
+					</SELECT>					
+				</div>
+			</div>
+			<div class = "col-12 col-md-6">
+				<label><strong>SURFACE DESRIPTION:</strong></label><br />
+				<span style = "font-size: 0.8rem;"></span>
+				<div class = "form-group">
+					<input id='surface_description' name='surface_description' maxlength="1000" class = "form-control"
+						placeholder="Ex. Hand made paper. (Leave it blank if you are not sure)" 
+						value = "{{artwork.art_surface_desc}}" readonly/>
+				</div>
+			</div>
+		</div>
+		<div class="row box mt-5">
+			<div class = "col-12">
+				<div class = "row">
+					<div class = "col-12">
+						<label><strong>HOW DO YOU WANT TO SALE?</strong></label><br />
+					</div>
+					<div class = "col-12 col-md-3 text-center mt-3">
+						<span id='only_original' name='only_original' 
+							class = "p_size p_clicked">
+							ONLY ORIGINAL
+						</span>
+					</div>
+					<div class = "col-12 col-md-3 text-center mt-3">
+						<span id='only_art_print' name='only_art_print' 
+							class = "p_size">
+							ONLY ART PRINT
+						</span> 
+					</div>
+					<div class = "col-12 col-md-3 text-center mt-3">
+						<span id='both' name='both' 
+							class = "p_size">
+							BOTH
+						</span>
+					</div>
+					<input hidden id = "art_print_option" name = "art_print_option">
+					<div class = "col-12 mt-4">
+						<ul>
+							<li>'ONLY ORIGINAL': Art prints will not be available for customers to order</li>
+							<li>'ONLY ART PRINT': Original art will not be available for customers to order</li>
+							<li>'BOTH': Original art and it's print both will be available for customers to order.
+								Customers can choose to order the original art or it's art print.</li>
+						</ul>
+						<strong>Photographs can only be sold as art print</strong>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row box mt-5">		
+			<div class = "col-12 ">
+				<label><strong>YOUR PRICE FOR THE ORIGINAL ART</strong></label>
+				<div class = "row">
+					<div class = "col-12 col-md-3">	
+						<div style="display:flex; flex-direction: row; justify-content: center; align-items: center">
+							<label>
+								<i class = "fa fa-inr fa-lg">&nbsp;</i>  
+							</label>
+							<input id='original_art_price' name='original_art_price' type = "number" 
+								class = "form-control"
+								min = '1500' readonly
+								placeholder="" value = "{% if artwork.original_art_price %}{{artwork.original_art_price|get_art_price_without_tax|floatformat }}{% endif %}" />
+						</div>
+					</div>
+				</div>
+				<span style = "font-size: 0.8rem;">
+						The GST applicable for art is 12%. We will add 12% to your price and display as 
+						the artwork price on the website.<br />
+						PLEASE NOTE: Customers may choose to have the artwork framed. The price that will get added 
+						for framing is not owed to the artist. <br />
+						Art print price is determined by Arte'Venue. <br />
+						For details please see the <a> artists@Arte'Venue page</a>.
+				</span>
+			</div>
+		</div>
+		<div class = "row box" id = "keywords_div">
+			<div class = "col-12">
+				<label><strong>KEYWORDS</strong></label>
+			</div>
+			<div class = "col-12 ">
+				<div class = "form-group">
+					<input id = "keywords" name = "keywords" type = "text" maxlength = "200" 
+					class = "form-control" value = "{{artwork.key_words}}" readonly>
+				</div>
+			</div>
+		</div>
+		<div class = "row box" id = "keywords_div">
+			<div class = "col-12">
+				<label><strong>COLORS</strong></label>
+			</div>
+			<div class = "col-12 ">
+				<div class = "form-group">
+					<input id = "colors" name = "colors" type = "text" maxlength = "200" 
+					class = "form-control" value = "{{artwork.colors}}" readonly>
+				</div>
+			</div>
+		</div>
+		<input id = "form_mode" name = "form_mode" type = "text" hidden>
+		</form>		
+    </div>
+
+	
+	{% endblock sitecontent %}
+
+	
+	{% block jscripts %}
+
+	
+	<script>
+		$(document).ready(function(){
+			$("#max_size_artprint").hide();
+			
+			{% if artwork %}
+				// Artwork present
+			{% if artwork.image_type == 0 or artwork.image_type == '0' %}
+				// Painting
+			art_type_change('PAINTING');
+			{% elif artwork.image_type == 1 or artwork.image_type == '1' %}
+				// Photo
+			art_type_change('PHOTOGRAPH');
+			{% endif %}
+			{% endif %}
+			
+			{% if orig_artwork_sts %}
+				allow_art_print('{{orig_artwork_sts.sell_mode}}');
+			{% else %}
+				allow_art_print('B');				
+			{% endif %}
+			
+			{% if category %}
+				$("#category").val("{{category}}");
+			{% endif %}
+		});
+	</script>
+	<script>
+	function art_type_change(typ){	
+		$("#art_type").val(typ);
+		if (typ == 'PAINTING') {
+			art_type = 'PAINTING';
+			
+			$("#PAINTING").addClass("p_clicked");
+			$("#PHOTOGRAPH").removeClass("p_clicked");
+			$("#art_width").prop('disabled',false);
+			$("#art_height").prop('disabled',false);
+
+			$("#medium").prop('disabled',false);
+			$("#surface").prop('disabled',false);
+			$("#surface_description").prop('disabled',false);
+			
+			$("#original_art_price").prop('disabled',false);
+			
+			$("#only_original").prop('readonly',false);
+			$("#only_art_print").prop('readonly',false);
+			$("#both").prop('readonly',false);
+		} else {
+			art_type = 'PHOTOGRAPH';
+			sell_mode = 'A';
+			$("#PAINTING").removeClass("p_clicked");
+			$("#PHOTOGRAPH").addClass("p_clicked");
+			$("#art_width").prop('disabled',true);
+			$("#art_height").prop('disabled',true);
+			
+			$("#medium").prop('disabled',true);
+			$("#surface").prop('disabled',true);
+			$("#surface_description").prop('disabled',true);
+
+			$("#only_original").prop('readonly',true);
+			$("#original_art_price").prop('disabled',true);
+			$("#both").prop('readonly',true);
+
+			$("#only_art_print").addClass('p_clicked');
+			$("#only_original").removeClass('p_clicked');
+			$("#both").removeClass('p_clicked');
+
+			$("#art_print_option").val(sell_mode);
+		}
+
+	}
+	
+	function allow_art_print(mode) {
+		$("#art_print_option").val(mode);
+		if (art_type == 'PHOTOGRAPH') {
+			sell_mode = 'A';
+			$("#only_original").removeClass('p_clicked');
+			$("#only_art_print").addClass('p_clicked');
+			$("#both").removeClass('p_clicked');
+			return;
+		}
+		
+		switch (mode){
+			case 'O':
+				sell_mode = 'O';
+				$("#only_original").addClass('p_clicked');
+				$("#only_art_print").removeClass('p_clicked');
+				$("#both").removeClass('p_clicked');
+				break;
+			case 'A':
+				sell_mode = 'A';
+				$("#only_original").removeClass('p_clicked');
+				$("#only_art_print").addClass('p_clicked');
+				$("#both").removeClass('p_clicked');										
+				break;
+			case 'B':
+				sell_mode = 'B';
+				$("#only_original").removeClass('p_clicked');
+				$("#only_art_print").removeClass('p_clicked');
+				$("#both").addClass('p_clicked');							
+				break;	
+				
+			default:
+				sell_mode = 'B';
+				$("#only_original").removeClass('p_clicked');
+				$("#only_art_print").removeClass('p_clicked');
+				$("#both").addClass('p_clicked');							
+				break;			
+		}	
+	}
+	</script>
+	{% endblock jscripts %}
+			
+	
+	
+	

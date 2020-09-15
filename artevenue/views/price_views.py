@@ -109,8 +109,8 @@ def get_prod_price(prod_id,**kwargs):
 				item_price = Decimal(item_price + stretch_price)
 			
 	elif prod_type == 'ORIGINAL-ART':
-		item_price = prod.price
-		
+		item_price = prod.original_art_price
+
 		# Moulding price
 		if moulding_id:
 			moulding_price = (image_width + image_height) * 2 * get_moulding_price_by_id(moulding_id)

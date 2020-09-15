@@ -47,7 +47,7 @@
 								</div>
 							</div>
 						{% else %}
-							{{prods.paginator.count}} artworks found
+							{{prods.paginator.count}} artworks
 						{% endif %}
 					</h5>
 					<div class="box-cat info-bar">
@@ -69,7 +69,7 @@
 					<div class="row">
 						{% for prod in prods %}
 						{% if prod.publisher %}
-						<div class="col-lg-3 col-md-6">
+						<div class="col-6 col-md-6 col-lg-3 mb-3">
 							<div class = "prod-details">
 								<div class="img-container">
 									<a id = "alink_{{prod.product_id}}" href="{% url 'original_art_detail' prod.product_id %}">
@@ -80,11 +80,11 @@
 
 								<div class="text text-center" style = "margin-top: 5px;">
 									<h4><a href="">{{prod.name}}</a></h4>
-									{% if show_artist %}
+									{% if prod.artist %}
 									<h5 style = "color:blue;">By {{prod.artist}}</h5>
 									{% endif %}
 									<p class="price">
-										{{ prod.price|indian_number_format }}
+										{{ prod.original_art_price|indian_number_format }}
 										<del></del>
 										{% if prod.product_id in wishlist_prods %}
 											<span id = "fav_{{prod.product_id}}" class = "pull-right">

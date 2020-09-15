@@ -1,0 +1,30 @@
+{% load static %}
+{% load indian_numbers_tags %}
+						{% for c in categories %}
+							<div class="col-4 col-md-6 col-lg-2" style="border: 1px solid #cfcfcf; padding:15px 5px 5px 5px; margin-bottom:0px; border-radius:5px;">
+								<span style = "margin-left: auto; margin-right: auto;">
+									{% if c.url_suffix %}
+										<a href="{% url 'original_art_by_category' c.url_suffix %}">
+									{% else %}
+										<a href="{% url 'original_art_by_category' c.name %}">
+									{% endif %}
+										{% if c.background_image %}
+											{% with c.background_image as image_static %}												
+											<img 
+											data-src = "{% static image_static %}" alt="{{c.name|title}} Category"
+											class="img-fluid lazyload"
+											style = "filter: drop-shadow(0.25rem 0.25rem 0.25rem grey);
+													display: block; margin-left: auto; margin-right: auto;"
+											width=70>
+											{% endwith %}
+										{% endif %}
+										<p class = "text-center" style="color: #11b6bd !important; font-size:0.9rem; font-weight: 700; margin-bottom:0px; padding-top:5px;">
+											{{c.name|title|default:'Unspecified'|default_if_none:'Unspecified'}}
+										</p>
+										<p class = "text-center" style="font-size:0.6rem;">
+											{{c.original_art_category__count|intcomma_indian}} artworks
+										</p>
+									</a>
+								</span>
+							</div>						
+						{% endfor categories %}

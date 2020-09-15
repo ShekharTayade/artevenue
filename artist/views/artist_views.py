@@ -10,9 +10,9 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Count, Q, F
 from django.http import HttpResponse, JsonResponse
 
-from artist.models import Artist_group, Artist_sms_email, Artist, Artist_original_art
+from artist.models import Artist_group, Artist_sms_email, Artist, Artist_original_art, Artist_art_view, Artist_stock_image, Generate_art_number
 from artevenue.models import Country, State, City, Pin_code, Ecom_site, Original_art
-from artevenue.models import Original_art_original_art_category, Stock_image_category
+from artevenue.models import Original_art_original_art_category, Stock_image_category, Stock_image, Stock_image_stock_image_category
 from artevenue.models import Wishlist, Wishlist_item_view, Publisher_price
 from artevenue.models import Print_medium, Cart_item_view
 
@@ -25,11 +25,14 @@ from artevenue.decorators import is_artist
 from django.contrib import messages
 import datetime
 import re
+from decimal import Decimal
 
 
+from PIL import Image
 
 ecom = Ecom_site.objects.get(pk=settings.STORE_ID)
 wall_colors = ['255,255,255', '255,255,224', '242,242,242', '230,242,255', '65,182,230', '64,224,208', '204,255,204', '128,128,0', '255,255,179', '255,205,72', '255,215,0', '255,230,230', '137,46,58', '255,0,0']
+env = settings.EXEC_ENV
 
 def register_as_artist(request, email=None):
 	msg =''
@@ -108,17 +111,54 @@ def artist_registration_confirmation(request, id):
 
 @is_artist
 def create_artist_profile(request):
-		
+	a1 = a2 = a3 = a4 = a5 = ''	
+	e1 = e2 = e3 = e4 = e5 = ''	
 	try:
 		userObj = User.objects.get(username = request.user)
 		artist = Artist.objects.get(user = userObj)
+		
 	except Artist.DoesNotExist:
 		artist = None
 	except User.DoesNotExist:
 		userObj = None
 		artist = None
 		
-	return render(request, "artist/create_artist_profile.html", {'artist':artist} )
+	if artist:
+		if artist.artist_showcase1:
+			achievements = artist.artist_showcase1.split('<br />')
+			cnt = 0
+			for s in achievements:
+				cnt = cnt+1
+				if cnt == 1:
+					a1 = s
+				if cnt == 2:
+					a2 = s
+				if cnt == 3:
+					a3 = s
+				if cnt == 4:
+					a4 = s
+				if cnt == 5:
+					a5 = s
+
+		if artist.artist_showcase2:
+			events = artist.artist_showcase2.split('<br />')
+			cnt = 0
+			for e in events:
+				cnt = cnt+1
+				if cnt == 1:
+					e1 = e
+				if cnt == 2:
+					e2 = e
+				if cnt == 3:
+					e3 = e
+				if cnt == 4:
+					e4 = e
+				if cnt == 5:
+					e5 = e
+		
+		
+	return render(request, "artist/create_artist_profile.html", {'artist':artist,
+		'e1': e1, 'e2': e2, 'e3': e3, 'e4': e4, 'e5': e5, 'a1': a1, 'a2': a2, 'a3': a3, 'a4': a4, 'a5': a5})
 
 @login_required
 def artist_webpage(request, url_name, cat_id = '', page = 1):
@@ -199,11 +239,15 @@ def create_artist_group(request):
 			
 def get_original_arts(request, cat_nm = None, page = None, curated_coll_id = None):
 	if cat_nm:
-		if cat_nm != 'Still-Life' and cat_nm != 'X-Ray':
-			cat_nm = cat_nm.replace("-", " ")
+		#if cat_nm != 'Still-Life' and cat_nm != 'X-Ray':
+		#	cat_nm = cat_nm.replace("-", " ")
 		try:
-			product_cate = Stock_image_category.objects.filter(name = cat_nm).first()
-			cat_id = product_cate.category_id
+			product_cate = Stock_image_category.objects.filter(url_suffix = cat_nm).first()
+			if product_cate :				
+				cat_id = product_cate.category_id
+			else:
+				cat_id = 0
+				product_cate = None					
 		except Stock_image_category.DoesNotExist:
 			cat_id = 0
 			product_cate = None
@@ -242,8 +286,9 @@ def get_original_arts(request, cat_nm = None, page = None, curated_coll_id = Non
 	if page is None or page == 0:
 		page = 1 # default
 
-	prod_categories = Stock_image_category.objects.filter(store_id=settings.STORE_ID, trending = True )
-
+	#prod_categories = Stock_image_category.objects.filter(store_id=settings.STORE_ID, trending = True )
+	prod_categories = Original_art_original_art_category.objects.all().select_related('stock_image_category').distinct()
+	print(prod_categories)
 	if cat_id:
 		category_prods = Original_art_original_art_category.objects.filter(
 				stock_image_category_id = cat_id).values('original_art_id')
@@ -440,13 +485,6 @@ def get_original_arts(request, cat_nm = None, page = None, curated_coll_id = Non
 	template = "artevenue/original_art_by_category.html"
 
 	env = settings.EXEC_ENV
-
-	print("prod_categories:")
-	print(prod_categories)
-	print("=========================")
-	print("product_category")
-	print(product_cate)
-	
 	
 	return render(request, template, {'prod_categories':prod_categories, 
 		'category_prods': category_prods, 'product_category':product_cate, 
@@ -669,10 +707,10 @@ def validate_url_name(request):
 		if re.search("^[a-zA-Z0-9_-]+$", url) is None:
 			return JsonResponse( {'ret_msg': "The webpage URL you entered is invalid. It can only contain alphabets, number, '-' & '_' and no blanks spaces are allowed."})
 
-	artist = Artist.objects.filter(url_name = url).exclude(artist_id = artist_id)
+	artist = Artist.objects.filter(url_name__iexact = url).exclude(artist_id = artist_id)
 	
 	if artist:
-		return JsonResponse( {'ret_msg': "This URL is already taken. Please choose another URL."})
+		return JsonResponse( {'ret_msg': "The webpage URL you entered is already taken. Please choose another webpage URL."})
 	
 	a = Artist.objects.filter(artist_id = artist_id).update(url_name = url)
 	
@@ -684,21 +722,21 @@ def save_artist_profile(request):
 	if request.method == 'POST':
 		artist_id = request.POST.get("artist_id", "")
 		mode = request.POST.get("mode", "")
-		profile_name = request.POST.get("profile_name", "")
-		url_name = request.POST.get("url_name", "")
-		tag_line = request.POST.get("tag_line", "")
+		profile_name = request.POST.get("profile_name", "").strip()
+		url_name = request.POST.get("url_name", "").strip()
+		tag_line = request.POST.get("tag_line", "").strip()
 		profile = request.POST.get("profile", "")
-		a1 = request.POST.get("a1", "")
-		a2 = request.POST.get("a2", "")
-		a3 = request.POST.get("a3", "")
-		a4 = request.POST.get("a4", "")
-		a5 = request.POST.get("a5", "")
+		a1 = request.POST.get("a1", "").strip()
+		a2 = request.POST.get("a2", "").strip()
+		a3 = request.POST.get("a3", "").strip()
+		a4 = request.POST.get("a4", "").strip()
+		a5 = request.POST.get("a5", "").strip()
 
-		e1 = request.POST.get("e1", "")
-		e2 = request.POST.get("e2", "")
-		e3 = request.POST.get("e3", "")
-		e4 = request.POST.get("e4", "")
-		e5 = request.POST.get("e5", "")
+		e1 = request.POST.get("e1", "").strip()
+		e2 = request.POST.get("e2", "").strip()
+		e3 = request.POST.get("e3", "").strip()
+		e4 = request.POST.get("e4", "").strip()
+		e5 = request.POST.get("e5", "").strip()
 		
 		achievements = ''
 		if a1:
@@ -724,17 +762,19 @@ def save_artist_profile(request):
 		if e5:
 			events = events + '<br />'+ e5
 
-		e1 = request.POST.get("#e1", "")
-		e2 = request.POST.get("#e2", "")
-		e3 = request.POST.get("#e3", "")
-		e4 = request.POST.get("#e4", "")
-		e5 = request.POST.get("#e5", "")			
-
 		if request.user.is_authenticated:
 			try:
 				artist = Artist.objects.get(artist_id = artist_id)
 			except Artist.DoesNotExist:
 				artist = None
+
+			if url_name:		
+				if re.search("^[a-zA-Z0-9_-]+$", url_name) is None:
+					return JsonResponse( {'ret_msg': "The webpage URL you entered is invalid. It can only contain alphabets, number, '-' & '_' and no blanks spaces are allowed."})
+			
+			oth_a = Artist.objects.filter(url_name__iexact = url_name).exclude(artist_id = artist_id)
+			if oth_a:
+				return JsonResponse( {'ret_msg': "The webpage URL you entered is already taken. Please choose another webpage URL."})
 
 			if mode == 'NEXT':
 				if not profile_name:
@@ -768,6 +808,21 @@ def upload_art(request, part_number=None):
 	today = datetime.date.today()
 	artist = {}
 	artwork = {}
+	art_print = {}
+	category = ''
+	save_draft = False 
+	submit_artwork = False
+	art_print_width = None
+	art_print_height = None
+	sell_original = False
+	sell_art_print = False
+	saved_msg = False
+	submitted_msg = False
+	artist_approved = False
+	artevenue_approved = False
+	a_orig_artwork = {}
+	a_stk_image = {}
+	
 	if request.user.is_authenticated:
 		try:
 			user = User.objects.get(username = request.user)
@@ -784,6 +839,41 @@ def upload_art(request, part_number=None):
 	img_type_list = Original_art.IMAGE_TYPE
 	category_list = Stock_image_category.objects.all().order_by('name')
 
+
+	if part_number is None:
+		part_number = request.POST.get("part_number", "")
+		if part_number == '':
+			part_number = request.GET.get("part_number", "")
+
+	if part_number:
+		artwork = Original_art.objects.filter(part_number = part_number).first()
+		a_orig_artwork = Artist_original_art.objects.filter(product = artwork).first()
+		orig_art_id = artwork.product_id
+		art_print = Stock_image.objects.filter(part_number = part_number).first()
+		a_stk_image = Artist_stock_image.objects.filter( product = art_print).first()
+		stock_image_id = art_print.product_id
+
+		if artwork :
+			sell_original = artwork.is_published
+			cate = Original_art_original_art_category.objects.filter(original_art = artwork).first()
+			if cate:
+				category = str(cate.stock_image_category_id)
+		else:
+			sell_original = False
+		if art_print:
+			sell_art_print = art_print.is_published
+			art_print_width = art_print.max_width
+			art_print_height = art_print.max_height 
+			sell_art_print = art_print.is_published
+		else: 
+			sell_art_print = False
+			
+		
+	else:
+		sell_original = False
+		sell_art_print = False
+
+
 	if request.POST:
 		if "SAVE_DRAFT" in request.POST:
 			save_draft = True
@@ -797,124 +887,557 @@ def upload_art(request, part_number=None):
 	else:
 		submit_artwork = False
 		save_draft = False
-
-	import pdb
-	pdb.set_trace()
-		
 		
 	if save_draft or submit_artwork :
-		product_id = request.POST.get("product_id", "")
-		file = request.FILES.get('file')
-		art_type = request.POST.get("art_type", "")
+		artwork_image = request.FILES.get('artwork_image')
+		iart_type = request.POST.get("art_type", "")
+		if iart_type == 'PAINTING':
+			art_type = 0
+		elif iart_type == 'PHOTOGRAPH':
+			art_type = 1
+		else:
+			art_type = 0
 		title = request.POST.get("title", "")
 		category = request.POST.get("category", "")
-		art_width = request.POST.get("art_width", "")
-		art_height = request.POST.get("art_height", "")
+		art_width = Decimal(request.POST.get("art_width", "0"))
+		art_height = Decimal(request.POST.get("art_height", "0"))
+		max_width = Decimal(request.POST.get("art_print_width", "0"))
+		max_height = Decimal(request.POST.get("art_print_height", "0"))
 		medium = request.POST.get("medium", "")
+		surface = request.POST.get("surface", "")
 		surface_description = request.POST.get("surface_description", "")
 		art_print_option = request.POST.get("art_print_option", "")
-		original_art_price = request.POST.get("original_art_price", "")
-		keywords = request.POST.get("keywords", "")
-		
-	else:	
-		if part_number:
-			artwork = Artist_art_view.objects.filter(part_number = part_number)
-		
-	return render(request, "artist/upload_artwork.html", {'artist':artist, 'medium_list': medium_list, 'artwork': artwork,
-		'surface_list': surface_list, 'img_type_list': img_type_list, 'product_id': product_id, 'category_list': category_list})
-	
-
-def save_art(request):
-	today = datetime.date.today()
-	art = {}
-	if request.method == 'POST':
-		from PIL import Image, ExifTags
-		from io import BytesIO
-		import base64
-
-		file = request.FILES.get('file')
-		session_id = request.session.session_key
-		user = None
-		
-		if request.user.is_authenticated:
-			try:
-				user = User.objects.get(username = request.user)
-				artist = Artist.objects.get(user = user)
-			except User.DoesNotExist:
-				user = None
-			except Artist.DoesNotExist:
-				artist = None
+		if max_width < 8:
+			msg = "The minimum required art print width is 8 inch. The image you have uploaded doesn't have enough resolution and can't be printed with 8 inch width or more. Please upload another image of this artwork with better resolution."
+			return render(request, "artist/upload_artwork.html", {'msg': msg, 'artist':artist, 'medium_list': medium_list, 'artwork': artwork,
+				'surface_list': surface_list, 'img_type_list': img_type_list, 'part_number': part_number, 'category_list': category_list,
+				'sell_original': sell_original, 'sell_art_print': sell_art_print, 'art_print_width':art_print_width
+				, 'art_print_height':art_print_height, 'category': category , 'orig_artwork_sts': a_orig_artwork})
+			
+		if art_print_option == 'O':
+			art_print_allowed = False
 		else:
-			return render(request, "artist/show_original_art.html", {'art':art})
-
-		if artist :
-		
-			art = Original_art()
+			art_print_allowed = True
 			
-			IMAGE_TYPE = (
-				('ART', 'Art Work'),
-				('PHT', 'Photograph'),
-			)
-			MEDIUM = (
-				('OIL', 'Oil'),
-				('ACR', 'Acrylic'),
-				('WTR', 'Water Color'),
-				('GOU', 'Gouache'),
-				('INK', 'Ink'),
-				('PEN', 'Pen'),
-				('PST', 'Pastel'),
-				('PNC', 'Pencil'),
-				('COL', 'Charcoal'),
-			)
-			SURFACE = (
-				('CVS', 'Canvas'),
-				('PPR', 'Paper'),
-				('FAB', 'Fabric'),	
-				('GLS', 'Glass'),	
-				('WOD', 'Wood'),	
-			)
-			#product_id = 
-			art.product_type = 'ORIGINAL-ART'
-			art.name = name
-			description = description
-			price = price
-			available_on = None
-			part_number = part_number
-			is_published = False
-			seo_description = None
-			seo_title  = None
-			charge_taxes = True
-			featured = False
-			has_variants = False
-			aspect_ratio = aspect_ratio
-			image_type = image_type
-			orientation = orientation
-			max_width = max_width
-			max_height = max_height
-			min_width = min_width
-			publisher = '0001'
-			artist = artist.artist_id
-			colors = color
-			key_words = key_words
-			url = url
-			thumbnail_url = thumbnail_url
-			high_resolution_url = high_resolution_url
-			art_width = art_width
-			art_height = art_height
-			art_medium = art_medium
-			art_surface = art_surface
-			art_surface_desc = art_surface_desc
-			category_disp_priority = None
-			art_print_allowed = art_print_allowed
-			original_art_price = original_art_price
-			available_qty = available_qty
-			sold_qty = none
-			stock_image = stock_image	
-	#	artist.profile_photo = file
-		art.save()
-		
-		im=Image.open(artist.profile_photo)
-			
+		original_art_price = float(request.POST.get("original_art_price", "0"))
+		original_art_price = Decimal( round(original_art_price + (original_art_price*0.12)) ) ## Add tax
+		keywords = request.POST.get("keywords", "")
+		colors = request.POST.get("colors", "")
 
-	return render(request, "artist/show_original_art.html", {'art':art})
+		if art_type == 1:
+			original_art_price = 0
+			art_width = 0
+			art_height = 0
+			medium = ''
+			surface = ''
+			surface_description = ''
+			art_print_option = 'A'
+			art_print_allowed = True
+			
+		if not artwork:
+			# Generate new part number & original art id
+			part_number = get_next_part_number()			
+			orig_art_id = get_next_orig_art_id()
+			## Creat new artwork object`
+			artwork = Original_art()
+			
+		if not art_print :
+			stock_image_id = get_next_stock_image_id()
+			## Creat new art print object
+			art_print = Stock_image()
+			
+		if not artwork_image:
+			img_highres = Image.open(artwork.high_resolution_url)
+		else:
+			img_highres = Image.open(artwork_image)
+		wd = img_highres.width
+		ht = img_highres.height
+		aspect_ratio = round(Decimal(wd)/Decimal(ht), 18)
+		if wd > ht :
+			orientation = 'horizontal'
+		elif wd == ht:
+			orientation = 'square'
+		else:
+			orientation = 'vertical'
+							
+		if env == 'PROD':
+			lowres_name_save = '/home/artevenue/website/estore/static/image_data/artevenue/artprint/' + part_number + "_lowres.jpg"
+			lowres_name = 'image_data/artevenue/artprint/' + part_number + "_lowres.jpg"
+			highres_name_save = '/home/artevenue/website/estore/static/image_data/artevenue/original/' + part_number + "_highres.jpg"
+			thumbnail_name = 'image_data/artevenue/artprint/' + part_number + "_thumb.jpg"
+		else:
+			lowres_name_save = 'c:/artevenue/estore/artevenue/static/image_data/artevenue/artprint/' + part_number + "_lowres.jpg"
+			lowres_name = 'image_data/artevenue/artprint/' + part_number + "_lowres.jpg"
+			highres_name = 'c:/artevenue/estore/artevenue/static/image_data/artevenue/original/' + part_number + "_highres.jpg"
+			thumbnail_name_save = 'c:/artevenue/estore/artevenue/static/image_data/artevenue/artprint/' + part_number + "_thumb.jpg"
+			thumbnail_name = 'image_data/artevenue/artprint/' + part_number + "_thumb.jpg"
+			
+		if wd < 1000:
+			w = wd
+		else:
+			w = 1000
+		img_lowres = img_highres.resize((w, w/aspect_ratio))
+		img_thumbnail = img_highres.resize((75, 75/aspect_ratio))
+		
+		img_lowres.save(lowres_name_save, 'JPEG')
+		img_highres.save(highres_name, 'JPEG')
+		img_thumbnail.save(thumbnail_name_save, 'JPEG')
+					
+		
+		## Update/Insert Original Art
+		artwork.product_id = orig_art_id
+		artwork.product_type_id = 'ORIGINAL-ART'
+		artwork.name = title
+		artwork.description = ''
+		artwork.price = 0
+		artwork.available_on = None
+		artwork.part_number = part_number
+		artwork.is_published = False
+		artwork.charge_taxes = True
+		artwork.featured = False
+		artwork.has_variants = False
+		artwork.aspect_ratio = aspect_ratio
+		artwork.image_type =  art_type
+		artwork.orientation = orientation
+		artwork.max_width = max_width
+		artwork.max_height = max_height
+		artwork.min_width = 8
+		artwork.publisher = 'ARTEVENUE'
+		artwork.artist = artist.profile_name
+		artwork.colors = colors
+		artwork.key_words = keywords
+		artwork.url = lowres_name
+		artwork.thumbnail_url = thumbnail_name
+		artwork.high_resolution_url = highres_name
+		artwork.art_width = art_width
+		artwork.art_height = art_height
+		artwork.art_medium = medium
+		artwork.art_surface = surface
+		artwork.art_surface_desc = surface_description
+		artwork.category_disp_priority = None
+		artwork.art_print_allowed = art_print_allowed
+		artwork.original_art_price = original_art_price
+		artwork.available_qty = 1	
+		artwork.sold_qty = 0	
+		artwork.stock_image = None
+
+		artwork.save()
+
+		if submit_artwork:
+			artist_approved = True
+		else:
+			artist_approved = False
+
+		if not a_orig_artwork:
+			a_orig_artwork = Artist_original_art()			
+			a_orig_artwork.artist = artist
+			a_orig_artwork.product = artwork
+			a_orig_artwork.uploaded_date = today
+		a_orig_artwork.sell_mode = art_print_option
+		a_orig_artwork.artist_listed = artist_approved
+		a_orig_artwork.approved = False
+		a_orig_artwork.approval_date = None
+		a_orig_artwork.save()
+
+		## Update/Insert Art Print
+		art_print.store = ecom
+		art_print.product_id = stock_image_id
+		art_print.product_type_id = 'STOCK-IMAGE'
+		art_print.name = title
+		art_print.description = ''
+		art_print.price = 0
+		art_print.available_on = None
+		art_print.part_number = part_number
+		art_print.is_published = False
+		art_print.charge_taxes = True
+		art_print.featured = False
+		art_print.has_variants = False
+		art_print.aspect_ratio = aspect_ratio
+		art_print.image_type =  art_type
+		art_print.orientation = orientation
+		art_print.max_width = max_width
+		art_print.max_height = max_height
+		art_print.min_width = 8
+		art_print.publisher = 'ARTEVENUE'
+		art_print.artist = artist.profile_name
+		art_print.colors = colors
+		art_print.key_words = keywords
+		art_print.url = lowres_name
+		art_print.thumbnail_url = thumbnail_name
+		art_print.category_disp_priority = None
+
+		art_print.save()
+
+		artwork.stock_image = art_print
+		artwork.save()
+
+
+		if not a_stk_image:
+			a_stk_image = Artist_stock_image()
+			a_stk_image.artist = artist
+			a_stk_image.product = art_print
+			
+		a_stk_image.artist_listed = artist_approved
+		a_stk_image.approved = False
+		a_stk_image.approval_date = None
+		a_stk_image.save()
+			
+		
+		oc = Original_art_original_art_category.objects.filter(
+			original_art = artwork)
+		if oc: 
+			cate_orig = Original_art_original_art_category.objects.filter(
+				original_art = artwork).update(stock_image_category_id = category)
+		else:
+			cate_orig = Original_art_original_art_category(
+				original_art = artwork,
+				stock_image_category_id = category
+			)
+			cate_orig.save()
+
+		pc = Stock_image_stock_image_category.objects.filter(stock_image = art_print)
+		if pc:
+			cate_stki = Stock_image_stock_image_category.objects.filter(
+				stock_image = art_print).update(stock_image_category_id = category)
+		else:
+			cate_stki = Stock_image_stock_image_category(
+				stock_image = art_print,
+				stock_image_category_id = category
+			)		
+			cate_stki.save()
+
+		if save_draft :
+			saved_msg = True
+		if submit_artwork :
+			submitted_msg = True
 	
+	else:
+		if a_orig_artwork:
+			if a_orig_artwork.approved:
+				artevenue_approved = True
+			if a_orig_artwork.artist_listed:
+				artist_approved = True
+
+	if submit_artwork:
+		return render(request, "artist/confirm_artwork_submit.html", {'artist':artist, 'medium_list': medium_list, 'artwork': artwork,
+			'surface_list': surface_list, 'img_type_list': img_type_list, 'part_number': part_number, 'category_list': category_list,
+			'sell_original': sell_original, 'sell_art_print': sell_art_print, 'art_print_width':art_print_width
+			, 'art_print_height':art_print_height, 'category': category , 'saved_msg': saved_msg , 'orig_artwork_sts': a_orig_artwork,
+			'submitted_msg': submitted_msg, 'artist_approved': artist_approved, 'artevenue_approved': artevenue_approved})
+	
+	else:
+		return render(request, "artist/upload_artwork.html", {'artist':artist, 'medium_list': medium_list, 'artwork': artwork,
+			'surface_list': surface_list, 'img_type_list': img_type_list, 'part_number': part_number, 'category_list': category_list,
+			'sell_original': sell_original, 'sell_art_print': sell_art_print, 'art_print_width':art_print_width
+			, 'art_print_height':art_print_height, 'category': category , 'saved_msg': saved_msg , 'orig_artwork_sts': a_orig_artwork,
+			'submitted_msg': submitted_msg, 'artist_approved': artist_approved, 'artevenue_approved': artevenue_approved})
+	
+
+
+def get_next_part_number():
+
+	num = 0
+
+	prefix = 'AVP-'
+	suffix = '-0920'
+	typ = 'PART'
+	
+	rec = Generate_art_number.objects.filter(publisher = 'ARTEVENUE', prefix = 'AVP-', suffix = '-0920', type = 'PART').first()
+	
+	if rec :
+		num = rec.current_number + 1
+	else :
+		num = 1
+		
+	# Update generated number in DB
+	if rec :
+		Generate_art_number.objects.filter(publisher = 'ARTEVENUE', prefix = 'AVP-', suffix = '-0920', type = 'PART').update(
+			current_number = num)
+	else:
+		gen_num = Generate_art_number(
+			publisher = 'ARTEVENUE', 
+			prefix = 'AVP-', 
+			suffix = '-0920', 
+			type = 'PART',
+			current_number = num
+			)	
+		gen_num.save()
+		
+	part_number = ''
+	
+	if prefix:
+		part_number = prefix + str(num)
+	if suffix:
+		part_number = (part_number + suffix )
+	else:
+		part_number = (str(num))
+		
+	return part_number 	
+
+
+def get_next_orig_art_id():
+	num = 0
+	typ = 'PROD'
+	
+	rec = Generate_art_number.objects.filter(publisher = 'ARTEVENUE', type = 'ORIG').first()
+	
+	if rec :
+		num = rec.current_number + 1
+	else :
+		num = 1		
+	# Update generated number in DB
+	if rec :
+		Generate_art_number.objects.filter(publisher = 'ARTEVENUE', type = 'ORIG').update(
+			current_number = num)
+	else:
+		gen_num = Generate_art_number(
+			publisher = 'ARTEVENUE', 
+			type = 'ORIG',
+			current_number = num
+		)	
+		gen_num.save()	
+	
+	prod_id = (str(num))
+	
+	return prod_id
+
+
+def get_next_stock_image_id():
+	num = 0
+	typ = 'PROD'
+	
+	rec = Generate_art_number.objects.filter(publisher = 'ARTEVENUE', type = 'STKI').first()
+	
+	if rec :
+		num = rec.current_number + 1
+	else :
+		num = 1		
+	# Update generated number in DB
+	if rec :
+		Generate_art_number.objects.filter(publisher = 'ARTEVENUE', type = 'STKI').update(
+			current_number = num)
+	else:
+		
+		gen_num = Generate_art_number(
+			publisher = 'ARTEVENUE', 
+			type = 'STKI',
+			current_number = num
+		)	
+		gen_num.save()	
+		
+	prod_id = (str(num))
+	
+	return prod_id
+
+@staff_member_required
+def original_artwork_approval(request):
+	artworks = Artist_original_art.objects.filter(artist_listed = True, approved = False, unapproved = False)
+	msg = ""
+	return render(request, "artist/original_artwork_approval.html",
+		{ 'msg': msg, 'env': env, 'artworks': artworks})
+		
+
+@staff_member_required
+def set_original_artwork_approval(request):
+	today = datetime.datetime.today()
+	sts = 'SUCCESS'
+
+	id = request.GET.get('id', '');
+	if id != None and id != '' :
+		try:
+			artwork = Artist_original_art.objects.get(id = id, artist_listed = True, approved = False, unapproved = False)
+			msg = ""
+			action = request.GET.get('action', '').upper();
+			if action == 'A':
+				artwork.approved = True
+				artwork.disapproved = False
+				artwork.approval_date = today
+			if action == 'D':
+				artwork.approved = False
+				artwork.disapproved = True
+				artwork.unapproval_date = today
+			artwork.save()
+			try:
+				orig_art = Original_art.objects.get(product_id = artwork.product_id)
+				orig_art.is_published = True
+				try:
+					stk_img = Stock_image.objects.get(product_id = orig_art.stock_image_id)
+					stk_img.is_published = True
+					orig_art.save()
+					stk_img.save()
+				except Stock_image.DoesNotExist:
+					sts = 'FAILURE'
+					
+			except Original_art.DoesNotExist:
+				sts = 'FAILURE'
+			
+		except Artist_original_art.DoesNotExist:
+			sts = 'FAILURE'
+	else:
+		sts = 'FAILURE'
+	return JsonResponse({"status":sts})
+	
+	
+@csrf_exempt
+def show_all_original_art_categories(request, sortorder=None):
+	if not sortorder:
+		sort_order = request.GET.get("sortorder", '')
+	# Get all the categories along with count of images in each
+
+	all_cnt = Original_art.objects.filter(is_published = True).count()
+
+	if sort_order:
+		if sort_order == 'N':
+			categories_list = Stock_image_category.objects.annotate(Count(
+				'original_art_category')).filter(
+				original_art_category__count__gt = 0).exclude(
+				name = '').exclude(name = '#N/A').exclude(
+				name = 'Passion').exclude(name = 'Nude').order_by('name')
+		if sort_order == 'C':
+			categories_list = Stock_image_category.objects.annotate(Count(
+				'original_art_category')).filter(
+				original_art_category__count__gt = 0).exclude(
+				name = '').exclude(name = '#N/A').exclude(
+				name = 'Passion').exclude(name = 'Nude').order_by('-original_art_category__count')
+	else:
+		categories_list = Stock_image_category.objects.annotate(Count(
+			'original_art_category')).filter(
+			original_art_category__count__gt = 0).exclude(
+			name = '').exclude(name = '#N/A').exclude(
+			name = 'Passion').exclude(name = 'Nude').order_by('name')
+
+	if request.is_ajax():
+		template = "artist/show_all_original_art_categories_include.html"
+	else:
+		template = "artist/show_all_original_art_categories.html"
+
+	return render(request, template, {'categories':categories_list,
+	'cnt': categories_list.count(), 'all_cnt':all_cnt, 'env': env})	
+	
+	
+	
+@is_artist
+def get_my_artworks(request):
+	try:
+		userObj = User.objects.get(username = request.user)
+		artist = Artist.objects.get(user = userObj)
+		
+	except Artist.DoesNotExist:
+		artist = None
+	except User.DoesNotExist:
+		userObj = None
+		artist = None
+	
+	startDt = None
+	endDt = None	
+	page = request.POST.get('page', 1)
+	filter_applied = False
+
+	from_date = request.POST.get("fromdate", '')
+	if from_date != '' :
+		startDt = datetime.datetime.strptime(from_date, "%Y-%m-%d")
+		filter_applied = True
+		
+	to_date = request.POST.get("todate", '')
+	if to_date != '' :
+		endDt = datetime.datetime.strptime(to_date, "%Y-%m-%d")
+		filter_applied = True
+
+	part_number = request.POST.get('part_number', '')
+	if part_number:
+		filter_applied = True
+	
+	title = request.POST.get('title', '')
+	if title:
+		filter_applied = True
+	
+	artworks = Artist_original_art.objects.filter(artist = artist)
+	
+	if startDt:
+		artworks = artworks.filter(uploaded_date__gte = startDt)
+	if endDt:
+		artworks = artworks.filter(uploaded_date__lte = endDt)
+	if part_number:
+		artworks = artworks.filter(product__part_number = part_number)
+	if title:
+		artworks = artworks.filter(product__name__icontains = title)
+		
+	
+	msg = ""
+	return render(request, "artist/artist_artworks.html",
+		{ 'msg': msg, 'env': env, 'artworks': artworks, 'filter_applied': filter_applied,
+			'startDt':startDt, 'endDt':endDt, 'part_number': part_number, 'title': title})
+
+@is_artist
+def delist_artwork(request, part_number=None):
+	try:
+		userObj = User.objects.get(username = request.user)
+		artist = Artist.objects.get(user = userObj)
+		
+	except Artist.DoesNotExist:
+		artist = None
+	except User.DoesNotExist:
+		userObj = None
+		artist = None
+
+	artwork = Original_art.objects.filter(part_number = part_number).first()
+	a_orig_artwork = Artist_original_art.objects.filter(product = artwork).first()
+	orig_art_id = artwork.product_id
+
+	art_print = Stock_image.objects.filter(part_number = part_number).first()
+	a_stk_image = Artist_stock_image.objects.filter(product = art_print).first()
+	stock_image_id = art_print.product_id
+
+	if artwork:
+		artwork.is_published = False
+		artwork.save()
+		
+	if art_print:
+		art_print.is_published = False
+		art_print.save()
+		
+	if a_orig_artwork:
+		a_orig_artwork.artist_listed = False
+		a_orig_artwork.approved = False
+		a_orig_artwork.save()
+		
+	if a_stk_image:
+		a_stk_image.artist_listed = False
+		a_stk_image.approved = False
+		a_stk_image.save()
+	
+	msg = ""
+	medium_list = Original_art.MEDIUM
+	surface_list = Original_art.SURFACE
+	img_type_list = Original_art.IMAGE_TYPE
+	category_list = Stock_image_category.objects.all().order_by('name')
+	return render(request, "artist/delist_artwork.html",
+		{ 'msg': msg, 'env': env, 'artwork': artwork, 'medium_list': medium_list, 'surface_list': surface_list,
+		'img_type_list': img_type_list, 'category_list': category_list})
+
+@is_artist
+def artist_page(request):
+	try:
+		userObj = User.objects.get(username = request.user)
+		artist = Artist.objects.get(user = userObj)
+	except Artist.DoesNotExist:
+		artist = None
+	except User.DoesNotExist:
+		userObj = None
+		artist = None
+	
+	return render(request, "artist/artist_page.html", {'artist': artist})
+
+def artist_terms(request):
+	try:
+		userObj = User.objects.get(username = request.user)
+		artist = Artist.objects.get(user = userObj)
+	except Artist.DoesNotExist:
+		artist = None
+	except User.DoesNotExist:
+		userObj = None
+		artist = None
+	
+	return render(request, "artist/artist_terms.html", {'artist': artist, 'ecom_site': ecom})
+
+		

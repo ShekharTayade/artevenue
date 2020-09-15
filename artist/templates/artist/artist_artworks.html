@@ -1,0 +1,233 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load utils %}
+{% load widget_tweaks %}
+{% block page-title %} 
+<title>Arte'Venue | Artist Artworks</title>
+{% endblock page-title %} 
+{% block page-description %}
+<meta name="description" content="Arte'Venue | Artist Artworks">
+{% endblock page-description %}
+{% block page-keywords %}
+<meta name="keywords" content="Artist artworks, artevenue, original artwork">
+{% endblock page-keywords %}
+
+
+{% block coursel-stylesheet %}
+{% endblock coursel-stylesheet %}
+
+{% block jqueryui-script %}
+{% endblock jqueryui-script %}
+
+{% block coursel-script %}
+{% endblock coursel-script %}
+
+{% block front.js %}
+{% endblock front.js %}
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+{% block google-recaptcha-3 %}
+{% endblock google-recaptcha-3 %}
+
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+        <div class="container mb-5">
+			<div class="row">
+				<!-- breadcrumb-->
+				<div class="col-12">
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+							<li aria-current="page" class="breadcrumb-item active">View Artworks</li>
+						</ol>
+					</nav>
+				</div>
+			</div>
+
+			{% if msg %}
+			<div class="row">
+				<div class="col-12 text-center" style = "background-color: #add8e6; color:red; padding:5px; font-weight:600;">
+					{{msg}}
+				</div>
+			</div>
+			{% endif %}							
+			<div class="row">
+				<div class="col-12 text-center">
+					<h1>LIST OF ALL ARTWORKS</h1>
+				</div>
+			</div>
+			
+			<div class="row">
+				<div class = "col-12">
+					<div class="panel-group">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h4 class="panel-title" style = "background-color: #f9f9f9; 
+										padding:15px;">
+									<a data-toggle="collapse" href="#collapse1" style = "text-decoration: underline;">
+										<strong><i class = "fa fa-filter fa-lg"> </i> FILTER</strong>
+									</a>
+									{% if filter_applied %}<span class="pull-right" style = "color: #11b6bd;"><i class = "fa fa-exclamation" style = "color: red;"></i> Filter(s) are applied</span>{% endif %}
+								</h4>
+							</div>
+							<form method = 'POST'>
+							{% csrf_token %}
+							<div id="collapse1" class="panel-collapse collapse">
+								<div class="panel-body">
+									<div class="row">
+										<div class = "col-6 col-md-3">
+										  <div class="form-group">
+											<label for="fromdate">Uploaded Date From:</label>
+											<input type="date" class="form-control" id="fromdate" name="fromdate" value = "{{startDt|date:'Y-m-d'}}">
+										  </div>										
+										</div>
+										<div class = "col-6 col-md-3">
+										  <div class="form-group">
+											<label for="todate">To:</label>
+											<input type="date" class="form-control" id="todate" name="todate" value = "{{endDt|date:'Y-m-d'}}">
+										  </div>										
+										</div>
+										<div class = "col-6 col-md-2">
+										  <div class="form-group">
+											<label for="order_namber">Artwork ID:</label>
+											<input class="form-control" id="part_number" name="part_number" value = "{{part_number}}">
+										  </div>										
+										</div>
+										<div class = "col-6 col-md-2">
+										  <div class="form-group">
+											<label for="order_namber">Title Like:</label>
+											<input class="form-control" id="title" name="title" value = "{{title}}">
+										  </div>										
+										</div>
+										<div class = "col-6 col-md-2">
+											<span style = "text-decoration: underline; cursor: pointer;" onclick="clearFilters();">Clear All Filters</span> 
+											<button class = "btn btn-primary mt-2" type = "submit">Submit</button>
+										</div>
+										<div class = "col-12">
+											<hr>
+										</div>
+									</div>
+								</div>
+							</div>
+							</form>
+						</div>
+					</div>				
+				</div>
+			</div>
+			
+			<div class="row">
+				<div class="col-12" style = "color:#11b6bd;">
+				{% if artworks %}
+					({{artworks.count}} artworks found)
+				{% else	%}
+					(No artwork found)
+				{% endif %}
+				</div>
+			</div>
+			
+			
+			{% for a in artworks %}
+			<div class = "box mb-4" id = "box_{{a.product.part_number}}" style = "padding-top:0px; background-color:#f9f9f9;">
+				<div class="row d-flex d-align-items-center" style = "background-color:#f6f6f6; padding:10px;">
+					<div class="col-12" style = "color:#11b6bd;">
+						<h3> <strong>ARTWORK ID: {{a.product.part_number}}</strong> <span style = "font-size: 0.75rem;">, Upload Dt: {{a.uploaded_date|date:'d/M/y'}}</span></h3>
+					</div>
+					<div class="col-12 col-md-6" style = "color:#11b6bd;">
+						<strong>
+						STATUS: 
+						{% if a.artist_listed %}
+							{% if a.approved %}
+								Listed for sell.
+							{% else %}
+								Pending Arte'Venue approval. Not lilsted for sell.
+							{% endif %}
+						{% else %}
+							Not submitted for Arte'Venue review. Not listed for sell.
+						{% endif %}
+						</strong>
+					</div>
+				</div>
+				<div class="row mt-3">
+					<div class = "col-12 col-md-6">
+						{% if a.product.high_resolution_url %} 
+						<img src = "{% static a.product.high_resolution_url %}" alt="Artist Artwork Image" 
+							width=250 style="">
+						{% else %}
+						<img src = "{% static 'img/custom_framing/upload_icon.png' %}" alt="Upload Image Icon" 
+							width=100 style="top: 25%; position: absolute;left: 25%;">
+						<h3>High resolution artwork image not uploaded</h3>
+						{% endif %}
+					</div>
+					<div class = "col-12 col-md-6">
+						<div class = "row">
+							<div class = "col-6">
+								Title: {{a.product.name}}
+							</div>
+							<div class = "col-6">
+								Price: {{a.product.original_art_price|floatformat}}
+							</div>
+							<div class = "col-6 pull-left">
+								Medium: {{a.product.get_art_medium_display}}
+							</div>
+							<div class = "col-6 pull-right">
+								TYPE: {% if a.product.image_type == '0' %} PAINTING {% else %} PHOTOGRAPH {% endif %}
+							</div>
+							<div class = "col-6">
+								Surface: {{a.product.get_art_surface_display}}
+							</div>
+							<div class = "col-6 pull-left">
+								Size: {{a.product.art_width}}" X {{a.product.art_height}}"
+							</div>
+							<div class = "col-12 pull-left">
+								Sell Mode: {% if a.sell_mode == 'O' %} Original Art Only  {% endif %}{% if a.sell_mode == 'A' %}  Art Print Only  {% endif %}{% if a.sell_mode == 'B' %} Original and Art Print {% endif %}
+							</div>
+							<div class = "col-12 pull-left">
+								Art Print Max Size: {{a.product.max_width}}" X {{a.product.max_height}}"
+							</div>
+						</div>
+						<div class="row text-center">
+							<div class = "col-12 col-md-6 mt-3">
+								<a class = "btn btn-secondary" 
+									href = "{% url 'delist_artwork' a.product.part_number %}" >
+									Delist
+								</a><br />
+								Stop selling this artwork
+							</div>
+							<div class = "col-12 col-md-6 mt-3">
+								<a class = "btn btn-primary"
+									href = "{% url 'upload_art' a.product.part_number %}" >
+									Update
+								</a> <br />
+								Update size, price, etc. Or change the image.
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			{% endfor %}
+		</div>
+		{% include 'artevenue/message-modal_ok.html' %}		
+
+	{% endblock sitecontent %}
+	
+	{% block jscripts %}	
+	<script>
+		$( document ).ready(function() {
+		});	
+	</script>
+	<script>
+		function clearFilters(){
+		
+			$("#fromdate").val('');
+			$("#todate").val('');
+			$("#part_number").val('');
+			$("#title").val('');
+			
+		}	
+	</script>
+	{% endblock jscripts %}
+			
+	{% block tawkto %} 
+	{% endblock tawkto %} 		

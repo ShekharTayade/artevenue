@@ -218,3 +218,8 @@ def create_cat_filenm(val=None, disp=None):
 		nm = None
 		
 	return nm
+	
+@register.filter
+def get_art_price_without_tax(val=None):
+	unit_price = round( float(val)/ (1 + (12/100)), 2 )
+	return Decimal(unit_price)

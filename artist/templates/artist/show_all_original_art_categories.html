@@ -1,0 +1,111 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load utils %}
+{% load indian_numbers_tags %}
+
+{% block page-title %} 
+	<title>All Original Handmade Painting Categories | Arte'Venue</title>
+{% endblock page-title %} 
+{% block page-description %}
+<meta name="description" content="Show all original art categories at ArteVenue.com">
+{% endblock page-description %}
+{% block page-keywords %}
+<meta name="keywords" content="original art categories, fine art categories, handmade painting categories, wall art, wall art categories, paintings,  Buy Art, Buy Art prints online, artevenue">
+{% endblock page-keywords %}	<!-- Only Override the site content block -->
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+{% block lazysizes %}
+<script src="{% static '/vendor/lazysizes/lazysizes.min.js' %}" async=""></script>
+{% endblock lazysizes %}
+
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+        <div class="container mb-5">
+			<div class="row">
+				<div class="col-12">
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+							<li aria-current="page" class="breadcrumb-item active">All Original Art Categories</li>
+						</ol>
+					</nav>
+				</div>
+
+
+				<div class="col-12">
+					<div class="box-cat">
+						<h1>ALL ORIGINAL ART CATEGORIES</h1>
+					</div>
+					
+					<div class = "row mt-2">
+						<div class="col-12">
+							<span class = "pull-left" style="font-size:0.7rem;">{{cnt}} categories, {{all_cnt|intcomma_indian}} artworks</span>
+							<span  class = "pull-right" style="font-size:0.7rem; cursor: pointer;"
+								onclick= "$('#sort-modal').modal('show');">
+								Sort 
+								<i class="fa fa-angle-down"></i>
+								<i class="fa fa-angle-up"></i>
+							</span>
+						</div>
+					</div>
+					<hr style="margin:0.3rem 0;">
+					<div id = "cate" class = "cat-div row">					
+					{% include 'artist/show_all_original_art_categories_include.html' %}
+					</div>
+				</div>
+			</div>
+			
+			<div id="sort-modal" tabindex="-1" role="dialog" aria-labelledby="Message_OK" aria-hidden="true" class="modal fade">
+				<div class="modal-dialog modal-sm">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h3 class="modal-title"><span id = "modal-hedline">Sort By</span></h3>
+							<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
+						</div>
+						<div class="modal-body">
+							<div class="">
+								<div class = "text-center">
+									<button class="btn btn-outline mb-2" 
+										onclick="sort('N');">
+										Category Name
+									</button>
+									<button class="btn btn-outline mb-2" 
+										onclick="sort('C');">
+										Count of Artworks
+									</button>
+								</div>					
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>			
+			
+		</div>
+	{% endblock sitecontent %}
+
+		
+	{% block jscripts %}
+	<script>
+		function sort(sortorder){
+			$('#sort-modal').modal('hide');
+		
+			$.ajax({
+				url: '{% url "show_all_original_art_categories" %}', 
+				data: {'sortorder': sortorder},
+				dataType: 'text', 
+				type: 'GET',
+				success: function (data) {
+					$('#cate').html(data);
+				},
+				error: function(xhr){
+					alert("An error occured: " + xhr.status + " " + xhr.statusText + " Apologies for the inconvenience!! Please contact support team and we will be happy to help sort it out."); 
+					return;
+				}					
+			});
+		}
+	</script>	
+	{% endblock jscripts %}
+			
+	

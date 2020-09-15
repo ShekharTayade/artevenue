@@ -12,6 +12,7 @@ from django.template.context_processors import csrf
 from django.contrib.auth.models import User
 from django.db import IntegrityError, DatabaseError, Error
 from decimal import Decimal
+from django.db.models import F
 
 from django.conf import settings
 from django.core.mail import send_mail, EmailMultiAlternatives, EmailMessage
@@ -304,8 +305,11 @@ def payment_done(request):
 				print("Payment info sent again by Payment gateway, do nothing. #" + order.order_number)
 				print("==============================================")
 				return render(request, "artevenue/estore_base.html",{'env': env})
-				
-		order_items = Order_items_view.objects.filter(order = order)
+		
+		order_items = Order_items_view.objects.select_related(
+				'product', 'promotion').filter(
+				order = order, product__product_type_id = F('product_type_id'))		
+		
 		o = Order.objects.filter(order_id = order_id).update(
 			order_status = 'PC', order_date = today.date(),
 			updated_date = today)

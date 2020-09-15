@@ -57,7 +57,7 @@
         "@type": "Offer",
         "url": "https://www.artevenue.com/offers",
         "priceCurrency": "INR",
-        "price": "{{ product.price }}",
+        "price": "{{ product.original_art_price }}",
         "priceValidUntil": "2022-12-31",
         "itemCondition": "NewCondition",
         "availability": "InStock",
@@ -96,6 +96,9 @@
 						</ol>
 					</nav>
 				</div>
+				<div class="col-12 text-center" style = "padding:15px;">
+				<h1><strong>ORIGINAL HANDMADE PAINTING</strong></h1>
+				</div>
 				<div class="col-12" style = "padding:30px;">
 					<div id="productMain" class="row">
 						<div class = "d-none d-md-block col-12 col-md-2 img-thumbs">
@@ -111,12 +114,13 @@
 								<div class = "col-2">
 									<img src = '' alt ="Painting in bedroom" class = "card-thumb" id = "card3">
 								</div>
+								<!--
 								<div class = "col-2">
 									<img src = '' alt ="Artwork features" class = "card-thumb" id = "card4">
 								</div>							
 								<div class = "col-2">
 									<img src = '' alt ="Art work freatures more" class = "card-thumb" id = "card5">
-								</div>
+								</div>-->
 						</div>
 						<div class = "d-none d-md-block col-12 col-md-5 img-div">
 							<div class = "show_on_large_only mt-5">
@@ -169,6 +173,7 @@
 									<img id= "prod-card3" src="" 
 										alt="Painting in bedroom" >
 								</div>
+								<!--
 								<div class="item card-img">
 									<img id= "prod-card4" src="" 
 										alt="Artwork features">
@@ -176,7 +181,7 @@
 								<div class="item card-img">
 									<img id= "prod-card5" src="" 
 										alt="More artwork feaures" >
-								</div>
+								</div>-->
 							</div>
 							<div class = "pull-right">
 								<button data-target='tooltip' title = "Add to favourites" 
@@ -200,12 +205,12 @@
 									</div>
 									<div class="price pull-right">
 										<div id = "promo-display" style = "display:none">
-											<small id = "item_unit_price" style = "color:red; text-decoration: line-through;">{{product.price|floatformat:"0"|indian_number_format}}</small>
-											<span id = "item_total_price" style = "color:green; text-decoration: underline;">{{product.price|floatformat:"0"|indian_number_format}}</span>
+											<small id = "item_unit_price" style = "color:red; text-decoration: line-through;">{{product.original_art_price|floatformat|indian_number_format}}</small>
+											<span id = "item_total_price" style = "color:green; text-decoration: underline;">{{product.original_art_price|floatformat|indian_number_format}}</span>
 											<br /><span id = "disc" style = "font-size:0.75rem;" class = "pull-right text-muted"></span>
 										</div>	
 										<div id = "no-disc">
-											<span id="prod-price">{{product.price|floatformat:"0"|indian_number_format}}</span>
+											<span id="prod-price">{{product.original_art_price|floatformat|indian_number_format}}</span>
 										</div>
 										<div id = "item_unit_price_nv" style = "display:none;"></div>
 										<div id = "promotion_id_nv" style = "display:none;"></div>
@@ -223,6 +228,10 @@
 										<div class = "col-12">
 											Painting Size: {{product.art_width|floatformat}}" X {{product.art_height|floatformat}}" inch
 										</div>
+										<div class = "col-12">
+											Medium: {{product.get_art_medium_display}},  Surface: {{product.get_art_surface_display}}
+										</div>
+										
 										{% if product.available_qty >= 1 %}
 										<div class="col-12" style = "color:green;">
 											(In Stock)
@@ -249,7 +258,7 @@
 							</div>
 							<div class = "col-12 sticky d-flex justify-content-around">
 								<div class = "" style = "color:#11b6bd; font-size:1.2rem; font-weight:600; margin-right:10px;">
-									<span id="prod-price-cart">{{product.price|floatformat:"0"|indian_number_format}} </span>
+									<span id="prod-price-cart">{{product.original_art_price|floatformat:"0"|indian_number_format}} </span>
 								</div>
 								<div id = "selected_med"  class = "" style="font-size:0.65rem;">
 									<span id="prod-desc">
@@ -265,18 +274,18 @@
 							</div>
 							{% if product.stock_image_id %}
 							<hr>
-							<div class = "row">
+							<div class = "row" style = "background-color: #f6f6f6;">
 								<div class = "col-12 text-center">
-										<span style = "font-size: 0.75rem;">
-											We have top quality art prints of this painting available from 
-											<i class = "fa fa-inr">{% get_price product.max_width product.aspect_ratio per_sqinch_paper 10 %}</i>
-											(size 10" X {{10|get_height:product.aspect_ratio}}" unframed),
-											multiple sizes, complete customization available
-										</span>
+									<span style = "font-size: 0.7rem;">
+										We have top quality art prints of this painting available from 
+										<i class = "fa fa-inr">{% get_price product.max_width product.aspect_ratio per_sqinch_paper 10 %}</i>
+										(size 10" X {{10|get_height:product.aspect_ratio}}" unframed),
+										multiple sizes, complete customization available
+									</span>
 								</div>
-								<div class = "col-12 text-center">
+								<div class = "col-12 text-center mb-2">
 									<a class = "btn btn-secondary btn-sm"
-										href = "{% url 'stock_image_detail' product.product_id %}"> Buy Art Print
+										href = "{% url 'stock_image_detail' product.stock_image_id %}"> Buy Art Print
 									</a>
 								</div>
 							</div>
@@ -429,6 +438,7 @@
 								</div>
 							</div>
 							{% if not user.is_authenticated %}
+							<!--
 							<div class = "row mt-3">
 								<div id = "signupsave" class = "col-12">
 									<img src="{% static 'img/signup_callout.png' %}" alt="Sign and save 15% on Wall art painting" width=50 onclick = "$('#signup_popup-modal').modal('show');" align="left">
@@ -443,6 +453,7 @@
 									</ul>
 								</div>
 							</div>
+							-->
 							{% endif %}
 							<div class = "col-12 text-muted mt-3"
 									style= "font-size: 0.65rem; text-align: left; padding:15px;
@@ -466,7 +477,7 @@
 								</div>
 								<hr>
 								<div class="row">
-									<div class="col-4 mb-3 why-artevenue-div">
+									<div class="col-6 mb-3 why-artevenue-div">
 										<div onclick = "show_modal('FREE_SHIPPING');">
 											<img src="{% static 'img/why_artevenue/truck.png' %}" 
 											alt = "Free Shipping of wall art painting" class = "why_artevenue">
@@ -478,7 +489,7 @@
 											</div>
 										</div>
 									</div>
-									<div class="col-4 mb-3 why-artevenue-div" >
+									<div class="col-6 mb-3 why-artevenue-div" >
 										<div onclick = "show_modal('CUSTOMIZATION');">
 											<img src="{% static 'img/why_artevenue/customize.png' %}" 
 											alt= "Customize the wall art painting" class = "why_artevenue">
@@ -486,7 +497,7 @@
 												Customize it
 											</div>
 											<div class = "why-artevenue-text">
-												Every artwork can be customized - frame, and mount
+												Every artwork can be customized - frame, strech, mount
 											</div>
 										</div>
 									</div>
@@ -525,12 +536,20 @@
 													<td class = "comp-frame">{{product.artist}}</td>
 												</tr>
 												<tr>
+													<td class="accordian-subhead">MEDIUM</td>
+													<td class = "comp-frame">{{product.get_art_medium_display}}</td>
+												</tr>
+												<tr>
+													<td class="accordian-subhead">SURFACE</td>
+													<td class = "comp-frame">{{product.get_art_surface_display}} {% if product.art_surface_description %}, {{product.art_surface_description}}{% endif %}</td>
+												</tr>
+												<tr>
 													<td class="accordian-subhead">PAINTING WIDTH</td>
-													<td class = "comp-frame">{{product.max_width|floatformat}} inch
+													<td class = "comp-frame">{{product.art_width|floatformat}} inch
 												</tr>
 												<tr>
 													<td class="accordian-subhead">PAINTING HEIGHT</td>
-													<td class = "comp-frame">{{product.max_height|floatformat}} inch
+													<td class = "comp-frame">{{product.art_height|floatformat}} inch
 												</tr>
 												<tr>
 													<td class="accordian-subhead">ORIENTATION</td>
@@ -580,7 +599,7 @@
 										<table class = "table table-borderless">
 											<tbody>
 												<tr>
-													<td class="accordian-subhead"> LOCATIONS</td>
+													<td class="accordian-subhead">LOCATIONS</td>
 													<td class = "comp-frame">
 														Fast and free shipping across India.
 													</td>
@@ -588,7 +607,7 @@
 												<tr>
 													<td class="accordian-subhead">SHIPPING TIME</td>
 													<td class = "comp-frame">
-														Ships by FedEx in 3-4 business days. Usually deliveres in 3-7 days in most parts of India.
+														Ships by FedEx in 5-10 business days. Usually deliveres in 5-10 days in most parts of India.
 													</td>
 												</tr>
 											</tbody>
@@ -603,9 +622,8 @@
 												<tr>
 													<td class="accordian-subhead">QUALITY</td>
 													<td class = "comp-frame">
-														If the artwork framing has any quality issue, is damaged during 
-														delivery or you receive wrong artwork, we replace it with
-														with no additional cost to you.
+														If the artwork framing has any quality issue, or is damaged during 
+														delivery we will take it back and give you a full refund .
 													</td>
 												</tr>
 											</tbody>
@@ -979,7 +997,8 @@
 				$.ajax({
 						url: "{% url 'get_framed_image' %}", 
 						data: {'prod_id':get_product_id(), 'moulding_id': get_moulding_id(),
-								'mount_color':mnt_color, 'mount_size':mnt_size, 'image_width':get_image_width()
+								'mount_color':mnt_color, 'mount_size':mnt_size, 'image_width':get_image_width(),
+								'prod_type' : 'ORIGINAL-ART'
 							}, 
 						dataType: 'text', 
 					success: function (data) {
@@ -1186,6 +1205,7 @@
 			set_image_width({{product.art_width}});
 			set_image_height({{product.art_height}});
 			
+			/*
 			{% if not user.is_authenticated %}
 				val = sessionStorage.getItem("SignUpPopupShown");
 				if ( val == null){
@@ -1199,7 +1219,8 @@
 				//	$("#signup-ask-modal").modal('show');
 				//	}, 10000);
 			{% endif %}
-
+			*/
+			
 			{% if cart_item or wishlist_item %}
 				set_for_cart_wishlist_item();
 			{% endif %}			
@@ -1712,7 +1733,7 @@
 			// Get the framed image
 			$.ajax({
 					url: "{% url 'get_ready_products' %}", 
-					data: {'prod_id':prod_id, 'prod_width':prod_width, 'print_medium':p_medium}, 
+					data: {'prod_id':prod_id, 'prod_width':prod_width, 'print_medium':p_medium, 'product_type': product_type}, 
 					dataType: 'text', 
 					type: 'POST', 
 				success: function (data) {
@@ -1739,7 +1760,7 @@
 			break;
 		  case 'CUSTOMIZATION':
 			$("#modal-hedline").html('CUSTOMIZE THE ARTWORK AS YOU LIKE');
-			$("#msg").html("<p><strong>A FIRST IN INDIA:</strong> Customize every artwork the way you would like it. You are not bound by those 'standard sizes' & frames, create it exactly as your space needs.</p> <p>Click on the 'CUSTOMIZE' tab and you can choose print size from minimum 4 inch wide to maximum allowed by the artist. Choose the frame and also choose the mount color, size.</p> <p>Before you finalize, see how it looks.</p>");
+			$("#msg").html("<p><strong>CUSTOMIZE:</strong> Customize every artwork the way you would like it. Choice of frames. Choice of mounts for art on paper. For art on canvas, you can choose have it streched.</p> <p>Click on the 'CUSTOMIZE' tab and you can choose print size from minimum 4 inch wide to maximum allowed by the artist. Choose the frame and also choose the mount color, size.</p> <p>Before you finalize, see how it looks.</p>");
 			break;
 		  case 'GUARANTEE':
 			$("#modal-hedline").html('YOUR SATISFACTION IS GUARANTEED');	  
@@ -1823,37 +1844,6 @@
 			success: function (data) {
 				document.getElementById("card3").src = "data:image/png;base64," + data;
 				document.getElementById("prod-card3").src = "data:image/png;base64," + data;				
-				},
-			error: function(xhr){
-				alert("An error occured: " + xhr.status + " " + xhr.statusText); 
-			}
-		});
-		$.ajax({
-				url: "{% url 'get_catalog_card' %}", 
-				data: {'card_no': '4', 'prod_id':prod_id, 'moulding_id': m_id,
-						'mount_color':mnt_color, 'mount_size':mnt_size, 
-						'image_width':currwidth, 'prod_type':'ORIGINAL-ART'
-					}, 
-				dataType: 'text', 
-			success: function (data) {
-				document.getElementById("card4").src = "data:image/png;base64," + data;
-				document.getElementById("prod-card4").src = "data:image/png;base64," + data;				
-				},
-			error: function(xhr){
-				alert("An error occured: " + xhr.status + " " + xhr.statusText); 
-			}
-		});
-		
-		$.ajax({
-				url: "{% url 'get_catalog_card' %}", 
-				data: {'card_no': '5', 'prod_id':prod_id, 'moulding_id': m_id,
-						'mount_color':mnt_color, 'mount_size':mnt_size, 
-						'image_width':currwidth, 'prod_type':'ORIGINAL-ART'
-					}, 
-				dataType: 'text', 
-			success: function (data) {
-				document.getElementById("card5").src = "data:image/png;base64," + data;
-				document.getElementById("prod-card5").src = "data:image/png;base64," + data;				
 				},
 			error: function(xhr){
 				alert("An error occured: " + xhr.status + " " + xhr.statusText); 

@@ -77,7 +77,7 @@
 								</div>
 								<p>
 									Are you sure that you want to remove all items in your cart
-									and emtpy your cart?
+									and empty your cart?
 									<ul>
 										<li>Please click "CLEAR CART" button to remove the cart.</li>
 										<li>Please click "CANCEL" button to cancel.</li>
@@ -234,7 +234,7 @@
 					if (data = "SUCCESS") {
 						// Update the display
 						$('#cart-del').modal('hide');
-						show_cart();
+						show_cart();						
 					} else {
 						alert(data);
 					}
@@ -254,7 +254,7 @@
 				type: 'POST',
 				success: function (data) {
 					$("#cart-display").html(data);
-
+					$("#v_btn").click();
 				},
 				error: function(xhr){
 					alert("An error occured: " + xhr.status + " " + xhr.statusText + " Apologies for the inconvenience!! Please let us know the details and we will be happy to help sort it out."); 
@@ -313,7 +313,7 @@
 							$("#cart_total").html(cart_total);
 							$("#disc_amt_nv").val(disc_amt);
 							$("#cart_total_nv").val(cart_total); */
-							$("#vouch_text").html( "(You have used coupan " + v_code + ". Discount of <i class = 'fa fa-inr'></i> " +  response.disc_amount + " is applied).");
+							$("#vouch_text").html( "(You have used coupon " + v_code + ". Discount of <i class = 'fa fa-inr'></i> " +  response.disc_amount + " is applied).");
 							break;
 					  case "INVALID-CODE":
 							$("#voucher-msg").html("Entered Code is invalid (You need to be logged in and using correct code)");
@@ -325,8 +325,8 @@
 							break;
 							break;
 					  case "NO-USER":
-							$("#voucher-msg").html("You need to be logged in to use coupan/voucher.");
-							$('#msg').html("You need to be logged in to use coupan/voucher.");
+							$("#voucher-msg").html("You need to be logged in to use coupon/voucher.");
+							$('#msg').html("You need to be logged in to use coupon/voucher.");
 							$('#msg-modal').modal('show');
 							setTimeout(function() {
 								$('#msg-modal').modal('hide');
@@ -349,8 +349,8 @@
 							}, 2500);
 							break;
 					  case "ONLY-ONE":
-							$("#voucher-msg").html("You can use only one coupan per order.");
-							$('#msg').html("You can use only one coupan per order.");
+							$("#voucher-msg").html("You can use only one coupon per order.");
+							$('#msg').html("You can use only one coupon per order.");
 							$('#msg-modal').modal('show');
 							setTimeout(function() {
 								$('#msg-modal').modal('hide');
@@ -388,8 +388,8 @@
 							$("#cart_total").html(cart_total);
 							$("#disc_amt_nv").val(disc_amt);
 							$("#cart_total_nv").val(cart_total); */
-							$("#vouch_text").html( "(You have used coupan " + v_code + ". Discount of <i class = 'fa fa-inr'></i> " +  response.disc_amount + " is applied).");
-							$('#msg').html("(You have used coupan " + v_code + ". Discount of <i class = 'fa fa-inr'></i> " +  response.disc_amount + " is applied).");
+							$("#vouch_text").html( "(You have used coupon " + v_code + ". Discount of <i class = 'fa fa-inr'></i> " +  response.disc_amount + " is applied).");
+							$('#msg').html("(You have used coupon " + v_code + ". Discount of <i class = 'fa fa-inr'></i> " +  response.disc_amount + " is applied).");
 							$('#msg-modal').modal('show');
 							setTimeout(function() {
 								$('#msg-modal').modal('hide');
@@ -407,16 +407,16 @@
 							break;
 					   
 					   case 'DOESNOT-APPLY':
-							$("#voucher-msg").html("This coupan doesn't apply to you. Please ensure you have logged as the eligible user or check the code you have entered.");
-							$('#msg').html("This coupan doesn't apply to you. Please ensure you have logged as the eligible user or check the code you have entered.");
+							$("#voucher-msg").html("This coupon doesn't apply to you. Please ensure you have logged as the eligible user or check the code you have entered.");
+							$('#msg').html("This coupon doesn't apply to you. Please ensure you have logged as the eligible user or check the code you have entered.");
 							$('#msg-modal').modal('show');
 							setTimeout(function() {
 								$('#msg-modal').modal('hide');
 							}, 2500);
 							break;
 					   case 'NO-BALANCE':
-							$("#voucher-msg").html("Sorry, you have no balance left in this coupan.");
-							$('#msg').html("Sorry, you have no balance left in this coupan.");
+							$("#voucher-msg").html("Sorry, you have no balance left in this coupon.");
+							$('#msg').html("Sorry, you have no balance left in this coupon.");
 							$('#msg-modal').modal('show');
 							setTimeout(function() {
 								$('#msg-modal').modal('hide');
@@ -455,6 +455,12 @@
 				$("#c_cart_item_id").val(cart_item_id);
 				$("#edit_form_collage").submit();
 			}
+			function edit_item_original_art(cart_item_id, product_id, product_type='ORIGINAL-ART'){
+				$("#o_product_id").val(product_id);
+				//$("#o_product_type").val(product_type);
+				//$("#o_cart_item_id").val(cart_item_id);
+				$("#edit_form_original_art").submit();
+			}
 		</script>
 		
 		<script>
@@ -464,7 +470,7 @@
 				ajaxStart: function() { $body.addClass("loading");    },
 				ajaxStop: function() { $body.removeClass("loading"); }    
 			});
-			
+		
 			if ('{{promo_removed}}' == 'Y') {
 				$('#msg').html("Promotions applied to one or more items in your cart have expired. Prices have been changed accordingly.");
 				$('#msg-modal').modal('show');

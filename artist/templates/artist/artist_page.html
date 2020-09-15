@@ -1,0 +1,193 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load utils %}
+{% load widget_tweaks %}
+{% block page-title %} 
+<title>Arte'Venue | Artist Page</title>
+{% endblock page-title %} 
+{% block page-description %}
+<meta name="description" content="Arte'Venue | Artist's Page - Update profile, Artworks, View Sales">
+{% endblock page-description %}
+{% block page-keywords %}
+<meta name="keywords" content="Art, artevenue, original artwork,  artist sales">
+{% endblock page-keywords %}
+
+
+{% block coursel-stylesheet %}
+{% endblock coursel-stylesheet %}
+
+{% block jqueryui-script %}
+{% endblock jqueryui-script %}
+
+{% block coursel-script %}
+{% endblock coursel-script %}
+
+{% block front.js %}
+{% endblock front.js %}
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+{% block google-recaptcha-3 %}
+{% endblock google-recaptcha-3 %}
+
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+        <div class="container mb-5">
+			<div class="row">
+				<!-- breadcrumb-->
+				<div class="col-12">
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+							<li aria-current="page" class="breadcrumb-item active">Artist's Page</li>
+						</ol>
+					</nav>
+				</div>
+			</div>
+
+			{% if msg %}
+			<div class="row">
+				<div class="col-12 text-center" style = "background-color: #add8e6; color:red; padding:5px; font-weight:600;">
+					{{msg}}
+				</div>
+			</div>
+			{% endif %}	
+			<div class = "box mb-3">
+				<div class = "row" style="border: 1px solid #cfcfcf; padding: 10px 5px; border-radius:5px; margin: 20px 0px;">
+					<div class="col-12 col-md-4 d-flex justify-content-center align-items-center" >
+						<a href = "{% url 'artist_profile' %}" style = "color: #212529;">	
+						<img src = "{% static 'img/artist/artist_profile.png' %}" width = 75 class = "mb-3 mb-md-0">
+						</a>
+					</div>
+					<div class="col-12 col-md-8">
+						<div class = "row">
+							<div class = "col-12 text-center">
+								<a href = "{% url 'artist_profile' %}" style = "color: #212529;">	
+								<strong>YOUR PROFILE</strong>
+								</a>
+							</div>
+							<div class = "col-12 text-center">
+								View and update your profile. The content in your profile is what gets shown on your webpage.<br />
+								Your webpage also displays your art gallery.
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class = "row" style="border: 1px solid #cfcfcf; padding: 10px 5px; border-radius:5px; margin: 20px 0px;">
+					<div class="col-12 col-md-4 d-flex justify-content-center align-items-center" >
+						<a href = "{% url 'upload_art' %}" style = "color: #212529;">	
+						<img src = "{% static 'img/artist/upload_art.png' %}" width = 75 class = "mb-3 mb-md-0">
+						</a>
+					</div>
+					<div class="col-12 col-md-8">
+						<div class = "row">
+							<div class = "col-12 text-center">
+								<a href = "{% url 'upload_art' %}" style = "color: #212529;">	
+								<strong>UPLOAD YOUR ARTWORK</strong>
+								</a>
+							</div>
+							<div class = "col-12 text-center">
+								Along with uploading the image of your artwork, specify other details of your artwork
+								such as its' title, medium, surface, size, whether you want to only original or art prints as well, 
+								your price and a few other parameters.<br />
+								Please make sure that you upload a high resolution image of your artwork. You can find an image upload
+								guide in this page.
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class = "row" style="border: 1px solid #cfcfcf; padding: 10px 5px; border-radius:5px; margin: 20px 0px;">
+					<div class="col-12 col-md-4 d-flex justify-content-center align-items-center" >
+						<img src = "{% static 'img/artist/artist_sales.png' %}" width = 75 class = "mb-3 mb-md-0">
+					</div>
+					<div class="col-12 col-md-8">
+						<div class = "row">
+							<div class = "col-12 text-center">
+								<strong>SALES OF YOUR ARTWORKS</strong>
+							</div>
+							<div class = "col-12 text-center">
+								Find complete details of the sales of your artworks.<br />
+								Every sale of your artwork, sale value, your license fee from the sale are on this page.								
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class = "row" style="border: 1px solid #cfcfcf; padding: 10px 5px; border-radius:5px; margin: 20px 0px;">
+					<div class="col-12 col-md-4 d-flex justify-content-center align-items-center" >
+						<a href = "{% url 'get_my_artworks' %}" style = "color: #212529;">	
+						<img src = "{% static 'img/artist/artwork_list.png' %}" width = 75 class = "mb-3 mb-md-0">
+						</a>
+					</div>
+					<div class="col-12 col-md-8">
+						<div class = "row">
+							<div class = "col-12 text-center">
+								<a href = "{% url 'get_my_artworks' %}" style = "color: #212529;">	
+								<strong>LIST YOUR ARTWORKS</strong>
+								</a>
+							</div>
+							<div class = "col-12 text-center">
+								View artworks and update image and other details or delist.<br />
+								Please note that any change to an uploaded artwork needs to be sbumitted for Arte'Venue and 
+								is listed for sell only after Arte'Venue aproval.
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class = "row" style="border: 1px solid #cfcfcf; padding: 10px 5px; border-radius:5px; margin: 20px 0px;">
+					<div class="col-12 col-md-4 d-flex justify-content-center align-items-center" >
+						<a href = "{% url 'artist_webpage' artist.url_name %}" style = "color: #212529;">	
+						<img src = "{% static 'img/artist/artist_webpage.png' %}" width = 75 class = "mb-3 mb-md-0">
+						</a>
+					</div>
+					<div class="col-12 col-md-8">
+						<div class = "row">
+							<div class = "col-12 text-center">
+								<a href = "{% url 'artist_webpage' artist.url_name %}" style = "color: #212529;">
+								<strong>YOUR WEBPAGE</strong>
+								</a>
+							</div>
+							<div class = "col-12 text-center">
+								View your webpage with your gallery.
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class = "row" style="border: 1px solid #cfcfcf; padding: 10px 5px; border-radius:5px; margin: 20px 0px;">
+					<div class="col-12 col-md-4 d-flex justify-content-center align-items-center" >
+						<a href = "{% url 'artist_terms'%}" style = "color: #212529;">	
+						<img src = "{% static 'img/artist/artist_terms.png' %}" width = 75 class = "mb-3 mb-md-0">
+						</a>
+					</div>
+					<div class="col-12 col-md-8">
+						<div class = "row">
+							<div class = "col-12 text-center">
+								<a href = "{% url 'artist_terms' %}" style = "color: #212529;">
+								<strong>IMPORTANT TERMS OF USAGE</strong>
+								</a>
+							</div>
+							<div class = "col-12 text-center">
+								Information on important terms of usage for Artists.
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	{% endblock sitecontent %}
+	
+	{% block jscripts %}	
+	<script>
+		$( document ).ready(function() {
+		});	
+	</script>
+	{% endblock jscripts %}
+			
+	{% block tawkto %} 
+	{% endblock tawkto %} 

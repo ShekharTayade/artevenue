@@ -38,14 +38,14 @@
 									<li><span class="badge badge-secondary">{{prod_cat_count}}</span>
 									{% for p in prod_categories %}
 										<ul class="list-unstyled">
-											{% if p.category_id %}
-												<li><a href="{% url 'original_art_by_category' cat_nm=p.name page=page%}" class="nav-link">{{p.name|title}}</a></li>
+											{% if p.stock_image_category.url_suffix %}
+												<li><a href="{% url 'original_art_by_category' cat_nm=p.stock_image_category.url_suffix page=page%}" class="nav-link">{{p.stock_image_category.name|title}}</a></li>
 											{% else %}
-												<li><a href="{% url 'original_art_by_category' %}" class="nav-link">{{p.name|title}}</a></li>
+												<li><a href="{% url 'original_art_by_category' %}" class="nav-link">{{p.stock_image_category.name|title}}</a></li>
 											{% endif %}
 										</ul>
 									{% endfor prod_categories %}
-										<a href=""><small>See All...</small></a>
+										<a href="{% url 'original_art_by_category' %}"><small>See All...</small></a>
 									</li>
 								</ul>
 							</div>

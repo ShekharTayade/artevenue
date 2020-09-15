@@ -738,6 +738,11 @@ class Product_view(models.Model):
 	art_surface = models.CharField(max_length = 3, blank=True, default='')
 	art_surface_desc = models.CharField(max_length = 500, blank=True, default='')
 	category_disp_priority = models.IntegerField(null = True)
+	art_print_allowed = models.BooleanField(null=False, default=False)
+	original_art_price = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	available_qty = models.IntegerField(null=True)	
+	sold_qty = models.IntegerField(null=True)	
+	stock_image = models.ForeignKey(Stock_image, models.PROTECT, null=True)
 	
 	class Meta:
 		managed = False

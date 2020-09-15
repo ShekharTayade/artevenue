@@ -10,7 +10,12 @@ SELECT "store_id" as store_id, "product_id" as product_id, "name" as name, "desc
 	'' as session_id, 0 as user_id, '' as image_to_frame, '' as status, CURRENT_DATE as created_date, 
 	CURRENT_DATE as updated_date, 0 as collage_layout_id, ''  as image_to_frame_thumbnail,
 	0 as art_width , 0 as art_height, '' as art_medium, '' as art_surface, '' as art_surface_desc,
-	'' as high_resolution_url, "category_disp_priority" as category_disp_priority	
+	'' as high_resolution_url, "category_disp_priority" as category_disp_priority,
+	true as art_print_allowed,
+	0 as original_art_price, 
+	0 as available_qty,	
+	0 as sold_qty,	
+	0 as stock_image_id
 FROM "artevenue_stock_image"
 
 UNION
@@ -25,7 +30,12 @@ SELECT 0 as store_id, "product_id" as product_id, '' as name, '' as description,
 	"updated_date" as updated_date, 0 as collage_layout_id,
 	"image_to_frame_thumbnail" as image_to_frame_thumbnail,
 	0 as art_width , 0 as art_height, '' as art_medium, '' as art_surface, '' as art_surface_desc,
-	'' as high_resolution_url, "category_disp_priority" as category_disp_priority
+	'' as high_resolution_url, "category_disp_priority" as category_disp_priority,
+	true as art_print_allowed,
+	0 as original_art_price, 
+	0 as available_qty,	
+	0 as sold_qty,	
+	0 as stock_image_id
 FROM "artevenue_user_image"
 
 UNION
@@ -39,7 +49,12 @@ SELECT 0 as store_id, "product_id" as product_id, "name" as name, '' as descript
 	CURRENT_DATE as updated_date, "collage_layout_id" as collage_layout_id,
 	''  as image_to_frame_thumbnail,
 	0 as art_width , 0 as art_height, '' as art_medium, '' as art_surface, '' as art_surface_desc,
-	'' as high_resolution_url, "category_disp_priority" as category_disp_priority
+	'' as high_resolution_url, "category_disp_priority" as category_disp_priority,
+	true as art_print_allowed,
+	0 as original_art_price, 
+	0 as available_qty,	
+	0 as sold_qty,	
+	0 as stock_image_id
 FROM "artevenue_stock_collage"
 
 UNION
@@ -55,5 +70,10 @@ SELECT 0 as store_id, "product_id" as product_id, "name" as name, "description" 
 	CURRENT_DATE as updated_date, 0 as collage_layout_id, ''  as image_to_frame_thumbnail,
 	"art_width" as art_width , "art_height" as art_height, "art_medium" as art_medium, 
 	"art_surface" as art_surface, "art_surface_desc" as art_surface_desc,
-	"high_resolution_url" as high_resolution_url, "category_disp_priority" as category_disp_priority
+	"high_resolution_url" as high_resolution_url, "category_disp_priority" as category_disp_priority,
+	"art_print_allowed" as art_print_allowed,
+	"original_art_price" as original_art_price, 
+	"available_qty" as available_qty,
+	"sold_qty" as sold_qty,
+	"stock_image_id" as stock_image_id
 FROM "artevenue_original_art"

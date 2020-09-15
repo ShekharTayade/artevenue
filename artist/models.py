@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.conf import settings
 from django.db.models.fields import DecimalField
 
-from artevenue.models import Ecom_site, Product_type, Original_art
+from artevenue.models import Ecom_site, Product_type, Original_art, Order_items_view, Product_view, Order
 
 
 class Artist_group (models.Model):
@@ -135,16 +135,27 @@ class Artist_stock_image (models.Model):
 	approval_date = models.DateTimeField(null = True)
 	created_date = models.DateTimeField(auto_now_add=True, null=False)	
 	updated_date = models.DateTimeField(auto_now=True, null=False)	
+	unapproved = models.BooleanField(null=False, default=False)
+	unapproval_date = models.DateTimeField(null = True)
 
 
 class Artist_original_art (models.Model):
+	SELL_MODE = (
+		('O', 'ONLY ORIGINAL'),
+		('A', 'ONLY ART PRINT'),
+		('B', 'BOTH'),
+	)
 	artist = models.ForeignKey(Artist, on_delete=models.CASCADE)
 	product = models.ForeignKey('artevenue.Original_art', models.PROTECT, null=False)
+	sell_mode = models.CharField(max_length=1, choices = SELL_MODE, null=True)
 	artist_listed = models.BooleanField(null=False, default=False)
+	uploaded_date = models.DateField(null = True)
 	approved = models.BooleanField(null=False, default=False)
 	approval_date = models.DateTimeField(null = True)
 	created_date = models.DateTimeField(auto_now_add=True, null=False)	
 	updated_date = models.DateTimeField(auto_now=True, null=False)	
+	unapproved = models.BooleanField(null=False, default=False)
+	unapproval_date = models.DateTimeField(null = True)
 
 # A DB view "Artist_art_view". This holds data for all product types. 
 class Artist_art_view(models.Model):
@@ -209,3 +220,40 @@ class Inventory_udate(models.Model):
 
 	def __str__(self):
 		return str(self.product) + str(updated_qty)
+
+class Generate_art_number(models.Model):
+	NUM_TYPE = (
+		('PART', 'Part Number'),
+		('ORIG', 'Original ID'),
+		('STKI', 'Stock Image ID'),
+	)
+
+	publisher = models.CharField(max_length = 20, null=False)
+	type = models.CharField(max_length = 4, choices = NUM_TYPE, null=False)
+	prefix = models.CharField(max_length = 10, null=False) 
+	suffix = models.CharField(max_length = 10, null=False, default = '')
+	current_number = models.IntegerField(null=False)	
+
+	def __str__(self):
+		return self.type + ", " + self.publisher + ', ' + self.prefix + str(current_number) + ', ' + self.suffix
+
+
+class Artist_sales(models.Model):
+	artist = models.ForeignKey(Artist, on_delete=models.CASCADE) 
+	product_id = models.ForeignKey(Product_view, models.PROTECT, null=False)
+	product_type = models.ForeignKey(Product_type, models.CASCADE, null=True)
+	part_number = models.CharField(max_length = 30, null=True)
+	order = models.ForeignKey(Order, models.PROTECT, null=False)
+	order_item_id = models.ForeignKey(Order_items_view, models.PROTECT, null=False)
+	sale_value = models.DecimalField(max_digits=12, decimal_places=2,  null=False, default=0)
+	license_fee = models.DecimalField(max_digits=12, decimal_places=2,  null=False, default=0)
+	pay_date = models.DateField(null = True)
+	pay_reference = models.CharField(max_length = 100, null=True)
+	created_date = models.DateTimeField(auto_now_add=True, null=False)	
+	updated_date = models.DateTimeField(auto_now=True, null=False)	
+	
+	
+	def __str__(self):
+		return self.artist + " - " + self.part_number + " - " + str(sale_value)
+		
+		
