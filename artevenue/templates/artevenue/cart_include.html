@@ -17,25 +17,25 @@
 				<div id="cart" class="col-lg-9">
 					{% if orig_msg %}
 					<div class = "row">
-						<div class = "col-12 text-center">
-							<i class = "fa fa-exclamation-circle"> </i> <span style = "font-size: 0.85rem;">{{orig_msg}}</span>
+						<div class = "col-12 text-center" style ="color: #999; font-size: 0.8rem;">
+							<i class = "fa fa-exclamation-circle" style ="color: orange;"> </i> <span style = "font-size: 0.85rem;">{{orig_msg}}</span>
 						</div>
 					</div>
 					{% endif %}
 					{% if user_msg %}
 					<div class = "row">
-						<div class = "col-12 text-center">
-							<i class = "fa fa-exclamation-circle"> </i> <span style = "font-size: 0.85rem;">{{user_msg}}</span>
+						<div class = "col-12 text-center" style ="color: #999; font-size: 0.8rem;">
+							<i class = "fa fa-exclamation-circle" style ="color: orange;"> </i> <span style = "font-size: 0.85rem;">{{user_msg}}</span>
 						</div>
 					</div>
 					{% endif %}
 					{% if usercart.voucher %} 
 					<div class = "row">
 						<div class = "col-12">
-							<div id "vouch_text" style ="color: #999; font-size: 0.9rem;">
+							<div id "vouch_text" style ="color: #999; font-size: 0.8rem;">
 								<i class = "fa fa-exclamation-circle" style ="color: green;"> </i> 
-								You have used coupon {{ usercart.voucher.voucher_code }}. 
-								Discount of <i class = "fa fa-inr"></i> {{usercart.voucher_disc_amount |floatformat }} is applied
+								Discount of <i class = "fa fa-inr"></i> {{usercart.voucher_disc_amount |floatformat }} is applied, 
+								(Coupon {{ usercart.voucher.voucher_code }}).
 							</div>
 						</div>
 					</div>

@@ -54,6 +54,7 @@ INSTALLED_APPS = [
 	'blog.apps.BlogConfig',
 	'channelsales.apps.ChannelsalesConfig',
 	'review.apps.ReviewConfig',	
+	'gallerywalls.apps.GallerywallsConfig',	
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

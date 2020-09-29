@@ -389,6 +389,7 @@ def my_account(request):
 	except UserProfile.DoesNotExist:
 		curruser_profile = None
 
+
 	if request.method == 'POST':
 		if request.POST.get('u_form', 'NONE') != 'NONE':
 			user_form = userForm( request.POST, instance=request.user )
@@ -397,9 +398,9 @@ def my_account(request):
 				msg = "Changes to your Arte'Venue account saved."
 
 		if request.POST.get('b_form', 'NONE') != 'NONE':
-			businessprofile_form = businessprof_Form( request.POST )
+			profile = Business_profile.objects.get( user = curruser )
+			businessprofile_form = businessprof_Form( request.POST, instance = profile )
 			if businessprofile_form.is_valid():
-				profile = Business_profile.objects.get( user = curruser )
 				b = businessprofile_form.save(commit=False)
 				b.user = curruser
 				b.created_date = profile.created_date
@@ -448,6 +449,7 @@ def my_account(request):
 	# Get user id
 	user_form = userForm( instance = curruser )
 
+	
 	if not businessprofile_form:
 		try:
 			profile = Business_profile.objects.get( user = curruser )

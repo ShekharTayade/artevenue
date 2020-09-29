@@ -34,6 +34,18 @@
 	
     <div class="container mb-5">
 		<div class="row mt-3 mb-3">
+			<div class="col-12">
+				<!-- breadcrumb-->
+				<nav aria-label="breadcrumb">
+					<ol class="breadcrumb">
+						<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+						<li class="breadcrumb-item"><a href="{% url 'artist_page' %}">Artist's Page</a></li>
+						<li class="breadcrumb-item active">Upload or Update Artwork</li>
+					</ol>
+				</nav>
+			</div>
+		</div>
+		<div class="row mt-3 mb-3">
 			<div class = "col-12 text-center">
 				{% if artwork %}
 				<h1><strong>UPDATE ARTWORK</strong></h1>
@@ -66,38 +78,53 @@
 					</strong>
 				</label>
 			</div>
+			{% if msg %}
+			<div class = "col-12 col-md-6 mt-3">
+				<span style = "font-size: 1rem; font-weight:700; border:1px solid #cfcfcf; color:red; padding: 5px;" >
+				<i class = "fa fa-exclamation-circle"> </i> {{msg}}
+				</span>
+			</div>
+			{% endif %}
 			{% if saved_msg %}
 			<div class = "col-12 col-md-6 mt-3">
-				<span id ="art_id" style = "font-size: 1rem; font-weight:700; border:1px solid #cfcfcf; color:green; padding: 5px; border: 1px solid #cfcfcf;" >
+				<span style = "font-size: 1rem; font-weight:700; border:1px solid #cfcfcf; color:green; padding: 5px;" >
 				<i class = "fa fa-exclamation-circle"> </i> Artwork details have been saved.
 				</span>
 			</div>
 			{% endif %}
 			{% if submitted_msg %}
 			<div class = "col-12 col-md-6 mt-3">
-				<span id ="art_id" style = "font-size: 1rem; font-weight:700; border:1px solid #cfcfcf; color:green; padding: 5px; border: 1px solid #cfcfcf;" >
+				<span style = "font-size: 1rem; font-weight:700; border:1px solid #cfcfcf; color:green; padding: 5px;" >
 				<i class = "fa fa-exclamation-circle"> </i>Submitted for review. It will  be listed once it is approved.
 				</span>
 			</div>
 			{% endif %}
+			{% if artevenue_disapproved %}
+			<div class = "col-12 col-md-6 mt-3">
+				<span style = "font-size: 1rem; font-weight:700; border:1px solid #cfcfcf; color:green; padding: 5px;" >
+				<i class = "fa fa-warning"> </i>Artwork is not approved: {{disapprove_msg}}
+				</span>
+			</div>
+			{% endif %}
 		</div>
+		{% if part_number %} 
 		<div class="row">
 			<div class = "col-12">
 				<strong>
 				STATUS: 
 				{% if artist_approved %}
 					{% if artevenue_approved %}
-						Listed for sell.
+						<span style = "color: green;">Listed for sell.</span>
 					{% else %}
-						Pending Arte'Venue approval. Not lilsted for sell.
+						<span style = "color: blue;">Pending Arte'Venue approval. Not listed for sell.</span>
 					{% endif %}
 				{% else %}
-					Not submitted for Arte'Venue review. Not lilsted for sell.
+					<span style = "color: red;">Not submitted for Arte'Venue review. Not listed for sell.</span>
 				{% endif %}
 				</strong>
 			</div>
 		</div>
-
+		{% endif %}
 		<div class="row">
 			<div class = "col-12 col-md-7 mt-2">
 				<div class = "row box">
@@ -349,8 +376,8 @@
 							</label>
 							<input id='original_art_price' name='original_art_price' type = "number" 
 								class = "form-control"
-								min = '1500'
-								placeholder="" value = "{% if artwork.original_art_price %}{{artwork.original_art_price|get_art_price_without_tax|floatformat }}{% endif %}" />
+								min = '5000'
+								placeholder="" value = "{% if orig_artwork.artist_price %}{{orig_artwork.artist_price|floatformat }}{% endif %}" />
 						</div>
 					</div>
 				</div>
@@ -503,17 +530,19 @@
 			
 			{% if artwork %}
 				// Artwork present
-			{% if artwork.image_type == 0 or artwork.image_type == '0' %}
-				// Painting
-			art_type_change('PAINTING');
-			{% elif artwork.image_type == 1 or artwork.image_type == '1' %}
-				// Photo
-			art_type_change('PHOTOGRAPH');
-			{% endif %}
+				{% if artwork.image_type == 0 or artwork.image_type == '0' %}
+					// Painting
+				art_type_change('PAINTING');
+				{% elif artwork.image_type == 1 or artwork.image_type == '1' %}
+					// Photo
+				art_type_change('PHOTOGRAPH');
+				{% endif %}
+			{% else %}
+			art_type_change('PAINTING');				
 			{% endif %}
 			
-			{% if orig_artwork_sts %}
-				allow_art_print('{{orig_artwork_sts.sell_mode}}');
+			{% if orig_artwork %}
+				allow_art_print('{{orig_artwork.sell_mode}}');
 			{% else %}
 				allow_art_print('B');				
 			{% endif %}

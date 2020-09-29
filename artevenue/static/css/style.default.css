@@ -69,7 +69,7 @@ h1 {
 
 .menu-large .textmenu {
 	top: 80%;
-	left: 40%;
+	left: 50%;
 	-webkit-transform: translateX(-50%);
 	transform: translateX(-50%);
 	margin-top: -1px;

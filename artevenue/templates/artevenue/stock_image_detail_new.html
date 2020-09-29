@@ -361,14 +361,14 @@
 												<div class = "col-6">												
 													<div class = "form-group">
 														<label>Width:</label>
-														<input class = "form-control" name = "i_width" id = "i_width" type = "number" value="16">
+														<input class = "form-control" name = "i_width" id = "i_width" type = "number" value="16"  min = '8'>
 													</div>
 												</div>
 												<div class = "col-6">												
 													<div class = "form-group">
 														<div class = "form-group">
 															<label>Height:</label>
-															<input class = "form-control" name = "i_height" id = "i_height" type = "number"> 
+															<input class = "form-control" name = "i_height" id = "i_height" type = "number" min = '8'> 
 														</div>
 													</div>
 												</div>
@@ -868,6 +868,9 @@
 		});
 		$( "#i_height" ).change(function() {
 			currheight = $(this).val();
+			if (currheight < 8){
+				currheight = 8;
+			}
 			currwidth = Math.round(currheight * ratio);
 			set_size_slider(currwidth);
 		});
@@ -1282,7 +1285,15 @@
 			
 	<script>
 		jQuery(document).ready(function(){
-
+		
+			r = {{product.aspect_ratio}};
+			if (r > 1) {
+				ht = 8
+				wd = Math.round(ht * r)
+			} else {
+				wd = 10
+			}
+			
 			$body = $("body");
 			
 			$(document).on({
@@ -1327,40 +1338,40 @@
 						buy_without_frame_change(false, false);
 						
 					} else {
-						if ({{product.max_width}} < 10 ){
+						if ({{product.max_width}} < wd ){
 							set_size_slider({{product.max_width}});
 							print_medium_change('PAPER', false);
 							//$( "#size-slider" ).slider( "option", "value", {{product.max_width}});
 							$("#paper-size-10").addClass("p_clicked");
 							$("#canvas-size-10").addClass("p_clicked");
-							set_ready_product('PAPER', 10, 10, false);
+							set_ready_product('PAPER', wd, wd, false);
 							buy_without_frame_change(false, false);
 						} else {
-							set_size_slider(10);
+							set_size_slider(wd);
 							print_medium_change('PAPER', false);
 							//$( "#size-slider" ).slider( "option", "value", 10);
 							$("#paper-size-10").addClass("p_clicked");
 							$("#canvas-size-10").addClass("p_clicked");
-							set_ready_product('PAPER', 10, 10, false);
+							set_ready_product('PAPER', wd, wd, false);
 							buy_without_frame_change(false, false);
 						}
 					}
 				{% else %}
-					if ({{product.max_width}} < 10 ){
+					if ({{product.max_width}} < wd ){
 						set_size_slider({{product.max_width}});
 						print_medium_change('PAPER', false);
 						//$( "#size-slider" ).slider( "option", "value", {{product.max_width}});
 						$("#paper-size-10").addClass("p_clicked");
 						$("#canvas-size-10").addClass("p_clicked");
-						set_ready_product('PAPER', 10, 10, false);
+						set_ready_product('PAPER', wd, wd, false);
 						buy_without_frame_change(false, false);				
 					} else {						
-						set_size_slider(10);
+						set_size_slider(wd);
 						print_medium_change('PAPER', false);
 						//$( "#size-slider" ).slider( "option", "value", 10);
 						$("#paper-size-10").addClass("p_clicked");
 						$("#canvas-size-10").addClass("p_clicked");
-						set_ready_product('PAPER', 10, 10, false);
+						set_ready_product('PAPER', wd, wd, false);
 						buy_without_frame_change(false, false);
 					}
 				{% endif %}
@@ -1540,11 +1551,19 @@
 					maxsize = 40;
 				}
 			}
+			if (ratio > 1){
+				//////
+				minsize = Math.round(8 * ratio);
+			}
+
+			
 			if ( $( "size-slider" ).slider( "instance" ) != null ) { 
 				if (isize == $( "#size-slider" ).slider( "value" ) ){
 					return;
 				}
 			}
+			
+			
 			$("#size-slider").slider({
 				value:isize,
 				min:minsize,

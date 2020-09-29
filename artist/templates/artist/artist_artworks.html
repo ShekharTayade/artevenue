@@ -40,7 +40,8 @@
 					<nav aria-label="breadcrumb">
 						<ol class="breadcrumb">
 							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
-							<li aria-current="page" class="breadcrumb-item active">View Artworks</li>
+						<li class="breadcrumb-item"><a href="{% url 'artist_page' %}">Artist's Page</a></li>
+							<li aria-current="page" class="breadcrumb-item active">Artworks List</li>
 						</ol>
 					</nav>
 				</div>
@@ -137,14 +138,18 @@
 					<div class="col-12 col-md-6" style = "color:#11b6bd;">
 						<strong>
 						STATUS: 
-						{% if a.artist_listed %}
-							{% if a.approved %}
-								Listed for sell.
-							{% else %}
-								Pending Arte'Venue approval. Not lilsted for sell.
-							{% endif %}
+						{% if a.product.unapproved %}
+							Not Approved for Sell: {{a.product.unapproval_reason}}
 						{% else %}
-							Not submitted for Arte'Venue review. Not listed for sell.
+							{% if a.artist_listed %}
+								{% if a.approved %}
+									Listed for sell.
+								{% else %}
+									Pending Arte'Venue approval. Not listed for sell.
+								{% endif %}
+							{% else %}
+								Not submitted for Arte'Venue review. Not listed for sell.
+							{% endif %}
 						{% endif %}
 						</strong>
 					</div>

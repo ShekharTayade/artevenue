@@ -1,0 +1,49 @@
+{% load static %}
+{% load utils %}
+
+					<div class = "col-12 text-center">
+						<label>ARTWORKS IN THE GALLERY WALL</label>
+					</div>
+					{% for i in gallery_items %}
+					<div id = "item_{{i.product_id}}" class = "col-6 col-md-4 mt-4 gal_items">
+						<div class="img-container" style= "background-color: transparent; position: relative;">
+							<i id = "prod-select_{{i.product_id}}" style = "position: absolute; top:0; left:0; color: #11b6bd; z-index: 111" class = "fa fa-check-circle fa-2x"></i>
+							<img id = "img_{{i.product_id}}" src="" alt="Wall art:" class="img-fluid image-display lazyload" 
+									style = "filter: drop-shadow(0.25rem 0.25rem 0.25rem grey); display: block;">
+						</div>
+						<div class = "row">
+							<div class = "col-12">
+								<span class = "text-center" style="color: #11b6bd !important; font-size:0.8rem;">
+									{{i.product_name}}
+								</span>
+							</div>
+							<div id = "spec_{{i.id}}"class = "col-12 mt-3" style = "font-size:0.7rem;">
+								<ul>
+								<li>Art Print On: <span id = "{{i.product_id}}_surface">{{i.print_medium_id|title}}</span></li>
+								<li>Print Size: <span id = "{{i.product_id}}_psize">{{i.image_width}} X {{i.image_height}} inch</span></li>
+								<li>Frame: <span id = "{{i.product_id}}_frame">{{i.moulding.name}}</span></li>
+								<li>Mount: <span id = "{{i.product_id}}_mount">{{i.mount.name}}, size: {{i.mount_size|floatformat}} inch</span></li>
+								<li>Finished Size: <span id = "{{i.product_id}}_fsize"></span></li>
+								</ul>
+								
+							</div>
+
+							<div class = "col-12 col-md-6 text-center mt-3" style = "font-size:0.7rem;">
+								<button id = "remove-btn_{{i.product_id}}" class = "btn btn-outline btn-sm" type = "button"
+									onclick = "removeFromGallery('{{i.product_id}}')">
+									<i class = "fa fa-trash"> Remove from Gallery</i>
+								</button>
+								<button id = "add-btn_{{i.product_id}}" class = "btn btn-outline btn-sm" type = "button"
+									onclick = "addToGallery('{{i.product_id}}');">
+									<i class = "fa fa-plus"> Add to Gallery</i>
+								</button>
+							</div>
+							<div class = "col-12  col-md-6 text-center mt-3" style = "font-size:0.7rem;">
+								<a class = "btn btn-outline btn-sm" type = "button" 
+									href="{% url 'stock_image_detail' i.product_id i.image_width i.image_height %}">
+									<i class = "fa fa-rupee"> Buy Only This</i>
+								</a>
+							</div>
+						</div>
+					</div>
+					{% endfor %}

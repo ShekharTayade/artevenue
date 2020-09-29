@@ -622,9 +622,6 @@ class Original_art(models.Model):
 	SURFACE = (
 		('CVS', 'Canvas'),
 		('PPR', 'Paper'),
-		('FAB', 'Fabric'),	
-		('GLS', 'Glass'),	
-		('WOD', 'Wood'),	
 	)
 	product_id = models.AutoField(primary_key=True, null=False)
 	product_type = models.ForeignKey(Product_type, models.CASCADE, null=True)
@@ -1158,6 +1155,14 @@ class Publisher_price (models.Model):
 #  	Business User
 ############################
 class Profile_group (models.Model):
+	PROFILE_TYPE = (
+		('D', 'Discount on every order'),
+		('R', 'Referral fee for every order'),
+	)
+	SLAB_FLAT = (
+		('F', 'Flat Discount or referral fee percentage'),
+		('S', 'Discount or referral fee percentage based on slabs of order volumes'),
+	)
 	profile_id = models.AutoField(primary_key=True, null=False)
 	name = models.CharField(max_length=30, blank=True)
 	description = models.CharField(max_length=30, blank=True)
@@ -1167,9 +1172,38 @@ class Profile_group (models.Model):
 	effective_to = models.DateField(blank=True, null=True)
 	deferred_payment = models.BooleanField(null=False, default=True)
 	payment_due_period_days = models.IntegerField(null=True)
+	profile_type = models.CharField(max_length=1, choices=PROFILE_TYPE, blank=False, default = 'D')
+	flat_or_slab = models.CharField(max_length=1, choices=SLAB_FLAT, blank=False, default = 'F' )
 
 	def __str__(self):
 		return self.name
+
+class Discount_slab(models.Model):
+	profile = models.ForeignKey(Profile_group, on_delete = models.PROTECT, null=False)
+	product_type = models.ForeignKey(Product_type, models.PROTECT, null=False) 	
+	slab_name = models.CharField(max_length=30, blank=True)
+	rule = models.CharField(max_length=500, blank=True)
+	min_amt = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	max_amt = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	voucher = models.ForeignKey(Voucher, models.PROTECT, null=True)
+
+class Discount_flat(models.Model):
+	profile = models.ForeignKey(Profile_group, on_delete = models.PROTECT, null=False)
+	product_type = models.ForeignKey(Product_type, models.PROTECT, null=False) 	
+	name = models.CharField(max_length=30, blank=True)
+	rule = models.CharField(max_length=500, blank=True)
+	voucher = models.ForeignKey(Voucher, models.PROTECT, null=True)
+	
+
+class Referral_slab(models.Model):
+	profile = models.ForeignKey(Profile_group, on_delete = models.PROTECT, null=False)
+	product_type = models.ForeignKey(Product_type, models.PROTECT, null=False) 	
+	slab_name = models.CharField(max_length=30, blank=True)
+	rule = models.CharField(max_length=500, blank=True)
+	min_amt =  models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	max_amt =  models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	percentage =  models.DecimalField(max_digits=12, decimal_places=2, null=True)
+
 
 class Channel_partner(models.Model):
 	user = models.OneToOneField(User, on_delete=models.CASCADE, null=False, related_name="channel_partner")

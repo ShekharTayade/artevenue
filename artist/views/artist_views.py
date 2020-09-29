@@ -10,7 +10,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Count, Q, F
 from django.http import HttpResponse, JsonResponse
 
-from artist.models import Artist_group, Artist_sms_email, Artist, Artist_original_art, Artist_art_view, Artist_stock_image, Generate_art_number
+from artist.models import Artist_group, Artist_sms_email, Artist, Artist_original_art, Artist_stock_image, Generate_art_number
 from artevenue.models import Country, State, City, Pin_code, Ecom_site, Original_art
 from artevenue.models import Original_art_original_art_category, Stock_image_category, Stock_image, Stock_image_stock_image_category
 from artevenue.models import Wishlist, Wishlist_item_view, Publisher_price
@@ -820,6 +820,8 @@ def upload_art(request, part_number=None):
 	submitted_msg = False
 	artist_approved = False
 	artevenue_approved = False
+	artevenue_disapproved = False
+	disapprove_msg = ''
 	a_orig_artwork = {}
 	a_stk_image = {}
 	
@@ -837,7 +839,7 @@ def upload_art(request, part_number=None):
 	medium_list = Original_art.MEDIUM
 	surface_list = Original_art.SURFACE
 	img_type_list = Original_art.IMAGE_TYPE
-	category_list = Stock_image_category.objects.all().order_by('name')
+	category_list = Stock_image_category.objects.all().distinct('name').order_by('name')
 
 
 	if part_number is None:
@@ -845,6 +847,7 @@ def upload_art(request, part_number=None):
 		if part_number == '':
 			part_number = request.GET.get("part_number", "")
 
+	## If part number exists, then artwork has already been uploaded and this is either a save or a submit for review
 	if part_number:
 		artwork = Original_art.objects.filter(part_number = part_number).first()
 		a_orig_artwork = Artist_original_art.objects.filter(product = artwork).first()
@@ -852,26 +855,16 @@ def upload_art(request, part_number=None):
 		art_print = Stock_image.objects.filter(part_number = part_number).first()
 		a_stk_image = Artist_stock_image.objects.filter( product = art_print).first()
 		stock_image_id = art_print.product_id
-
+		
+		## Get the category
 		if artwork :
-			sell_original = artwork.is_published
+			#sell_original = artwork.is_published
 			cate = Original_art_original_art_category.objects.filter(original_art = artwork).first()
 			if cate:
 				category = str(cate.stock_image_category_id)
-		else:
-			sell_original = False
 		if art_print:
-			sell_art_print = art_print.is_published
 			art_print_width = art_print.max_width
 			art_print_height = art_print.max_height 
-			sell_art_print = art_print.is_published
-		else: 
-			sell_art_print = False
-			
-		
-	else:
-		sell_original = False
-		sell_art_print = False
 
 
 	if request.POST:
@@ -911,18 +904,32 @@ def upload_art(request, part_number=None):
 			msg = "The minimum required art print width is 8 inch. The image you have uploaded doesn't have enough resolution and can't be printed with 8 inch width or more. Please upload another image of this artwork with better resolution."
 			return render(request, "artist/upload_artwork.html", {'msg': msg, 'artist':artist, 'medium_list': medium_list, 'artwork': artwork,
 				'surface_list': surface_list, 'img_type_list': img_type_list, 'part_number': part_number, 'category_list': category_list,
-				'sell_original': sell_original, 'sell_art_print': sell_art_print, 'art_print_width':art_print_width
+				'art_print_width':art_print_width
 				, 'art_print_height':art_print_height, 'category': category , 'orig_artwork_sts': a_orig_artwork})
 			
 		if art_print_option == 'O':
 			art_print_allowed = False
 		else:
 			art_print_allowed = True
-			
-		original_art_price = float(request.POST.get("original_art_price", "0"))
+		
+		str_p = request.POST.get("original_art_price", "0")
+		if str_p == '':
+			str_p = '0'
+		original_art_price = float(str_p)
+		artist_price = original_art_price	## To store the original art price before tax
+		
+		if art_type == 0:
+			if original_art_price < 5000:
+				msg = "The minimum original artwork price required is Rs. 5,000."
+				return render(request, "artist/upload_artwork.html", {'msg': msg, 'artist':artist, 'medium_list': medium_list, 'artwork': artwork,
+					'surface_list': surface_list, 'img_type_list': img_type_list, 'part_number': part_number, 'category_list': category_list,
+					'art_print_width':art_print_width
+					, 'art_print_height':art_print_height, 'category': category , 'orig_artwork_sts': a_orig_artwork})
+				
 		original_art_price = Decimal( round(original_art_price + (original_art_price*0.12)) ) ## Add tax
 		keywords = request.POST.get("keywords", "")
 		colors = request.POST.get("colors", "")
+
 
 		if art_type == 1:
 			original_art_price = 0
@@ -947,7 +954,10 @@ def upload_art(request, part_number=None):
 			art_print = Stock_image()
 			
 		if not artwork_image:
-			img_highres = Image.open(artwork.high_resolution_url)
+			if env == 'PROD':
+				img_highres = Image.open('/home/artevenue/website/estore/static/' + artwork.high_resolution_url)
+			else:			
+				img_highres = Image.open('c:/artevenue/estore/artevenue/static/' + artwork.high_resolution_url)
 		else:
 			img_highres = Image.open(artwork_image)
 		wd = img_highres.width
@@ -961,16 +971,19 @@ def upload_art(request, part_number=None):
 			orientation = 'vertical'
 							
 		if env == 'PROD':
-			lowres_name_save = '/home/artevenue/website/estore/static/image_data/artevenue/artprint/' + part_number + "_lowres.jpg"
 			lowres_name = 'image_data/artevenue/artprint/' + part_number + "_lowres.jpg"
+			lowres_name_save = '/home/artevenue/website/estore/static/image_data/artevenue/artprint/' + part_number + "_lowres.jpg"
+			highres_name = 'image_data/artevenue/original/' + part_number + "_highres.jpg"
 			highres_name_save = '/home/artevenue/website/estore/static/image_data/artevenue/original/' + part_number + "_highres.jpg"
 			thumbnail_name = 'image_data/artevenue/artprint/' + part_number + "_thumb.jpg"
+			thumbnail_name_save = '/home/artevenue/website/estore/static/image_data/artevenue/artprint/' + part_number + "_thumb.jpg"
 		else:
-			lowres_name_save = 'c:/artevenue/estore/artevenue/static/image_data/artevenue/artprint/' + part_number + "_lowres.jpg"
 			lowres_name = 'image_data/artevenue/artprint/' + part_number + "_lowres.jpg"
-			highres_name = 'c:/artevenue/estore/artevenue/static/image_data/artevenue/original/' + part_number + "_highres.jpg"
-			thumbnail_name_save = 'c:/artevenue/estore/artevenue/static/image_data/artevenue/artprint/' + part_number + "_thumb.jpg"
+			lowres_name_save = 'c:/artevenue/estore/artevenue/static/image_data/artevenue/artprint/' + part_number + "_lowres.jpg"
+			highres_name = 'image_data/artevenue/original/' + part_number + "_highres.jpg"
+			highres_name_save = 'c:/artevenue/estore/artevenue/static/image_data/artevenue/original/' + part_number + "_highres.jpg"
 			thumbnail_name = 'image_data/artevenue/artprint/' + part_number + "_thumb.jpg"
+			thumbnail_name_save = 'c:/artevenue/estore/artevenue/static/image_data/artevenue/artprint/' + part_number + "_thumb.jpg"
 			
 		if wd < 1000:
 			w = wd
@@ -980,7 +993,7 @@ def upload_art(request, part_number=None):
 		img_thumbnail = img_highres.resize((75, 75/aspect_ratio))
 		
 		img_lowres.save(lowres_name_save, 'JPEG')
-		img_highres.save(highres_name, 'JPEG')
+		img_highres.save(highres_name_save, 'JPEG')
 		img_thumbnail.save(thumbnail_name_save, 'JPEG')
 					
 		
@@ -1002,7 +1015,7 @@ def upload_art(request, part_number=None):
 		artwork.max_width = max_width
 		artwork.max_height = max_height
 		artwork.min_width = 8
-		artwork.publisher = 'ARTEVENUE'
+		artwork.publisher = '01'
 		artwork.artist = artist.profile_name
 		artwork.colors = colors
 		artwork.key_words = keywords
@@ -1037,6 +1050,7 @@ def upload_art(request, part_number=None):
 		a_orig_artwork.artist_listed = artist_approved
 		a_orig_artwork.approved = False
 		a_orig_artwork.approval_date = None
+		a_orig_artwork.artist_price = artist_price	#store the original art price before tax
 		a_orig_artwork.save()
 
 		## Update/Insert Art Print
@@ -1058,7 +1072,7 @@ def upload_art(request, part_number=None):
 		art_print.max_width = max_width
 		art_print.max_height = max_height
 		art_print.min_width = 8
-		art_print.publisher = 'ARTEVENUE'
+		art_print.publisher = '01'
 		art_print.artist = artist.profile_name
 		art_print.colors = colors
 		art_print.key_words = keywords
@@ -1105,7 +1119,7 @@ def upload_art(request, part_number=None):
 				stock_image_category_id = category
 			)		
 			cate_stki.save()
-
+		
 		if save_draft :
 			saved_msg = True
 		if submit_artwork :
@@ -1117,20 +1131,25 @@ def upload_art(request, part_number=None):
 				artevenue_approved = True
 			if a_orig_artwork.artist_listed:
 				artist_approved = True
+			if a_orig_artwork.unapproved:
+				artevenue_disapproved = True
+				disapprove_msg = a_orig_artwork.unapproval_reason
+				
 
 	if submit_artwork:
 		return render(request, "artist/confirm_artwork_submit.html", {'artist':artist, 'medium_list': medium_list, 'artwork': artwork,
 			'surface_list': surface_list, 'img_type_list': img_type_list, 'part_number': part_number, 'category_list': category_list,
-			'sell_original': sell_original, 'sell_art_print': sell_art_print, 'art_print_width':art_print_width
-			, 'art_print_height':art_print_height, 'category': category , 'saved_msg': saved_msg , 'orig_artwork_sts': a_orig_artwork,
+			'art_print_width':art_print_width,
+			'art_print_height':art_print_height, 'category': category , 'saved_msg': saved_msg , 'orig_artwork': a_orig_artwork,
 			'submitted_msg': submitted_msg, 'artist_approved': artist_approved, 'artevenue_approved': artevenue_approved})
 	
 	else:
 		return render(request, "artist/upload_artwork.html", {'artist':artist, 'medium_list': medium_list, 'artwork': artwork,
 			'surface_list': surface_list, 'img_type_list': img_type_list, 'part_number': part_number, 'category_list': category_list,
-			'sell_original': sell_original, 'sell_art_print': sell_art_print, 'art_print_width':art_print_width
-			, 'art_print_height':art_print_height, 'category': category , 'saved_msg': saved_msg , 'orig_artwork_sts': a_orig_artwork,
-			'submitted_msg': submitted_msg, 'artist_approved': artist_approved, 'artevenue_approved': artevenue_approved})
+			'art_print_width':art_print_width,
+			'art_print_height':art_print_height, 'category': category , 'saved_msg': saved_msg , 'orig_artwork': a_orig_artwork,
+			'submitted_msg': submitted_msg, 'artist_approved': artist_approved, 'artevenue_approved': artevenue_approved,
+			'disapprove_msg': disapprov_msg, 'artevenue_disapproved': artevenue_disapproved})
 	
 
 
@@ -1248,28 +1267,44 @@ def set_original_artwork_approval(request):
 			artwork = Artist_original_art.objects.get(id = id, artist_listed = True, approved = False, unapproved = False)
 			msg = ""
 			action = request.GET.get('action', '').upper();
+			# If approved for listing
 			if action == 'A':
 				artwork.approved = True
-				artwork.disapproved = False
+				artwork.unapproved = False
 				artwork.approval_date = today
+				artwork.save()
+				## Publish the artwork
+				try:
+					orig_art = Original_art.objects.get(product_id = artwork.product_id)
+					orig_art.is_published = True
+					try:
+						stk_img = Stock_image.objects.get(product_id = orig_art.stock_image_id)
+						stk_img.is_published = True
+						orig_art.save()
+						stk_img.save()
+					except Stock_image.DoesNotExist:
+						sts = 'FAILURE'						
+				except Original_art.DoesNotExist:
+					sts = 'FAILURE'
+
+			# If unapproved for listing
 			if action == 'D':
 				artwork.approved = False
-				artwork.disapproved = True
+				artwork.unapproved = True
 				artwork.unapproval_date = today
-			artwork.save()
-			try:
-				orig_art = Original_art.objects.get(product_id = artwork.product_id)
-				orig_art.is_published = True
+				artwork.save()
 				try:
-					stk_img = Stock_image.objects.get(product_id = orig_art.stock_image_id)
-					stk_img.is_published = True
-					orig_art.save()
-					stk_img.save()
-				except Stock_image.DoesNotExist:
+					orig_art = Original_art.objects.get(product_id = artwork.product_id)
+					orig_art.is_published = False
+					try:
+						stk_img = Stock_image.objects.get(product_id = orig_art.stock_image_id)
+						stk_img.is_published = False
+						orig_art.save()
+						stk_img.save()
+					except Stock_image.DoesNotExist:
+						sts = 'FAILURE'						
+				except Original_art.DoesNotExist:
 					sts = 'FAILURE'
-					
-			except Original_art.DoesNotExist:
-				sts = 'FAILURE'
 			
 		except Artist_original_art.DoesNotExist:
 			sts = 'FAILURE'
@@ -1370,6 +1405,7 @@ def get_my_artworks(request):
 
 @is_artist
 def delist_artwork(request, part_number=None):
+
 	try:
 		userObj = User.objects.get(username = request.user)
 		artist = Artist.objects.get(user = userObj)

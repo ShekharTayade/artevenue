@@ -1,0 +1,165 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load gallery_utils %}
+
+gallery_utils
+{% block popper-script %}
+	<script src="{% static 'vendor/popper.js/umd/popper.min.js' %}"> </script>
+{% endblock popper-script %}
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+        <div class="container">
+			<div class="row">
+				<!-- breadcrumb-->
+				<div class="col-xs-12 col-lg-12">
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+							<li aria-current="page" class="breadcrumb-item active">Gallery Walls</li>
+						</ol>
+					</nav>
+				</div>
+			</div>
+			<div class = "row mt-3">
+				<div class="col-12 text-center">
+					<h1><strong>GALLERY WALLS</strong></h1>
+				</div>
+			</div>
+			<div class = "row  mt-3">
+				<div class="col-12 text-center">
+					Get inspired by designer curated collage for your home and office walls. Set your interiors a class apart.
+				</div>
+			</div>
+			<div class = "row mt-5" style = "border-top: 1px solid #ddd; border-bottom: 1px solid #ddd;" >
+				<div class="col-3 text-center">
+					<div class="dropdown">
+						<button class="btn btn-default dropdown-toggle" 
+						style = "color: #212529; background-color: #fff; border-color: #fff;"
+						type="button" id="dropdownMenuButton" 
+						data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							ROOM
+						</button>
+						<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+								<li class="dropdown-item" onclick="getGalleryWalls('', '', '', '')">See All</li>
+							{% for r in rooms %}
+								<li class="dropdown-item" onclick="getGalleryWalls('{{r.name}}', '', '', '')">{{r.name}}</li>
+							{% endfor %}
+						</div>					
+					</div>
+				</div>
+				<div class="col-3 text-center">
+					<div class="dropdown">
+						<button class="btn btn-default dropdown-toggle" 
+						style = "color: #212529; background-color: #fff; border-color: #fff;"
+						type="button" id="dropdownMenuButton" 
+						data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							PLACE
+						</button>
+						<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+							<a class="dropdown-item" onclick="getGalleryWalls('', '', '', '')">See All</a>
+							{% for p in placements %}
+								<a class="dropdown-item" onclick="getGalleryWalls('', '{{p.name}}', '', '')">{{p.name}}</a>
+							{% endfor %}
+						</div>					
+					</div>
+				</div>
+				<div class="col-3 text-center">
+					<button class="btn btn-default dropdown-toggle" 
+					style = "color: #212529; background-color: #fff; border-color: #fff;"
+					type="button" id="dropdownMenuButton" 
+					data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						COLOR
+					</button>
+					<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+						<span style = "text-decoration: underline; cursor:pointer;" 
+							onclick="getGalleryWalls('', '', '', '')">See All</span><br/>
+						{% for c in colors %}
+							<div class= "text-center color-col mr-1" 
+								style = "display: inline-block; background-color:{{c}}; 
+									{% if c == 'White' %} border:1px solid gainsboro{% endif %}; 
+									border-radius:50%; width:30px; height:30px; 
+									margin:3px 3px; cursor:pointer;
+									color:{% if c == 'White' or c == 'Yellow'%} black {% else %} white {% endif %};"
+								onclick="getGalleryWalls('', '', '{{c}}', '')">
+							</div>
+						{% endfor %}
+					</div>
+				</div>
+				<div class="col-3 text-center">
+					<div class="dropdown">
+						<button class="btn btn-default dropdown-toggle" 
+						style = "color: #212529; background-color: #fff; border-color: #fff;"
+						type="button" id="dropdownMenuButton" 
+						data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							SET OF
+						</button>
+						<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+								<li class="dropdown-item" onclick="getGalleryWalls('', '', '', '')">See All</li>
+							{% for s in set_of %}
+								<li class="dropdown-item" onclick="getGalleryWalls('', '', '', '{{s.set_of}}')">{{s.set_of}}</li>
+							{% endfor %}
+						</div>
+					</div>
+				</div>
+				<form hidden id="cat-form" action = "{% url 'get_gallery_walls' %}">
+					<input id = "id_page_num" name = "page_num">
+					<input id = "id_sort" name = "sort">
+					<input id = "id_show" name = "show">
+					<input id = "id_keywords" name = "keywords">
+					<input id = "id_color" name = "color">
+					<input id = "id_room_name" name = "room_name">
+					<input id = "id_set_of" name = "set_of">
+					<input id = "id_placement_name" name = "placement_name">				
+				</form>
+			</div>
+
+			<div class = "row">
+				<div class="col-12 text-center">
+					{% if filt_msg %}
+						<span style = "padding: 0.375rem 0.75rem;">{{filt_msg}}</span> |<button class = "btn btn-link" onclick="getGalleryWalls('', '', '', '');">Show All {{total_galleries}}</button>
+					{% else %}
+						 {{total_galleries}} Gallery Walls
+					{% endif %}
+				</div>
+			</div>
+			<div id = "img-display">
+				{% include 'gallerywalls/prod_display_gallery_walls_include.html' %}
+			</div>
+
+			<!-- /.col-lg-9-->
+			{% include 'artevenue/wishlist-add-message.html' %}
+			{% include 'artevenue/message-modal_ok.html' %}
+		
+		</div>
+	</div>
+	{% endblock sitecontent %}
+
+	
+	{% block jscripts %}
+
+	<script>
+		function getGalleryWalls(room_name, place_name, color, set_of){ 
+			
+			$('#id_room_name').val(room_name);
+			$('#id_placement_name').val(place_name);
+			$('#id_color').val(color);
+			$('#id_set_of').val(set_of);
+			
+			$("#cat-form").submit();
+
+		}
+	</script>
+		
+	<script>
+		function select_color(ele){
+			if (ele.innerHTML == "<i class=\"fa fa-check\"></i>"){
+				ele.innerHTML = "";
+			} else {
+				ele.innerHTML = "<i class ='fa fa-check'></i>";
+			}
+		}
+	</script>
+	
+	{% endblock jscripts %}
+			
+	

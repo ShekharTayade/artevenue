@@ -148,6 +148,13 @@ class User_imageForm(forms.ModelForm):
 
         
 class businessprof_Form(forms.ModelForm):
+
+	id = forms.CharField(
+		widget=forms.HiddenInput(),
+		required=True,
+		#disabled=True
+	) 	
+
 	business_code = forms.CharField(
 		widget=forms.TextInput(attrs={'placeholder': 'Enter your business code (8 char max)'}),
 		required=False,
@@ -244,6 +251,13 @@ class userForm(forms.ModelForm):
 			'email', 'last_login')
 			
 class shipping_addressForm(forms.ModelForm):
+
+	shipping_address_id = forms.CharField(
+		widget=forms.HiddenInput(),
+		required=True,
+		#disabled=True
+	) 	
+
 	store = forms.CharField(
 		widget=forms.HiddenInput(),
 		required=False
@@ -292,12 +306,18 @@ class shipping_addressForm(forms.ModelForm):
 
 	class Meta:
 		model = User_shipping_address
-		fields = ('store', 'full_name', 'company', 'address_1', 'address_2',
+		fields = ('shipping_address_id', 'store', 'full_name', 'company', 'address_1', 'address_2',
 		'land_mark', 'city', 'state', 'pin_code', 'country',
 		'phone_number', 'email_id', 'pref_addr', 'user')
 
 		
 class billing_addressForm(forms.ModelForm): 
+	billing_address_id = forms.CharField(
+		widget=forms.HiddenInput(),
+		required=True,
+		#disabled=True
+	) 	
+
 	store = forms.CharField(
 		widget=forms.HiddenInput(),
 		required=False
@@ -347,7 +367,7 @@ class billing_addressForm(forms.ModelForm):
 
 	class Meta:
 		model = User_billing_address
-		fields = ('store', 'full_name', 'company', 'address_1', 'address_2',
+		fields = ('billing_address_id', 'store', 'full_name', 'company', 'address_1', 'address_2',
 		'land_mark', 'city', 'state', 'pin_code', 'country',
 		'phone_number', 'email_id', 'gst_number', 'pref_addr', 'user')
 

@@ -263,8 +263,16 @@ def get_price_reduction_by_size(price, size):
 	slab4_end = 5000
 	slab4_reduction = 5 / (5000 - 3547)
 
-	if size <= 1299:
+	# increase price for samller sizes
+	if size <= 100:
+		reduced_price = price * size + (price * size * 20/100)
+	elif size <= 256:
+		reduced_price = price * size + (price * size * 15/100)
+	elif size <= 500:
+		reduced_price = price * size + (price * size * 10/100)
+	elif size <= 1299:
 		reduced_price = (price * size)  ## no reduction
+	# decrease price for larger sizes
 	elif size  > 1299 and size < 1800:	
 		reduction_factor = (size - 1300) * slab1_reduction
 		reduced_price = (price * size) - (price * size * reduction_factor/100)				
@@ -274,22 +282,22 @@ def get_price_reduction_by_size(price, size):
 	elif size < 3456:
 		reduction_factor = (size - 2400) * slab3_reduction
 		reduced_price = (price * size) - (price * size * 15/100) - (price * size * reduction_factor/100)
-	else:
+	elif size >= 3456:
 		reduction_factor = (size - 3456) * slab4_reduction
 		reduced_price = (price * size) - (price * size * 20/100) - (price * size * reduction_factor/100)
-		'''
-		print("slab_Red" + str(slab4_reduction))
-		print("Orig Price" + str(size*price))
-		print("Reduction factor: " + str(reduction_factor))
-		print("Reduction: " + str(price * size * reduction_factor/100) )	
-		'''
 	return round(reduced_price)
-
+	
 
 def get_price_for_6_prods(prod_id, aspect_ratio, prod_type='STOCK-IMAGE'):
 	
 	##STANDARD_PROD_WIDTHS = [12, 18, 24, 30, 36, 42]
-	STANDARD_PROD_WIDTHS = [10, 14, 18, 24, 30, 36]
+	
+	if aspect_ratio > 1:
+		h = 8
+		w = round(h * aspect_ratio)
+		STANDARD_PROD_WIDTHS = [w, w+4 , w+8, w+14, w+20, w+26]
+	else:
+		STANDARD_PROD_WIDTHS = [10, 14, 18, 24, 30, 36]
 	# Get image price on paper and canvas
 	per_sqinch_price = get_per_sqinch_price(prod_id, prod_type)
 	per_sqinch_paper = per_sqinch_price['per_sqin_paper']

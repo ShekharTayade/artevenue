@@ -48,6 +48,15 @@ def get_price(width, aspect_ratio, sqin_price, user_width):
 		if width > 10:
 			width = 10
 	height = round(width / aspect_ratio)
+
+	# Small size prices increased by 20%  -- 26 Sep 2020
+	size = width * height
+	if size <= 100:
+		sqin_price = sqin_price + (sqin_price * 20/100)
+	elif size <= 256:
+		sqin_price = sqin_price + (sqin_price * 15/100)
+	elif size <= 500:
+		sqin_price = sqin_price + (sqin_price * 10/100)
 	
 	return Decimal(round( float(width * height * sqin_price ) , -1))
 

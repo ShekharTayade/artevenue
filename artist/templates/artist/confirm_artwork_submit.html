@@ -34,13 +34,25 @@
 	
     <div class="container mb-5">
 		<div class="row mt-3 mb-3">
+			<div class="col-12">
+				<!-- breadcrumb-->
+				<nav aria-label="breadcrumb">
+					<ol class="breadcrumb">
+						<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+						<li class="breadcrumb-item"><a href="{% url 'artist_page' %}">Artist's Page</a></li>
+						<li class="breadcrumb-item active">Artwork Submitted</li>
+					</ol>
+				</nav>
+			</div>
+		</div>
+		<div class="row mt-3 mb-3">
 			<div class = "col-12 text-center">
 				<h1><strong>SUBMITTED FOR ARTE'VENUE REVIEW</strong></h1>
 			</div>
 		</div>
 		<div class="row mt-3 mb-3">
 			<div class = "col-12 text-center" style = "">
-				<strong>
+				<strong style = "color: #11b6bd;">
 					This artwork has been submitted for Arte'Venue review and once approved by Arte'Venue,
 					it will be available for customers to buy. <br />
 					In the mean time if you make any changes to this artwork details or it's image, it will

@@ -156,60 +156,9 @@ class Artist_original_art (models.Model):
 	updated_date = models.DateTimeField(auto_now=True, null=False)	
 	unapproved = models.BooleanField(null=False, default=False)
 	unapproval_date = models.DateTimeField(null = True)
+	unapproval_reason = models.CharField(max_length=500, null=False, default = '')
+	artist_price = models.DecimalField(max_digits=12, decimal_places=2, null=True)
 
-# A DB view "Artist_art_view". This holds data for all product types. 
-class Artist_art_view(models.Model):
-	store = models.ForeignKey(Ecom_site, models.CASCADE)
-	product_id = models.AutoField(primary_key=True, null=False)
-	name = models.CharField(max_length = 128, null=False)
-	description = models.CharField(max_length = 2000, blank=True, default = '')
-	price = models.DecimalField(max_digits=12, decimal_places=2, blank=False, null=False)
-	available_on = models.DateField(blank=True, null=True)
-	updated_at = models.DateTimeField(blank=True, null=True)
-	part_number = models.CharField(max_length = 30, null=True)
-	product_type = models.ForeignKey(Product_type, models.CASCADE, null=True)
-	is_published = models.BooleanField(null=False, default=False)
-	seo_description = models.CharField(max_length = 300, null=True)
-	seo_title  = models.CharField(max_length = 70, null=True)
-	charge_taxes = models.BooleanField(null=False, default=False)
-	featured = models.BooleanField(null=False, default=False)
-	has_variants = models.BooleanField(null=False, default=False)
-	aspect_ratio = models.DecimalField(max_digits = 21, decimal_places=18, null=True)
-	image_type =  models.CharField(max_length = 1, null=True)
-	orientation = models.CharField(max_length = 20, null=True)
-	max_width = models.DecimalField(max_digits = 6, decimal_places=2, null=True)
-	max_height = models.DecimalField(max_digits = 6, decimal_places=2, null=True)
-	min_width = models.DecimalField(max_digits = 6, decimal_places=2, null=True)
-	publisher = models.CharField(max_length = 600, null=True)
-	artist = models.CharField(max_length = 600, null=True)
-	colors = models.CharField(max_length = 600, null=True)
-	key_words = models.CharField(max_length = 2000, null=True)
-	url = models.CharField(max_length = 1000, blank=True, default='')
-	thumbnail_url = models.CharField(max_length = 1000, blank=True, default='')
-	session_id = models.CharField(max_length = 40, blank=True, default='')
-	user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
-	image_to_frame = models.ImageField(upload_to='uploads/%Y/%m/%d/', blank=True, default="")
-	image_to_frame_thumbnail = models.ImageField(upload_to='uploads/%Y/%m/%d/', blank=True, default="")
-	status = models.CharField(max_length = 3, blank=True, null=False)
-	created_date = models.DateTimeField(auto_now_add=True, null=False)	
-	updated_date = models.DateTimeField(auto_now=True, null=False)	
-	collage_layout_id = models.IntegerField(null=True)
-	high_resolution_url = models.CharField(max_length = 1000, blank=True, default='')
-	art_width = models.DecimalField(max_digits = 6, decimal_places=2, null=True)
-	art_height = models.DecimalField(max_digits = 6, decimal_places=2, null=True)
-	art_medium = models.CharField(max_length = 3, blank=True, default='')
-	art_surface = models.CharField(max_length = 3, blank=True, default='')
-	art_surface_desc = models.CharField(max_length = 500, blank=True, default='')
-	category_disp_priority = models.IntegerField(null = True)
-	art_print_allowed = models.BooleanField(null=False, default=False)
-	original_art_price = models.DecimalField(max_digits=12, decimal_places=2, null=True)
-	available_qty = models.IntegerField(null=False)	
-	sold_qty = models.IntegerField(null=True)	
-	artist = models.ForeignKey(Artist, on_delete=models.CASCADE, null=True)
-	
-	class Meta:
-		managed = False
-		db_table = 'artist_art_view'
 
 class Inventory_udate(models.Model):
 	product = models.ForeignKey(Original_art, models.PROTECT, null=False)
@@ -240,11 +189,11 @@ class Generate_art_number(models.Model):
 
 class Artist_sales(models.Model):
 	artist = models.ForeignKey(Artist, on_delete=models.CASCADE) 
-	product_id = models.ForeignKey(Product_view, models.PROTECT, null=False)
+	product_id = models.IntegerField(null=False, default = 0)		## USE THIS TO REFER TO PRODUCT_VIEW ALONG WITH PRODUCT_TYPE
 	product_type = models.ForeignKey(Product_type, models.CASCADE, null=True)
 	part_number = models.CharField(max_length = 30, null=True)
 	order = models.ForeignKey(Order, models.PROTECT, null=False)
-	order_item_id = models.ForeignKey(Order_items_view, models.PROTECT, null=False)
+	order_item_id = models.IntegerField(null=False, default = 0) ## USE THIS TO REFER TO ORDER_ITEMS_VIEW
 	sale_value = models.DecimalField(max_digits=12, decimal_places=2,  null=False, default=0)
 	license_fee = models.DecimalField(max_digits=12, decimal_places=2,  null=False, default=0)
 	pay_date = models.DateField(null = True)

@@ -48,15 +48,15 @@ def send_customer_emails():
 		product__product_type_id = F('product_type_id'))
 	
 	for o in orders:
-		#get email id from Order_shipping
-		ord_shp = Order_shipping.objects.get(order = o)
-		if ord_shp:
-			to = ord_shp.email_id
+		#get email id from Order_billing
+		ord_bill = Order_billing.objects.get(order = o)
+		if ord_bill:
+			to = ord_bill.email_id
 		else:
 			#get email id from Order_shipping
-			ord_bill = Order_billing.objects.get(order = o)
-			to = ord_bill.email_id
-			if not ord_bill:	
+			ord_ship = Order_shipping.objects.get(order = o)
+			to = ord_ship.email_id
+			if not ord_ship:	
 				err_flag = True
 				print('Customer email ID not found in shipping or billing address')
 
@@ -334,7 +334,7 @@ def send_business_account_approval_email(request, id):
 	if accnt:
 		to = accnt.user.email
 		subject = "You business account is active. Welcome on board Arte'Venue!"
-		html_message = render_to_string('artevenue/business_account_approval_email.html', 
+		html_message = render_to_string('artevenue/business_account_approval_email_10perc.html', 
 			{'accnt': accnt})
 		plain_message = strip_tags(html_message)
 		from_email = 'support@artevenue.com'
@@ -685,10 +685,9 @@ def testSMS(num):
 
 def order_status_communication_email():
 	mail_cnt = 0
-	import pdb
-	pdb.set_trace()
-	## Send ready for shipping status
 	from artevenue.models import Order_status_communication
+
+	## Send ready for shipping status
 	orders = Order_status_communication.objects.filter(ready_to_ship_email_sent=False)
 	for o in orders:
 		sts = send_ord_update_sh(o.order_id)
@@ -698,13 +697,12 @@ def order_status_communication_email():
 			mail_cnt = mail_cnt + 1
 
 	## Send tracking info
-	from artevenue.models import Order_status_communication
 	orders = Order_status_communication.objects.filter(tracking_info_email_sent=False)
 	for o in orders:
 		sts = send_tracking_no_to_cust(o.order_id)
 		if sts:
 			o = Order_status_communication.objects.filter(order_id = o.order_id).update(
-				ready_to_ship_email_sent = True)
+				tracking_info_email_sent = True)
 			mail_cnt = mail_cnt + 1
 			
 	return 	mail_cnt

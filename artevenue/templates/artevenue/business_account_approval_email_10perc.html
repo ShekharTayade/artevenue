@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+{% load utils %}
+{% load static %}
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="robots" content="all,follow">
+		<!-- Bootstrap CSS-->
+		<link rel="stylesheet" href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}">
+				
+		<!-- Font Awesome CSS-->
+		<link rel="stylesheet" href="{% static 'vendor/font-awesome/css/font-awesome.min.css' %}">
+		<!-- Google fonts - Roboto -->
+		<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:400,500,700,300,100">
+		<!-- Custom stylesheet -->
+		<link rel="stylesheet" href="{% static  'css/custom.css' %}">
+		<!-- theme stylesheet-->
+		<link rel="stylesheet" href="{% static 'css/style.default.css' %}" id="theme-stylesheet">
+		<!-- theme stylesheet-->
+		<link rel="stylesheet" href="{% static 'css/home-page-style.css' %}" id="theme-stylesheet">
+
+	</head>
+
+	<body>
+		<div class = "row"  style = "border:1px solid #d4d4d4; padding:10px; margin:0px;">
+			<table style = "width: 100%; maring-bottom: 15px; ">
+				<tbody>
+					<tr>
+						<td>
+							<img src = "https://artevenue.com/static/img/av_logo_circle2_m1.png" %}" alt="Arte'venue" style = "left:0, margin:0px; padding:0px;" width=150>
+						</td>
+						<td style = "text-align: right;">
+							<span style = "font-size: 10px; right:0px;">www.artevenue.com</span><br>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<div style = "margin-top:10px; border-top: 1px solid #dddddd;">
+				<h5 style = "margin-top:20px;" >
+				Dear {{accnt.contact_name}} 
+					{% if accnt.company %}
+						<br>{{accnt.company}}
+					{% else %}
+						,<br>
+					{% endif %},
+					
+				<h5>Congratulations! Your business account with us has been approved.
+					Arte’Venue welcomes you on board as our privileged business partner.
+					You have access to the largest collection of licensed and top quality artworks
+					and you will receive a benefit for each order placed.
+				</h5>				
+				<hr>
+				<h5>
+					As our business customer you will receive 10% referral fee for every order that
+					has been placed through your account or by your clients who have signed up using your
+					business code.
+				</h5>
+				<h5>
+					If you let your clients place orders with us directly, please make sure that 
+					they sign up for an Arte'Venue account using your business code. You will receive
+					the referral fee benefit for the orders of clients who signed up using your 
+					business code.<br>
+					If you have not set up your business code, you can do so using - <br>
+					<a href = "http://artevenue.com/my-account/">My Account</a> menu option and My Business Profile
+					section.
+				</h5>
+				<h5>Online and real time details of the orders placed and referral fees paid for all the 
+					orders by you and your clients can be accessed at 
+					<a href = "http://artevenue.com/my-business-report/">My Business Report</a> menu option.
+				</h5>
+				
+				<hr>
+				Please Note: 
+				<h5> In the first week of the month, you will receive the referral credit for orders placed in
+					in previous months.
+				</h5>
+				<h5>
+					Customer satisfaction is our priority and you can expect 
+					a seamless experience from selection to delivery for 
+					each of your orders.
+				</h5>
+				<hr>
+
+				<h6>If you need any assitance, please feel free to write to us at 
+					support@artevenue.com, chat with us online at www.artevenue.com,
+					or call us at +91 96115 03626. We will be happy to help.
+				</h6>
+			</div>
+			<div style = " margin-top: 20px;">
+				<h5>
+					With warm regards,<br />
+					Team Arte'Venue
+					<br />
+					<img src = "https://artevenue.com/static/img/artevenue_logo_new.png" alt="Arte'Venue Logo"  height="25" width="110"> <br />
+					<a href = "https://www.artevenue.com">www.artevenue.com</a>
+				</h5>
+			</div>
+		</div>
+	</body>
+</html>

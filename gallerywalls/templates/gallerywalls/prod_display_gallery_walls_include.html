@@ -1,0 +1,84 @@
+{% load static %}					
+{% load utils %}
+{% load indian_numbers_tags %}
+{% load l10n %}	
+{% load gallery_utils %}
+				
+					<!--<h5>
+						{{galleries.paginator.count|intcomma_indian}} artworks
+					</h5>-->
+					<div class="row">
+						{% for gallery in galleries %}
+						<div class="col-12 col-md-4 mt-5 mb-3">
+							<a id = "alink_{{gallery.gallery_id}}" href="{% url 'gallery_wall_detail' gallery.gallery.gallery_id%}">
+								{% if env == 'DEV' or env == 'TESTING' %}
+								<picture>
+									<source media="(max-width:465px)" srcset="{% static gallery.gallery.room_view_thumbnail_url %}">
+									<source media="(min-width:465px)" srcset="{% static gallery.gallery.room_view_url %}">
+									<img data-src="{% static  gallery.gallery.room_view_url %}" alt="Wall art: {{gallery.gallery.name}}" class="img-fluid lazyload" 
+											onclick="$('#img-form_{{gallery.gallery.gallery_id}}').submit();">
+								</picture>
+								{% else %}
+								<picture>
+									<source media="(max-width:465px)" srcset="{% static gallery.gallery.room_view_thumbnail_url %}">
+									<source media="(min-width:465px)" srcset="{% static gallery.gallery.room_view_url %}">
+									<img data-src="{% static gallery.gallery.room_view_url %}" alt="Wall art: {{gallery.gallery.name}}" class="img-fluid lazyload"
+											onclick="$('#img-form_{{gallery.gallery.gallery_id}}').submit();">
+								</picture>
+								{% endif %}		
+							</a>
+
+							<div class = "row mt-2">
+								<div class = "col-12 text-center">
+									<span style="color: #11b6bd !important; font-size:0.9rem; font-weight:600;">
+										{{gallery.gallery.title}}
+									</span>
+								</div>
+								<div class = "col-12 text-center">
+									<i class = "fa fa-inr"></i> <span class="price"> {{gallery.gallery_id|get_gallery_parent_price|floatformat|intcomma_indian}}</span>
+								</div>
+								<div class = "col-12 text-center">
+									({{gallery.wall_area_width}}" X {{gallery.wall_area_height}}" inch) - Size Options Available
+								</div>
+							</div>
+						</div>
+						<!-- END of Products -->
+						{% endfor galleries %}
+
+					</div>
+
+					<div class="box-cat info-bar">
+						<div class="row">
+							<div class="col-md-12 col-lg-12">
+								<ul class = "pagination justify-content-center"style="margin-bottom:0px !important">
+									{% if galleries.has_previous %}
+									<li class="page-item">
+									  <button class="page-link" onclick="getAllFilters(page='1', sort='{{sortOrder}}', show='{{show}}', keywords='{{ikeywords}}');" aria-label="Previous">
+										<span aria-hidden="true">&laquo; First</span>
+										<span class="sr-only">begin</span>
+									  </button>
+									</li>   {% endif %}
+
+									{% for n in galleries.paginator.page_range %}
+									  {% if galleries.number == n %}
+										<li class="page-item active">
+										  <span class="page-link">{{ n }}<span class="sr-only">(current)</span></span>
+										</li>
+									  {% elif n > galleries.number|add:'-5' and n < galleries.number|add:'5' %}
+										<li class="page-item">
+										<button class="page-link" onclick="getAllFilters(page='{{n}}', sort='{{sortOrder}}', show='{{show}}', keywords='{{ikeywords}}');">{{ n }}</li>
+									  {% endif %}
+									{% endfor %}
+
+									{% if galleries.has_next %}
+									  <li class="page-item">
+										<button class="page-link" onclick="getAllFilters(page='{{galleries.paginator.num_pages}}', sort='{{sortOrder}}', show='{{show}}', keywords='{{ikeywords}}');" aria-label="Next">
+										  <span aria-hidden="true">Last &raquo;</span>
+										  <span class="sr-only">end</span>
+										</button>
+									  </li>
+									  {% endif %}   
+								</ul> 
+							</div>
+						</div>
+					</div>

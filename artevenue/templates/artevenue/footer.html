@@ -57,6 +57,7 @@
 					{% endif %}
 				{% endfor %}				
 			</div>
+			<!--
 			<div class = "d-none d-lg-block row mt-4 ml-1 mr-1" style = "font-size:0.75rem; border: 1px solid #cfcfcf; border-radius: 5px;">
 				<div class = "col-12 d-flex flex-column align-items-center justify-content-center h-100">
 					<div class = "mb-2 d-flex flex-row align-items-center">
@@ -81,6 +82,7 @@
 					</div>
 				</div>
 			</div>
+			-->
 		</div>
 		<div class="col-lg-3 col-md-6 mt-3" style = "color:#fff;">
 			<p class="footer-heading" style="font-size:0.85rem; font-weight:700;">IMPORTANT LINKS</p>
@@ -112,8 +114,10 @@
 						<li style = "margin-top:8px;"><a href="{% url 'privacy_policy' %}">Privacy Policy</a></li>
 						<li style = "margin-top:8px;"><a style = "cursor: pointer;"  onclick="$('#cancellation-modal').modal('show');" style = "padding:0px; margin:0px;  font-size:0.75rem;">
 						Cancellation</a></li>
-						<li style = "margin-top:8px;"><a style = "cursor: pointer;"  onclick="$('#artist-modal').modal('show');" style = "padding:0px; margin:0px;  font-size:0.75rem;">
-						Artist Sign Up</a></li>
+						<!--<li style = "margin-top:8px;"><a style = "cursor: pointer;"  onclick="$('#artist-modal').modal('show');" style = "padding:0px; margin:0px;  font-size:0.75rem;">
+							Artist Sign Up</a>
+						</li>-->
+						<li style = "margin-top:8px;"><a href="{% url 'artist_signup' %}">Join Us as Artist</a></li>
 					</ul>
 				</div>
 			</div>
