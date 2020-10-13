@@ -1,0 +1,27 @@
+{%load static %}
+<div id="wa" class="wanav">
+	<li class="list-inline-item clickable">
+		<!--<a class = "clickable" data-toggle="modal" data-target="#phone-help" style = "color: #77899e;">-->
+		<a class = "clickable btn btn-primary"	href = "https://wa.me/919535805505?text=Hi,%20I%20need%20help%20with"
+			style = "font-size: 0.75rem; height:40px;" 
+			target = "_blank">
+			WhatsApp Us
+		</a>
+	</li>
+
+	<span style="color:#fff; background-color: transparent; font-size:1rem; 
+		cursor:pointer; top:87%; left:5px; position:fixed; z-index: 99999;" 
+		onclick="toggleWhatsApp()">
+		<img src = "{% static 'img/whatsapp_logo.png' %}" width=40 alt="WhatsApp Logo">
+	</span>
+</div>
+
+<script>
+	function toggleWhatsApp() {
+	  if (document.getElementById("wa").style.width == '150px'){
+		document.getElementById("wa").style.width = "0";
+	  } else {
+		document.getElementById("wa").style.width = "150px";
+	  }
+	}
+</script>

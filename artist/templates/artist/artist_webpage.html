@@ -41,7 +41,7 @@
 				<span style="text-align:justify;">{{artist.artist_profile|safe}}</span>
 			</div>
 		</div>
-		{% if artist.artist_showcase1_name %}
+		{% if artist.artist_showcase1 %}
 		<div class="row mt-3">
 			<div class="col-12">
 				<div class = "artist-section">
@@ -55,7 +55,7 @@
 			</div>
 		</div>
 		{% endif %}
-		{% if artist.artist_showcase2_name %}
+		{% if artist.artist_showcase2 %}
 		<div class="row mt-3">
 			<div class="col-12">
 				<div class = "artist-section">
@@ -94,8 +94,8 @@
 		<div class="row mb-3">
 			{% for prod in prods %}
 			{% if prod.publisher %}
-			<div class="col-md-6 col-lg-3">
-				<div class = "prod-details">
+			<div class="col-6 col-md-6 col-lg-3">
+				<div class = "">
 					<div class="img-container artist-item">
 						<a id = "alink_{{prod.product_id}}" 
 							{% if prod.image_type == '0' %} 
@@ -129,7 +129,7 @@
 						{% else %}
 							<h4>{{prod.description}}</h4>
 						{% endif %}
-						<p class="price">
+						<p style="margin-bottom:5px;">
 							{% if prod.image_type == '0' %}
 							<i class = "fa fa-inr">{{prod.original_art_price}}</i> 
 							{% endif %}
@@ -144,10 +144,21 @@
 								<span  id = "fav_{{prod.product_id}}" class = "pull-right">
 									<i class = "fa fa-heart-o"  
 										onclick = "addToFav({{prod.product_id}}, {% if prod.max_width > 16 %} 16 {%else%} {{prod.max_width}} {%endif%}, {{prod.aspect_ratio}}, 0, '', 0, 0, 0);"
-										style="color:red; padding-right:5px;cursor:alias;" data-toggle="tooltip" title="Add to Favourites!"></i>
+										style="color:red; padding-right:5px;cursor:alias;" data-toggle="tooltip" title="Add to Favourites!">
+									</i>
 								</span>
 							{% endif %}
 						</p>
+						{% for i in org_artworks %}
+							{% if i.product_id == prod.product_id %}
+								{% if i.sell_mode == 'A' %}
+									<h4>Original Art Unavailable</h4>
+									<a id = "buy-art-print"
+										href = "{% url 'stock_image_detail' prod.stock_image_id %}"> Buy Art Print
+									</a>
+								{% endif %}
+							{% endif %}
+						{% endfor %}
 					</div>
 				</div>
 			</div>

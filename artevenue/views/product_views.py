@@ -454,7 +454,7 @@ def stock_image_detail(request, prod_id = '', iuser_width='', iuser_height=''):
 	first10 = product.name[:10]
 
 	similar_products = Stock_image.objects.filter(  
-			artist = product.artist).exclude(product_id = prod_id)
+			artist = product.artist, is_published = True).exclude(product_id = prod_id)
 
 	## First filter for products in the same category
 	prods_in_cat = Stock_image_stock_image_category.objects.filter(
@@ -462,15 +462,15 @@ def stock_image_detail(request, prod_id = '', iuser_width='', iuser_height=''):
 	similar_products_cat = similar_products.filter(
 		product_id__in = prods_in_cat)
 
-	if similar_products_cat.count() > 8:
+	if similar_products_cat.count() > 20:
 		## Filter for products with same artist
 		similar_products_artist = similar_products_cat.filter(  
 			artist = product.artist)
-		if similar_products_artist.count() > 8:
+		if similar_products_artist.count() > 20:
 			## Filter for products with similar name (title), match on first 10 chars
 			similar_products_name = similar_products_artist.filter(  
 				name__istartswith = first10)	
-			if similar_products_name.count() > 8:
+			if similar_products_name.count() > 20:
 				similar_products = similar_products_name
 			else:
 				similar_products = similar_products_artist
@@ -478,10 +478,10 @@ def stock_image_detail(request, prod_id = '', iuser_width='', iuser_height=''):
 			similar_products = similar_products_cat
 
 	similar_products = similar_products.order_by('name', 'artist')
-	if similar_products.count() > 8:
+	if similar_products.count() > 20:
 		similar_products = similar_products.annotate(
 			relevancy=Count(Case(When(name__istartswith=first10, then=1)))
-		).order_by('-relevancy')[:8]			
+		).order_by('-relevancy')[:20]			
 		#similar_products = similar_products.order_by('name', 'artist')[:8]
 	
 	
@@ -520,6 +520,7 @@ def stock_image_detail(request, prod_id = '', iuser_width='', iuser_height=''):
 	moulding_diagrams = mouldings['moulding_diagrams']
 	paper_mouldings_corner = mouldings['paper_mouldings_corner']
 	canvas_mouldings_corner = mouldings['canvas_mouldings_corner']
+	canvas_mouldings_show = mouldings['canvas_mouldings_show']
 	# get mounts
 	mounts = get_mounts(request)
 
@@ -544,18 +545,6 @@ def stock_image_detail(request, prod_id = '', iuser_width='', iuser_height=''):
 	ready_prod_data_paper = prod_data['size_price_paper']
 	ready_prod_data_canvas = prod_data['size_price_canvas']
 
-	'''
-	return render(request, "artevenue/stock_image_detail.html", {'product':product,
-		'prod_categories':prod_categories, 'printmedium':printmedium, 'product_category':product_category,
-		'mouldings_appply':paper_mouldings_apply, 'mouldings_show':paper_mouldings_show, 'mounts':mounts,
-		'per_sqinch_paper':per_sqinch_paper, 'per_sqinch_canvas':per_sqinch_canvas, 'acrylics':acrylics,
-		'boards':boards, 'moulding_diagrams':moulding_diagrams,
-		#######'img_with_all_mouldings':img_with_all_mouldings, 
-		'stretches':stretches,
-		'cart_item':cart_item_view, 'wishlist_item':wishlist_item_view, 'iuser_width':iuser_width, 
-		'iuser_height':iuser_height} )	
-	'''
-	
 	request.session.set_test_cookie()   ## To test if cookie is enabled on the browser. If not display message in Size and Color Tool.
 
 	return render(request, "artevenue/stock_image_detail_new.html", {'product':product,
@@ -566,6 +555,7 @@ def stock_image_detail(request, prod_id = '', iuser_width='', iuser_height=''):
 		'cart_item':cart_item_view, 'iuser_width':iuser_width, 'iuser_height':iuser_height,
 		'prods':similar_products, 'price':price, 'wishlist_prods':wishlist_prods,
 		'paper_mouldings_corner':paper_mouldings_corner, 'canvas_mouldings_corner':canvas_mouldings_corner,
+		'canvas_mouldings_show': canvas_mouldings_show,
 		'ready_prod_data_paper':ready_prod_data_paper, 'ready_prod_data_canvas':ready_prod_data_canvas,
 		'wishlist_item':wishlist_item_view, 'wall_colors': wall_colors} )
 
@@ -1609,7 +1599,7 @@ def get_stock_images(request, cat_nm = None, page = None, curated_coll_id = None
 	for o in orientation:
 		if o == '':
 			continue
-		f = f | Q(orientation = o)
+		f = f | Q(orientation__iexact = o)
 	t_f = t_f & f 
 	
 	f = Q()
@@ -1661,8 +1651,8 @@ def get_stock_images(request, cat_nm = None, page = None, curated_coll_id = None
 	
 	or_arr = []
 	for v in orientation_values:
-		if v['orientation'] not in or_arr:
-			or_arr.append ( v['orientation'] )
+		if v['orientation'].title() not in or_arr:
+			or_arr.append ( v['orientation'].title() )
 	prod_filter_values['ORIENTATION'] = or_arr 
 	
 	artist_values = products.values('artist').distinct().order_by('artist')

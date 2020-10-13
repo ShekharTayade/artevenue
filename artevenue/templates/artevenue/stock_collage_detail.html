@@ -108,7 +108,7 @@
 							
 						</div>
 						<div class = "d-block d-md-none" style = "width: 100%;">
-							<div id="card-slider" class="owl-carousel owl-theme">
+							<div id="card-slider" class="slider">
 								<div class="item card-img">
 									<img id = "prod-img-card" src="" alt="A set of wall art painting">
 								</div>
@@ -1136,7 +1136,32 @@
 
 			
 	<script>
+		$('#nav-tab a').on('shown.bs.tab', function(event){
+			$('.frames-slider').slick('setPosition');
+		});		
+		
+	</script>
+
+	<script>
 		jQuery(document).ready(function(){
+			$(".frames-slider").slick({
+				dots: true,
+				infinite: false,
+				mobileFirst: true,
+				rows: 2,
+				slidesToShow: 3,
+				slidesToScroll: 3,
+			});
+
+			$("#card-slider").slick({
+				dots: true,
+				arrows: false,
+				infinite: false,
+				mobileFirst: true,
+				rows: 1,
+				slidesToShow: 1,
+				slidesToScroll: 1,
+			});
 
 			$body = $("body");
 			

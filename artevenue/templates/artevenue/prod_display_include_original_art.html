@@ -69,7 +69,7 @@
 					<div class="row">
 						{% for prod in prods %}
 						{% if prod.publisher %}
-						<div class="col-6 col-md-6 col-lg-3 mb-3">
+						<div class="col-6 col-md-6 col-lg-4 mb-3">
 							<div class = "prod-details">
 								<div class="img-container">
 									<a id = "alink_{{prod.product_id}}" href="{% url 'original_art_detail' prod.product_id %}">
@@ -83,9 +83,19 @@
 									{% if prod.artist %}
 									<h5 style = "color:blue;">By {{prod.artist}}</h5>
 									{% endif %}
-									<p class="price">
-										{{ prod.original_art_price|indian_number_format }}
-										<del></del>
+									<p class="price" style = "margin: 5px;">
+										{% if prod.original_art_price > 0 %}
+											{{ prod.original_art_price|indian_number_format }}
+										{% endif %}
+										<div class = "row">
+											<div class ="col-12 text-center">
+												{% if prod.image_type == '0' %}
+													(Fine Art)
+												{% else %}
+													(Photograph)
+												{% endif %}
+											</div>
+										</div>
 										{% if prod.product_id in wishlist_prods %}
 											<span id = "fav_{{prod.product_id}}" class = "pull-right">
 												<i class = "fa fa-heart"  

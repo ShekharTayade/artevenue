@@ -135,20 +135,20 @@
 					<div class="col-12" style = "color:#11b6bd;">
 						<h3> <strong>ARTWORK ID: {{a.product.part_number}}</strong> <span style = "font-size: 0.75rem;">, Upload Dt: {{a.uploaded_date|date:'d/M/y'}}</span></h3>
 					</div>
-					<div class="col-12 col-md-6" style = "color:#11b6bd;">
+					<div class="col-12" style = "color:#11b6bd;">
 						<strong>
 						STATUS: 
-						{% if a.product.unapproved %}
-							Not Approved for Sell: {{a.product.unapproval_reason}}
+						{% if a.unapproved %}
+							<span style = "color:orange;">Not Approved for Sell - {{a.get_unapproval_reason_display}}</span>
 						{% else %}
 							{% if a.artist_listed %}
 								{% if a.approved %}
-									Listed for sell.
+									<span style = "color:green;">Listed for sell.</span>
 								{% else %}
-									Pending Arte'Venue approval. Not listed for sell.
+									Pending Arte'Venue approval.
 								{% endif %}
 							{% else %}
-								Not submitted for Arte'Venue review. Not listed for sell.
+								Not submitted for Arte'Venue review.
 							{% endif %}
 						{% endif %}
 						</strong>
@@ -200,13 +200,29 @@
 								</a><br />
 								Stop selling this artwork
 							</div>
-							<div class = "col-12 col-md-6 mt-3">
-								<a class = "btn btn-primary"
-									href = "{% url 'upload_art' a.product.part_number %}" >
-									Update
-								</a> <br />
-								Update size, price, etc. Or change the image.
-							</div>
+							{% if a.unapproved %}
+								{% if a.unapproval_reason == 'X' %}
+									<div class = "col-12 col-md-6 mt-3">
+										Arte'Venue art review team does not find this artwork fit for sell on our platform.
+									</div>
+								{% else %}
+									<div class = "col-12 col-md-6 mt-3">
+										<a class = "btn btn-primary"
+											href = "{% url 'upload_art' a.product.part_number %}">
+											Update
+										</a> <br />
+										Update size, price, etc. Or change the image.
+									</div>
+								{% endif %}
+							{% else %}
+								<div class = "col-12 col-md-6 mt-3">
+									<a class = "btn btn-primary"
+										href = "{% url 'upload_art' a.product.part_number %}">
+										Update
+									</a> <br />
+									Update size, price, etc. Or change the image.
+								</div>
+							{% endif %}
 						</div>
 					</div>
 				</div>

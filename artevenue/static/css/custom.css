@@ -390,18 +390,6 @@ top #phone-help .modal-header h5 {
 	margin-right: auto;
 }	
 
-.img-container-gallery{
-	/*width: 33.33333%;*/
-	/*height: 15vh;*/
-	/*box-shadow:0 3px 5px rgba(0, 0, 0, 0.75);*/
-	padding:10px;
-	background-color: #f4f4f4;
-	width:250px;
-	height:550px;
-	margin-left: auto;
-	margin-right: auto;
-}	
-
 
 @media (min-width: 736px) {
 	.img-container{
@@ -1503,7 +1491,7 @@ body.loading .ajax-modal {
     position: absolute;
     right:-20px;
     top:10px;
-    background: #000;
+    background: #6c757d;
 	color: #fff;
     text-align: center;
     border-radius: 30px 30px 30px 30px;
@@ -1511,6 +1499,18 @@ body.loading .ajax-modal {
     font-size:0.55rem;
 }
 
+.art-type-cate{
+    position: absolute;
+    right:15px;
+    top:10px;
+    background: transparent;
+	border: 1px solid #000;
+	color: #000;
+    text-align: center;
+    border-radius: 20px;
+    padding:5px 10px;
+    font-size:0.55rem;
+}
 
 @media screen and (min-width: 0px) and (max-width: 768px) {
 	div.sticky {
@@ -2206,3 +2206,22 @@ blockquote.right small {
 	border-radius: 3%;
 }
 
+
+.wanav {
+  height: 40px;
+  width: 0;
+  position: fixed;
+  z-index: 999;
+  top: 87%;
+  left: 35px;
+  overflow-x: hidden;
+  transition: 0.5s;
+  vertical-align: middle;
+}
+
+
+
+@media screen and (max-height: 450px) {
+  .wanav {padding-top: 15px; left: 15%;}
+  .wanav a {font-size: 18px;}
+}

@@ -80,29 +80,22 @@
 			</div>
 			{% if msg %}
 			<div class = "col-12 col-md-6 mt-3">
-				<span style = "font-size: 1rem; font-weight:700; border:1px solid #cfcfcf; color:red; padding: 5px;" >
+				<span style = "font-size: 1rem; font-weight:700; color:red; padding: 5px;" >
 				<i class = "fa fa-exclamation-circle"> </i> {{msg}}
 				</span>
 			</div>
 			{% endif %}
 			{% if saved_msg %}
 			<div class = "col-12 col-md-6 mt-3">
-				<span style = "font-size: 1rem; font-weight:700; border:1px solid #cfcfcf; color:green; padding: 5px;" >
+				<span style = "font-size: 1rem; font-weight:700; color:green; padding: 5px;" >
 				<i class = "fa fa-exclamation-circle"> </i> Artwork details have been saved.
 				</span>
 			</div>
 			{% endif %}
 			{% if submitted_msg %}
 			<div class = "col-12 col-md-6 mt-3">
-				<span style = "font-size: 1rem; font-weight:700; border:1px solid #cfcfcf; color:green; padding: 5px;" >
-				<i class = "fa fa-exclamation-circle"> </i>Submitted for review. It will  be listed once it is approved.
-				</span>
-			</div>
-			{% endif %}
-			{% if artevenue_disapproved %}
-			<div class = "col-12 col-md-6 mt-3">
-				<span style = "font-size: 1rem; font-weight:700; border:1px solid #cfcfcf; color:green; padding: 5px;" >
-				<i class = "fa fa-warning"> </i>Artwork is not approved: {{disapprove_msg}}
+				<span style = "font-size: 1rem; font-weight:700; color:green; padding: 5px;" >
+				<i class = "fa fa-exclamation-circle"> </i> Submitted for review. It will  be listed once it is approved.
 				</span>
 			</div>
 			{% endif %}
@@ -115,11 +108,15 @@
 				{% if artist_approved %}
 					{% if artevenue_approved %}
 						<span style = "color: green;">Listed for sell.</span>
+					{% elif artevenue_disapproved %}
+						<span style = "font-size: 1rem; font-weight:700; color:orange; padding: 5px;" >
+						<i class = "fa fa-warning"> </i> {{disapprove_msg}}
+						</span>
 					{% else %}
-						<span style = "color: blue;">Pending Arte'Venue approval. Not listed for sell.</span>
+						<span style = "color: blue;"> Pending Arte'Venue approval. Not listed for sell.</span>
 					{% endif %}
 				{% else %}
-					<span style = "color: red;">Not submitted for Arte'Venue review. Not listed for sell.</span>
+					<span style = "color: orange;"> Not submitted for Arte'Venue review. Not listed for sell.</span>
 				{% endif %}
 				</strong>
 			</div>

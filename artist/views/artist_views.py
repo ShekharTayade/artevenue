@@ -8,7 +8,7 @@ from django.db import IntegrityError, DatabaseError, Error
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Count, Q, F
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, Http404
 
 from artist.models import Artist_group, Artist_sms_email, Artist, Artist_original_art, Artist_stock_image, Generate_art_number
 from artevenue.models import Country, State, City, Pin_code, Ecom_site, Original_art
@@ -160,7 +160,7 @@ def create_artist_profile(request):
 	return render(request, "artist/create_artist_profile.html", {'artist':artist,
 		'e1': e1, 'e2': e2, 'e3': e3, 'e4': e4, 'e5': e5, 'a1': a1, 'a2': a2, 'a3': a3, 'a4': a4, 'a5': a5})
 
-@login_required
+
 def artist_webpage(request, url_name, cat_id = '', page = 1):
 	ikeywords = request.GET.get('keywords', '')
 	keywords = ikeywords.split()
@@ -180,7 +180,8 @@ def artist_webpage(request, url_name, cat_id = '', page = 1):
 	a_prods = Artist_original_art.objects.filter(artist_id = artist.artist_id).values('product_id')
 	products = Original_art.objects.filter(product_id__in = a_prods, 
 				is_published = True)
-				
+	org_artworks = Artist_original_art.objects.filter(artist_id = artist.artist_id).select_related('product')
+	
 	if show == None :
 		show = 50
 	
@@ -214,7 +215,7 @@ def artist_webpage(request, url_name, cat_id = '', page = 1):
 	#=====================
 				
 	return render(request, "artist/artist_webpage.html", {'form':form,
-		'artist':artist,'prods':prods} )
+		'artist':artist,'prods':prods, 'org_artworks': org_artworks} )
 
 
 @staff_member_required
@@ -238,26 +239,10 @@ def create_artist_group(request):
 			
 			
 def get_original_arts(request, cat_nm = None, page = None, curated_coll_id = None):
-	if cat_nm:
-		#if cat_nm != 'Still-Life' and cat_nm != 'X-Ray':
-		#	cat_nm = cat_nm.replace("-", " ")
-		try:
-			product_cate = Stock_image_category.objects.filter(url_suffix = cat_nm).first()
-			if product_cate :				
-				cat_id = product_cate.category_id
-			else:
-				cat_id = 0
-				product_cate = None					
-		except Stock_image_category.DoesNotExist:
-			cat_id = 0
-			product_cate = None
-		except Stock_image_category.MultipleObjectsReturned:
-			cat_id = 0
-			product_cate = None		
-	else:
-		cat_id = 0
-		product_cate = None
-		
+
+	artist_id = request.GET.get("artist_id", "")
+	artist = {}
+
 	if page is None:
 		page = request.GET.get("page_num", 1)
 
@@ -286,29 +271,62 @@ def get_original_arts(request, cat_nm = None, page = None, curated_coll_id = Non
 	if page is None or page == 0:
 		page = 1 # default
 
-	#prod_categories = Stock_image_category.objects.filter(store_id=settings.STORE_ID, trending = True )
-	prod_categories = Original_art_original_art_category.objects.all().select_related('stock_image_category').distinct()
-	print(prod_categories)
-	if cat_id:
-		category_prods = Original_art_original_art_category.objects.filter(
-				stock_image_category_id = cat_id).values('original_art_id')
-		products = Original_art.objects.filter(product_id__in = category_prods, 
+	if not artist_id :
+	
+		if cat_nm:
+			#if cat_nm != 'Still-Life' and cat_nm != 'X-Ray':
+			#	cat_nm = cat_nm.replace("-", " ")
+			try:
+				product_cate = Stock_image_category.objects.filter(url_suffix = cat_nm).first()
+				if product_cate :				
+					cat_id = product_cate.category_id
+				else:
+					cat_id = 0
+					product_cate = None					
+			except Stock_image_category.DoesNotExist:
+				cat_id = 0
+				product_cate = None
+			except Stock_image_category.MultipleObjectsReturned:
+				cat_id = 0
+				product_cate = None		
+		else:
+			cat_id = 0
+			product_cate = None
+			
+		if cat_id:
+			category_prods = Original_art_original_art_category.objects.filter(
+					stock_image_category_id = cat_id).values('original_art_id')
+			products = Original_art.objects.filter(product_id__in = category_prods, 
+					is_published = True)
+		elif curated_coll_id:
+			curated_coll = Curated_collection.objects.filter(curated_category_id = curated_coll_id,
+					product_type_id = 'ORIGINAL-ART').values('product_id')
+			try:
+				product_cate = Curated_category.objects.get(category_id = curated_coll_id);
+			except Curated_category.DoesNotExist:
+				product_cate = {}
+			products = Original_art.objects.filter(product_id__in = curated_coll, 
 				is_published = True)
-	elif curated_coll_id:
-		curated_coll = Curated_collection.objects.filter(curated_category_id = curated_coll_id,
-				product_type_id = 'ORIGINAL-ART').values('product_id')
-		try:
-			product_cate = Curated_category.objects.get(category_id = curated_coll_id);
-		except Curated_category.DoesNotExist:
-			product_cate = {}
-		products = Original_art.objects.filter(product_id__in = curated_coll, 
-			is_published = True)
-	else :
-		category_prods = Original_art_original_art_category.objects.values('original_art_id')		
-		product_cate = {}		
-		products = Original_art.objects.filter(product_id__in = category_prods, 
-				is_published = True)
+		else :
+			category_prods = Original_art_original_art_category.objects.values('original_art_id')		
+			product_cate = {}		
+			products = Original_art.objects.filter(product_id__in = category_prods, 
+					is_published = True)
+					
+		prod_categories = Original_art_original_art_category.objects.all().select_related(
+			'stock_image_category').distinct('stock_image_category')
 
+	else:
+		artist_arts = Artist_original_art.objects.filter(artist_id = artist_id).values('product_id')
+		artist = Artist.objects.filter(artist_id = artist_id).first()
+		products = Original_art.objects.filter(
+			product_id__in = artist_arts, is_published = True)
+		prod_categories = Original_art_original_art_category.objects.all().select_related(
+			'stock_image_category').distinct('stock_image_category')
+		category_prods = Original_art_original_art_category.objects.values('original_art_id')		
+		product_cate = None
+		
+	
 	if request.user.is_authenticated:
 		user = User.objects.get(username = request.user)
 		wishlist = Wishlist.objects.filter(
@@ -372,7 +390,6 @@ def get_original_arts(request, cat_nm = None, page = None, curated_coll_id = Non
 		f = f | Q(key_words__icontains = c)
 	t_f = t_f & f 
 	
-	print (t_f)
 	products = products.filter( t_f )
 
 	# Apply keyword filter (through ajax or search)
@@ -385,12 +402,12 @@ def get_original_arts(request, cat_nm = None, page = None, curated_coll_id = Non
 			Q(name__icontains = word) |
 			Q(part_number__icontains = word)
 			)
-	
-	products = products.order_by('category_disp_priority')
+				
+	products = products.order_by('category_disp_priority', 'product_id')
 	
 	price = Publisher_price.objects.filter(print_medium_id = 'PAPER') 
 	
-	prod_filters = ['ORIENTATION', 'ARTIST', 'COLORS']	
+	prod_filters = ['ORIENTATION', 'ARTIST', 'IMAGE-TYPE', 'COLORS']	
 	prod_filter_values ={}
 	orientation_values = products.values('orientation').distinct()
 	
@@ -407,9 +424,16 @@ def get_original_arts(request, cat_nm = None, page = None, curated_coll_id = Non
 			ar_arr.append(a['artist'] )
 	prod_filter_values['ARTIST'] = ar_arr 
 
+	image_type_values = products.values('image_type').distinct()
+	im_type = []
+	for i in image_type_values:
+		if i['image_type'] not in im_type:
+			im_type.append(i['image_type'] )
+	prod_filter_values['IMAGE-TYPE'] = im_type
+
 	#image_type_values = products.values('colors').distinct()
-	im_arr = ['Red', 'Orange',  'Yellow', 'Green', 'Blue', 'Purple', 'Pink', 'Brown', 'black', 'White']
-	prod_filter_values['COLORS'] = im_arr
+	im_color = ['Red', 'Orange',  'Yellow', 'Green', 'Blue', 'Purple', 'Pink', 'Brown', 'black', 'White']
+	prod_filter_values['COLORS'] = im_color
 
 	####################################
 	####### Limiting the result set
@@ -472,7 +496,7 @@ def get_original_arts(request, cat_nm = None, page = None, curated_coll_id = Non
 	if not page:
 		page = request.GET.get('page')
 	
-	prods = paginator.get_page(page)			
+	prods = paginator.get_page(page)
 	
 	#=====================
 	index = prods.number - 1 
@@ -496,7 +520,7 @@ def get_original_arts(request, cat_nm = None, page = None, curated_coll_id = Non
 		'filt_orientation':filt_orientation, 'filt_image_type':filt_image_type,
 		'total_count':total_count, 'sliced_count':sliced_count, 'result_limit':result_limit,
 		'slab_0_50':slab_0_50, 'slab_50_100':slab_50_100, 'slab_100_150':slab_100_150, 
-		'slab_150_200':slab_150_200, 'slab_200_plus':slab_200_plus, 'env':env} )
+		'slab_150_200':slab_150_200, 'slab_200_plus':slab_200_plus, 'env':env, 'artist':artist} )
 
 
 def original_art_detail(request, prod_id = ''):
@@ -508,11 +532,14 @@ def original_art_detail(request, prod_id = ''):
 	if prod_id == None:
 		render(request, "artevenue/original_art_detail.html", {} )
 	
+	orig_art = None
 	# get the product
 	try:
-		product = Original_art.objects.get(is_published = True, pk=prod_id)
+		product = Original_art.objects.get(pk=prod_id, is_published = True)
+		orig_art = Artist_original_art.objects.filter(product = product).first()
 	except Original_art.DoesNotExist:
-		render(request, "artevenue/original_art_detail.html", {} )
+		raise Http404()
+		#render(request, "artevenue/original_art_detail.html", {} )
 		
 	product_category = Original_art_original_art_category.objects.get(original_art = product)
 	
@@ -527,13 +554,13 @@ def original_art_detail(request, prod_id = ''):
 	similar_products = {}
 	## First get rpoducts by same artist
 	similar_products_artist = Original_art.objects.filter(  
-			artist = product.artist).exclude(product_id = prod_id)
+			artist = product.artist, is_published = True).exclude(product_id = prod_id)
 	## If same artist has more than 8 products, then filter further
 	if similar_products_artist:
 		if similar_products_artist.count() > 8 :
 			## Filter for the same artist and same category
 			prods_in_cat = Original_art_original_art_category.objects.filter(
-				stock_image_category_id = product_category.stock_image_category).values('stock_image_id')
+				stock_image_category_id = product_category.stock_image_category_id).values('original_art_id')
 				
 			similar_products_cat = similar_products_artist.filter(
 				product_id__in = prods_in_cat)
@@ -561,7 +588,7 @@ def original_art_detail(request, prod_id = ''):
 						artist = product.artist)
 		else:
 			similar_products = Original_art.objects.filter(  
-					artist = product.artist)
+					artist = product.artist, is_published = True)
 
 	## Restrict the result to 10 products
 	if similar_products:
@@ -638,7 +665,7 @@ def original_art_detail(request, prod_id = ''):
 		'stretches':stretches,
 		'cart_item':cart_item_view, 'art_width':art_width, 'art_height':art_height,
 		'prods':similar_products, 'price':price, 'wishlist_prods':wishlist_prods,
-		'wall_colors':wall_colors} )
+		'wall_colors':wall_colors, 'orig_art': orig_art} )
 
 @csrf_exempt
 def upload_artist_photo(request):
@@ -738,28 +765,51 @@ def save_artist_profile(request):
 		e4 = request.POST.get("e4", "").strip()
 		e5 = request.POST.get("e5", "").strip()
 		
+		if len(url_name) > 20:
+			return JsonResponse( {'ret_msg': "Please restrict your url name to 20 characters."})
+		
 		achievements = ''
 		if a1:
+			if len(a1) > 50:
+				return JsonResponse( {'ret_msg': "Please restrict achievements to 50 characters per line."})
 			achievements = achievements + a1
 		if a2:
+			if len(a2) > 50:
+				return JsonResponse( {'ret_msg': "Please restrict achievements to 50 characters per line."})
 			achievements = achievements + '<br />'+ a2
 		if a3:
+			if len(a3) > 50:
+				return JsonResponse( {'ret_msg': "Please restrict achievements to 50 characters per line."})
 			achievements = achievements + '<br />'+ a3
 		if a4:
+			if len(a4) > 50:
+				return JsonResponse( {'ret_msg': "Please restrict achievements to 50 characters per line."})
 			achievements = achievements + '<br />'+ a4
 		if a5:
+			if len(a5) > 50:
+				return JsonResponse( {'ret_msg': "Please restrict achievements to 50 characters per line."})
 			achievements = achievements + '<br />'+ a5
 
 		events = ''
 		if e1:
+			if len(e1) > 50:
+				return JsonResponse( {'ret_msg': "Please restrict events to 50 characters per line."})
 			events = events + e1
 		if e2:
+			if len(e2) > 50:
+				return JsonResponse( {'ret_msg': "Please restrict events to 50 characters per line."})
 			events = events + '<br />'+ e2
 		if e3:
+			if len(e3) > 50:
+				return JsonResponse( {'ret_msg': "Please restrict events to 50 characters per line."})
 			events = events + '<br />'+ e3
 		if e4:
+			if len(e4) > 50:
+				return JsonResponse( {'ret_msg': "Please restrict events to 50 characters per line."})
 			events = events + '<br />'+ e4
 		if e5:
+			if len(e5) > 50:
+				return JsonResponse( {'ret_msg': "Please restrict events to 50 characters per line."})
 			events = events + '<br />'+ e5
 
 		if request.user.is_authenticated:
@@ -768,6 +818,10 @@ def save_artist_profile(request):
 			except Artist.DoesNotExist:
 				artist = None
 
+			chars = len(profile)
+			if chars > 2000:
+				return JsonResponse( {'ret_msg': "The section 'A Few Words About Youself' can't have more than 2000 characters. You have entered " + str(chars) + " characters."})
+				
 			if url_name:		
 				if re.search("^[a-zA-Z0-9_-]+$", url_name) is None:
 					return JsonResponse( {'ret_msg': "The webpage URL you entered is invalid. It can only contain alphabets, number, '-' & '_' and no blanks spaces are allowed."})
@@ -890,22 +944,55 @@ def upload_art(request, part_number=None):
 			art_type = 1
 		else:
 			art_type = 0
+			
 		title = request.POST.get("title", "")
+		if title == '':
+			title = "Untitled"
 		category = request.POST.get("category", "")
-		art_width = Decimal(request.POST.get("art_width", "0"))
-		art_height = Decimal(request.POST.get("art_height", "0"))
-		max_width = Decimal(request.POST.get("art_print_width", "0"))
-		max_height = Decimal(request.POST.get("art_print_height", "0"))
+		art_w = request.POST.get("art_width", "0")
+		if art_w == '' or art_w == '0':
+			art_width = 0
+		else:
+			art_width = Decimal(art_w)
+			
+		art_h = request.POST.get("art_height", "0")
+		if art_h == '' or art_h == '0':
+			art_height = 0
+		else:
+			art_height = Decimal(art_h)
+		
+		max_w = request.POST.get("art_print_width", "0")
+		if max_w == '' or max_w == '0':
+			max_width = 0
+		else:
+			max_width = Decimal(max_w)
+		
+		max_h = request.POST.get("art_print_height", "0")
+		if max_h == '' or max_h == '0':
+			max_height = 0
+		else:
+			max_height = Decimal(max_h)
+		
 		medium = request.POST.get("medium", "")
 		surface = request.POST.get("surface", "")
 		surface_description = request.POST.get("surface_description", "")
 		art_print_option = request.POST.get("art_print_option", "")
-		if max_width < 8:
-			msg = "The minimum required art print width is 8 inch. The image you have uploaded doesn't have enough resolution and can't be printed with 8 inch width or more. Please upload another image of this artwork with better resolution."
-			return render(request, "artist/upload_artwork.html", {'msg': msg, 'artist':artist, 'medium_list': medium_list, 'artwork': artwork,
-				'surface_list': surface_list, 'img_type_list': img_type_list, 'part_number': part_number, 'category_list': category_list,
-				'art_print_width':art_print_width
-				, 'art_print_height':art_print_height, 'category': category , 'orig_artwork_sts': a_orig_artwork})
+		
+		if art_type == 0:
+			if art_width == 0:
+				msg = "The original artwork width and height are required."
+				return render(request, "artist/upload_artwork.html", {'msg': msg, 'artist':artist, 'medium_list': medium_list, 'artwork': artwork,
+					'surface_list': surface_list, 'img_type_list': img_type_list, 'part_number': part_number, 'category_list': category_list,
+					'art_print_width':art_print_width
+					, 'art_print_height':art_print_height, 'category': category , 'orig_artwork_sts': a_orig_artwork})				
+			
+		if art_print_option != 'O':
+			if max_width < 8 or max_height < 8:
+				msg = "The minimum required art print width & height is 8 inch. The image you have uploaded doesn't have enough resolution and can't be printed with 8 inch width or more. Please upload another image of this artwork with better resolution."
+				return render(request, "artist/upload_artwork.html", {'msg': msg, 'artist':artist, 'medium_list': medium_list, 'artwork': artwork,
+					'surface_list': surface_list, 'img_type_list': img_type_list, 'part_number': part_number, 'category_list': category_list,
+					'art_print_width':art_print_width
+					, 'art_print_height':art_print_height, 'category': category , 'orig_artwork_sts': a_orig_artwork})
 			
 		if art_print_option == 'O':
 			art_print_allowed = False
@@ -919,12 +1006,13 @@ def upload_art(request, part_number=None):
 		artist_price = original_art_price	## To store the original art price before tax
 		
 		if art_type == 0:
-			if original_art_price < 5000:
-				msg = "The minimum original artwork price required is Rs. 5,000."
-				return render(request, "artist/upload_artwork.html", {'msg': msg, 'artist':artist, 'medium_list': medium_list, 'artwork': artwork,
-					'surface_list': surface_list, 'img_type_list': img_type_list, 'part_number': part_number, 'category_list': category_list,
-					'art_print_width':art_print_width
-					, 'art_print_height':art_print_height, 'category': category , 'orig_artwork_sts': a_orig_artwork})
+			if art_print_option == 'O' or art_print_option == 'B':
+				if original_art_price < 5000:
+					msg = "The minimum original artwork price required is Rs. 5,000."
+					return render(request, "artist/upload_artwork.html", {'msg': msg, 'artist':artist, 'medium_list': medium_list, 'artwork': artwork,
+						'surface_list': surface_list, 'img_type_list': img_type_list, 'part_number': part_number, 'category_list': category_list,
+						'art_print_width':art_print_width
+						, 'art_print_height':art_print_height, 'category': category , 'orig_artwork_sts': a_orig_artwork})
 				
 		original_art_price = Decimal( round(original_art_price + (original_art_price*0.12)) ) ## Add tax
 		keywords = request.POST.get("keywords", "")
@@ -991,11 +1079,24 @@ def upload_art(request, part_number=None):
 			w = 1000
 		img_lowres = img_highres.resize((w, w/aspect_ratio))
 		img_thumbnail = img_highres.resize((75, 75/aspect_ratio))
-		
-		img_lowres.save(lowres_name_save, 'JPEG')
-		img_highres.save(highres_name_save, 'JPEG')
-		img_thumbnail.save(thumbnail_name_save, 'JPEG')
-					
+
+		try:
+			if img_lowres.mode in ("RGBA", "P"):
+				img_lowres = img_lowres.convert("RGB")			
+			if img_highres.mode in ("RGBA", "P"):
+				img_highres = img_lowres.convert("RGB")			
+			if img_thumbnail.mode in ("RGBA", "P"):
+				img_thubmnail = img_lowres.convert("RGB")			
+			img_lowres.save(lowres_name_save, 'JPEG')
+			img_highres.save(highres_name_save, 'JPEG')
+			img_thumbnail.save(thumbnail_name_save, 'JPEG')
+		except OSError as e:
+				msg = "Please verify the image format. It should be JPG, PNG"
+				return render(request, "artist/upload_artwork.html", {'msg': msg, 'artist':artist, 'medium_list': medium_list, 'artwork': artwork,
+					'surface_list': surface_list, 'img_type_list': img_type_list, 'part_number': part_number, 'category_list': category_list,
+					'art_print_width':art_print_width
+					, 'art_print_height':art_print_height, 'category': category , 'orig_artwork_sts': a_orig_artwork})
+			
 		
 		## Update/Insert Original Art
 		artwork.product_id = orig_art_id
@@ -1049,6 +1150,9 @@ def upload_art(request, part_number=None):
 		a_orig_artwork.sell_mode = art_print_option
 		a_orig_artwork.artist_listed = artist_approved
 		a_orig_artwork.approved = False
+		a_orig_artwork.unapproved = False
+		a_orig_artwork.unapproval_date = None
+		a_orig_artwork.unapproval_reason = ''
 		a_orig_artwork.approval_date = None
 		a_orig_artwork.artist_price = artist_price	#store the original art price before tax
 		a_orig_artwork.save()
@@ -1133,7 +1237,7 @@ def upload_art(request, part_number=None):
 				artist_approved = True
 			if a_orig_artwork.unapproved:
 				artevenue_disapproved = True
-				disapprove_msg = a_orig_artwork.unapproval_reason
+				disapprove_msg = a_orig_artwork.get_unapproval_reason_display
 				
 
 	if submit_artwork:
@@ -1149,7 +1253,7 @@ def upload_art(request, part_number=None):
 			'art_print_width':art_print_width,
 			'art_print_height':art_print_height, 'category': category , 'saved_msg': saved_msg , 'orig_artwork': a_orig_artwork,
 			'submitted_msg': submitted_msg, 'artist_approved': artist_approved, 'artevenue_approved': artevenue_approved,
-			'disapprove_msg': disapprov_msg, 'artevenue_disapproved': artevenue_disapproved})
+			'disapprove_msg': disapprove_msg, 'artevenue_disapproved': artevenue_disapproved})
 	
 
 
@@ -1252,8 +1356,11 @@ def get_next_stock_image_id():
 def original_artwork_approval(request):
 	artworks = Artist_original_art.objects.filter(artist_listed = True, approved = False, unapproved = False)
 	msg = ""
+	
+	reasons = Artist_original_art.REASON
+	
 	return render(request, "artist/original_artwork_approval.html",
-		{ 'msg': msg, 'env': env, 'artworks': artworks})
+		{ 'msg': msg, 'env': env, 'artworks': artworks, 'reasons': reasons})
 		
 
 @staff_member_required
@@ -1262,6 +1369,7 @@ def set_original_artwork_approval(request):
 	sts = 'SUCCESS'
 
 	id = request.GET.get('id', '');
+	reason = request.GET.get('reason', '');
 	if id != None and id != '' :
 		try:
 			artwork = Artist_original_art.objects.get(id = id, artist_listed = True, approved = False, unapproved = False)
@@ -1273,15 +1381,25 @@ def set_original_artwork_approval(request):
 				artwork.unapproved = False
 				artwork.approval_date = today
 				artwork.save()
+				
+				sell_mode = artwork.sell_mode
 				## Publish the artwork
 				try:
 					orig_art = Original_art.objects.get(product_id = artwork.product_id)
-					orig_art.is_published = True
+					if sell_mode == 'O' or sell_mode == 'B':
+						orig_art.is_published = True
+					elif sell_mode == 'A':
+						orig_art.is_published = False
+						
+					orig_art.save()
 					try:
 						stk_img = Stock_image.objects.get(product_id = orig_art.stock_image_id)
-						stk_img.is_published = True
-						orig_art.save()
+						if sell_mode == 'A' or sell_mode == 'B':
+							stk_img.is_published = True
+						elif sell_mode == 'O':
+							stk_img.is_published = False
 						stk_img.save()
+						
 					except Stock_image.DoesNotExist:
 						sts = 'FAILURE'						
 				except Original_art.DoesNotExist:
@@ -1291,16 +1409,17 @@ def set_original_artwork_approval(request):
 			if action == 'D':
 				artwork.approved = False
 				artwork.unapproved = True
+				artwork.unapproval_reason = reason
 				artwork.unapproval_date = today
 				artwork.save()
 				try:
 					orig_art = Original_art.objects.get(product_id = artwork.product_id)
 					orig_art.is_published = False
+					orig_art.save()
 					try:
 						stk_img = Stock_image.objects.get(product_id = orig_art.stock_image_id)
 						stk_img.is_published = False
-						orig_art.save()
-						stk_img.save()
+						stk_img.save()						
 					except Stock_image.DoesNotExist:
 						sts = 'FAILURE'						
 				except Original_art.DoesNotExist:

@@ -5,8 +5,8 @@ IP: 139.59.78.215
 
 email: shekhar@artevenue / Arch8262~2
 
-root pwd - 54vmartevenue100m
-User - Id: artevenue 	Pwd: projuser_art
+root pwd - Arte@54Vm&165JP (54vmartevenue100m)
+User - Id: artevenue 	Pwd: Arte@54vm  (projuser_art)
 
 
 User HOME:  /home/artevenue/
@@ -174,7 +174,7 @@ shekharrtayade@gmail.com / av$10M@12m (Arch8262~1)
 
 Amazon Seller 
 ~~~~~~~~~~~~~~~~~~~~
-shekhar@artevenue.com / av$10M@12m (Arch8262$1)
+shekhar@artevenue.com / Arch8262~1 (av$10M@12m)  (Arch8262$1)
 
 Flipkart Seller
 

@@ -25,6 +25,7 @@ env = settings.EXEC_ENV
 '''
 
 def get_FramedImage(request):
+
 	prod_id = request.GET.get('prod_id', '')
 	m_id = request.GET.get('moulding_id', '') 
 	mount_color = request.GET.get('mount_color', '') 

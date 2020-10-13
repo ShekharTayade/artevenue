@@ -2,7 +2,30 @@
 {% load static %}
 {% load gallery_utils %}
 
-gallery_utils
+{% block page-title %} 
+	<title>
+		Gallery Walls | Cohesive & Well Styled | Arte'Venue Designer Curated
+	</title>
+{% endblock page-title %} 
+{% block page-description %}
+	<meta name="description" content="Gallery Walls cruated by Arte'Venue designers. Set your interiors apart. Buy whole set or pick some from the set.">
+{% endblock page-description %}
+{% block page-keywords %}
+	<meta name="keywords" content="Gallery Walls, set of paintings, gallery collage, collage, set of 3 paintings, set of paintings">	
+{% endblock page-keywords %}
+
+{% block coursel-stylesheet %}
+{% endblock coursel-stylesheet %}
+
+{% block coursel-script %}
+{% endblock coursel-script %}
+
+{% block front.js %}
+{% endblock front.js %}
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
 {% block popper-script %}
 	<script src="{% static 'vendor/popper.js/umd/popper.min.js' %}"> </script>
 {% endblock popper-script %}
@@ -25,9 +48,12 @@ gallery_utils
 					<h1><strong>GALLERY WALLS</strong></h1>
 				</div>
 			</div>
-			<div class = "row  mt-3">
+			<div class = "row">
 				<div class="col-12 text-center">
 					Get inspired by designer curated collage for your home and office walls. Set your interiors a class apart.
+				</div>
+				<div class="col-12 text-center mt-3">
+					BUY THE WHOLE SET OR PICK SOME FROM THE SET
 				</div>
 			</div>
 			<div class = "row mt-5" style = "border-top: 1px solid #ddd; border-bottom: 1px solid #ddd;" >

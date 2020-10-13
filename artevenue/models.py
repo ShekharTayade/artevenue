@@ -1186,6 +1186,8 @@ class Discount_slab(models.Model):
 	min_amt = models.DecimalField(max_digits=12, decimal_places=2, null=True)
 	max_amt = models.DecimalField(max_digits=12, decimal_places=2, null=True)
 	voucher = models.ForeignKey(Voucher, models.PROTECT, null=True)
+	effective_from = models.DateField(blank=True, null=True)
+	effective_to = models.DateField(blank=True, null=True)
 
 class Discount_flat(models.Model):
 	profile = models.ForeignKey(Profile_group, on_delete = models.PROTECT, null=False)
@@ -1193,6 +1195,8 @@ class Discount_flat(models.Model):
 	name = models.CharField(max_length=30, blank=True)
 	rule = models.CharField(max_length=500, blank=True)
 	voucher = models.ForeignKey(Voucher, models.PROTECT, null=True)
+	effective_from = models.DateField(blank=True, null=True)
+	effective_to = models.DateField(blank=True, null=True)
 	
 
 class Referral_slab(models.Model):
@@ -1982,18 +1986,40 @@ class Invoice_items_view (models.Model):
 '''
 class Credit_note(models.Model):	
 	CRN_REASON = (
-		('', 'Not Specified'),
-		('R', 'Full Refund Issues for Customer Return'),
-		('D', 'Full Refund Issued for Damaged Delivery'),
-		('P', 'Partial Refund for Damaged Delivery'),
+		('UN', 'Not Specified'),
+		('RT', 'Full Refund Issued for Customer Return'),
+		('DM', 'Full Refund Issued for Damaged Delivery'),
+		('PR', 'Partial Refund for Damaged Delivery'),
+		('CA', 'Reduced Price Due to Changes to Artwork'),
+		('RM', 'Artwork Removed from the Order'),
+		('CN', 'Order Cancelled'),
 	)    
 
-	crn_id =  models.AutoField(primary_key=True)
+	crn_id = models.AutoField(primary_key=True)
 	credit_note_number = models.CharField(max_length = 15, blank = True, default = '')
 	credit_note_date = models.DateTimeField(null=True)
 	order = models.ForeignKey(Order,on_delete=models.PROTECT, null=False)
 	credit_note_amount = models.DecimalField(max_digits=12, decimal_places=2,  null=False, default=0)
-	credit_note_reason = models.CharField(max_length = 2000, blank=True, default = '')
+	credit_note_reason = models.CharField(max_length = 2, blank=True, default = '')
+	created_date = models.DateTimeField(auto_now_add=True, null=False)	
+	updated_date = models.DateTimeField(auto_now=True, null=False)	
+
+
+class Debit_note(models.Model):	
+	CRN_REASON = (
+		('UN', 'Not Specified'),
+		('CZ', 'Increased Price Due to Changes to size'),
+		('AA', 'Additional Artwork Add to the Order'),
+		('AF', 'Increased Price Due to Additional Framing'),
+		('OT', 'Increased Price Due to Other Changes'),
+	)    
+
+	drn_id = models.AutoField(primary_key=True)
+	debit_note_number = models.CharField(max_length = 15, blank = True, default = '')
+	debit_note_date = models.DateTimeField(null=True)
+	order = models.ForeignKey(Order,on_delete=models.PROTECT, null=False)
+	debit_note_amount = models.DecimalField(max_digits=12, decimal_places=2,  null=False, default=0)
+	debit_note_reason = models.CharField(max_length = 2, blank=True, default = '')
 	created_date = models.DateTimeField(auto_now_add=True, null=False)	
 	updated_date = models.DateTimeField(auto_now=True, null=False)	
 '''	

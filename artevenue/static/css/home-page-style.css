@@ -274,9 +274,6 @@ a.shop_btn:hover, a.shop_btn:focus{
 	margin-bottom:15px;
 	overflow:hidden;
 }
-.slick-slide img{
-	width:100%;
-}
 .trend_inner{
 	overflow:hidden;
 	position:relative;
@@ -306,6 +303,7 @@ a.shop_btn:hover, a.shop_btn:focus{
     transform: scale(1.1);
 }
 
+/*
 .slick-slide {
 	padding:0px 10px;
 }
@@ -322,6 +320,7 @@ ul.slick-dots li {
     padding: 0px 3px;
 }
 
+
 ul.slick-dots li button {
     border: 0px solid;
     font-size: 0px;
@@ -337,6 +336,34 @@ ul.slick-dots li button {
 
 ul.slick-dots li.slick-active button {
     background-color: #ff9900;
+}
+
+*/
+
+.slick-slide img{
+	width: 80%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.slick-prev::before, .slick-next::before {
+    color: #000;
+}
+.slick-prev, .slick-next {
+	top: 50%;
+}
+.slick-prev::before {
+    font-family: FontAwesome;
+    content: "\f0d9";
+    font-size: 22px;
+}  
+.slick-next::before {
+    font-family: FontAwesome;
+    content:  "\f0da";
+    font-size: 22px;        
+} 
+.slick-slide {
+    width: 80%;
 }
 
 .prev {

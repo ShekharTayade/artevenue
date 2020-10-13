@@ -1,0 +1,80 @@
+{% load static %}
+<div class = "container mt-3">
+	<!-- Featured Products  Header -->
+	{% if ecom_site.show_featured_section %}
+	<div class="row">
+		<div class="col-12 py-5 text-center" style = "background-color: #fafafa;">
+			<!--<h1 class="mb-2 text-center">{{ecom_site.featured_header|upper}} </h1>-->
+			<h1>
+				BEAUTIFUL WALL ART TO MAKE INTERIORS AWESOME
+			</h1> 
+			<h4>Quality Meets Affordablity.</h4>
+
+			<h2 class = "mt-4" >				
+				BUY PAINTINGS ONLINE? <br/>
+				ART PRINTS ARE YOUR BEST BET
+			</h2>
+			<div class = "d-block">
+				<h3 class = "mt-3">
+					Pick from our huge collection of
+						over 2.7 lakh licensed paintings & artworks, <br/>
+					    and we assure you of top quality & elegant art prints.<br/><br/>
+					Go ahead & make your interiors amazing.
+					Your satisfaction is guaranteed.
+				</h3>
+				<!--
+				<h3 class = "mt-3">
+							As real as it gets. It is elegant, affordable and wise.<br />
+				   Enrich your experience in choosing the right kind of wall art from our huge collection of<br/>
+						over 2.6 lakh artworks, carefully curated to meet your demand.<br/>
+					 Be it home decor, office space or any empty wall, we have variety to pick from.
+				</h3>
+				-->
+			</div>
+		</div>
+	</div>
+	<div class="mt-3 py-2">
+		<div class="row">
+			<div class="col-12" >
+				<!--<h1 class="mb-2 text-center">{{ecom_site.featured_header|upper}} </h1>-->
+				<h2 class="mb-2 text-center">
+					WALL ART CATEGORIES TRENDING NOW
+				</h2> 
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+<!-- Featured items slider -->
+<div class="product-slider owl-carousel owl-theme">
+	{% for c in trending_categories %}
+		<div class="item">  
+				{% with 'img/'|add:c.url as image_static %}
+				<div class="front"  style="margin:0px 2px 0px 2px !important;">
+					{% if c.url_suffix %}				
+					<a href="{% url 'art_by_category' cat_nm=c.url_suffix %}"> 
+						<img src="{% static image_static %}" alt="Wall art prints in {{c.name}} category" class="img-fluid img-container-cat">
+					</a>
+					{% else %}
+					<a href="{% url 'art_by_category' cat_nm=c.name %}"> 
+						<img src="{% static image_static %}" alt="Wall art prints in {{c.name}} category" class="img-fluid img-container-cat">
+					</a>
+					{% endif %}
+				</div>
+				{% endwith %}
+				<div class="mt-2 trending-cat text text-center">
+					<p>
+					{% if c.url_suffix %}				
+						<a href="{% url 'art_by_category' cat_nm=c.url_suffix %}">{{ c.name|title }}</a>
+					{% else %}
+						<a href="{% url 'art_by_category' cat_nm=c.name %}">{{ c.name|title }}</a>
+					{% endif %}
+					</p>
+				</div>
+				
+		</div>
+	{% endfor %}
+</div>
+{% endif %}

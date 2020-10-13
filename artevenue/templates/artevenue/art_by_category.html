@@ -197,8 +197,9 @@
 															</div>
 														{% endif %}
 														<div id = "{{d_pf}}">
+														<ul style = "list-style: none; padding-inline-start:0px;">
 														{% for val in value %}
-															<li>
+															<li class = "mt-2">
 															<input class = "i_{{pf}}" type="checkbox" />
 																{% if pf == 'IMAGE-TYPE' %}
 																	<label id = "l_{{val}}" style="display:none">{{val}}</label>{% if val == '1' %} Photo {% elif val == '0' %} Fine Art {% endif %}
@@ -207,6 +208,7 @@
 																{% endif %}
 															</li>
 														{% endfor %}
+														</ul>
 														</div>
 													{% endif %}
 												{% endif %}

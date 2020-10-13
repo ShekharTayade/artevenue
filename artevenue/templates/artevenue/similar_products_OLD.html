@@ -1,0 +1,76 @@
+				{% load static %}
+				{% load utils %}
+				<div class = "row mt-3">
+					{% for prod in prods %}
+						<div class="col-6 col-md-6 col-lg-3 text-center">
+							<div class="similar-image">
+								<!-- <a href="{% url 'stock_image_detail' %}">Test</a> -->
+								{% if prod.product_type_id == 'STOCK-IMAGE' %}
+								<form id = "img-form_{{prod.product_id}}" action = "{% url 'stock_image_detail' prod.product_id %}" method = 'GET' >
+									<input hidden class ='iuser_width' id="iuser_width_{{prod.product_id}}" name = "iuser_width" type = "number" value = '{{width}}' min="4" max="60" >
+									<input hidden class ='iuser_height' id="iuser_height_{{prod.product_id}}" name = "iuser_height" type = "number"  value = '{{height}}' min="4" max="60" >
+									
+									<img data-src="{% if ENV == 'DEV' or ENV == 'TESTING' %} {{prod.url}} {% else %} {% static prod.url %} {% endif %}" alt="Similar wall art painting: {{prod.product_id}}" class="img-fluid image-display lazyload" 
+											style = "filter: drop-shadow(0.25rem 0.25rem 0.25rem grey); display: block; margin-left: auto;" onclick="$('#img-form_{{prod.product_id}}').submit();">
+								</form>
+								{% else %}
+								<form id = "img-form_{{prod.product_id}}" action = "{% url 'original_art_detail' prod.product_id %}" method = 'GET' >
+									<input hidden class ='iuser_width' id="iuser_width_{{prod.product_id}}" name = "iuser_width" type = "number" value = '' min="4" max="60" >
+									<input hidden class ='iuser_height' id="iuser_height_{{prod.product_id}}" name = "iuser_height" type = "number"  value = '' min="4" max="60" >
+									
+									<img data-src="{% if ENV == 'DEV' or ENV == 'TESTING' %} {{prod.url}} {% else %} {% static prod.url %} {% endif %}" alt="Similar wall art painting: {{prod.product_id}}" class="img-fluid image-display lazyload" 
+											style = "filter: drop-shadow(0.25rem 0.25rem 0.25rem grey); display: block; margin-left: auto;" onclick="$('#img-form_{{prod.product_id}}').submit();">
+								</form>
+								
+								{% endif %}
+								<!--</a>-->
+							</div>
+
+							<div class="text text-center" style = "margin-top: 5px;">
+								<h4>{{prod.name}}</h4>
+								{% if show_artist %}
+								<h5 style = "color:blue;">By {{prod.artist}}</h5>
+								{% endif %}
+								<p class="price">
+								{% if prod.product_type_id == 'STOCK-IMAGE' %}
+									{% for p in price %}
+										{% if p.publisher_id == prod.publisher %}
+											
+											{% if width %}
+												{% if prod.aspect_ratio > 0 %}
+													<i class = "fa fa-inr"></i> {% get_price prod.max_width prod.aspect_ratio p.price width %}
+												{% else %}
+													<i class = "fa fa-inr"></i> {{p.price|multiply:256|floatformat:"0"}}
+												{% endif %}
+											{% else %}													
+												{% if prod.aspect_ratio > 0 %}
+													<i class = "fa fa-inr"></i> {% get_price prod.max_width prod.aspect_ratio p.price 0 %}
+												{% else %}
+													<i class = "fa fa-inr"></i> {{p.price|multiply:256|floatformat:"0"}}												
+												{% endif %}
+											{% endif %}
+											
+										{% endif %}
+									{% endfor %}
+									{% else %}
+										{{prod.original_art_price|floatformat|indian_number_format}}
+									{% endif %}
+									<del></del>
+									{% if prod.product_id in wishlist_prods %}
+										<span id = "fav_{{prod.product_id}}" class = "pull-right">
+											<i class = "fa fa-heart"  
+												onclick = "deleteItem('{{prod.product_id}}')" 
+												style="color:red; padding-right:5px;cursor:alias;" data-toggle="tooltip" title="Added to Favorites!"></i>
+										</span>
+									{% else %}
+										<span  id = "fav_{{prod.product_id}}" class = "pull-right">
+											<i class = "fa fa-heart-o"  
+												onclick = "addToFav({{prod.product_id}}, {% if prod.max_width > 16 %} 16 {%else%} {{prod.max_width}} {%endif%}, {{prod.aspect_ratio}}, 0, '', 0, 0, 0);"
+												style="color:red; padding-right:5px;cursor:alias;" data-toggle="tooltip" title="Add to Favourites!"></i>
+										</span>
+									{% endif %}
+								</p>
+							</div>
+						</div>
+					{% endfor %}
+				</div>

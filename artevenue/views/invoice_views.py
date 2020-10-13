@@ -52,7 +52,7 @@ def get_invoices(request, order_number=None, printpdf=''):
 		
 	order_list = Order.objects.filter().select_related('order_billing', 
 		'order_shipping').exclude(invoice_number = '').order_by('-updated_date')
-		
+	
 	order_items_list = {}
 	if startDt:
 		order_list = order_list.filter(order_date__gte = startDt)
@@ -66,7 +66,7 @@ def get_invoices(request, order_number=None, printpdf=''):
 		order_list = order_list.filter(invoice_number = invoice_number)	
 
 	
-	if	not startDt and not endDt and not order_number:
+	if	not startDt and not endDt and not order_number and not invoice_number:
 		return render(request, 'artevenue/orders_table.html', {'count':0, 
 			'orders': {}, 'order_items_list':{}, 
 			'startDt':startDt, 'endDt':endDt})

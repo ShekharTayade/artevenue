@@ -82,14 +82,14 @@
 									<div class="form-group">
 										<label>Order Number:</label>
 										<input name = "order_num" id = "order_num" 
-											class = "form-control" type="text"/>
+											class = "form-control" type="text" onchange = "copy_order_num($(this).val());"/>
 									</div>
 								</div>
 								<div class = "col-sm-5 col-lg-3">
 									<div class="form-group">
 										<label>Invoice Number:</label>
 										<input name = "invoice_num" id = "invoice_num"
-											class = "form-control" type="text"/>
+											class = "form-control" type="text"  onchange = "copy_invoice_num($(this).val());"/>
 									</div>
 								</div>
 								<div class = "col-sm-2 col-lg-2">
@@ -113,6 +113,8 @@
 									<input hidden name = "fromdate" id = "fromdate_pdf" value = "$('#fromdate').val();">
 									<input hidden name = "todate" id = "todate_pdf" value = "$('#todate').val();">
 									<input hidden name = "ordtype" id = "ordtype" value = "A">
+									<input hidden name = "invoice_num" id = "invoice_num_pdf" type="text"/>
+									<input hidden name = "order_num" id = "order_num_pdf" type="text"/>
 									<div class="form-group">
 										<button type="submit" id = "submit_pdf" 
 										class = "btn btn-primary" form = "getpdf">
@@ -264,4 +266,12 @@
 	}
 	</script>
 
+	<script>
+	function copy_order_num(value){
+		$('#order_num_pdf').val(value);
+	}
+	function copy_invoice_num(value){
+		$('#invoice_num_pdf').val(value);
+	}
+	</script>
 	{% endblock jscripts %}

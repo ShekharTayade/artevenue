@@ -84,8 +84,8 @@
 					<div class="col-12 col-md-6" style = "color:#11b6bd;">
 						<h4>
 							{% if a.artist.url_name %}
-							<a href = "https://www.artevenue.com/artist/{{a.artist.url_name}}">
-								https://www.artevenue.com/artist/{{a.artist.url_name}}
+							Artist Webpage: <a href = "https://www.artevenue.com/artist/{{a.artist.url_name}}">
+								{{a.artist.url_name}}
 							</a>
 							{% endif %}
 						<h4>
@@ -130,13 +130,25 @@
 							</div>
 						</div>
 						<div class="row mt-3 text-center">
-							<div class = "col-12 col-md-6">
+							<div class = "col-4">
+								Applies only if disapproved:
+							</div>
+							<div class = "col-8">
+								<select id = "{{a.id}}_reason" class = "form-control">
+								{% for k, v in reasons %}
+									<option value = "{{k}}">{{v}}</option>
+								{% endfor %}
+								</select>
+							</div>
+						</div>
+						<div class="row mt-3 text-center">
+							<div class = "col-6">
 								<button class = "btn btn-secondary" 
 									onclick =" approve('{{a.id}}', 'D', '{{a.product.part_number}}');" >
 									Disapprove
 								</button>
 							</div>
-							<div class = "col-12 col-md-6">
+							<div class = "col-6">
 								<button class = "btn btn-primary"
 									onclick =" approve('{{a.id}}', 'A', '{{a.product.part_number}}');" >
 									Approve
@@ -158,16 +170,19 @@
 		});	
 	</script>
 	<script>
-		function approve(id, action, part_number){
+		function approve(id, action, part_number, reason){
+			var act = '';
+			var reason = '';
 			if (action == 'A'){
-				var act = 'approve';
+				act = 'approve';
 			} else {
-				var act = 'disapprove';
+				reason = $("#"+id+"_reason").val();
+				act = 'disapprove';
 			}
 			if (confirm("Are you want to " + act +  ": " + part_number + "?" )){				
 				$.ajax({
 						url: "{% url 'set_original_artwork_approval' %}", 
-						data: {'id':id, 'action': action, 'part_number': part_number }, 
+						data: {'id':id, 'action': action, 'part_number': part_number, 'reason': reason }, 
 						dataType: 'text', 
 					success: function (data) {
 						data = JSON.parse(data);

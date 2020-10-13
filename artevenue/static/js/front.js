@@ -1,6 +1,6 @@
 $(function () {
 
-    $('.shop-detail-carousel').owlCarousel({
+    /*$('.shop-detail-carousel').owlCarousel({
         items: 1,
         thumbs: true,
         nav: false,
@@ -9,7 +9,6 @@ $(function () {
         autoplay: true,
         thumbsPrerendered: true
     });
-
 
     $('#main-slider').owlCarousel({
         items: 1,
@@ -117,6 +116,7 @@ $(function () {
         },
 
     });
+	*/
 
 
     // productDetailGallery(4000);

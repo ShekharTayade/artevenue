@@ -1,3 +1,4 @@
+  
 {% load static %}					
 {% load utils %}
 {% load indian_numbers_tags %}
@@ -78,19 +79,23 @@
 								<div class="img-container">
 									<a id = "alink_{{prod.product_id}}" href="{% url 'stock_image_detail' prod.product_id %}">
 										{% if env == 'DEV' or env == 'TESTING' %}
-										<picture>
+										<img data-src="{{ prod.url }}" alt="Wall art: {{prod.name}}, by {{prod.artist}}" class="img-fluid image-display lazyload"
+												style = "filter: drop-shadow(0.25rem 0.25rem 0.25rem grey);" onclick="$('#img-form_{{prod.product_id}}').submit();">
+										<!--<picture>
 											<source media="(max-width:465px)" srcset="{{ prod.thumbnail_url }}">
 											<source media="(min-width:465px)" srcset="{{ prod.url }}">
 											<img data-src="{{ prod.url }}" alt="Wall art: {{prod.name}}, by {{prod.artist}}" class="img-fluid image-display lazyload" 
 													style = "filter: drop-shadow(0.25rem 0.25rem 0.25rem grey);" onclick="$('#img-form_{{prod.product_id}}').submit();">
-										</picture>
+										</picture>-->
 										{% else %}
-										<picture>
+										<img data-src="{% static prod.url %}" alt="Wall art: {{prod.name}}, by {{prod.artist}}" class="img-fluid image-display lazyload" 
+												style = "filter: drop-shadow(0.25rem 0.25rem 0.25rem grey);" onclick="$('#img-form_{{prod.product_id}}').submit();">
+										<!--<picture>
 											<source media="(max-width:465px)" srcset="{{ prod.thumbnail_url }}">
 											<source media="(min-width:465px)" srcset="{{ prod.url }}">
 											<img data-src="{% static prod.url %}" alt="Wall art: {{prod.name}}, by {{prod.artist}}" class="img-fluid image-display lazyload"
 													style = "filter: drop-shadow(0.25rem 0.25rem 0.25rem grey);" onclick="$('#img-form_{{prod.product_id}}').submit();">
-										</picture>
+										</picture>-->
 										{% endif %}		
 									</a>
 								</div>

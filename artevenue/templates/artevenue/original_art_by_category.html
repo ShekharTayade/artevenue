@@ -91,13 +91,14 @@
 														
 													{% else %}
 														{% if pf == 'ARTIST' %}
-															<div class = "sticky mb-2">
+															<div class = "mb-2">
 																<input id="artist_search" name="artist-search" class = "form-control" type="search" placeholder="Search...">
 															</div>
 														{% endif %}
 														<div id = "{{d_pf}}">
+														<ul style = "list-style: none; padding-inline-start:0px;">
 														{% for val in value %}
-															<li>
+															<li class = "mt-2">
 															<input class = "i_{{pf}}" type="checkbox" />
 																{% if pf == 'IMAGE-TYPE' %}
 																	<label id = "l_{{val}}" style="display:none">{{val}}</label>{% if val == '1' %} Photo {% elif val == '0' %} Fine Art {% endif %}
@@ -106,10 +107,12 @@
 																{% endif %}
 															</li>
 														{% endfor %}
+														</ul>
 														</div>
 													{% endif %}
 												{% endif %}
 											{% endfor prod_filter_values %}
+
 										</div>
 									</div>
 								</form>
@@ -208,22 +211,16 @@
 
 				<div class="col-lg-9">
 					<div class="box-cat">
+							<h1 style="color:#11b6bd; font-weight:700">FINE ART</h1>
 						{% if ikeywords %}
-							<h1>Original Wall Art Paintings & Artworks for Your Search "{{ikeywords}}"</h1>
-							<h3>Wall paintings for bedroom, living room and other spaces.
-								Don't miss the most important factor - paintings for 
-								home decor. Choose paintings for home walls and give 
-								that beautiful look to the space.
-							</h3>
+							<h1>Original Fine Art Paintings, Artworks, & Photographs for Your Search "{{ikeywords}}"</h1>
+						{% elif artist %}
+							<h1>Original Fine Art Paintings, Artworks, & Photographs by <strong>{{artist.profile_name}}</strong></h1>
 						{% else %}
-							<h1>Original Wall Art Paintings & Artworks{% if product_category %} from {{ product_category.name }} Category {% endif %}</h1>
+							<h1>Original Fine Art Paintings, Artworks, & Photographs{% if product_category %} from {{ product_category.name }} Category {% endif %}</h1>
 							<p>{% if product_category.description %} {{product_category.description}}{% endif %}</p>
-							<h3>{{product_category.name}} wall paintings for bedroom, living room and other spaces.
-								Don't miss the most important factor - paintings for 
-								home decor. Choose paintings for home walls and give 
-								that beautiful look to the space.
-							</h3>
 						{% endif %}
+						<h3>Where available, you may be able to buy the art prints of the paintings.</h3>
 					</div>
 					 
 
@@ -234,6 +231,41 @@
 				<!-- /.col-lg-9-->
 				{% include 'artevenue/wishlist-add-message.html' %}
 				{% include 'artevenue/message-modal_ok.html' %}
+				{% if product_category.category_id %}
+					<form  hidden id="cat-form" action = "{% url 'original_art_by_category' cat_nm=product_category.url_suffix %}">
+						<input id = "id_page_num" name = "page_num">
+						<input id = "id_sort" name = "sort">
+						<input id = "id_show" name = "show">
+						<input id = "id_keywords" name = "keywords">
+						<input id = "id_result_limit" name = "result_limit">
+						<input id = "id_f_colors" name = "filt_colors">
+						<input id = "id_f_size" name = "filt_size">
+						<input id = "id_f_width" name = "filt_width">
+						<input id = "id_f_height" name = "filt_height">
+						<input id = "id_f_artist" name = "filt_artist">
+						<input id = "id_f_orientation" name = "filt_orientation">
+						<input id = "id_f_image_type" name = "filt_image_type">
+						<input id = "id_tf" name = "t_f">
+						
+					</form>
+				{% else %}
+					<form  hidden id="cat-form" action = "{% url 'original_art_by_category' %}">
+						<input id = "id_page_num" name = "page_num">
+						<input id = "id_sort" name = "sort">
+						<input id = "id_show" name = "show">
+						<input id = "id_keywords" name = "keywords">
+						<input id = "id_result_limit" name = "result_limit">
+						<input id = "id_f_colors" name = "filt_colors">
+						<input id = "id_f_size" name = "filt_size">
+						<input id = "id_f_width" name = "filt_width">
+						<input id = "id_f_height" name = "filt_height">
+						<input id = "id_f_artist" name = "filt_artist">
+						<input id = "id_f_orientation" name = "filt_orientation">
+						<input id = "id_f_image_type" name = "filt_image_type">
+						<input id = "id_tf" name = "t_f">
+					</form>
+				{% endif %}
+			</div>
 			
 			</div>
 		</div>
@@ -270,11 +302,19 @@
 		}
 		
 		function getAllFilters(page, sort, show, keywords, result_limit=''){ 
+			$("#id_f_colors").val('');
+			$("#id_f_size").val('');
+			$("#id_f_artist").val('');
+			$("#id_f_orientation").val('');
+			$("#id_f_image_type").val('');
+			
 			if (isNaN(page) == false) {
 				page_num = parseInt(page);
 			} else {
 				page_num = 1;  // default
 			}
+			$("#id_page_num").val(page_num);
+			
 			var filter = '{';
 			var fcnt = 0;
 			{% for pf in prod_filters %}
@@ -296,6 +336,23 @@
 								rec = rec + ', "' + val.trim() + '": ' + ' " ' + sts + '"';
 							}
 							valcnt = valcnt + 1;
+							
+							filt = "{{pf}}";
+							
+							switch (filt) {
+							  case 'ORIENTATION':
+								var o = $("#id_f_orientation").val();
+								$("#id_f_orientation").val( o + "|" + val.trim());
+								break;
+							  case "ARTIST":
+								var a = $("#id_f_artist").val();
+								$("#id_f_artist").val( a + "|" + val.trim());
+								break;
+							  case "IMAGE-TYPE":
+								var i = $("#id_f_image_type").val();
+								$("#id_f_image_type").val( i + "|" + val.trim());
+								break;
+							}
 						}
 						
 					});
@@ -317,19 +374,32 @@
 			var size_input = w + "_" + h;
 			if ( ( parseInt(w) >= 4) && ( parseInt(h) >= 4) ){
 				size_val = size_input;
+				$("#id_f_size").val( size_input );
 			}
 
 			if (size_val != "any") {
 				rec = ', "SIZE": {"' + size_val + '" : ' + ' "true"';
 				filter = filter + rec + ' }';
+				$("#id_f_size").val( size_val );
+			}
+
+			if (w != "") {
+				$("#id_f_width").val(w);
+			} else {
+				$("#id_f_width").val("");
+			}
+			if (h != "") {
+				$("#id_f_height").val(h);
+			} else {
+				$("#id_f_height").val("");
 			}
 			
 			var chl = document.getElementById("colors-div").childNodes;
 			var len = chl.length;
 			var rec = ', "COLORS": {' ;
-			valcnt = 0;
+			var valcnt = 0;
 			for (i=0; i < len; i++){
-				ele = chl[i];
+				var ele = chl[i];
 				if (ele.innerHTML == "<i class=\"fa fa-check\"></i>") {
 					if (valcnt == 0) {
 						rec = rec + '"' + ele.style.backgroundColor + '"  : ' + ' "true"';
@@ -337,6 +407,8 @@
 						rec = rec + ', "' + ele.style.backgroundColor + '"  : ' + ' "true"';					
 					}
 					valcnt = valcnt + 1;
+					col = $("#id_f_colors").val();
+					$("#id_f_colors").val(col + "|" + ele.style.backgroundColor );
 				}
 			}
 			
@@ -351,14 +423,17 @@
 			if (result_limit != '' ){
 				rec = ', "RESULT-LIMIT": {"result_limit": "' + result_limit + '"}';
 				filter = filter + rec;
+				$("#id_result_limit").val(result_limit);
 			}						
 			if (sort != '' && sort != 'None' ){
 				rec = ', "SORT": {"sort":"' + sort + '"}';
 				filter = filter + rec
+				$("#id_sort").val(sort);
 			}
 			if (keywords != '' && keywords !== 'None'){
 				rec = ', "KEY-WORDS": {"keywords":"{{ikeywords}}"}';
 				filter = filter + rec
+				$("#id_keywords").val("{{ikeywords}}");
 			}
 			
 			if (isNaN(show) == false) {
@@ -373,6 +448,7 @@
 			if (show_num != '' ){
 				rec = ', "SHOW": {"show":"' + show_num + '"}';
 				filter = filter + rec
+				$("#id_show").val(show_num);
 			}
 			
 			filter = filter + '}';		
@@ -380,33 +456,7 @@
 			document.body.scrollTop = 0; // For Safari
 			document.documentElement.scrollTop = 0; 
 			
-			{% if product_category.category_id %}				
-				$.ajax({url: '{% url "original_art_by_category" product_category.category_id page %}', 
-					data: filter, 
-					dataType: 'text', 
-					type: 'POST',
-					success: function (data) {
-						$("#img-display").html(data);
-					},
-					error: function(xhr){
-						alert("An error occured: " + xhr.status + " " + xhr.statusText + " Apologies for the inconvenience!! Please let us know the details and we will be happy to help sort it out."); 
-						return;
-					}
-				});
-			{% elif ikeywords %}
-				$.ajax({url: '{% url "original_art_by_category" %}', 
-					data: filter, 
-					dataType: 'text', 
-					type: 'POST',
-					success: function (data) {
-						$("#img-display").html(data);
-					},
-					error: function(xhr){
-						alert("An error occured: " + xhr.status + " " + xhr.statusText + " Apologies for the inconvenience!! Please let us know the details and we will be happy to help sort it out."); 
-						return;
-					}
-				});						
-			{% endif %}
+			$("#cat-form").submit();
 		}
 	</script>
 	
@@ -437,6 +487,8 @@
 				$('#cat_navigation').addClass('show');
 				$('#filter_navigation').addClass('show');
 			  }				
+
+			setFilterDisplay();
 		});
 	</script>
 	
@@ -593,7 +645,76 @@
 			$(".iuser_height").val(value);
 		}		
 	}
+
+	function setFilterDisplay(){
+		$("#id_f_colors").val('{{filt_colors}}');
+		$("#id_f_size").val('{{filt_size}}');
+		$("#id_f_artist").val('{{filt_artist}}');
+		$("#id_f_orientation").val('{{filt_orientation}}');
+		$("#id_f_image_type").val('{{filt_image_type}}');
+		$("#size_width").val("{{filt_width}}");
+		$("#size_height").val("{{filt_height}}");
+		
+		if ("{{filt_colors}}" != '' ) {
+			var chld = document.getElementById("colors-div").childNodes;
+			var leng = chld.length;
+			for (i=0; i < leng; i++){
+				var e = chld[i];
+				if ( e.tagName == 'DIV' ){
+					var color = e.style.backgroundColor;
+					var col = color.toUpperCase();
+					var f = "{{filt_colors}}".toUpperCase();
+					var n = f.search(col);
+					if (n >= 0){
+						e.innerHTML = "<i class=\"fa fa-check\"></i>";
+					} else {
+						e.innerHTML = "";
+					}
+				}
+				
+			}
+		}
+		
+		if ("{{filt_orientation}}" != '') {
+			$(".i_ORIENTATION").each(function () {
+				var val = $(this).next('label').text().toUpperCase().trim();
+				var filt = "{{filt_orientation}}".toUpperCase().trim();
+				var n = filt.indexOf(val);
+				if (n >= 0) {
+					$(this).prop('checked', true);
+				} else {
+					$(this).prop('checked', false);					
+				}
+			});
+		}
+		if ("{{filt_artist}}" != '') {
+			$(".i_ARTIST").each(function () {
+				var val = $(this).next('label').text().toUpperCase().trim();
+				var filt = "{{filt_artist}}".toUpperCase().trim();
+				var n = filt.indexOf(val);
+				if (n >= 0) {
+					$(this).prop('checked', true);
+				} else {
+					$(this).prop('checked', false);					
+				}
+			});
+		}
+		if ("{{filt_image_type}}" != '') {
+			$(".i_IMAGE-TYPE").each(function () {
+				var val = $(this).next('label').text().toUpperCase().trim();
+				var filt = "{{filt_image_type}}".toUpperCase().trim();
+				var n = filt.indexOf(val);
+				if (n >= 0) {
+					$(this).prop('checked', true);
+				} else {
+					$(this).prop('checked', false);					
+				}
+			});
+		}
+	}
 	</script>
 	{% endblock jscripts %}
+	{% block tawkto %}
+	{% endblock tawkto %}
 			
 	

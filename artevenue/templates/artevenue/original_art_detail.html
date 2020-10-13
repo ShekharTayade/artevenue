@@ -91,13 +91,17 @@
 					<nav aria-label="breadcrumb">
 						<ol class="breadcrumb">
 							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
-							<li class="breadcrumb-item"><a href="{% url 'original_art_by_category' %}">Categories</a></li>
+							<li class="breadcrumb-item"><a href="{% url 'show_all_original_art_categories' %}">Categories</a></li>
 							<li class="breadcrumb-item active">{{ product.product_id }}</li>
 						</ol>
 					</nav>
 				</div>
 				<div class="col-12 text-center" style = "padding:15px;">
-				<h1><strong>ORIGINAL HANDMADE PAINTING</strong></h1>
+				{% if product.image_type == '0' %}
+					<h1><strong>ORIGINAL FINE ART PAINTING</strong></h1>
+				{% else %}
+					<h1><strong>PHOTOGRAPH</strong></h1>				
+				{% endif %}
 				</div>
 				<div class="col-12" style = "padding:30px;">
 					<div id="productMain" class="row">
@@ -156,7 +160,7 @@
 							</div>
 						</div>
 						<div class = "d-block d-md-none" style = "width: 100%;">
-							<div id="card-slider" class="owl-carousel owl-theme">
+							<div id="card-slider" class="slider">
 								<div class="item card-img">
 									<img id = "prod-img-card" src="" 
 										alt ="Wall Art Painting full view">
@@ -224,24 +228,108 @@
 									{{ product.description }}
 								</div>
 								<div class = "col-12">
-									<div class = "row mb-4">
+									<div class = "row mb-2">
 										<div class = "col-12">
 											Painting Size: {{product.art_width|floatformat}}" X {{product.art_height|floatformat}}" inch
 										</div>
 										<div class = "col-12">
 											Medium: {{product.get_art_medium_display}},  Surface: {{product.get_art_surface_display}}
 										</div>
-										
-										{% if product.available_qty >= 1 %}
-										<div class="col-12" style = "color:green;">
-											(In Stock)
-										</div>							
+										{% if orig_art %}
+											{% if orig_art.sell_mode == 'A' %}
+												<div class="col-12" style = "">
+													<strong>(Original art is unavailable)</strong>
+												</div>
+												<div class="col-12 text-center mt-2">
+													<a class = "btn btn-primary text-center" id = "buy-art-print"
+														href = "{% url 'stock_image_detail' product.stock_image_id %}"> Buy Art Print
+													</a>													
+												</div>
+											{% else %}
+												{% if product.available_qty >= 1 %}
+												<div class="col-12" style = "color:green;">
+													(In Stock)
+												</div>							
+												{% else %}
+												<div class="col-12"  style = "color:red;">
+													(Sold Out)
+												</div>
+												{% endif %}											
+											{% endif %}
 										{% else %}
-										<div class="col-12"  style = "color:red;">
-											(Sold Out)
-										</div>
-										{% endif %}											
+											{% if product.available_qty >= 1 %}
+											<div class="col-12" style = "color:green;">
+												(In Stock)
+											</div>							
+											{% else %}
+											<div class="col-12"  style = "color:red;">
+												(Sold Out)
+											</div>
+											{% endif %}																					
+										{% endif %}
 									</div>
+									{% if product.art_surface == 'CVS' %}
+									<div class = "row" id ="stretched" style = "padding-right: 15px;">
+										<div class = "col-12 mt-3" style = "font-size:0.6rem;" class = "checkbox row">
+											<label class="checkbox-inline">
+												<input id="in_stretched" name="in_stretched"
+													onchange = "stretch_changed();"
+													type = "checkbox"> <strong>Stretched Canvas</strong>
+											</label>
+										</div>
+										<div class = "col-12" style = "margin-bottom:15px;">
+											<span class = "">
+												<i class = "fa fa-question-circle" 
+													data-toggle="tooltip" title="Click to know more!"
+													id="strt" 
+													onclick="$('#stretched-modal').modal('show');">
+													<span style = "color:#11b6bd; font-size:0.7rem; text-decoration:underline;">
+														What is 'Stretched Canvas'?
+													</span>
+												</i>
+											</span>
+										</div>
+									</div>
+									{% endif %}
+								</div>
+							</div>
+							<hr>
+							<div id = "add-to-cart-div">
+								<div class = "col-12 sticky d-flex justify-content-around">
+									<div class = "" style = "color:#11b6bd; font-size:1.2rem; font-weight:600; margin-right:10px;">
+										<span id="prod-price-cart">{{product.original_art_price|floatformat:"0"|indian_number_format}} </span>
+									</div>
+									<div id = "selected_med"  class = "" style="font-size:0.65rem;">
+										<span id="prod-desc">
+										</span>
+									</div>							
+									<div id = "">
+										<button class="btn btn-artevenue" {% if product.available_qty < 1 or orig_art.sell_mode == 'A'%} disabled {% endif %}
+											id = "add-to-cart_btn"
+											onclick="addProdToCart({{product.product_id}}, 1)">
+											<i class="fa fa-shopping-cart"></i>
+											<strong>ADD TO CART</strong>
+										</button>
+									</div>
+								</div>
+								<div class = "col-12 text-center">
+									<hr>
+								</div>
+							</div>
+							{% if product.stock_image_id and orig_art.sell_mode != 'O' %}
+							<div class = "row" style = "background-color: #f6f6f6;">
+								<div class = "col-12 text-center">
+									<span style = "font-size: 0.7rem;">
+										We have top quality art prints of this painting available from 
+										<i class = "fa fa-inr">{% get_price product.max_width product.aspect_ratio per_sqinch_paper 10 %}</i>
+										(size 10" X {{10|get_height:product.aspect_ratio}}" unframed),
+										multiple sizes, complete customization available
+									</span>
+								</div>
+								<div class = "col-12 text-center mb-2">
+									<a class = "btn btn-secondary btn-sm" id="art-print-btn"
+										href = "{% url 'stock_image_detail' product.stock_image_id %}"> Buy Art Print
+									</a>
 								</div>
 							</div>
 							<hr>
@@ -256,40 +344,6 @@
 									<span style="font-size:0.7rem;">(See on different color walls)</span>
 								</div>								
 							</div>
-							<div class = "col-12 sticky d-flex justify-content-around">
-								<div class = "" style = "color:#11b6bd; font-size:1.2rem; font-weight:600; margin-right:10px;">
-									<span id="prod-price-cart">{{product.original_art_price|floatformat:"0"|indian_number_format}} </span>
-								</div>
-								<div id = "selected_med"  class = "" style="font-size:0.65rem;">
-									<span id="prod-desc">
-									</span>
-								</div>							
-								<div class = "">
-									<button class="btn btn-artevenue" {% if product.available_qty < 1 %} disabled {% endif %}
-										onclick="addProdToCart({{product.product_id}}, 1)">
-										<i class="fa fa-shopping-cart"></i>
-										<strong>ADD TO CART</strong>
-									</button>
-								</div>
-							</div>
-							{% if product.stock_image_id %}
-							<hr>
-							<div class = "row" style = "background-color: #f6f6f6;">
-								<div class = "col-12 text-center">
-									<span style = "font-size: 0.7rem;">
-										We have top quality art prints of this painting available from 
-										<i class = "fa fa-inr">{% get_price product.max_width product.aspect_ratio per_sqinch_paper 10 %}</i>
-										(size 10" X {{10|get_height:product.aspect_ratio}}" unframed),
-										multiple sizes, complete customization available
-									</span>
-								</div>
-								<div class = "col-12 text-center mb-2">
-									<a class = "btn btn-secondary btn-sm"
-										href = "{% url 'stock_image_detail' product.stock_image_id %}"> Buy Art Print
-									</a>
-								</div>
-							</div>
-							<hr>
 							{% endif %}
 							<div class = "row mt-3" style="display:none;">
 								<div class = "col-12">
@@ -400,33 +454,11 @@
 										</div>
 									</span>
 									{% endif %}
-									{% if product.art_surface == 'CVS' %}
-									<div class = "row" id ="stretched">
-										<div class = "col-12" style = "margin-top:-5px; font: 0.85rem 'Roboto', sans-serif;" class = "checkbox row">
-											<label class="checkbox-inline">
-												<input id="in_stretched" name="in_stretched"
-													onchange = "stretch_changed();"
-													type = "checkbox"> <strong>Stretched?</strong>
-											</label>
-										</div>
-										<div class = "col-12" style = "margin-bottom:15px;">
-											<small>Check the checkbox to get the canvas streched on a wooden frame</small>
-											<span class = "">
-												<i class = "fa fa-question-circle" 
-													data-toggle="tooltip" title="Click to know more!"
-													id="strt" 
-													onclick="$('#stretched-modal').modal('show');">
-													<span style = "color:#11b6bd; font-size:0.7rem; text-decoration:underline;">What does 'Stretched' mean</span>
-												</i>
-											</span>
-										</div>
-									</div>		
-									{% endif %}
 								</div>
 							</div>
-							<div class = "mt-1 mb-5">
-								<div class = "col-12 align-middle d-flex flex-row justify-content-between" style="display: inline; background-color:#f9f9f9; padding:5px;">
-									<img src = "{% static 'img/how-to/customization/how_to_icon.png' %}" alt="How To Customize the painting" width=20 onclick = "$('#how-to-customize').modal('show');">
+							<div class = "row mt-1 mb-5">
+								<div class = "col-12 align-middle d-flex flex-row justify-content-between" style="display: inline; background-color:#f9f9f9; padding:0 15px; align-items: flex-start;">
+									<img src = "{% static 'img/how-to/customization/how_to_icon_small.png' %}" alt="How To Customize the art print" width=20 onclick = "$('#how-to-customize').modal('show');">
 									<div class = "align-self-center" style = "cursor: pointer; text-decoration:underline; color:#11b6bd; font-size:0.85rem;" 
 										onclick = "$('#how-to-customize').modal('show');">
 										How to Customize
@@ -437,24 +469,6 @@
 									</a>
 								</div>
 							</div>
-							{% if not user.is_authenticated %}
-							<!--
-							<div class = "row mt-3">
-								<div id = "signupsave" class = "col-12">
-									<img src="{% static 'img/signup_callout.png' %}" alt="Sign and save 15% on Wall art painting" width=50 onclick = "$('#signup_popup-modal').modal('show');" align="left">
-									<ul style = "list-style: none; margin-left: 25px;">
-									<li class = "align-top" style = "font-size:0.8rem; cursor: pointer; text-decoration:underline; color:#11b6bd;"
-										onclick = "$('#signup_popup-modal').modal('show');">
-										Sign Up In seconds & Save 15%
-									</li>
-									<li style = "line-height:1;">
-										<small>Sign up, add the artworks to the cart and coupon 'FIRST15' (flat 15% off) is applied automatically</small>
-									</li>
-									</ul>
-								</div>
-							</div>
-							-->
-							{% endif %}
 							<div class = "col-12 text-muted mt-3"
 									style= "font-size: 0.65rem; text-align: left; padding:15px;
 									background-color:#efefef;">
@@ -485,7 +499,7 @@
 												Free Shipping
 											</div>
 											<div class = "why-artevenue-text">
-												Don't pay to bring it home, ships in 1-2 days
+												Don't pay to bring it home, ships in 7-10 days
 											</div>
 										</div>
 									</div>
@@ -607,7 +621,7 @@
 												<tr>
 													<td class="accordian-subhead">SHIPPING TIME</td>
 													<td class = "comp-frame">
-														Ships by FedEx in 5-10 business days. Usually deliveres in 5-10 days in most parts of India.
+														Ships by Courier in 7-10 business days. Usually courier deliveres in 5-10 days in most parts of India.
 													</td>
 												</tr>
 											</tbody>
@@ -638,15 +652,6 @@
 					<div class = "row mt-2">
 						<hr>
 					</div>
-					<div class = "row mt-2">
-						<div class = "col-12 col-md-1 img-thumbs">
-						</div>
-						<div class = "col-12 col-md-10">
-							{% customer_review product.product_id cart_item.cart_item_id wishlist_item.wishlist_item_id iuser_width iuser_height %}
-						</div>
-						<div class = "col-12 col-md-1 img-thumbs">
-						</div>
-					</div>
 					<!-- Similar products -->
 					<div class = "row mt-5">
 						{% if prods %}
@@ -656,13 +661,22 @@
 						<div class = "col-12 col-md-10">
 							YOU MAY ALSO LIKE THESE
 							<hr>
-							<div id = "similar-show" class = "size-box" style = "background-color:#fafafa">
+							<div id = "similar-show" class = "" style = "background-color:#fafafa">
 								<div id = "similar_include">
 									{% include 'artevenue/similar_products.html' %}
 								</div>
 							</div>
 						</div>
 						{% endif %}
+					</div>
+					<div class = "row mt-2">
+						<div class = "col-12 col-md-1 img-thumbs">
+						</div>
+						<div class = "col-12 col-md-10">
+							{% customer_review product.product_id cart_item.cart_item_id wishlist_item.wishlist_item_id iuser_width iuser_height %}
+						</div>
+						<div class = "col-12 col-md-1 img-thumbs">
+						</div>
 					</div>
 				</div>
 			</div>
@@ -678,7 +692,7 @@
 				<div class="modal-dialog modal-sm">
 					<div class="modal-content">
 						<div class="modal-header">
-							<h3 class="modal-title">Stretched Canvas Print</h3>
+							<h3 class="modal-title">Stretched Canvas</h3>
 							<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
 						</div>
 						<div class="modal-body">
@@ -687,11 +701,15 @@
 									alt = "What is Stretched Canvas"
 									style = "display:block; margin-left:auto; margin-right:auto; width:200px;">
 								<ul class = "mt-3" style = "font-size:0.75rem;">
-									<li>Please check the "Streched" checkbox to get the art 
-										printed on canvas and streched on a wooden frame as 
-									shown above. </li>
-									<li>If not checked, we print art on canvas, roll it and 
-									deliver it in a tube.</li>
+									<li>Please check the "Streched Canvas" checkbox to get the 
+										canvas streched on a wooden frame (stretcher bars) as shown above.
+										There is no frame visible from the front or the side view. <br/>
+										It comes
+										with hooks and is ready to hang.
+									</li>
+									<li>If not checked, we roll the canvas and 
+										deliver it in a tube.
+									</li>
 								</ul>
 							</div>
 						</div>
@@ -927,7 +945,7 @@
 			}
 			
 			details_txt = txt + ', Finished Size:' + frame_width.toString() + '" X ' + frame_height.toString() + '" inch';
-			txt = 'Product Size: ' + frame_width.toString() + '" X ' + frame_height.toString() + '" inch <br />Ships in 1-2 days';
+			txt = 'Product Size: ' + frame_width.toString() + '" X ' + frame_height.toString() + '" inch <br />Ships in 7-10 days';
 			$('#prod-desc').html(txt);
 			$('#prod-details').html(details_txt);
 		}
@@ -1184,9 +1202,74 @@
 
 	</script>
 
+
+	<script>
+		$('#nav-tab a').on('shown.bs.tab', function(event){
+			$('.frames-slider').slick('setPosition');
+		});		
+		
+	</script>
 			
 	<script>
 		jQuery(document).ready(function(){
+			$(".frames-slider").slick({
+				dots: true,
+				infinite: false,
+				mobileFirst: true,
+				rows: 2,
+				slidesToShow: 3,
+				slidesToScroll: 3,
+			});
+
+			$("#card-slider").slick({
+				dots: true,
+				arrows: false,
+				infinite: false,
+				mobileFirst: true,
+				rows: 1,
+				slidesToShow: 1,
+				slidesToScroll: 1,
+			});
+
+			$(".similar-prods-slider").slick({
+				dots: true,
+				infinite: true,
+				mobileFirst: true,
+				rows: 2,
+				slidesToShow: 4,
+				slidesToScroll: 4,
+				responsive: [
+					{
+					  breakpoint: 1024,
+					  settings: {
+						slidesToShow: 4,
+						slidesToScroll: 4,
+					  }
+					},
+					{
+					  breakpoint: 600,
+					  settings: {
+						slidesToShow: 3,
+						slidesToScroll: 3
+					  }
+					},
+					{
+					  breakpoint: 480,
+					  settings: {
+						slidesToShow: 2,
+						slidesToScroll: 2
+					  }
+					},
+					{
+					  breakpoint: 370,
+					  settings: {
+						slidesToShow: 2,
+						slidesToScroll: 2
+					  }
+					}
+				]
+			});
+				
 
 			$body = $("body");
 			
@@ -1228,6 +1311,14 @@
 			set_max_size_on_tool();
 			
 			buy_without_frame_change(true, true )
+			
+			{% if orig_art.sell_mode == 'A' %}
+				$("#add-to-cart_btn").css('background-color', '#6c757d');
+				$("#add-to-cart_btn").prop('disabled', 'true');
+				$("#art-print-btn").hide();
+				$("#add-to-cart-div").hide();
+				$("#buy-art-print").css('background-color', '#11b6bd');
+			{% endif %}
 		});
 
 	</script>
@@ -1442,25 +1533,27 @@
 						if (data.disc_applied) {
 							$("#no-disc").hide();
 							$("#promo-display").show("slow");
-							$("#item_unit_price").html("<i class = 'fa fa-inr'> " + " </i> " +data.item_unit_price);
-							$("#item_total_price").html("<i class = 'fa fa-inr'> " + " </i> " +data.item_price);
+							$("#item_unit_price").html("<i class = 'fa fa-inr'> " + " </i> " + parseInt(data.item_unit_price).toLocaleString('en-IN', {minimumFractionDigits : 0}));
+							$("#item_total_price").html("<i class = 'fa fa-inr'> " + " </i> " + parseInt(data.item_price).toLocaleString('en-IN', {minimumFractionDigits : 0}));
 							if ( parseInt(data.cash_disc) > 0 ) {
 								$("#disc").html("(" + "<i class = 'fa fa-inr'> " + " </i> " + data.cash_disc + " off)");
 							} else if( parseInt(data.percent_disc) > 0 ) {
 								$("#disc").html("(" + data.percent_disc + "% off)");
 							}
 							
-							$("#item_unit_price_nv").html(data.item_unit_price);
+							$("#item_unit_price_nv").html(pasrseInt(data.item_unit_price).toLocaleString('en-IN', {minimumFractionDigits : 0}));
 							$("#promotion_id_nv").html(data.promotion_id);
 							$("#disc_amt_nv").html(data.disc_amt);
 							$("#item_total_price_nv").html(data.item_price);
-							$("#prod-price-cart").html("<i class = 'fa fa-inr'> " + " </i> " + data.item_price);
+							$("#prod-price-cart").html("<i class = 'fa fa-inr'> " + " </i> " + parseInt(data.item_price).toLocaleString('en-IN', {minimumFractionDigits : 0}));
 							
 						} else {
 							$("#promo-display").hide();
 							$("#no-disc").show();
-							$("#prod-price").html("<i class = 'fa fa-inr'> " + " </i> " + data.item_price);
-							$("#prod-price-cart").html("<i class = 'fa fa-inr'> " + " </i> " +data.item_price);
+							$("#prod-price").html("<i class = 'fa fa-inr'> " + " </i> " + parseInt(data.item_price).toLocaleString('en-IN', {minimumFractionDigits : 0}));
+							//$("#prod-price").html("<i class = 'fa fa-inr'> " + " </i> " + convert_to_IN(data.item_price));
+							
+							$("#prod-price-cart").html("<i class = 'fa fa-inr'> " + " </i> " + parseInt(data.item_price).toLocaleString('en-IN', {minimumFractionDigits : 0}));
 
 							$("#item_unit_price_nv").html(data.item_unit_price);
 							$("#item_total_price_nv").html(data.item_price);
@@ -1911,6 +2004,22 @@
 		
 		$('#wall-color-tool').modal('show');
 		show_wall_tool();
+	}
+	</script>
+	
+	
+	<script>
+	function convert_to_IN(num){
+		if (isNaN(num)) {
+			num = parseInt(num);
+		}
+		num=num.toString();
+		var lastThree = x.substring(num.length-3);
+		var otherNumbers = x.substring(0,num.length-3);
+		if(otherNumbers != '')
+			lastThree = ',' + lastThree;
+		var res = otherNumbers.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + lastThree;
+		return(string(res));
 	}
 	</script>
 	

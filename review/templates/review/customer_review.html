@@ -77,7 +77,7 @@
 			</div>
 		</div>
 		
-		<div class = "col-12" style = "font-size:0.65rem;">
+		<div class = "col-12" style = "font-size:0.75rem;">
 			{{r.comments|truncatechars:200}}{% if r.comments|length > 200 %}
 				<form action = "{% url 'customer_review_one' r.review_id %}" id = "one-form{{r.review_id}}" method = "POST">
 					{% csrf_token %}

@@ -25,16 +25,18 @@
 			</div>
 			</a>
 		</div>
+		
 		<div class = "col-12 col-md-6 mt-5">
 			<h3 class = "curatedHeading1">
-				SETS
+				GALLERY WALLS
 			</h3>
 			<h4  class = "curatedHeading2">The Cohesive & Well Styled</h4>
-			<a class="btn-link" href = "{% url 'stock_collage_products' %}">
+			<!--<a class="btn-link" href = "{% url 'stock_collage_products' %}">-->
+			<a class="btn-link" href = "{% url 'get_gallery_walls' %}">
 				<div class="curated-container">
 				<picture>
-					<source media="(max-width:465px)" srcset="{% static 'img/hp_banners/sets_mobile.jpg' %}">
-					<source media="(min-width:465px)" srcset="{% static 'img/hp_banners/sets.jpg' %}">
+					<source media="(max-width:465px)" srcset="{% static 'img/hp_banners/gallerywalls_mobile.jpg' %}">
+					<source media="(min-width:465px)" srcset="{% static 'img/hp_banners/gallerywalls.jpg' %}">
 					<img src="{% static 'img/hp_banners/sets.jpg' %}" alt="Wall Art Collage Sets" style="width:100%">
 				</picture>
 				</div>

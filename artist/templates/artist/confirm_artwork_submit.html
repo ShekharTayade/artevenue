@@ -331,20 +331,22 @@
 	<script>
 		$(document).ready(function(){
 			$("#max_size_artprint").hide();
-			
+					
 			{% if artwork %}
 				// Artwork present
-			{% if artwork.image_type == 0 or artwork.image_type == '0' %}
-				// Painting
-			art_type_change('PAINTING');
-			{% elif artwork.image_type == 1 or artwork.image_type == '1' %}
-				// Photo
-			art_type_change('PHOTOGRAPH');
-			{% endif %}
+				{% if artwork.image_type == 0 or artwork.image_type == '0' %}
+					// Painting
+				art_type_change('PAINTING');
+				{% elif artwork.image_type == 1 or artwork.image_type == '1' %}
+					// Photo
+				art_type_change('PHOTOGRAPH');
+				{% endif %}
+			{% else %}
+			art_type_change('PAINTING');				
 			{% endif %}
 			
-			{% if orig_artwork_sts %}
-				allow_art_print('{{orig_artwork_sts.sell_mode}}');
+			{% if orig_artwork %}
+				allow_art_print('{{orig_artwork.sell_mode}}');
 			{% else %}
 				allow_art_print('B');				
 			{% endif %}

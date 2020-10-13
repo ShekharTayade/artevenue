@@ -1,0 +1,30 @@
+				{% load static %}
+				{% load utils %}
+						<section class="frames-slider slider" 
+							style="margin:25px; padding:10px 5px 5px; border:1px solid #cfcfcf; box-shadow: 0 1px 8px rgba(0, 0, 0, 0.15);">
+							{% for f in mouldings_show %}
+							<a onclick = "set_moulding('{{f.moulding_id}}');"> 
+								{% with 'img/'|add:f.url as image_static %}
+								<img src="{% if product.url %} {% static product.url %} {% else %} {{main_img}} {% endif %}" alt="{{f.mouldings__name}}" class="img-fluid"
+									 style = "
+										border-image : url({% static image_static %}) {{f.border_slice}} round !important; 
+										border:10px solid initial; 
+										border-style :solid;
+										border-width:12px;
+										background-size: 100% 100%;
+										box-shadow: 3px 4px 4px 0 #d3d3d3, 3px 6px 4px 0#d3d3d3; 
+										{% if forloop.counter|get_mountcolor != 'none' %}
+											padding:10px; 
+											background-color:{{ forloop.counter|get_mountcolor}};
+										{% endif %}
+								">
+								{% endwith %}
+								<span class="text text-center" onclick = "set_moulding('{{f.moulding_id}}')">
+									<h5>
+										{{ f.moulding__name }}
+										{% if f.moulding__width_inches %} ({{f.moulding__width_inches}} inch) {% endif %}
+									</h5>
+								</span>
+							</a>
+							{% endfor %}
+						</section>

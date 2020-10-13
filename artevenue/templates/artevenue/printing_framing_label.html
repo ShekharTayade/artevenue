@@ -40,7 +40,7 @@
 										<img src = "{% if oi.product_type_id|cut:' ' == 'USER-IMAGE' %} https://artevenue.com{{MEDIA_URL}}{{oi.product.image_to_frame_thumbnail}} {% else %} {% if env == 'DEV' or env == 'TESTING' %} {{ oi.product.thumbnail_url }} {% else %} {% static oi.product.thumbnail_url %} {% endif %} {% endif %}" style = "width:100px; object-fit:contain; float: left;">
 									</td>
 									<td>
-										<p><strong>Order Numer: {{order.order_number}}</strong></p>
+										<p><strong>Order Numer: {{order.order_number}} Dt:{{order.order_date|date:'d-M-y'}} </strong></p>
 										<p>Ship To: {{order.order_shipping.full_name}}, {{order.order_shipping.city}}</p>
 									</td>
 								<tr>
@@ -95,7 +95,7 @@
 										<img src = "{% if oi.product_type_id|cut:' ' == 'USER-IMAGE' %} https://artevenue.com{{MEDIA_URL}}{{oi.product.image_to_frame_thumbnail}} {% else %} {% if env == 'DEV' or env == 'TESTING' %} {{ oi.product.thumbnail_url }} {% else %} {% static oi.product.thumbnail_url %} {% endif %} {% endif %}" style = "width:100px; object-fit:contain; float: left;">
 									</td>
 									<td>
-										<p><strong>Order Numer: {{order.order_number}}</strong></p>
+										<p><strong>Order Numer: {{order.order_number}} Dt:{{order.order_date|date:'d-M-y'}}</strong></p>
 										<p>Ship To: {{order.order_shipping.full_name}}, {{order.order_shipping.city}}</p>
 									</td>
 								<tr>

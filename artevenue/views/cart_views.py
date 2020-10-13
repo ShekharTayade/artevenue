@@ -23,7 +23,9 @@ from artevenue.models import Product_view, Promotion, Order, Voucher, Voucher_us
 from artevenue.models import Cart_user_image, Cart_stock_image, Cart_stock_collage, Cart_original_art
 from artevenue.models import Order_stock_image, Order_stock_collage, Order_original_art, Order_user_image
 from artevenue.models import Referral, Egift_redemption, Egift, Order_items_view, Voucher_used
-from artevenue.models import Order_shipping, Order_billing, Collage_stock_image, UserProfile
+from artevenue.models import Order_shipping, Order_billing, Collage_stock_image
+from artevenue.models import UserProfile, Business_profile, Profile_group, Discount_flat
+
 from .product_views import *
 from .user_image_views import *
 from .tax_views import *
@@ -66,8 +68,7 @@ def show_cart(request):
 		order = Order.objects.filter(cart_id = usercart.cart_id).first()
 		if order:
 			shipping_cost = order.shipping_cost
-		
-		
+			
 		usercartitems = Cart_item_view.objects.select_related('product', 'promotion').filter(
 				cart = usercart.cart_id, product__product_type_id = F('product_type_id')).values(
 			'cart_item_id', 'product_id', 'product__publisher','quantity', 'item_total', 'moulding_id',
@@ -166,23 +167,33 @@ def show_cart(request):
 	# Also check if it's other business user $ apply voucher based on the business user profile
 	livuser = False
 	bus_user = False
+	
 	if request:
 		if request.user:
 			if request.user.is_authenticated:
-				usr = User.objects.get(username = request.user)
+				##usr = User.objects.get(username = request.user)
+				## Check it's a business user
 				try:
-					livprofile = UserProfile.objects.get(user = usr)
+					busprofile = Business_profile.objects.get(user = usr)
+				except Business_profile.DoesNotExist:
+					busprofile = None
+					
+				if busprofile:
+					bus_user = True
+				
+				## Check if it's a client/designer account of a business
+				try:
+					c_profile = UserProfile.objects.get(user = usr)		## Get user's profile
 				except UserProfile.DoesNotExist:
-					livprofile = None
-				if livprofile:
-					if livprofile.business_profile_id:
-						if livprofile.business_profile_id == 17:
-							livuser = True
-						else:
+					c_profile = None
+				if c_profile:
+					if c_profile.business_profile_id != usr.id:	# It's not the same business user, then it's a client/designer of the the business user
+						if c_profile.business_profile_id:
+							busprofile = Business_profile.objects.filter(id = c_profile.business_profile_id).first()    ## Get business profile of the parent business user
 							bus_user = True
+							if c_profile.business_profile_id == 17:
+								livuser = True
 
-
-	v_code = None
 	orig_flag = False
 	orig_cnt = 0
 	not_orig_flag = False
@@ -206,43 +217,50 @@ def show_cart(request):
 
 	user_msg = ''
 	v_code = ''
+	v_id = None
 	if usercart and request.user.is_authenticated :
 		## If business user then get the applicable voucher, if any
 		if bus_user:
-			v_code = get_voucher_for_busprofile(usr)			
-		
-		## No business user, then apply 15% off for first order
-		if v_code == '' or v_code is None:
+			if	busprofile:
+				v_id = get_voucher_for_busprofile(busprofile.profile_group_id)
+		else:
+			## If not businer user, the FIRST15 applies if it's a first order
 			orders = Order.objects.filter(user = usr).exclude(order_status = 'PP')
-			if not usercart.voucher_id and not orig_flag:
-				if not orders:			
-					voucher = Voucher.objects.get(voucher_id = 8, effective_from__lte = today, 
-							effective_to__gte = today, store_id = settings.STORE_ID)
-					if voucher:
-						v_code = voucher.voucher_code
-					else:
-						v_code = None
-			else:
-					
-				## If there is an original art in the cart and FIRST15 discount is applied, then remove the voucher from the cart
-				if orig_flag and not_orig_flag and not orders:
-					remove_voucher(request, usercart.cart_id)
-					orig_msg = "15% off is available on art prints for first order. Not applicable to original art. You may remove original art to get the discount."
-					
-					## Re-fetch cart and cart item to get latest values
-					usercart = Cart.objects.get(user = usr, cart_status = "AC")
-					usercartitems = Cart_item_view.objects.select_related('product', 'promotion').filter(
-							cart = usercart.cart_id, product__product_type_id = F('product_type_id')).values(
-						'cart_item_id', 'product_id', 'product__publisher','quantity', 'item_total', 'moulding_id',
-						'moulding__name', 'moulding__width_inches', 'print_medium_id', 'mount_id', 'mount__name',
-						'acrylic_id', 'mount_size', 'product__name', 'image_width', 'image_height', 'stretch_id', 'board_id',
-						'product__thumbnail_url', 'cart_id', 'promotion__discount_value', 'promotion__discount_type', 'mount__color',
-						'item_unit_price', 'item_sub_total', 'item_disc_amt', 'item_tax', 'item_total', 'product_type',
-						'product__image_to_frame', 'promotion_id', 'moulding__width_inner_inches', 'product__description',
-						'product__art_medium', 'product__art_surface'
-						).order_by('product_type')
+			if not orders:
+				v_id = 8	##FIRST15
+							
+		## Apply the voucher to the cart only if it's not already applied and the cart doesn't
+		## include any original art
+		if v_id:
+			if not usercart.voucher_id and not_orig_flag:
+				voucher = Voucher.objects.get(voucher_id = v_id, effective_from__lte = today, 
+						effective_to__gte = today, store_id = settings.STORE_ID)
+				if voucher:
+					v_code = voucher.voucher_code
+				else:
+					v_code = None
+
+			## If there is an original art and art-print in the cart and FIRST15 discount is applied, then remove the voucher from the cart
+			if orig_flag and not_orig_flag and v_id == 8:
+				remove_voucher(request, usercart.cart_id)
+				orig_msg = "Discount is not applicable to original art. You may remove original art to get the applicable discount."
+				## Re-fetch cart and cart item to get latest values
+				usercart = Cart.objects.get(user = usr, cart_status = "AC")
+				usercartitems = Cart_item_view.objects.select_related('product', 'promotion').filter(
+						cart = usercart.cart_id, product__product_type_id = F('product_type_id')).values(
+					'cart_item_id', 'product_id', 'product__publisher','quantity', 'item_total', 'moulding_id',
+					'moulding__name', 'moulding__width_inches', 'print_medium_id', 'mount_id', 'mount__name',
+					'acrylic_id', 'mount_size', 'product__name', 'image_width', 'image_height', 'stretch_id', 'board_id',
+					'product__thumbnail_url', 'cart_id', 'promotion__discount_value', 'promotion__discount_type', 'mount__color',
+					'item_unit_price', 'item_sub_total', 'item_disc_amt', 'item_tax', 'item_total', 'product_type',
+					'product__image_to_frame', 'promotion_id', 'moulding__width_inner_inches', 'product__description',
+					'product__art_medium', 'product__art_surface'
+					).order_by('product_type')
 	else:
-		user_msg = "If you login and it's your first order, you can avail 15% off on all art prints"
+		if not bus_user:
+			user_msg = "If you login and it's your first order, you can avail 15% off on all art prints"
+		else:
+			user_msg = ""
 		
 	return render(request, template, {'usercart':usercart, 
 		'usercartitems': usercartitems, 'shipping_cost':shipping_cost, 
@@ -252,18 +270,6 @@ def show_cart(request):
 		'cart_without_disc':cart_without_disc, 'promo_removed':promo_removed,
 		'v_code': v_code,'env': env, 'orig_msg': orig_msg, 'medium_list':medium_list, 'surface_list': surface_list, 
 		'user_msg': user_msg })
-
-'''	
-def show_wishlist(request):
-
-	if request.is_ajax():
-
-		template = "artevenue/cart_include.html"
-	else :
-		template = "artevenue/show_wishlist.html"
-	
-	return render(request, template, {})
-'''
 
 @csrf_protect
 @csrf_exempt	
@@ -2318,7 +2324,7 @@ def add_to_cart_new(request):
 		## Check if it's first order for this user, if yes, apply FIRST15 voucher by default
 		else:
 			livuser = False
-			
+			bus_user = False
 			if request:
 				if request.user:
 					if request.user.is_authenticated:
@@ -2331,7 +2337,12 @@ def add_to_cart_new(request):
 							if livprofile.business_profile_id:
 								if livprofile.business_profile_id == 17:
 									livuser = True	
-			if request.user.is_authenticated and livuser == False:
+								else:
+									bus_user = True
+						bus_profile = Business_profile.objects.filter(user = usr)
+						if bus_profile:
+							bus_user = True
+			if request.user.is_authenticated and not livuser and not bus_user:
 				orders = Order.objects.filter(user = userid).exclude(order_status = 'PP')
 				if not orders:
 					## 15% auto discount does not apply if its' an original art
@@ -2341,7 +2352,7 @@ def add_to_cart_new(request):
 							cart.cart_total, cart.cart_sub_total, False)						
 						res = json.loads(response.content.decode('utf-8'))
 						if res['status'] == 'SUCCESS' or res['status'] == 'SUCCESS-':
-							print('OK')
+							print('Disc Applied')
 						else:
 							msg = "There was an issue while apply your Coupan: " + res['status']
 							err_flg = True
@@ -3217,16 +3228,18 @@ def delete_cart(request, cart_id=None):
 	return JsonResponse({'msg':'SUCCESS'}, safe=False)
 
 
-def get_voucher_for_busprofile(user_id):
+def get_voucher_for_busprofile(profile_id):
 	
+	profilegroup = None
 	##Get the profile group
 	try:
-		profilegroup = Profile_group.objects.get(user_id = user_id, effective_from__gte = today, effective_to__gte = today)
-	except:
+		profilegroup = Profile_group.objects.get(profile_id = profile_id, effective_from__lte = today, effective_to__gte = today)
+	except Profile_group.DoesNotExist:
 		profilegroup = None
 	
 	v_code = ''
-	if profile_group:	
+	coupon_applies = False
+	if profilegroup:	
 		## Discount on every order
 		if profilegroup.profile_type == 'D':
 
@@ -3243,18 +3256,23 @@ def get_voucher_for_busprofile(user_id):
 						voucher = s.voucher
 				voucher = Voucher.objects.filter(voucher_id = slabs.voucher_id).first()
 				if voucher:
-					v_code = voucher.voucher_code
+					v_code = voucher.voucher_id
+					coupon_applies = True
 				else:
 					v_code = ''
 			## Flat discount 
-			elif profilegroup.flat_or_slab == 'S':
+			elif profilegroup.flat_or_slab == 'F':
 				v_code = ''
 				voucher = {}
 				disc_flat = Discount_flat.objects.filter(profile = profilegroup).first()
-				if disc_flat.voucher:
-					voucher = Voucher.objects.filter(voucher_id = disc_flat.voucher_id).first()
-					if voucher:
-						v_code = voucher.voucher_code
+				if disc_flat:
+					if disc_flat.voucher:
+						voucher = Voucher.objects.filter(voucher_id = disc_flat.voucher_id).first()
+						if voucher:
+							v_code = voucher.voucher_id
+							coupon_applies = True
+						else:
+							v_code = ''
 					else:
 						v_code = ''
 				else:
@@ -3264,7 +3282,7 @@ def get_voucher_for_busprofile(user_id):
 		else:
 			v_code = ''
 		
-	return v_code			
+	return (v_code)
 
 def getBusVolume(user_id):
 	today = datetime.date.today()

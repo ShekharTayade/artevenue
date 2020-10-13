@@ -89,24 +89,6 @@
 }
 
 
-
-.slick-prev::before, .slick-next::before {
-    color: #000;
-}
-.slick-prev, .slick-next {
-	top: 50%;
-}
-.slick-prev::before {
-    font-family: FontAwesome;
-    content: "\f0d9";
-    font-size: 22px;
-}  
-.slick-next::before {
-    font-family: FontAwesome;
-    content:  "\f0da";
-    font-size: 22px;        
-} 
-
 .frame-sec-disabled {
   background-color: rgba(192,192,192,0.5); /* Black background with opacity */
   z-index: 2; /* Specify a stack order in case you're using a different order for other elements */

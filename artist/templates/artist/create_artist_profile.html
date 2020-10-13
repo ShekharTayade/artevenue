@@ -92,14 +92,20 @@
 								<label>
 									https://artevenue.com/artist/ 
 								</label>
-								<input id='url_name' name='url_name' maxlength="50" class = "form-control"
+								<input id='url_name' name='url_name' maxlength="20" class = "form-control"
 									placeholder="" value = "{{artist.url_name}}" onchange="validate_url(this);" />
 							</div>
+						</div>
+						
+						<div class = "col-12">
+							<span style = "font-size: 0.75rem;">
+								(Ex: https://artevenue/artist/<strong>amit-kumar</strong>)
+							</span>
 						</div>
 						<div class = "col-12">												
 							<span style = "font-size: 0.75rem;">
 								It can include only alphabets, numbers, '_' (underscore), and '-' (dash).
-								Blank spaces, special characters (like $ or @) are not allowed.
+								Blank spaces, special characters (like $ or @) are not allowed. 20 Characters max.
 							</span>
 						</div>
 					</div>
@@ -110,9 +116,9 @@
 		<div class="row mt-3">
 			<div class = "col-12">
 				<label><strong>TAG LINE:</strong></label><br />
-				<span style = "font-size: 0.75rem;">Leave it blank if you don't to show this on your webpage. 500 character max</span>
+				<span style = "font-size: 0.75rem;">Leave it blank if you don't to show this on your webpage. 100 character max</span>
 				<div class = "form-group">
-					<input id='tag_line' name='tag_line' maxlength="500" class = "form-control"
+					<input id='tag_line' name='tag_line' maxlength="100" class = "form-control"
 						placeholder="A tag line you may want to include" value = "{{artist.profile_tagline}}">
 					
 				</div>
@@ -148,27 +154,27 @@
 		<div class="row ">
 			<div class="col-12 col-md-6">
 				<div class = "form-group">
-					<input class = "form-control" id = "a1" name = "award_1" max-width = "400" value = "{{a1}}">
+					<input class = "form-control" id = "a1" name = "award_1" maxlength = "50" value = "{{a1}}">
 				</div>
 			</div>
 			<div class="col-12 col-md-6">
 				<div class = "form-group">
-					<input class = "form-control" id = "a2" name = "award_2" max-width = "400" value = "{{a2}}">
+					<input class = "form-control" id = "a2" name = "award_2"  maxlength = "400" value = "{{a2}}">
 				</div>
 			</div>
 			<div class="col-12 col-md-6">
 				<div class = "form-group">
-					<input class = "form-control" id = "a3" name = "award_3" max-width = "400" value = "{{a3}}">
+					<input class = "form-control" id = "a3" name = "award_3" maxlength = "50" value = "{{a3}}">
 				</div>
 			</div>
 			<div class="col-12 col-md-6">
 				<div class = "form-group">
-					<input class = "form-control" id = "a4" name = "award_4" max-width = "400" value = "{{a4}}">
+					<input class = "form-control" id = "a4" name = "award_4" maxlength = "50" value = "{{a4}}">
 				</div>
 			</div>
 			<div class="col-12 col-md-6">
 				<div class = "form-group">
-					<input class = "form-control" id = "a5" name = "award_5" max-width = "400" value = "{{a5}}">
+					<input class = "form-control" id = "a5" name = "award_5" maxlength = "50" value = "{{a5}}">
 				</div>
 			</div>
 		</div>
@@ -183,27 +189,27 @@
 		<div class="row ">
 			<div class="col-12 col-md-6">
 				<div class = "form-group">
-					<input class = "form-control" id = "e1" name = "event_1" max-width = "400" value = "{{e1}}">
+					<input class = "form-control" id = "e1" name = "event_1" maxlength = "50" value = "{{e1}}">
 				</div>
 			</div>
 			<div class="col-12 col-md-6">
 				<div class = "form-group">
-					<input class = "form-control" id = "e2" name = "event_2" max-width = "400" value = "{{e2}}">
+					<input class = "form-control" id = "e2" name = "event_2" maxlength = "50" value = "{{e2}}">
 				</div>
 			</div>
 			<div class="col-12 col-md-6">
 				<div class = "form-group">
-					<input class = "form-control" id = "e3" name = "event_3" max-width = "400" value = "{{e3}}">
+					<input class = "form-control" id = "e3" name = "event_3" maxlength = "50" value = "{{e3}}">
 				</div>
 			</div>
 			<div class="col-12 col-md-6">
 				<div class = "form-group">
-					<input class = "form-control" id = "e4" name = "event_4" max-width = "400" value = "{{e4}}">
+					<input class = "form-control" id = "e4" name = "event_4" maxlength = "50" value = "{{e4}}">
 				</div>
 			</div>
 			<div class="col-12 col-md-6">
 				<div class = "form-group">
-					<input class = "form-control" id = "e5" name = "event_5" max-width = "400" value = "{{e5}}">
+					<input class = "form-control" id = "e5" name = "event_5" maxlength = "50" value = "{{e5}}">
 				</div>
 			</div>
 		</div>
@@ -381,7 +387,7 @@
 					}
 				},
 				error: function(xhr){
-					$("#msg").html("An error occured: " + xhr.status + " " + xhr.statusText + " Please make sure that you are uploading a proper ,jpg, .gif or .png image."); 
+					$("#msg").html("An error occured: " + xhr.status + " " + xhr.statusText ); 
 					$("#msg-modal").modal('show');
 					return;
 				}

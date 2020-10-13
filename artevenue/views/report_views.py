@@ -369,3 +369,143 @@ def get_cart_order_match(request):
 		'orders':order, 'order_items':order_items, 'carts': carts, 'cart_items': cart_items,
 		'startDt': startDt, 'endDt': endDt}	)
 		'''
+		
+		
+def referral_fee_month_process(yrmonth=''):
+	#########################################
+	## Move all orders to referral fee table
+	## For current  month
+	#########################################
+	today = datetime.datetime.today()
+	
+	if yrmonth == '':
+		last_mth_yr = datetime.datetime.now() - relativedelta(months=1)
+		mth = str(last_mth_yr.month)
+		year = str(last_mth_yr.year)
+		yrmonth = year + '-' + mth
+	else:
+		last_mth_yr = datetime.datetime.strptime(yrmonth + '-01', "%Y-%m-%d").date()	
+	
+	process_start_date = datetime.datetime.strptime(yrmonth + '-01', "%Y-%m-%d").date()	
+	month_days = calendar.monthrange(last_mth_yr.year, last_mth_yr.month)[1]
+	process_end_date = datetime.datetime.strptime(yrmonth + '-' + str(month_days), "%Y-%m-%d").date()
+
+	business_profiles = Business_profile.objects.all().order_by('id')
+	
+	for b in business_profiles:
+	
+		if b.created_date.year > process_end_date.year:
+			continue
+
+		profile_grp = None
+		try:
+			profile_grp = Profile_group.objects.get(profile_id = b.profile_group_id)
+		except Profile_group.DoesNotExist:
+			print("Error Occured: " + b.contact_name + " - " + b.company + ": does not have profile group assigned")
+			continue
+
+		############################################################################
+		## Process only if it's referral type. If it's a discount type then skip  ##
+		############################################################################
+		if profile_grp:	
+			if profile_type == 'R':			
+				## Get clients of this business users	
+				clients = UserProfile.objects.filter(business_profile = b)
+
+				if profile_grp.disc_flat == 'F':
+					disc_flat = Discount_flat.objects.filter(profile = profile_grp,
+						effective_from__lte = process_end_date, 
+						effective_from__gte = process_end_date).first()
+					disc_perc = disc_flat.voucher.discount_value
+
+				elif profile_grp.disc_flat == 'S':
+					slabs = Discount_slab.objects.filter(profile = profile_grp,
+						effective_from__lte = process_end_date, 
+						effective_from__gte = process_end_date)
+				
+					###########################################
+					## Get total sale in last one user year  ##
+					###########################################
+					year_start_date = None
+					## Get start date of last 1 user year
+					if b.created_date.year == process_end_date.year:
+						year_start_date = b.created_date
+					else:
+						day = str(b.created_date.day)
+						mth = str(b.created_date.month)
+						yr = str(process_end_date - relativedelta(years=1).year)
+						year_start_date = datetime.datetime.strptime(yr + '-' + mth + '-' + day, "%Y-%m-%d").date()
+					'''
+					ord_value = Order.objects.filter(
+							order_date__gte = year_start_date,
+							order_date__lte = process_end_date,
+							Q(Q(user_id = b.user_id) || Q(user_id__in = client))
+							).exclude( order_status = 'CN', order_status = 'PP').aggregate(
+								sum = Sum('sub_total'))
+						'''
+					total_order_value =0
+					if ord_value :
+						if ord_value['sum']:
+							total_order_value = ord_value['sum']
+
+					###########################################
+					##   Determine applicble fee percetnage  ##
+					###########################################
+					fee_amt = 0
+					if total_order_value < 200000:
+						perc = 10
+					elif total_order_value < 500000:
+						perc = 15
+					else :
+						perc = 20
+
+					total_fee_amt = total_order_value * perc / 100
+
+					#### Orders in last 1 user year for which referral fee is not processed
+					orders = Order.objects.filter( order_date__gte = year_start_date,
+						order_date__lte = process_end_date,
+						user_id = b.user_id ).exclude(order_status = 'CN')
+					
+					for o in orders:
+					
+						##### Skip orders that have payment outstanding
+						def_pay = Order_deferred_payment.objects.filter(order = o)
+						if not def_pay:
+							continue
+
+					##################################################
+					## Update referral fee for the order.    		##
+					## If order already has a referral fee record	##
+					## then update it, else enter new record 		##
+					##################################################
+					b_ref = Business_referral_fee.objects.filter(order = o).first()
+					if b_ref:
+						
+						bus_ref = Business_referral_fee (
+							id = b_ref.id,
+							month_year = yrmonth,
+							business_profile = b,
+							order = o,
+							ord_value_ytd = total_order_value,
+							fee_amount = o.sub_total * perc / 100,
+							fee_paid_date = today,
+							fee_paid_reference = '',
+							created_date = today,
+							updated_date = today
+						)
+					else:
+						bus_ref = Business_referral_fee (
+							month_year = yrmonth,
+							business_profile = b,
+							order = o,
+							ord_value_ytd = total_order_value,
+							fee_amount = o.sub_total * perc / 100,
+							fee_paid_date = today,
+							fee_paid_reference = '',
+							created_date = today,
+							updated_date = today
+						)
+					
+					bus_ref.save()
+
+	return

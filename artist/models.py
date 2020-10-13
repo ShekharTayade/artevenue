@@ -145,6 +145,11 @@ class Artist_original_art (models.Model):
 		('A', 'ONLY ART PRINT'),
 		('B', 'BOTH'),
 	)
+	REASON =  (
+		('I', 'Artwork image is not fit for listing, Please upload another image. Follow image guidelines.'),
+		('X', 'Artwork not found fit for listing'),
+		('O', 'Other reason (Please get in touch with us)'),
+	)
 	artist = models.ForeignKey(Artist, on_delete=models.CASCADE)
 	product = models.ForeignKey('artevenue.Original_art', models.PROTECT, null=False)
 	sell_mode = models.CharField(max_length=1, choices = SELL_MODE, null=True)
@@ -156,7 +161,7 @@ class Artist_original_art (models.Model):
 	updated_date = models.DateTimeField(auto_now=True, null=False)	
 	unapproved = models.BooleanField(null=False, default=False)
 	unapproval_date = models.DateTimeField(null = True)
-	unapproval_reason = models.CharField(max_length=500, null=False, default = '')
+	unapproval_reason = models.CharField(max_length=1, choices = REASON, null=False, default = '')
 	artist_price = models.DecimalField(max_digits=12, decimal_places=2, null=True)
 
 
