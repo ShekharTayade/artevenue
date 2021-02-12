@@ -4,6 +4,9 @@ from artevenue.models import Ecom_site, Publisher_price, Publisher, Curated_coll
 from artevenue.models import Stock_image_error, Stock_image_category_error
 from artevenue.models import Publisher_error, Stock_image_stock_image_category_error, Image_url_error
 
+from artevenue.models import Collage_stock_image, Stock_collage
+from gallerywalls.models import Gallery_item, Gallery
+
 from datetime import datetime
 from django.conf import settings
 from decimal import Decimal
@@ -387,12 +390,22 @@ def importPODImageData():
 	
 def deletePODImageData():
 
+	'''
 	url = "https://www.podexchange.com/pod-export/fc30cfbd-50ba-4d40-b29f-cdc10dd88f66.csv"
 	csvfile = urllib.request.urlopen(url)
 	if csvfile.code != 200:
 		print ("File not found on POD!")
 		return
 	cr = csv.reader(codecs.iterdecode(csvfile, 'utf-8'))
+	'''
+	
+	##POD file is already downloaded by import program
+	cfile = Path('PODFile.csv')
+	if not cfile.is_file():
+		print("PODFile.csv file did not downloaded")
+		return
+	file = open('PODFile.csv')	
+	cr = csv.reader(file, delimiter=',')
 	
 	cnt = 0
 	d_cnt = 0
@@ -415,6 +428,12 @@ def deletePODImageData():
 
 	# Get all products
 	prods = Stock_image.objects.filter(is_published=True)
+
+	# Get all Sets
+	collages = Collage_stock_image.objects.filter(stock_collage__is_published=True)
+	
+	# Get all Gallery Walls
+	gallery_items = Gallery_item.objects.filter(gallery__is_published=True)
 	
 	for prod in prods:
 		if str(prod.product_id) in prod_ids:
@@ -432,18 +451,28 @@ def deletePODImageData():
 						is_published = False)
 				d_cnt = d_cnt+1
 				print(d_cnt)
-				'''
-				# Delete from curated collections, if present
-				curated = Curated_collection.objects.filter(product_id = prod.product_id).first()
-				if curated:
-					curated.delete()
-					c_cnt = c_cnt+1
-					print(c_cnt)
-				'''
-						
+
 		cnt = cnt + 1
 		if cnt >= 1000000:
 			break	
+
+	##	Remove from collage sets and gallery walls too
+	for c in collages:
+		cpr = Product_view.objects.filter(product_id = c.stock_image_id,
+			published = False).first()		
+		if cpr:
+			stk_collage = Stock_collage.objects.filter( 
+			product_id = c.stock_collage ).update( is_published = False)
+			d_cnt = d_cnt+11
+			
+	for g in gallery_items:
+		gpr = Product_view.objects.filter(product_id = g.stock_image_id,
+			published = False).first()		
+		if gpr:
+			gal = Gallery.objects.filter( 
+			gallery_id = g.gallery_id ).update( is_published = False)
+			d_cnt = d_cnt+1
+
 	print("Total deleted: " + str(d_cnt) )
 	print("Total curated deleted: " + str(c_cnt) )
 	return cnt
@@ -647,6 +676,7 @@ def getMissingImages():
 				loc = pos+1
 			lowres_img = lowres_url[loc:]
 			mfile = Path("/home/artevenue/website/estore/static/image_data/POD/images/" + lowres_img)
+
 			# If file does not exists then copy the file
 			if not mfile.is_file():	
 				print("Downloading:- " + lowres_url + "\n")

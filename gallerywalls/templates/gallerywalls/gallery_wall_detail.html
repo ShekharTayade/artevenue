@@ -1,16 +1,15 @@
-
 {% extends 'artevenue/estore_base.html' %}
 {% load static %}
 {% load utils %}
 {% block page-title %} 
-
+{% load customer_review from customer_review %}
 	<title>Gallery Wall - {{gal.gallery.title}}, Set of {{gal.gallery.set_of}}, Customization Available</title>
 {% endblock page-title %} 
 {% block page-description %}
-	<meta name="description" content="Classy collage sets for your home and office decor. Specially curated for you by our designers.">
+	<meta name="description" content="Designer curated gallery wall. pucture wall, collage set for your home and office decor.">
 {% endblock page-description %}
 {% block page-keywords %}
-	<meta name="keywords" content="gallery walls, set of paintings, set of 2 paintings, set of 3 paintings, picture wall, collage frames">
+	<meta name="keywords" content="gallery wall, set of paintings, set of 2 paintings, set of 3 paintings, picture wall, collage frames">
 {% endblock page-keywords %}
 
 {% block page-author %}
@@ -30,7 +29,6 @@
 	<script src="{% static 'vendor/popper.js/umd/popper.min.js' %}"> </script>
 {% endblock popper-script %}
 
-
 	<!-- Only Override the site content block -->
 	{% block sitecontent %}
 	<div class="container mt-4">
@@ -49,11 +47,12 @@
 		<div class="row">
 			<div class = "col-12 text-center">
 				<h1 style = "font-size: 1.3rem;">
-					<strong>{{gal.gallery.title}}</strong>
+					Gallery Wall  <br /> <strong>{{gal.gallery.title}}</strong>
 				</h1>
 				<span style = "font-size: 0.7rem;">	
 					{{gal.gallery.description}}
 				</span>
+				<span class="id" hidden>{{gal.gallery.gallery_id}}</span>
 			</div>
 			<div class="col-12 col-md-6 mt-3">		
 				<img src="{% static  gal.gallery.room_view_url %}" alt="Gallery: {{gal.gallery.name}}" class="img-fluid lazyload">
@@ -111,6 +110,44 @@
 						</button>						
 						<br /><span style="font-size: 0.75rem;" class = "pull-right">Selected <span id = "no_of_prod"></span> artworks</span>
 					</div>
+					<div class = "col-12">
+						<hr>
+					</div>		
+					{% if not user.is_authenticated %}
+					<div class = "col-12 mt-3 px-3 py-1 text-center">
+						<button class = "btn " style = "border: 1px solid #11b6bd; background-color: transparent; width: 100%;">
+							<img src="{% static 'img/signup_callout.png' %}" alt="Sign and save 15% on Wall art painting" width=40 onclick = "$('#signup_popup-modal').modal('show');" align="left" style = "margin:auto;">
+							<ul style = "list-style: none; margin-left: 15px; margin-top: 0px; margin-bottom:0px;">
+								<li class = "align-top" style = "font-size:0.9rem; cursor: pointer; color:#11b6bd;"
+									onclick = "$('#signup_popup-modal').modal('show');">
+								Tap to Sign Up & Save 15%<br/>
+								on total cart value
+								</li>
+							</ul>
+						</button>
+					</div>
+					<div class = "col-12 text-center py-2">
+						<div style = "font-size:0.6rem; line-height: 1;"> Discount coupon gets automatically applied 
+							in your cart. Price shown here is before discount.
+						</div>
+					</div>	
+					{% else %}
+						{% if v15off %}
+						<div class = "col-12 mt-3 py-1 text-center">
+							<button class = "btn" style = "border: 1px solid #11b6bd; background-color: transparent; width: 100%;">
+								<img src="{% static 'img/signup_callout.png' %}" alt="Save 15% on Gallery Wall" width=40 align="left" style = "margin:auto;">
+								<div style = "font-size:0.9rem; color:#11b6bd;">
+									You are eligible to get 15% off <br />on total cart value.
+								</div>
+							</button>
+						</div>
+						<div class = "col-12 text-center py-2">
+							<div style = "font-size:0.6rem; line-height: 1;"> Discount coupon gets automatically applied 
+								in your cart. Price shown here is before discount.
+							</div>
+						</div>	
+						{% endif %}							
+					{% endif %}
 				</div>
 			</div>			
 		</div>
@@ -124,8 +161,196 @@
 				</div>
 			</div>
 		</div>
+		<div class = "row">
+			<hr>
+		</div>
+		<div class = "row">
+			<div class = "col-12">
+				<div class = "mt-5">
+					ARTE'VENUE ADVANTAGE
+					<div class="row">
+						<div class = "col-12">
+							<span style = "font-size:0.75rem;">(Click or tap each to know more)</span>
+						</div>
+					</div>
+					<hr>
+					<div class="row mb-3">
+						<div class="col-4 why-artevenue-div" >
+							<div onclick = "show_modal('GUARANTEE');" style = "border:1px solid #cfcfcf; border-radius: 8px; padding:5px;">
+								<img src="{% static 'img/why_artevenue/guarantee.png' %}"
+									alt="100% Guranteed" class = "why_artevenue">
+								<div class = "why-artevenue-head">
+									Guarantee
+								</div>
+								<div class = "why-artevenue-text">
+									Don't like Quality? Inform us within 5 days and get the full refund.
+								</div>
+							</div>
+						</div>
+						<div class="col-4 why-artevenue-div">
+							<div onclick = "show_modal('FREE_SHIPPING');" style = "border:1px solid #cfcfcf; border-radius: 8px; padding:5px;">
+								<img src="{% static 'img/why_artevenue/truck.png' %}" 
+								alt = "Free Shipping of wall art painting" class = "why_artevenue">
+								<div class = "why-artevenue-head">
+									Free Shipping
+								</div>
+								<div class = "why-artevenue-text">
+									We ship in 1-3 days & courier takes about 4-7 days to deliver in all major cities in India.
+								</div>
+							</div>
+						</div>
+						<div class="col-4 why-artevenue-div">
+							<div onclick = "show_modal('CUSTOMIZATION');" style = "border:1px solid #cfcfcf; border-radius: 8px; padding:5px;">
+								<img src="{% static 'img/why_artevenue/customize.png' %}" 
+								alt= "Customize the wall art painting" class = "why_artevenue">
+								<div class = "why-artevenue-head">
+									Customize it
+								</div>
+								<div class = "why-artevenue-text">
+									Every artwork can be customized - surface, size, frame and more. You can choose your own size.
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class = "row mt-3">
+			<div class = "col-12">
+				ABOUT THIS GALLERY WALL
+				<hr>
+				<span style = "font-size: 0.8rem;">
+				All art prints in this set are produced using the fine art
+				printer, bringing out vivid colors, giving 
+				you more realistic reproduction.
+				Choice of quality frames that have classy finish. 	
+				You won't go wrong with this carefully crafted art print.
+				</span>
+				<div id="accordion" class="accordion mt-5">
+					<div class=" mb-0">
+						<div class="card-header" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">
+							<a class="card-title">SPECIFICATIONS</a>
+						</div>
+						<div id="collapseTwo" class="card-body " data-parent="#accordion">
+							<div class = "text-center"><strong> All materials are sourced from the best in the industry. 
+							Print quality is top notch. Frame has very good finish, is strong and highly durable.</strong>
+							</div>
+							<table class = "table table-borderless">
+								<tbody>
+									<tr>
+										<td class="accordian-subhead">FRAME (does not apply to stretched canvas)</td>
+										<td class = "comp-frame">
+											Made of Polystyrene, which is light weight, strong and durable. It has classy finish.
+										</td>
+									</tr>
+									<tr>
+										<td class="accordian-subhead">PAPER (applies to artworks printed on paper)</td>
+										<td class = "comp-frame">
+											NovaJet Matte Coated Premium Paper 230 (MCP 230). Bright white, smooth finish matte, top-coated with an ink-receptive layer. Ideal for printing fine art reproduction.
+										</td>
+									</tr>
+									<tr>													
+										<td class="accordian-subhead">CANVAS (applies to artworks printed on canvas)</td>
+										<td class = "comp-frame">
+											NovaJet Artistic Matte Canvas 410 (AMC 410). Water-resistant canvas, top-coated with an ink-receptive layer. Ideal for printing fine art reproductions.
+										</td>
+									</tr>
+									<tr>													
+										<td class="accordian-subhead">GLASS (applies to artworks printed on paper)</td>
+										<td class = "comp-frame">
+											Clear Acrylic: Added protection, durability and clear visibility. 
+										</td>
+									</tr>
+									<tr>													
+										<td class="accordian-subhead">STRETCHED CANVAS</td>
+										<td class = "comp-frame">
+											The canvas is stretched over a wooden frame. The frame is not visible from the front and sides.
+										</td>
+									</tr>
+									<tr>													
+										<td class="accordian-subhead">COMES WITH HOOKS</td>
+										<td class = "comp-frame">
+											All artworks come with hooks at the back and is ready to be hung.
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div class="card-header collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseThree">
+							<a class="card-title">FREE SHIPPING</a>
+						</div>
+						<div id="collapseThree" class="card-body collapse" data-parent="#accordion">
+							<table class = "table table-borderless">
+								<tbody>
+									<tr>
+										<td class="accordian-subhead"> LOCATIONS</td>
+										<td class = "comp-frame">
+											Fast and free shipping across India.
+										</td>
+									</tr>
+									<tr>
+										<td class="accordian-subhead">SHIPPING TIME</td>
+										<td class = "comp-frame">
+											Ships by courier in 1-3 days. Usually deliveres in 3-10 days in most parts of India.
+											It ususally takes between 4-7 days to deliver in all metro and major cities.
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div class="card-header collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseFour">
+							<a class="card-title"> SATISFACTION GUARANTEE</a>
+						</div>
+						<div id="collapseFour" class="card-body collapse" data-parent="#accordion">
+							<table class = "table table-borderless">
+								<tbody>
+									<tr>
+										<td class="accordian-subhead">QUALITY</td>
+										<td class = "comp-frame">
+											If any artwork has any quality issue, is damaged during 
+											delivery or you receive wrong artwork, we replace it with
+											with no additional cost to you.
+										</td>
+									</tr>
+									<tr>
+										<td class="accordian-subhead"> RETURNS</td>
+										<td class = "comp-frame">
+											If you are not happy with the quality we accept returns within 5 days and give you refund. No questions asked! You only pay for the return shipment.
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class = "col-12 col-md-1 img-thumbs">
+			</div>
+		</div>
+		<div class = "row mt-2">
+			<hr>
+		</div>
+		
+		{% include 'artevenue/how_to_tips.html' %}
+
+		<div class = "row mt-2">
+			<hr>
+		</div>
+
+		<div class = "row mt-2">
+			<div class = "col-12 col-md-12">
+				{% customer_review product.product_id cart_item.cart_item_id wishlist_item.wishlist_item_id iuser_width iuser_height %}
+			</div>
+		</div>
+		<div class = "row mt-2">
+			<hr>
+		</div>
+
 		{% include 'artevenue/cart-add-message.html' %}
 		{% include 'artevenue/message-modal_ok.html' %}
+		{% include 'artevenue/signup_modal.html' %}
+		
 		<div id="stretched-modal" tabindex="-1" role="dialog" aria-labelledby="What is Stretcher" aria-hidden="true" class="modal fade">
 			<div class="modal-dialog modal-sm">
 				<div class="modal-content">
@@ -201,7 +426,7 @@
 	
 	{% block footer-text %}
 		<div class = "text-center">
-			Our designers has specially curated the collage sets for you. These are sure to set your home decor apart.
+			Our designers have specially curated the gallery wall collage sets for you. These are sure to set your home decor apart.
 		</div>
 	{% endblock footer-text %}
 	
@@ -219,6 +444,12 @@
 					get_variation('{{v.id}}');
 				{% endif %}				
 			{% endfor %}			
+
+			{% if not user.is_authenticated %}			
+				{% if user.usename != "livspace" %}
+				$('#signupsave').effect("highlight", {}, 3000);
+				{% endif %}
+			{% endif %}
 		});
 	</script>
 
@@ -295,7 +526,7 @@
 						gal_items = JSON.parse(data);
 						set_size(gallery_variation_id);
 						items = gal_items['gallery_items'];
-						$("#price").html(gal_items['gallery_variation_price']);
+						$("#price").html(parseInt(gal_items['gallery_variation_price']).toLocaleString('en-IN', {minimumFractionDigits : 0}));
 						for (i = 0; i < items.length; i++) {
 							var is_moulding = true;
 							var is_mount = true;
@@ -320,7 +551,7 @@
 								$("#" + items[i].product_id + "_mount").html('None');
 								 is_mount = false;
 							} else {
-								$("#" + items[i].product_id + "_mount").html(items[i].mount__name + ", size: " + items[i].mount_size + " inch");
+								$("#" + items[i].product_id + "_mount").html(items[i].mount__name + ", " + items[i].mount_size + " inch");
 								 is_mount = true;
 							}
 							
@@ -428,111 +659,45 @@
 				alert("An error occured: " + xhr.status + " " + xhr.statusText); 
 			}
 		});
-		/*
-		$.ajax({
-				url: "{% url 'get_gallery_variation_and_price' %}", 
-				data: {'gallery_variation_id': gallery_variation_id,
-						'gallery_id':gallery_id, 'exclude_items': excl
-					}, 
-				dataType: 'text',
-				type: 'POST',
-				success: function (data) {
-					gal_items = JSON.parse(data);
-					items = gal_items['gallery_items'];
-					for (i = 0; i < items.length; i++) {	
-						console.log("ADDING: " + items[i].product_id);
-					
-						addProdToCart(items[i].product_id, 1, items[i].image_width, items[i].image_height, 
-							items[i].print_medium_id, items[i].moulding_id, items[i].stretch_id, 
-							items[i].acrylic_id, items[i].board_id, items[i].mount_id, items[i].mount_size,
-							items[i].product_type_id);
-					}
-					$('#cart-msg-modal').modal('show');
-
-				},
-			error: function(xhr){
-				alert("An error occured: " + xhr.status + " " + xhr.statusText); 
-			}
-		}); 
-		*/
 	}
 	
 	</script>
-	
 	<script>
-		// ---- Add Product to Cart ----//
-		function addProdToCart(product_id, qty, image_width, image_height, print_medium_id, moulding_id, stretch_id, acrylic_id, board_id, mount_id, mount_size, product_type_id) {
-			var cart_qty;
-			var price = $("#price").html();
-			if (price == '0'){
-				alert("Sorry, can't add to cart.");
-				return;
+		function show_modal(param){
+			switch(param) {
+		  case 'FREE_SHIPPING':
+			$("#modal-hedline").html('FREE DELIVERY ANYWHERE IN INDIA');
+			$("#msg").html('<p>We produce the artwork and ship it within 1-3 days on receipt of an order.</p><p> Ususally courier delivers to most parts of India in 3-10 days.</p><p>It ususally takes between 4-7 days to deliver in all metro and major cities.</p>');
+			break;
+		  case 'CUSTOMIZATION':
+			$("#modal-hedline").html('CUSTOMIZE THE ARTWORK AS YOU LIKE');
+			$("#msg").html("<p><strong>A FIRST IN INDIA:</strong> Customize every artwork the way you would like it. You are not bound by those 'standard sizes' & frames, create it exactly as your space needs.</p> <p>Click on the 'CUSTOMIZE' tab and you can choose print size from minimum 8 inch wide to maximum allowed by the artist. Choose the frame and also choose the mount color, size.</p> <p>Before you finalize, see how it looks.</p>");
+			break;
+		  case 'GUARANTEE':
+			$("#modal-hedline").html('YOUR SATISFACTION IS GUARANTEED');	  
+			$("#msg").html("<p><strong>RETURNS</strong>: If you are not satisfied with the quality, we accept the returns, no questions asked. You need to ship the products to our address. Returns apply only to art prints. Custom photo framing items, where you upload pictures and we print & frame, and framed original artworks are not eligible for returns.</p> <p><strong>REPLACEMENT:</strong> If you receive the artwork with damages, or having quality issues, we will replace it without any additional cost to you.</p><p><small>You may go through our returns, refund policy in footer of this webpage.</small></p>");
+			break;
+		  case 'LICENSED':
+			$("#modal-hedline").html('LICENSED ARTWORKS');			  
+			$("#msg").html("<p><strong>All our artworks are licensed from  artists.</strong></p> <p>We don't use unauthorized images. So quality of print is assured.</p> <p>No copyright issues and you can enjoy the art to the fullest.</p>");
+			break;
+		  case 'SECURED':
+			$("#modal-hedline").html('SECURED CHECKOUT PROCESS');
+			$("#msg").html("The checkout process and payments are completely secured. We will not save your payment details. You will receive all the details on your order and payment.");
+			break;				
+		  case 'QUALITY':
+			$("#modal-hedline").html('HIGH QUALITY AT AFFORDABLE PRICES');
+			$("#msg").html("<p><strong>QUALITY:</strong> You won't be disapponted. We use professional printer, high quality frames with classy finish and materials used for fine art reproductions. We craft each artwork carefully and with state-of-the-art machines.</p> <p><strong>PRICE:</strong> Our prices are highly competitive for the quality we provide. If you don't like the price you paid, we accept returns without any questions.</p>");
+			break;				
+		  case 'LARGEST':
+			$("#modal-hedline").html('LARGEST COLLECTION');
+			$("#msg").html("<p><strong>DID YOU KNOW THAT WE HAVE THE LARGEST COLLECTION OF LICENSED ARTWORKS IN INDIA?</strong></p> <p>Over 2.7 lakh artworks licensed from over 4500 artists across the world.</p> <p>Arte'Venue saves you the pain of looking around for that exact piece of art you want for your home or office interiors.");
+			break;
 			}
-			var currwidth = image_width;
-			var currheight = image_height;
-			var sqin = currwidth * currheight;
-			
-			print_medium_size = sqin;
-			moulding_size = (currwidth + currheight) * 2;
-			acrylic_size = currwidth * currheight;
-			board_size = currwidth * currheight;
-			stretch_size = (currwidth + currheight) * 2;
-
-			var acr_id = '';
-			var brd_id = '';
-			var str_id = '';
-			var mnt_id = '';
-			var mount_w_left, mount_w_right, mount_w_top, mount_w_bottom = '0';
-			var discount = '';
-			var promotion_id = '';
-			var disc_amt = '';
-			var item_unit_price = '';
-			
-			if (print_medium_id == 'CANVAS') {
-				var str_id = stretch_id;
-				mnt_id = '0'
-			} else {
-				if (moulding_id != '' && moulding_id != '0') {
-					var acr_id = acrylic_id;
-					var brd_id = board_id;
-					mnt_id = mount_id;
-				} else {
-					var acr_id = '';
-					var brd_id = '';
-					mnt_id = '';
-				}
-				var str_id = '';
-			}
-
-			// Update the cart
-			$.ajax({
-				url: "{% url 'add_to_cart' %}", 
-				data: {'prod_id':product_id, 'qty':qty, 'moulding_id': moulding_id,
-						'width':currwidth, 'height':currheight,
-						'moulding_size' : moulding_size,
-						'print_medium_id':print_medium_id, 'print_medium_size':print_medium_size, 
-						'mount_id':mnt_id, 'mount_size':mount_size,
-						'mount_w_left' : mount_w_left, 'mount_w_right':mount_w_right, 
-						'mount_w_top':mount_w_top, 'mount_w_bottom' : mount_w_bottom, 
-						'acrylic_id':acr_id, 'acrylic_size':acrylic_size,
-						'board_id':brd_id, 'board_size':board_size, 'stretch_id':str_id,
-						'stretch_size':stretch_size, 
-						'total_price':price, 'image_width':currwidth, 'image_height':currheight,
-						'discount':discount, 'promotion_id':promotion_id, 'disc_amt':disc_amt,
-						'item_unit_price':item_unit_price, 'prod_type': product_type_id}, 
-				dataType: 'text', 
-					type: 'POST',
-				success: function (data) {
-					data = JSON.parse(data);
-					if (data.msg.toUpperCase() != 'SUCCESS'){
-						alert("Sorry, a system error occured: " + data.msg);
-					}
-				},
-				error: function(xhr){
-					alert("An error occured: " + xhr.status + " " + xhr.statusText); 
-				}
-			});
-		}			
+			$('#msg-modal').modal('show');
+		}
+		
 	</script>
+		
 	{% endblock jscripts %}
 	

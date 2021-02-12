@@ -93,11 +93,12 @@
 									</div>
 								</div>
 								<div class = "row" id="informations">
-									<div class = "col-4" id="informations">
+									<div class = "col-12" id="informations">
 									  <dt>Invoice number: <span style = "color:blue">{{order.invoice_number}}</span></dt>
 									  <dd></dd>
 									  <dt>Date: {{order.invoice_date|date:"d-M-Y"}}</dt>
 									  <dd></dd>
+									  <dt>Order number:{{order.order_number}}, {{order.order_date|date:"d-M-Y"}}
 									 </div>
 								</div>
 
@@ -212,7 +213,7 @@
 									</tbody>
 									<tfoot>
 										<tr>
-											<td>Total
+											<td><strong>Grand Total</strong>
 											</td>
 											<td>
 											</td>
@@ -241,7 +242,7 @@
 												{% endif %}
 											</td>
 											<td style = "text-align:right">
-											<small>{{order.order_total|floatformat}}</small>							
+											<strong>{{order.order_total|floatformat}}</strong>
 											</td>
 											
 										</tr>

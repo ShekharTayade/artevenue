@@ -1,0 +1,155 @@
+{% load static %}
+{% load utils %}
+<hr>
+<div class="row">
+	<div class="col-12">
+	<div class="text-muted">
+		{% if order_list.count > 0 %} 
+			{{ order_list.count }} invoices(s) found {% if startDt %} between {{startDt|date:'d-M-Y'}} and {{endDt|date:'d-M-Y'}} {% endif %} 
+		{% else %} 
+			No invoices found {% if startDt %} between {{startDt|date:'d-M-Y'}} and {{endDt|date:'d-M-Y'}} {% endif %}
+		{% endif %}
+	</div>
+	</div>
+</div>	
+<div style = "border : 2px solid gainsboro; line-height:normal !important;">
+	<table id = "ordTbl" class="table table-responsive table-striped">
+		<thead>
+			<tr>
+				<th width="5%">Arte'Venue Order No.</th>
+				<th width="2%">Length</th>
+				<th width="2%">Width</th>
+				<th width="2%">Height</th>
+				<th width="2%">Weight</th>
+				<th width="3%">Invoice value</th>
+				<th width="5%">Description</th>
+				<th width="2%">Insurance</th>
+				<th width="10%">billing_address</th>
+				<th width="2%">billing_address_postal_code</th>
+				<th width="10%">shipper_address</th>
+				<th width="2%">shipper_address_postal_code</th>
+				<th width="5%">shipper_person_name</th>
+				<th width="5%">shipper_company_name</th>
+				<th width="2%">shipper_mobile_number</th>
+				<th width="2%">shipper_email</th>
+				<th width="10%">receiver_address</th>
+				<th width="2%">receiver_address_postal_code</th>
+				<th width="5%">receiver_person_name</th>
+				<th width="5%">receiver_company_name</th>
+				<th width="5%">receiver_mobile_number</th>
+				<th width="5%">receiver_email</th>
+				<th width="5%">receiver_company_name</th>
+				<th width="5%">cod</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for order in order_list %}
+				{% for i in order_items_list %}
+				{% if i.order_id != order.order_id %}
+					<!-- Nothing -->
+					
+				{% else %}
+				
+				{% endif %}
+				{% endfor %}
+			<tr>
+				<td>
+					{{order.order_number}}
+				</td>
+				<td>
+				</td>
+				<td>
+				</td>
+				<td>
+				</td>
+				<td>
+				</td>
+				<td>
+					{{order.order_total|floatformat}}
+				</td>
+				<td>
+					Artwork
+				</td>
+				<td>
+					No
+				</td>
+				<td>
+					Montage Art Pvt Ltd <br />
+					#58 MKR Plaza,  <br />
+					JP nagar 1st phase, Sarakki Main road, <br />
+					Bangalore
+				</td>
+				<td>
+					560078
+				</td>
+				<td>
+					Montage Art Pvt Ltd <br />
+					#58 MKR Plaza,  <br />
+					JP nagar 1st phase, Sarakki Main road, <br />
+					Bangalore
+				</td>
+				<td>
+					560078
+				</td>
+				<td>
+					Montage Art Pvt Ltd
+				</td>
+				<td>
+					Montage Art Pvt Ltd
+				</td>
+				<td>
+					9880337048
+				</td>
+				<td>
+					montageframe@gmail.com
+				</td>
+				<td>
+					<small>
+					{% if order.order_shipping %}
+						{{order.order_shipping.address_1}}
+						{% if order.order_shipping.address_2 %}
+							{{order.order_shipping.address_2 }}
+						{% endif %}
+						{% if order.order_shipping.address_1 or order.order_shipping.address_2 %}
+							<br />
+						{% endif %}
+						{% if order.order_shipping.land_mark %}
+							{{order.order_shipping.land_mark}}
+							<br />
+						{% endif %}
+						
+						{{order.order_shipping.city}} {{order.order_shipping.state}}
+						<br />
+						<br />
+					{% endif %}
+					</small>
+				</td>
+				<td>
+					 {{order.order_shipping.pin_code_id}}
+				</td>
+				<td>
+					{{order.order_shipping.full_name}}
+				</td>
+				<td>
+					{% if order.order_shipping.Company %}
+						{{order.order_shipping.Company}}
+					{% else %}
+						N/A
+					{% endif %}
+				</td>
+				
+				<td>
+					{{order.order_shipping.phone_number}} 
+				</td>
+				<td>
+					{{order.order_shipping.email_id}}
+				</td>
+				<td>
+					No
+				</td>
+
+			</tr>
+			{% endfor orders %}
+		</tbody>
+	</table>
+</div>

@@ -230,7 +230,9 @@ urlpatterns = [
 
 	url(r'^order-management/', views.order_management, name='order_management'),	
 	url(r'^manage-order-details/', views.manage_order_details, name='manage_order_details'),	
-	path('order-modification/<int:order_id>', views.order_modification, name='order_modification'),
+	path('order-address-change/<int:order_id>', views.order_addr_change, name='order_addr_change'),
+	path('order-address-change-confirm/<int:order_id>', views.order_addr_change_confirm, name='order_addr_change_confirm'),
+	#path('order-modify-items/<int:order_id>', views.order_modify_items, name='order_modify_items'),
 
 	url(r'^start-production/', views.start_production, name='start_production'),
 	url(r'^ajax/set-in-production/$', views.set_in_production, name='set_in_production'),
@@ -242,6 +244,15 @@ urlpatterns = [
 	path('print-pf-labels/<int:order_id>', views.print_pf_labels, name='print_pf_labels'),
 	url(r'^order-delivery/', views.order_delivery, name='order_delivery'),
 	url(r'^ajax/set-order-delivery/$', views.set_order_delivery, name='set_order_delivery'),
+
+
+	url(r'^staff-page/', views.staff_page, name='staff_page'),	
+	url(r'^generate-shipping-template/', views.generate_shipping_template, name='generate_shipping_template'),	
+	url(r'^ajax/shipping-template-table/$', views.get_orders_for_shipping_template, name='get_orders_for_shipping_template'),
+
+	url(r'^coupon-management/', views.coupon_management, name='coupon_management'),	
+	url(r'^apply-coupon/', views.apply_coupon, name='apply_coupon'),	
+	url(r'^ajax/after-coupon-view/$', views.after_coupon_view, name='after_coupon_view'),
 
 	
 	] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

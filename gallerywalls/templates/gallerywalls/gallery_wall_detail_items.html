@@ -2,7 +2,15 @@
 {% load utils %}
 
 					<div class = "col-12 text-center">
-						<label>ARTWORKS IN THE GALLERY WALL</label>
+						<label><strong>ARTWORKS IN THE GALLERY WALL</strong></label>
+					</div>
+					<div class = "col-12 mt-2">
+						<span style = "font-size: 0.6rem;">
+						<ul>
+							<li>Click "Remove" button if you do not to want add it to the cart.</li>
+							<li>Click on "Buy Only This" link, if want to customize and buy the individual artwork.</li>
+						</ul>
+						</span>
 					</div>
 					{% for i in gallery_items %}
 					<div id = "item_{{i.product_id}}" class = "col-6 col-md-4 mt-4 gal_items">
@@ -18,27 +26,27 @@
 								</span>
 							</div>
 							<div id = "spec_{{i.id}}"class = "col-12 mt-3" style = "font-size:0.7rem;">
-								<ul>
+								<ul style = "margin-bottom:5px;">
 								<li>Art Print On: <span id = "{{i.product_id}}_surface">{{i.print_medium_id|title}}</span></li>
 								<li>Print Size: <span id = "{{i.product_id}}_psize">{{i.image_width}} X {{i.image_height}} inch</span></li>
 								<li>Frame: <span id = "{{i.product_id}}_frame">{{i.moulding.name}}</span></li>
-								<li>Mount: <span id = "{{i.product_id}}_mount">{{i.mount.name}}, size: {{i.mount_size|floatformat}} inch</span></li>
+								<li>Mount: <span id = "{{i.product_id}}_mount">{{i.mount.name|title}}, {{i.mount_size|floatformat}} inch</span></li>
 								<li>Finished Size: <span id = "{{i.product_id}}_fsize"></span></li>
 								</ul>
 								
 							</div>
 
-							<div class = "col-12 col-md-6 text-center mt-3" style = "font-size:0.7rem;">
+							<div class = "col-12 col-md-6 text-center" style = "font-size:0.7rem;">
 								<button id = "remove-btn_{{i.product_id}}" class = "btn btn-outline btn-sm" type = "button"
 									onclick = "removeFromGallery('{{i.product_id}}')">
-									<i class = "fa fa-trash"> Remove from Gallery</i>
+									<i class = "fa fa-trash"> Remove</i>
 								</button>
 								<button id = "add-btn_{{i.product_id}}" class = "btn btn-outline btn-sm" type = "button"
 									onclick = "addToGallery('{{i.product_id}}');">
-									<i class = "fa fa-plus"> Add to Gallery</i>
+									<i class = "fa fa-plus"> Add</i>
 								</button>
 							</div>
-							<div class = "col-12  col-md-6 text-center mt-3" style = "font-size:0.7rem;">
+							<div class = "col-12  col-md-6 text-center mt-1" style = "font-size:0.7rem;">
 								<a class = "btn btn-outline btn-sm" type = "button" 
 									href="{% url 'stock_image_detail' i.product_id i.image_width i.image_height %}">
 									<i class = "fa fa-rupee"> Buy Only This</i>

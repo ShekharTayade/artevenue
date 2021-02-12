@@ -77,7 +77,8 @@ def menubar(request, auth_user):
 	# Level 1
 	level1_menuitems = Stock_image_category.objects.annotate(Count(
 			'stock_image_stock_image_category')).filter(parent_id__isnull = True,
-			stock_image_stock_image_category__count__gt = 1000).order_by('-stock_image_stock_image_category__count')
+			stock_image_stock_image_category__count__gt = 1000).exclude(
+			category_id = 72).order_by('-stock_image_stock_image_category__count')
 
 	level1_menuitems_original_art = Stock_image_category.objects.annotate(Count(
 			'original_art_category')).filter(parent_id__isnull = True,

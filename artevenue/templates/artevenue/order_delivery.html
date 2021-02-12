@@ -40,6 +40,7 @@
 					<nav aria-label="breadcrumb">
 						<ol class="breadcrumb">
 							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+							<li class="breadcrumb-item"><a href="{% url 'staff_page' %}">Staff Page</a></li>
 							<li aria-current="page" class="breadcrumb-item active">Order Delivery</li>
 						</ol>
 					</nav>
@@ -230,6 +231,11 @@
 											Image Code: {{oi.product.part_number}}
 										{% endif %}													
 										</span>		
+									</div>
+									<div class = "col-12">
+										<span style = "font-weight:600;" >
+											{{oi.product.quantity|floatformat}}
+										</span>
 									</div>
 								</div>
 								<div class="row">									

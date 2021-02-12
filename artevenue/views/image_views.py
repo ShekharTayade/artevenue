@@ -25,7 +25,6 @@ env = settings.EXEC_ENV
 '''
 
 def get_FramedImage(request):
-
 	prod_id = request.GET.get('prod_id', '')
 	m_id = request.GET.get('moulding_id', '') 
 	mount_color = request.GET.get('mount_color', '') 
@@ -109,7 +108,8 @@ def get_FramedImage(request):
 	else :
 		# No moulding, returing the image as it is.
 		framed_img = Image.new("RGB", (img_source.width, img_source.height), 0)
-		framed_img.paste(img_source, (0,0))		
+		framed_img.paste(img_source, (0,0))
+
 	'''
 	response = HttpResponse(content_type="image/png")
 	framed_img.save(response, "PNG")

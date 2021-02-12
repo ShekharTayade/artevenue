@@ -179,7 +179,7 @@ def apply_25_off_offer(cart_ids=None):
 			res = remove_voucher(request, cart.cart_id)
 			rep = json.loads(res.content.decode('utf-8'))
 			if rep['status'] == 'FAILURE':
-				print("Error occured while removing existing voucher " + cart.cart_id + " not found")
+				print("Error occured while removing existing voucher " + str(cart.cart_id) + " not found")
 				continue
 			else:
 				print(rep)
@@ -298,3 +298,54 @@ def apply_15_off_offer(cart_ids=None):
 	
 	print ("Finished.")
 	return		
+	
+	
+	
+######################################################################
+## This methods removes the existing voucher from the given carts,
+## and applies the the 15% off voucher
+######################################################################
+def apply_99_off_offer(cart_ids=None):
+	
+	if not cart_ids:
+		return
+	
+	for c in cart_ids:
+		try :
+			cart = Cart.objects.get(cart_id = c)
+		except Cart.DoesNotExist:
+			cart = None
+			print("Cart Id: " + cart_id + " not found")
+			continue
+			
+		if cart:
+			request = HttpRequest()
+			request.user = cart.user.username
+			
+			if not request.user:
+				print("User for cart id " + cart.cart_id + " not found")
+				continue
+				
+			# Remove existing voucher
+			res = remove_voucher(request, cart.cart_id)
+			rep = json.loads(res.content.decode('utf-8'))
+			if rep['status'] == 'FAILURE':
+				print("Error occured while removing existing voucher " + cart.cart_id + " not found")
+				continue
+			else:
+				print(rep)
+				
+			## Apply 20% off voucher "U2slzt"
+			vou = apply_voucher_py_new(request, cart.cart_id, 'ADYtAB5yh', 0, 0)
+			rep_v = json.loads(vou.content.decode('utf-8'))
+			if rep_v['status'] == 'FAILURE':
+				print("Error occured while applying this voucher " + cart.cart_id + " not found")
+				continue
+			else:
+				print(rep_v)
+	
+		print("Done for " + str(c) )
+		print("=================================================")
+	
+	print ("Finished.")
+	return			

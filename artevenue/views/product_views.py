@@ -15,8 +15,8 @@ from artevenue.models import Ecom_site, Stock_image, Stock_image_category
 from artevenue.models import Publisher_price, Original_art_original_art_category, Original_art
 from artevenue.models import Stock_image_stock_image_category, Cart_stock_image, Cart_item_view
 from artevenue.models import Print_medium, Publisher_price, Promotion_stock_image, Promotion_product_view
-from artevenue.models import Curated_collection, Curated_category, Promotion
-from artevenue.models import Wishlist, Wishlist_item_view, Homelane_data
+from artevenue.models import Curated_collection, Curated_category, Promotion, UserProfile
+from artevenue.models import Wishlist, Wishlist_item_view, Homelane_data, Business_profile, Order
 
 from .frame_views import *
 from .image_views import *
@@ -487,7 +487,7 @@ def stock_image_detail(request, prod_id = '', iuser_width='', iuser_height=''):
 	
 	price = Publisher_price.objects.filter(print_medium_id = 'PAPER') 
 
-
+	user = None
 	if request.user.is_authenticated:
 		user = User.objects.get(username = request.user)
 		wishlist = Wishlist.objects.filter(
@@ -520,7 +520,6 @@ def stock_image_detail(request, prod_id = '', iuser_width='', iuser_height=''):
 	moulding_diagrams = mouldings['moulding_diagrams']
 	paper_mouldings_corner = mouldings['paper_mouldings_corner']
 	canvas_mouldings_corner = mouldings['canvas_mouldings_corner']
-	canvas_mouldings_show = mouldings['canvas_mouldings_show']
 	# get mounts
 	mounts = get_mounts(request)
 
@@ -547,17 +546,53 @@ def stock_image_detail(request, prod_id = '', iuser_width='', iuser_height=''):
 
 	request.session.set_test_cookie()   ## To test if cookie is enabled on the browser. If not display message in Size and Color Tool.
 
+	img_download_flg = False
+	
+	livuser = False
+	bus_user = False
+	if user:
+		try:
+			livprofile = UserProfile.objects.get(user = user)
+		except UserProfile.DoesNotExist:
+			livprofile = None
+		if livprofile:
+			if livprofile.business_profile_id:
+				if livprofile.business_profile_id == 17:
+					livuser = True	
+				else:
+					bus_user = True
+		bus_profile = Business_profile.objects.filter(user = user)
+		if bus_profile:
+			bus_user = True
+
+		try:
+			flg = user.employee.image_download
+		except Exception as e:
+			flg = None
+			img_download_flg = False
+			
+		if flg :
+			img_download_flg = True
+
+	v15off = False
+	if user and not livuser and not bus_user:
+		orders = Order.objects.filter(user = user).exclude(order_status = 'PP')
+		if not orders:
+			v15off = True
+		
+		
+		
 	return render(request, "artevenue/stock_image_detail_new.html", {'product':product,
 		'prod_categories':prod_categories, 'printmedium':printmedium, 'product_category':product_category,
 		'mouldings_apply':paper_mouldings_apply, 'mouldings_show':paper_mouldings_show, 'mounts':mounts,
 		'per_sqinch_paper':per_sqinch_paper, 'per_sqinch_canvas':per_sqinch_canvas, 'acrylics':acrylics,
-		'boards':boards,'stretches':stretches, 'ENV':settings.EXEC_ENV,
+		'boards':boards,'stretches':stretches, 'env':settings.EXEC_ENV,
 		'cart_item':cart_item_view, 'iuser_width':iuser_width, 'iuser_height':iuser_height,
 		'prods':similar_products, 'price':price, 'wishlist_prods':wishlist_prods,
 		'paper_mouldings_corner':paper_mouldings_corner, 'canvas_mouldings_corner':canvas_mouldings_corner,
-		'canvas_mouldings_show': canvas_mouldings_show,
 		'ready_prod_data_paper':ready_prod_data_paper, 'ready_prod_data_canvas':ready_prod_data_canvas,
-		'wishlist_item':wishlist_item_view, 'wall_colors': wall_colors} )
+		'wishlist_item':wishlist_item_view, 'wall_colors': wall_colors, 'v15off': v15off, 
+		'img_download_flg': img_download_flg} )
 
 @csrf_exempt	
 def get_item_price (request):

@@ -88,11 +88,11 @@
 					<div id="contact" class="box">
 						<h1>Contact</h1>
 						<p class="lead">Are you curious about something? <br />
-										Do you have some kind of problem with our website, products, orders etc.?</p>
+							Do you have any questions on products, orders, process or our website etc or need any help?</p>
 						<p>Please feel free to contact us using any of the following means</p>
 						<hr>
 						<div class="row">
-							<div class="col-md-4">
+							<div class="col-md-4 mt-2" style = "border-left: 1px solid #11b6bd; padding-left: 10px;">
 								<h3><i class="fa fa-map-marker"></i> Address</h3>
 								<p><strong>{{ ecom_site.store_name }}</strong><br>
 								{{ ecom_site.store_address1 }}<br>
@@ -102,23 +102,42 @@
 								{{ ecom_site.store_city }}<br>
 								{{ ecom_site.store_zip }} &nbsp;{{ ecom_site.store_country }}<br>
 							</div>
-							<!-- /.col-sm-4-->
-							<div class="col-md-4">
-								<h3><i class="fa fa-phone"></i> Phone Support</h3>
-								<p class="text-muted">Please use this number to reach us between {{ecom_site.phone_support_start_time}} to {{ecom_site.phone_support_end_time}}. We will be happy to help you.</p>
-								<p><strong>{{ecom_site.support_phonenumber }}</strong></p>
-							</div>
-							<!-- /.col-sm-4-->
-							<div class="col-md-4">
-								<h3><i class="fa fa-envelope"></i> Electronic support</h3>
-								<p class="text-muted">Please feel free to write an email to us at -</p>
+							<div class="col-md-4 mt-2" style = "border-left: 1px solid #11b6bd; padding-left: 10px;">
+								<h3><img src = "{% static 'img/whatsapp_logo.png' %}" width=15 alt="WhatsApp Logo"></i> WhatsApp Support</h3>
+								<p class="text-muted">Send us a WhatsApp message -</p>
 								<p>
-								  <strong><a href="mailto:">support@artevenue.com</a></strong>
+									<a href = "https://wa.me/919535805505?text=Hi,%20I%20need%20help%20with"
+										style = "font-size: 0.75rem;" 
+										target = "_blank">
+										<img src = "{% static 'img/whatsapp_logo.png' %}" width=40 alt="WhatsApp Logo"> 
+										<span style = "text-decoration: underline;
+											font-family: 'Lato', sans-serif; font-size: 14px; color: #212529;
+											letter-spacing: 0.5px;">
+											95358 05505
+										</span>
+									</a>
 								</p>
 							</div>
-							<!-- /.col-sm-4-->
+							<div class="col-md-4 mt-2" style = "border-left: 1px solid #11b6bd; padding-left: 10px;">
+								<h3><i class="fa fa-phone"></i> Phone Support</h3>
+								<p><a href="tel:{{ecom_site.support_phonenumber }}">
+									<span style = "text-decoration: underline;
+										font-family: 'Lato', sans-serif; font-size: 14px; color: #212529;
+										letter-spacing: 0.5px;">
+										{{ecom_site.support_phonenumber }}
+									</span>
+									</a>
+								</p>
+								<p class="text-muted">Time: between {{ecom_site.phone_support_start_time}} to {{ecom_site.phone_support_end_time}}. We will be happy to help you.</p>
+							</div>
+							<div class="col-md-4 mt-2" style = "border-left: 1px solid #11b6bd; padding-left: 10px;">
+								<h3><i class="fa fa-envelope"></i> Email support</h3>
+								<p class="text-muted">Please feel free to write an email to us at -</p>
+								<p>
+								  <strong><a href="mailto:support@artevenue.com">support@artevenue.com</a></strong>
+								</p>
+							</div>
 						</div>
-						<!-- /.row-->
 						<hr>
 						<div id = "locateus"> <h3><i class="fa fa-map-marker"></i> Locate Us:</h3></div>
 						<div id="map"></div>

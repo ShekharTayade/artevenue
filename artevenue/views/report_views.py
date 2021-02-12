@@ -18,6 +18,8 @@ from artevenue.models import Order, Order_items_view, Ecom_site, Business_referr
 from artevenue.models import Business_profile
 from artevenue.models import Cart, Cart_item_view
 
+from django.contrib.admin.views.decorators import staff_member_required
+
 from django.core.files.storage import FileSystemStorage
 from django.http import HttpResponse
 from django.template.loader import render_to_string
@@ -219,6 +221,7 @@ def my_business_report(request, user_id=None):
 		order_date = o.order_date
 		order_val = o.sub_total		
 		def_pay = o.deferred_payment
+		name = ''
 		for c in clients:
 			if o.user_id == c.id:
 				name = c.first_name + ' ' + c.last_name
@@ -509,3 +512,97 @@ def referral_fee_month_process(yrmonth=''):
 					bus_ref.save()
 
 	return
+
+
+@staff_member_required		
+def generate_shipping_template(request):
+	order_list = Order.objects.filter(order_status = 'SH').select_related('order_billing', 
+		'order_shipping').exclude(invoice_number = '').order_by('-updated_date')
+	return render(request, 'artevenue/generate_shipping_template.html', {'order_list': order_list})	
+	
+@staff_member_required		
+@csrf_exempt
+def get_orders_for_shipping_template(request, order_number=None, printpdf=''):
+	startDt = ''
+	endDt = ''	
+	page = request.POST.get('page', 1)
+	order_number = request.POST.get('order_num','')
+	invoice_number = request.POST.get('invoice_num', '')
+	if printpdf == '':
+		printpdf = request.POST.get('printpdf', 'NO')
+		
+	ordreadyforshippingflag = request.POST.get('ordreadyforshippingflag', 'NO')
+	
+	if not order_number:
+		order_number = request.POST.get("order_number", '')
+
+	from_date = request.POST.get("fromdate", '')
+	if from_date != '' :
+		startDt = datetime.datetime.strptime(from_date, "%Y-%m-%d")	
+		
+	to_date = request.POST.get("todate", '')
+	if to_date != '' :
+		endDt = datetime.datetime.strptime(to_date, "%Y-%m-%d")
+
+	if ordreadyforshippingflag == 'NO':
+		order_list = Order.objects.filter().select_related('order_billing', 
+			'order_shipping').exclude(invoice_number = '').order_by('-updated_date')
+		
+		order_items_list = {}
+		if startDt:
+			order_list = order_list.filter(order_date__gte = startDt)
+		if endDt:
+			order_list = order_list.filter(order_date__lte = endDt)
+
+		if order_number:
+			order_list = order_list.filter(order_number = order_number)	
+
+		if invoice_number:
+			order_list = order_list.filter(invoice_number = invoice_number)	
+
+		
+		if	not startDt and not endDt and not order_number and not invoice_number:
+			return render(request, 'artevenue/shipping_template_table.html', { 
+				'order_list': {}, 'startDt':startDt, 'endDt':endDt})
+				
+	## Orders with status ready for shipping
+	else:
+		order_list = Order.objects.filter(order_status = 'SH').select_related('order_billing', 
+			'order_shipping').exclude(invoice_number = '').order_by('-updated_date')
+			
+	if printpdf == "YES":
+		response = HttpResponse(content_type='text/csv')
+		response['Content-Disposition'] = 'attachment; filename="shipping_template.csv"'
+		import csv
+		writer = csv.writer(response)
+		writer.writerow(['ArteVenue Order Number', 'length', 'width', 'height', 'weight', 'invoice_value', 'description', 
+			'insurance', 'billing_address', 'billing_address_postal_code', 'shipper_address', 
+			'shipper_address_postal_code', 'shipper_person_name', 'shipper_company_name', 
+			'shipper_mobile_number', 'shipper_email', 'receiver_address', 
+			'receiver_address_postal_code', 'receiver_person_name', 'receiver_company_name', 
+			'receiver_mobile_number', 'receiver_email', 'cod'])
+
+		for order in order_list:
+			if order.order_shipping:
+				shipping_addrs = order.order_shipping.address_1 + ", " + order.order_shipping.address_2 + ", " + order.order_shipping.land_mark + ", " + order.order_shipping.city + ", " + order.order_shipping.state.state_name	
+				shipping_addrs_pin = order.order_shipping.pin_code_id
+				s_name = order.order_shipping.full_name
+				s_company = order.order_shipping.Company
+				s_ph = order.order_shipping.phone_number
+				s_email = order.order_shipping.email_id
+			else:
+				shipping_addrs = shipping_addrs_pin = s_name = s_company = s_ph = s_email = 'N/A'
+
+			row = [order.order_number, '', '', '', '', order.order_total, 'Artwork', 'No', 
+				'Montage Art Pvt Ltd, #58 MKR Plaza, JP nagar 1st phase, Sarakki Main road, Bangalore',
+				'560078', 'Montage Art Pvt Ltd, #58 MKR Plaza, JP nagar 1st phase, Sarakki Main road, Bangalore',
+				'560078', 'Montage Art Pvt Ltd', 'Montage Art Pvt Ltd', '9880337048', 
+				'montageframe@gmail.com', shipping_addrs, shipping_addrs_pin, s_name, s_company, 
+				s_ph, s_email, 'No']
+				
+			writer.writerow(row)
+
+		return response		
+	else:
+		return render(request, 'artevenue/shipping_template_table.html', { 
+			'order_list': order_list, 'startDt':startDt, 'endDt':endDt, 'MEDIA_URL':settings.MEDIA_URL})		

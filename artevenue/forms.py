@@ -5,6 +5,7 @@ from artevenue.models import Business_profile, Contact_us, User_image
 from artevenue.models import Pin_code, Referral, Order, UserProfile, Channel_partner
 from artevenue.models import User_shipping_address, User_billing_address
 from artevenue.models import Profile_group, Egift, Channel_order_amz
+from artevenue.models import Order_shipping, Order_billing
 
 from artevenue.models import Cart, Order_items_view, Cart_item_view
 
@@ -523,3 +524,124 @@ class userProfileForm(forms.ModelForm):
 		fields = ('id', 'user_id', 'phone_number', 'date_of_birth', 'gender', 
 			'subject_interests', 'business_profile_id')
 			
+
+class ship_addressForm(forms.ModelForm):
+
+	order_shipping_id = forms.CharField(
+		widget=forms.HiddenInput(),
+		required=True,
+		#disabled=True
+	) 	
+
+	store = forms.CharField(
+		widget=forms.HiddenInput(),
+		required=False
+	) 
+	user = forms.CharField(
+		widget=forms.HiddenInput(),
+	) 
+	address_1 = forms.CharField(
+		widget=forms.TextInput(attrs={'placeholder': 'Flat / House No./ Floor / Building'}),
+		required=False
+	) 
+	address_2 = forms.CharField(
+		widget=forms.TextInput(attrs={'placeholder': 'Colony / Street / Locality'}),
+		required=False
+	) 
+	pin_code = forms.CharField(
+		widget=forms.TextInput(),
+		required=False
+	)
+	def clean_pin_code(self):
+		pc = self.cleaned_data['pin_code']
+		try:
+			pincodeObj = Pin_code.objects.get(pk = pc)
+		except Pin_code.DoesNotExist:
+			pincodeObj = None
+
+		return pincodeObj
+
+	def clean_store(self):
+
+		try:
+			storeObj = get_object_or_404 (Ecom_site, store_id=settings.STORE_ID )
+		except Ecom_site.DoesNotExist:
+			storeObj = None
+
+		return storeObj
+		
+	def clean_user(self):
+		u = self.cleaned_data['user']
+		try:
+			userObj = User.objects.get(pk = u)
+		except User.DoesNotExist:
+			userObj = None
+
+		return userObj
+
+	class Meta:
+		model = Order_shipping
+		fields = ('order_shipping_id', 'store', 'full_name', 'Company', 'address_1', 'address_2',
+		'land_mark', 'city', 'state', 'pin_code', 'country',
+		'phone_number', 'email_id', 'user')
+
+		
+class bill_addressForm(forms.ModelForm): 
+	ordr_billing_id = forms.CharField(
+		widget=forms.HiddenInput(),
+		required=True,
+		#disabled=True
+	) 	
+
+	store = forms.CharField(
+		widget=forms.HiddenInput(),
+		required=False
+	) 
+	user = forms.CharField(
+		widget=forms.HiddenInput(),
+	) 
+	address_1 = forms.CharField(
+		widget=forms.TextInput(attrs={'placeholder': 'Flat / House No./ Floor / Building'}),
+		required=False
+	) 
+	address_2 = forms.CharField(
+		widget=forms.TextInput(attrs={'placeholder': 'Colony / Street / Locality'}),
+		required=False
+	) 
+	pin_code = forms.CharField(
+		widget=forms.TextInput(),
+		required=False
+	)
+	
+	def clean_pin_code(self):
+		pc = self.cleaned_data['pin_code']
+
+		try:
+			pincodeObj = Pin_code.objects.get(pk = pc)
+		except Pin_code.DoesNotExist:
+			pincodeObj = None
+
+		return pincodeObj
+
+	def clean_store(self):
+		try:
+			storeObj = get_object_or_404 (Ecom_site, store_id=settings.STORE_ID )
+		except Ecom_site.DoesNotExist:
+			storeObj = None
+
+		return storeObj
+
+	def clean_user(self):
+		u = self.cleaned_data['user']
+		try:
+			userObj = User.objects.get(pk = u)
+		except User.DoesNotExist:
+			userObj = None
+
+		return userObj
+
+	class Meta:
+		model = Order_billing
+		fields = ('order_billing_id', 'store', 'full_name', 'Company', 'address_1', 'address_2',
+		'land_mark', 'city', 'state', 'pin_code', 'country',
+		'phone_number', 'email_id', 'gst_number', 'user')

@@ -1395,7 +1395,7 @@ def set_original_artwork_approval(request):
 					try:
 						stk_img = Stock_image.objects.get(product_id = orig_art.stock_image_id)
 						if sell_mode == 'A' or sell_mode == 'B':
-							stk_img.is_published = True
+							stk_img.is_published = False	## Currently art prints are disabled
 						elif sell_mode == 'O':
 							stk_img.is_published = False
 						stk_img.save()
@@ -1580,8 +1580,9 @@ def artist_page(request):
 	except User.DoesNotExist:
 		userObj = None
 		artist = None
+	msg = "PLEASE NOTE: The sales for art prints are disabled. Our aim is to retain the high customer satisfaction on art prints. We will procure the necessary scanner to produce the highest quality scans of your original artworks and then enable the sales of art prints. Until then only original artwork can be sold through our website. Looking forward to your kind cooperation and patience."
 	
-	return render(request, "artist/artist_page.html", {'artist': artist})
+	return render(request, "artist/artist_page.html", {'artist': artist, 'msg': msg})
 
 def artist_terms(request):
 	try:

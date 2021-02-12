@@ -42,6 +42,7 @@
 									<td>
 										<p><strong>Order Numer: {{order.order_number}} Dt:{{order.order_date|date:'d-M-y'}} </strong></p>
 										<p>Ship To: {{order.order_shipping.full_name}}, {{order.order_shipping.city}}</p>
+										<p><strong>QTY: {{oi.quantity|floatformat}}</strong><p>
 									</td>
 								<tr>
 							</tbody>
@@ -97,6 +98,7 @@
 									<td>
 										<p><strong>Order Numer: {{order.order_number}} Dt:{{order.order_date|date:'d-M-y'}}</strong></p>
 										<p>Ship To: {{order.order_shipping.full_name}}, {{order.order_shipping.city}}</p>
+										<p><strong>QTY: {{oi.quantity|floatformat}}</strong><p>
 									</td>
 								<tr>
 							</tbody>
@@ -124,7 +126,7 @@
 						{% endif %}
 						{% if oi.stretch_id and not oi.moulding_id %}
 							<strong>CANVAS STRETCHED</strong><br>
-						{% endif %}
+						{% endif %}						
 					</td>
 				</tr>
 				{% endfor %}

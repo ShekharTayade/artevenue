@@ -1,0 +1,475 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load utils %}
+{% load widget_tweaks %}
+{% block page-title %} 
+<title>Arte'Venue - Order Management</title>
+{% endblock page-title %} 
+{% block page-description %}
+<meta name="description" content="Arte'Venue | Order Management - Modify Items">
+{% endblock page-description %}
+{% block page-keywords %}
+<meta name="keywords" content="Art, artevenue, order management, modify">
+{% endblock page-keywords %}
+
+
+{% block coursel-stylesheet %}
+{% endblock coursel-stylesheet %}
+
+{% block jqueryui-script %}
+{% endblock jqueryui-script %}
+
+{% block coursel-script %}
+{% endblock coursel-script %}
+
+{% block front.js %}
+{% endblock front.js %}
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+{% block google-recaptcha-3 %}
+{% endblock google-recaptcha-3 %}
+
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+        <div class="container mb-5">
+			<div class="row">
+				<!-- breadcrumb-->
+				<div class="col-12">
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+							<li class="breadcrumb-item"><a href="{% url 'order_management' %}">Order Management</a></li>
+							<li aria-current="page" class="breadcrumb-item active">Order Modify Items - {{order.order_number}}</li>
+						</ol>
+					</nav>
+				</div>
+			</div>
+
+			{% if err_msg %}
+			<div class="row">
+				<div class="col-12 text-center" style = "background-color: #add8e6; color:red; padding:5px; font-weight:600;">
+					{{err_msg}}
+				</div>
+			</div>
+			{% endif %}							
+			
+			<form method = "post" id = "order_manage_form" name = "ord_form">
+				{% csrf_token %}
+				<div class="row">
+					<input name="order_id" id = "order_id" value = "{{order.order_id}}" 
+						class = "form-control" hidden>
+					<div class="col-12">
+						<h3 class = "text-center"> <strong>MODIFY ORDER ITEMS</strong></h3>
+						<div class = "row">
+							<div class = "col-12 col-md-4">
+								<div class="form-group">
+									<label>Order Number:</label>
+									<input name="order_number" id = "order_number" value = "{{order.order_number}}" 
+										class = "form-control" readonly>
+								</div>
+							</div>
+							<div class = "col-12 col-md-4">
+								<div class="form-group">
+									<label>Order Date:</label>
+									<input name="order_date" id = "order_date" value = "{{order.order_date|date:'d M y'}}" 
+										class = "form-control" readonly>
+								</div>
+							</div>						
+							<div class = "col-12 col-md-4">
+								<div class="form-group">
+									<label>Status:</label>
+									<input name="order_status" id = "order_status" value = "{{order.get_order_status_display}}" 
+										class = "form-control" readonly>
+								</div>
+							</div>						
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-12 col-md-6">
+						<strong>Shipping Address:</strong><br />
+						{{order.order_shipping.full_name}} 
+						{% if order.order_shipping.Company %}
+							, {{order.order_shipping.Company}}
+						{% endif %}
+						<br />
+						{{order.order_shipping.address_1}}
+						{% if order.order_shipping.address_2 %}
+							{{order.order_shipping.address_2 }}
+						{% endif %}
+						{% if order.order_shipping.address_1 or order.order_shipping.address_2 %}
+							<br />
+						{% endif %}
+						{% if order.order_shipping.land_mark %}
+							{{order.order_shipping.land_mark}}
+							<br />
+						{% endif %}
+						
+						{{order.order_shipping.city}} {{order.order_shipping.state}} {{order.order_shipping.pin_code_id}}
+						<br />
+						Ph: {{order.order_shipping.phone_number}} Email: {{order.order_shipping.email_id}}
+					</div>
+					<div class="col-12 col-md-6">
+						<strong>Billing Address:</strong><br />
+						{{order.order_billing.full_name}} 
+						{% if order.order_billing.Company %}
+							, {{order.order_billing.Company}}
+						{% endif %}
+						{% if order.order_billing.gst_number %}
+							, GST No.:{{order.order_billing.gst_number}}
+						{% endif %}
+						
+						<br />
+						{{order.order_billing.address_1}}
+						{% if order.order_billing.address_2 %}
+							{{order.order_billing.address_2 }}
+						{% endif %}
+						{% if order.order_billing.address_1 or order.order_billing.address_2 %}
+							<br />
+						{% endif %}
+						{% if order.order_billing.land_mark %}
+							{{order.order_billing.land_mark}}
+							<br />
+						{% endif %}
+						
+						{{order.order_billing.city}} {{order.order_billing.state}} {{order.order_billing.pin_code_id}}
+						<br />
+						Ph: {{order.order_billing.phone_number}} Email: {{order.order_billing.email_id}}
+					</div>
+				</div>
+				<div class = "row mt-3" style = "font-weight:700; border: 1px solid #cfcfcf;">
+					<div class = "col-12 text-center" style = "background-color: #cfcfcf;">
+						ORDER TOTALS
+					</div>
+					<div class = "col-6 col-md-3">
+						Unit Price: {{order.unit_price}}	
+					</div>
+					<div class = "col-6 col-md-3">
+						Discount: {{order.order_discount_amt}} (Voucher: {{order.voucher}})
+					</div>
+					<div class = "col-6 col-md-3">
+						Sub Total: {{order.sub_total}}
+					</div>
+					<div class = "col-6 col-md-3">
+						Tax: {{order.tax}}
+					</div>
+					<div class = "col-6 col-md-3">
+						Order Total: {{order.order_total}}
+					</div>
+				</div>
+				<div class = "row mt-3" style = "font-weight:700; border: 1px solid #cfcfcf;">
+					<div class = "col-12 text-center" style = "background-color: #cfcfcf;">
+						ORDER ITEMS				
+					</div>		
+					<form id="item-form" method = "POST" >				
+					{% for oi in order_items %}
+						<input hidden id = "{{oi.product.product_id}}_{{oi.order_item_id}}" name ="{{oi.product.product_id}}_{{oi.order_item_id}}">
+						<input hidden id = "{{oi.product.product_type_id}}_{{oi.order_item_id}}" name ="{{oi.product.product_type_id}}_{{oi.order_item_id}}">
+						<div class = "col-12 col-md-6">
+							<div class = "row">
+								<div class = "col-12">
+									<span style = "font-weight:700;" >
+									{% if oi.product.product_type_id|cut:' ' == 'USER-IMAGE' %}  
+										Customer Image; Prod Id: {{oi.product.product_id}}
+									{% elif oi.product.product_type_id|cut:' ' == 'STOCK-COLLAGE' %}
+										SET; Prod Id: {{oi.product.product_id}}
+									{% else %}
+										{{oi.product.name}};  
+										Image Code: {{oi.product.part_number}} / Prod Id: {{oi.product.product_id}}
+									{% endif %}													
+									</span>		
+									<br />
+									<img src = "{% if oi.product_type_id|cut:' ' == 'USER-IMAGE' %} https://artevenue.com{{MEDIA_URL}}{{oi.product.image_to_frame_thumbnail}} {% else %} {% if env == 'DEV' or env == 'TESTING' %} {{ oi.product.thumbnail_url }} {% else %} {% static oi.product.thumbnail_url %} {% endif %} {% endif %}" style = "width:75px; height:75px; object-fit:contain; float: left;">
+									{% with width=oi.moulding.width_inner_inches|add_width_frame_mount:oi.mount_size %}
+									<small>
+									{% if oi.product_type_id == 'STOCK-COLLAGE' %}
+										EACH ITEM: <br/>
+									{% endif %}
+									{% if oi.product_type_id == 'ORIGINAL-ART' %}
+										<li>{{oi.product.description}}</li>
+									{% else %}													
+										<li>Print on {{oi.print_medium_id|title}}</li>
+									{% endif %}
+									{% if oi.moulding_id %}
+										<li>Image Size : {{ oi.image_width }}" X {{oi.image_height }}"</li>
+										<li>Frame: {{oi.moulding.name }} ({{oi.moulding.width_inches}} inch, Polystyrene)</li>
+										{% if oi.mount_id %}
+											<li>Mount: {{oi.mount_size }}", Color: {{oi.mount.name|title }} </li>
+										{% endif %}
+										<li>Total Size: 
+											{{ oi.image_width|add_width:width|add_width:width }}" X {{oi.image_height|add_width:width|add_width:width }}"</li>
+									{% else %}
+										<li>Image Size : {{ oi.image_width }}" X {{oi.image_height }}"</li>
+									{% endif %}
+									{% if oi.acrylic_id and oi.print_medium_id == 'PAPER' %}
+										<li>Acrylic covered</li>
+									{% endif %}
+									{% if oi.stretch_id and not oi.moulding_id %}
+										<li>Canvas Stretched</li>
+									{% endif %}
+									</small>
+									{% endwith %}
+								</div>
+							</div>
+							<div class = "col-12">
+								<small>Qty: {{oi.quantity}}; </small>
+								<small>Unit: {{oi.item_unit_price}}; </small>
+								<small>Disc: {{oi.item_disc_amt|floatformat}}; </small>
+								<small>Sub: {{oi.item_sub_total|floatformat}}; </small>
+								<small>Tax: {{oi.item_tax|floatformat}}; </small>
+								Total: {{oi.item_total|floatformat}};
+							</div>
+						</div>
+						<div class = "col-12 col-md-6">
+							<div class = "row">
+								<div class="col-6">
+									<div class="form-group">
+										<label>Print Surface: </label>
+										<select id = "print_medium_id_{{oi.order_item_id}}" 
+											name =  "print_medium_id_{{oi.order_item_id}}"
+											class = "form-control"
+											value =  "{{oi.print_medium_id}}" required>
+											{% for p in printmedium %}
+											<option value='{{p}}'>{{p}}</option>
+											{% endfor %}
+										</select>
+									</div>
+								</div>
+								<div class="col-6">
+									<div class="form-group">
+										<label>Stretched? </label>
+										<input type = "checkbox" id = "streched_id_{{oi.order_item_id}}" 
+											name = "streched_id_{{oi.order_item_id}}" 
+											class = "form-control"
+											value =  "{{oi.streched_id}}" >
+									</div>
+								</div>
+								<div class="col-6">
+									<div class="form-group">
+									<label>Image Width: </label>
+									<input type = "text" max="500" 
+										id = "image_width_{{oi.order_item_id}}" 
+										name = "image_width_{{oi.order_item_id}}" 
+										class = "form-control"
+										value =  "{{oi.image_width}}" required>
+									</div>
+								</div>						
+								<div class="col-6">
+									<div class="form-group">
+									<label>Image Height: </label>
+									<input type = "text" max="500" 
+										id = "image_height_{{oi.order_item_id}}" 
+										name = "image_height_{{oi.order_item_id}}" 
+										class = "form-control"
+										value =  "{{oi.image_height}}" required>
+									</div>
+								</div>		
+								<div class="col-6">
+									<div class="form-group">
+										<label>Frame: </label>
+										<select id = "moulding_id" 
+											name = "moulding_id_{{oi.order_item_id}}" 
+											class = "form-control"
+											value =  "" >
+											{% for m in mouldings_show %}
+											<option value="{{m.moulding_id}}">{{m.moulding__name}}</option>
+											{% endfor %}
+										</select>
+									</div>
+								</div>
+								<div class="col-3">
+									<div class="form-group">
+										<label>Mount Color: </label>
+										<select id = "mount_id_{{oi.order_item_id}}" 
+											name = "mount_id_{{oi.order_item_id}}" 
+											class = "form-control"
+											value =  "" >
+											{% for m in mounts %}
+											<option value='{{m.mount_id}}'>{{m}}</option>
+											{% endfor %}
+										</select>
+									</div>
+								</div>		
+								<div class="col-3">
+									<div class="form-group">
+										<label>Mount Size: </label>
+										<input type = "text" max="5" id = "mount_size_{{oi.order_item_id}}" 
+											name = "mount_size_{{oi.order_item_id}}" 
+											class = "form-control"
+											value =  "{{oi.mount_size}}" >
+									</div>
+								</div>								
+								<div class="col-6">
+									<div class="form-group">
+										<label>Unit Price </label>
+										<input type = "number" id = "item_unit_price_{{oi.order_item_id}}" 
+											name = "item_unit_price_{{oi.order_item_id}}" 
+											class = "form-control"
+											value =  "{{oi.item_unit_price}}" >
+									</div>
+								</div>
+								<div class="col-6">
+									<div class="form-group">
+										<label>Discount </label>
+										<input type = "number" id = "item_disc_amt_{{oi.order_item_id}}" 
+											name = "item_disc_amt_{{oi.order_item_id}}" 
+											class = "form-control"
+											value =  "{{oi.item_disc_amt}}" >
+									</div>
+								</div>
+								<div class="col-6">
+									<div class="form-group">
+										<label>Sub Total </label>
+										<input type = "number" id = "item_sub_total_{{oi.order_item_id}}" 
+											name = "item_sub_total_{{oi.order_item_id}}" 
+											class = "form-control"
+											value =  "{{oi.item_sub_total}}" >
+									</div>
+								</div>
+								<div class="col-6">
+									<div class="form-group">
+										<label>Tax </label>
+										<input type = "number" id = "item_tax_{{oi.order_item_id}}" 
+											name = "item_tax_{{oi.order_item_id}}" 
+											class = "form-control"
+											value =  "{{oi.item_tax}}" >
+									</div>
+								</div>
+								<div class="col-6">
+									<div class="form-group">
+										<label>Total </label>
+										<input type = "number" id = "item_total_{{oi.order_item_id}}" 
+											name = "item_total_{{oi.order_item_id}}" 
+											class = "form-control"
+											value =  "{{oi.item_total}}" >
+									</div>
+								</div>
+								
+							</div>
+						</div>
+					{% endfor %}
+					</form>
+				</div>
+				<div class = "row mt-3">
+				</div>
+			</form>
+		</div>
+	{% endblock sitecontent %}
+	
+	{% block jscripts %}	
+	<script>
+		$( document ).ready(function() {
+		});	
+	</script>
+	<script>
+	function calc_total_price(product_id){
+		//var ratio = parseFloat("{{product.aspect_ratio}}"); 
+		var currwidth = parseInt($("#image_width").val());
+		var currheight = parseInt($("#image_height").val());
+		var sqin = currwidth * currheight;
+		var rnin = (currwidth + currheight) * 2;
+		var image_price = 0;
+		var total_price = 0;
+		var acr_id = '0';
+		var brd_id = '0';
+		var mnt_id = '0';
+		var mnt_size = '0';
+		var str_id = '0';
+		
+		//Get Print Medium
+		//var print_medium = $('#print-medium-select').val();
+		var print_med = $("#print_medium_id").val();
+		var moulding_id = $("#moulding_id").val();
+		
+		// Set the pricing compoenents appropriately:
+		if (print_med == 'PAPER') {
+			if (moulding_id == '0' || moulding_id == '' || moulding_id == null){
+				acr_id = '0';
+				brd_id = '0';
+				mnt_id = '0';
+				mnt_size = '0';
+			} else {
+				acr_id = '1';
+				brd_id = '1';
+				mnt_id = $("#mount_id").val();
+				mnt_size = $("#mount_size").val();
+			}
+			str_id = '0';
+		} else {
+			if (document.getElementById('stretch_id').checked) {				
+				str_id = $("#stretch_id").val();
+			} else {
+				str_id = 0;
+			}
+				
+			acr_id = '0';
+			brd_id = '0';
+			mnt_id = '0';
+			mnt_size = '0';
+		}
+			
+			
+		// Form the pricing components
+		json = '{ ' + 
+				'"IMAGE": {"WIDTH":' + currwidth + ', "HEIGHT":' + currheight + '}, ' + 
+				'"PRINT_MEDIUM": {"ID" :"' + print_med + '", "SIZE":' + sqin + '}, ' +
+				'"ACRYLIC": {"ID" :' + acr_id + ', "SIZE":' + sqin + '}, ' +
+				'"MOULDING": {"ID" :' + moulding_id + ', "SIZE":' + rnin + '}, ' +
+				'"MOUNT": {"ID" :' + mnt_id + ', "SIZE":' + mnt_size + '}, ' +
+				'"BOARD": {"ID" :' + brd_id + ', "SIZE":' + sqin + '}, ' +
+				'"STRETCH": {"ID" :' + str_id + ', "SIZE":' + rnin + '}, ' +
+				'"PRODUCT": {"ID" :' + product_id + ', "SIZE":' + rnin + '}, ' +
+				'"PRODUCT_TYPE": {"ID" :"STOCK-IMAGE", "SIZE":' + rnin + '} ' +
+				'}';			
+		
+		
+		// GET ITEM PRICE
+		$.ajax({
+				url: "{% url 'get_item_price' %}", 
+				data: json, 
+				dataType: 'text', 
+				type: 'POST',
+				success: function (data) {
+					data = JSON.parse(data);
+					msg = data.msg.toUpperCase();
+					if (data.msg.toUpperCase() == 'SUCCESS') { 
+						$("#item_unit_price").val(data.item_unit_price);
+						$("#item_unit_price").val(data.disc_amt);
+						$("#item_sub_total").val(data.item_price);
+						$("#item_tax").val(data.item_price);
+						$("#item_total").val(data.item_price);
+							
+						} else {
+							$("#promo-display").hide();
+							$("#no-disc").show();
+							$("#prod-price").html(data.item_price);
+							$("#prod-price-cart").html(data.item_price);
+
+							$("#item_unit_price_nv").html(data.item_unit_price);
+							$("#item_total_price_nv").html(data.item_price);
+							$("#promotion_id_nv").html('');
+							$("#disc_amt_nv").html('');
+						}
+					} else {
+						alert(msg);
+							$("#promo-display").hide();
+							$("#no-disc").show();
+							
+							$("#item_unit_price_nv").html(data.item_unit_price);
+							$("#item_total_price_nv").html(data.item_price);
+							$("#promotion_id_nv").html('');
+							$("#disc_amt_nv").html('');
+					}
+				},
+				error: function(xhr){
+					//alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+				}
+		});		
+	}		
+	</script>
+	
+	{% endblock jscripts %}
+			
+	

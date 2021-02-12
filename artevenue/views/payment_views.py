@@ -94,7 +94,7 @@ def payment_details(request):
 	posted['udf6'] = order_billing.Company
 
 	return render (request, 'artevenue/payment_details.html', {"posted":posted,
-		'order':order})
+		'order':order, 'env':env})
 		
 def payment_submit(request):
 	today = datetime.datetime.today()
@@ -104,6 +104,8 @@ def payment_submit(request):
 		
 	order_id = posted['order_id']
 	order = Order.objects.get(order_id = order_id)
+	
+	firstname = posted['firstname']
 	
 	####################################################################
 	## Check if this is a business order. If yes, check if deferred   ##
@@ -120,13 +122,26 @@ def payment_submit(request):
 		if bus.profile_group:
 			if bus.profile_group.deferred_payment:
 				deferred_payment = True
-	
-	if deferred_payment:
 
+	cod_flag = False
+	if 'cod_chk' in posted:
+		cod_flag = True
+	else:
+		cod_flag = False
+		
+	if deferred_payment or cod_flag :
 		order_items = Order_items_view.objects.filter(order = order)
-		o = Order.objects.filter(order_id = order_id).update(
-			order_status = 'PC', deferred_payment = True, order_date = today.date(),
-			updated_date = today)
+		
+		if cod_flag:
+			o = Order.objects.filter(order_id = order_id).update(
+				order_status = 'PC', deferred_payment = True, order_date = today.date(),
+				updated_date = today, payment_type = 'COD')
+		
+		else:
+			o = Order.objects.filter(order_id = order_id).update(
+				order_status = 'PC', deferred_payment = True, order_date = today.date(),
+				updated_date = today, payment_type = 'ONP')
+				
 		cart = Cart.objects.filter(cart_id = order.cart_id).update(cart_status = 'CO',
 			updated_date = today)
 		
@@ -154,7 +169,6 @@ def payment_submit(request):
 				updated_date = today
 			)
 			vu.save()
-		
 
 		# Update email, sms table
 		o_email = Order_sms_email(
@@ -168,12 +182,15 @@ def payment_submit(request):
 		)
 		o_email.save()
 		
-		return render (request, 'artevenue/order_confirmation_deferred_payment.html', {"posted":posted,
-						'order':order, 'order_items':order_items })
-						
-	
+		if cod_flag:
+			o_template = 'artevenue/order_confirmation_cod.html'
+		else:
+			o_template = 'artevenue/order_confirmation_deferred_payment.html'
+
+		return render (request, o_template, {"posted":posted,
+						'order':order, 'order_items':order_items, 'env':env,
+						'firstname': firstname })
 	else:
-	
 		order_billing = Order_billing.objects.get(order_id = order.order_id)
 		##### Firstname, lastname, email and phonenumber are already in the 'posted'
 		##### as enetered by user
@@ -231,11 +248,11 @@ def payment_submit(request):
 		if(posted.get("key")!=None and posted.get("txnid")!=None and posted.get("productinfo")!=None and posted.get("firstname")!=None and posted.get("email")!=None):
 			return render (request, 'artevenue/payment_submit.html', {"posted":posted,"hashh":hashh,
 							"MERCHANT_KEY":MERCHANT_KEY,"txnid":txnid,"hash_string":hash_string,
-							"action":action })
+							"action":action, 'env':env })
 		else:		
 			return render (request, 'artevenue/payment_submit.html', {"posted":posted,"hashh":hashh,
 							"MERCHANT_KEY":MERCHANT_KEY,"txnid":txnid,"hash_string":hash_string,
-							"action":"." })
+							"action":".", 'env':env })
 
 @csrf_protect
 @csrf_exempt						
@@ -468,7 +485,7 @@ def payment_unsuccessful(request):
 	return render(request, 'artevenue/payment_unsuccessful.html',
 			{ "txnid":txnid, "status":status, "amount":amount, 'msg':msg,
 			'firstname':firstname, 'order':order,
-			'pay_status':pay_status}
+			'pay_status':pay_status, 'env':env}
 		)	
 			
 def egift_payment_details(request):

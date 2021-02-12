@@ -19,7 +19,7 @@ import calendar
 from artevenue.forms import registerForm, businessprofile_Form, businessuserForm
 from artevenue.forms import businessprof_Form, userProfileForm
 from artevenue.forms import userForm, shipping_addressForm, billing_addressForm
-from artevenue.forms import OrderStatusUpdate
+from artevenue.forms import OrderStatusUpdate, Cart
 from artevenue.models import Pin_code, Business_profile, User_shipping_address, Promotion_voucher
 from artevenue.models import Promotion_voucher, Voucher_user, UserProfile, Business_referral_fee
 from artevenue.models import User_billing_address, Order, Order_items_view, Cart_item_view
@@ -149,6 +149,7 @@ def register(request, email=None, signup_popup = 0):
 		promotion_id = None
 	msg =''
 	business_code = ''
+	
 	if request.method == 'POST':	
 		next = request.POST['curr_pg']
 		form = registerForm(request.POST)
@@ -190,6 +191,19 @@ def register(request, email=None, signup_popup = 0):
 							'promo_voucher':promo_voucher, 'msg':msg, 'business_code':business_code} )
 
 			user = form.save()
+
+			## Before loging user in, sync the cart
+			sessionid = request.session.session_key
+			if sessionid :				
+				try:
+					# Get usercart by session and user is None
+					sessioncart = Cart.objects.get(session_id = sessionid, user = None, cart_status = "AC")
+				except Cart.DoesNotExist:
+					sessioncart = None					
+			if sessioncart:
+				cnt_s = Cart.objects.filter(cart_id = sessioncart.cart_id).update(
+						user = user, updated_date = datetime.datetime.now())
+
 			auth_login(request, user, backend='django.contrib.auth.backends.ModelBackend')
 
 			# Update email, sms table
@@ -216,6 +230,7 @@ def register(request, email=None, signup_popup = 0):
 					business_profile = bus_profile )
 					
 				u_profile.save()
+				
 			# After successful sign up redirect to cuurent page
 			if signup_popup == 1:
 				next = request.POST['curr_pg']
@@ -1018,3 +1033,110 @@ def get_carts(request, printpdf=''):
 			'orders_value': orders_value})
 
 
+def referral_fee_month_process(yrmonth=''):
+
+	#########################################
+	## Move all orders to referral fee table
+	## For current  month
+	#########################################
+	today = datetime.datetime.today()
+	
+	if yrmonth == '':
+		last_mth_yr = datetime.datetime.now() - relativedelta(months=1)
+		mth = str(last_mth_yr.month)
+		year = str(last_mth_yr.year)
+		yrmonth = year + '-' + mth
+	else:
+		last_mth_yr = datetime.datetime.strptime(yrmonth + '-01', "%Y-%m-%d").date()	
+	
+	process_start_date = datetime.datetime.strptime(yrmonth + '-01', "%Y-%m-%d").date()	
+	month_days = calendar.monthrange(last_mth_yr.year, last_mth_yr.month)[1]
+	process_end_date = datetime.datetime.strptime(yrmonth + '-' + str(month_days), "%Y-%m-%d").date()
+
+	business_profiles = Business_profile.objects.all().order_by('id')
+	for b in business_profiles:
+	
+		if b.created_date.year > process_end_date.year:
+			continue
+		###########################################
+		## Get total sale in last one user year  ##
+		###########################################
+		year_start_date = None
+		## Get start date of last 1 user year
+		if b.created_date.year == process_end_date.year:
+			year_start_date = b.created_date
+		else:
+			day = str(b.created_date.day)
+			mth = str(b.created_date.month)
+			yr = str(process_end_date - relativedelta(years=1).year)
+			year_start_date = datetime.datetime.strptime(yr + '-' + mth + '-' + day, "%Y-%m-%d").date()
+
+		ord_value = Order.objects.filter(order_date__gte = year_start_date,
+				order_date__lte = process_end_date,
+				user_id = b.user_id).exclude(order_status = 'CN').aggregate(sum = Sum('sub_total'))
+		total_order_value =0
+		if ord_value :
+			if ord_value['sum']:
+				total_order_value = ord_value['sum']
+
+		###########################################
+		##   Determine applicble fee percetnage  ##
+		###########################################
+		fee_amt = 0
+		if total_order_value < 200000:
+			perc = 10
+		elif total_order_value < 500000:
+			perc = 15
+		else :
+			perc = 20
+
+		total_fee_amt = total_order_value * perc / 100
+
+		#### Orders in last 1 user year for which referral fee is not processed
+		orders = Order.objects.filter( order_date__gte = year_start_date,
+			order_date__lte = process_end_date,
+			user_id = b.user_id ).exclude(order_status = 'CN')
+		
+		for o in orders:
+		
+			##### Skip orders that have payment outstanding
+			def_pay = Order_deferred_payment.objects.filter(order = o)
+			if not def_pay:
+				continue
+
+			##################################################
+			## Update referral fee for the order.    		##
+			## If order already has a referral fee record	##
+			## then update it, else enter new record 		##
+			##################################################
+			b_ref = Business_referral_fee.objects.filter(order = o).first()
+			if b_ref:
+				
+				bus_ref = Business_referral_fee (
+					id = b_ref.id,
+					month_year = yrmonth,
+					business_profile = b,
+					order = o,
+					ord_value_ytd = total_order_value,
+					fee_amount = o.sub_total * perc / 100,
+					fee_paid_date = today,
+					fee_paid_reference = '',
+					created_date = today,
+					updated_date = today
+				)
+			else:
+				bus_ref = Business_referral_fee (
+					month_year = yrmonth,
+					business_profile = b,
+					order = o,
+					ord_value_ytd = total_order_value,
+					fee_amount = o.sub_total * perc / 100,
+					fee_paid_date = today,
+					fee_paid_reference = '',
+					created_date = today,
+					updated_date = today
+				)
+			
+			bus_ref.save()
+
+	return

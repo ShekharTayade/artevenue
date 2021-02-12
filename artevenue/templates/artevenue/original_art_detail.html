@@ -1541,7 +1541,7 @@
 								$("#disc").html("(" + data.percent_disc + "% off)");
 							}
 							
-							$("#item_unit_price_nv").html(pasrseInt(data.item_unit_price).toLocaleString('en-IN', {minimumFractionDigits : 0}));
+							$("#item_unit_price_nv").html(parseInt(data.item_unit_price).toLocaleString('en-IN', {minimumFractionDigits : 0}));
 							$("#promotion_id_nv").html(data.promotion_id);
 							$("#disc_amt_nv").html(data.disc_amt);
 							$("#item_total_price_nv").html(data.item_price);

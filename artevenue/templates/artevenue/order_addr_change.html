@@ -1,0 +1,449 @@
+
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load moulding_url %}
+
+{% block page-title %} 
+	<title>Arte'Venue | Change Order Address</title>
+{% endblock page-title %} 
+{% block page-description %}
+	<meta name="description" content="Arte'Venue, Change Order Address">
+{% endblock page-description %}
+{% block page-keywords %}
+	<meta name="keywords" content="Arte'Venue, Change Order Address">
+{% endblock page-keywords %}
+
+{% block page-author %}
+	<meta name="author" content="Arte'Venue">
+{% endblock page-author %}
+
+{% block jqueryui-stylesheet %}
+
+{% endblock jqueryui-stylesheet %}
+
+{% block jqueryui-script %}
+{% endblock jqueryui-script %}
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+
+{% block add_to_head %}
+
+{% endblock add_to_head %}
+
+
+	{% block sitecontent %}
+
+	<div id="" class = "container mb-5">
+		<div class="row">
+			<div class="col-12">
+				<!-- breadcrumb-->
+				<nav aria-label="breadcrumb">
+					<ol class="breadcrumb">
+						<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+						<li class="breadcrumb-item"><a href="{% url 'order_management' %}">Order Management</a></li>
+						<li class="breadcrumb-item active">Change Address - Order No: {{ order.order_number }}</li>
+					</ol>
+				</nav>
+			</div>
+		</div>
+		
+		<div class="row">
+			<div class="col-12 text-center">
+				<h1 class = "mb-3">
+					CHANGE ORDER ADDRESS
+				</h1>
+			</div>
+		</div>
+
+		{% if sts == 'SUCCESS' %}
+		<div class = "mb-3">
+			<div class="row text-center" >
+				<div class="col-12" style = "color:#11b6bd; background-color:#FFFACD; padding:15px; font-weight: 600;">
+					Address changes saved successfully
+					<a class = "btn btn-primary pull-right" href = "{% url 'order_management' %}">
+						Back to Order Management
+					</a>
+				</div>
+			</div>
+		</div>
+		{% elif sts == 'FAILURE' %}
+		<div class = "mb-3">
+			<div class="row d-flex d-align-items-center" >
+				<div class="col-12" style = "color:red; background-color:#FFFACD; padding:15px; font-weight: 600;">
+					Please fix following issues:
+					<ul>
+					{% for e in err_msg %}
+						<li>{{e}}</li>
+					{% endfor %}
+					</ul>
+				</div>
+			</div>
+		</div>
+		{% endif %}
+		<div class = "mb-3" id = "box_{{order.order_id}}">
+			<div class="row d-flex d-align-items-center" >
+				<div class="col-12" style = "color:#11b6bd; background-color:#f6f6f6;">
+					<h3> 
+						<strong>ORDER NUMBER: {{order.order_number}}, </strong>  
+						<strong>Ord Dt: {{order.order_date|date:'d/M/y'}}</strong> 
+						<span class = "pull-right">
+							<small>(Cart Id: {{order.cart_id}})</small><br /> 
+						</span>
+					</h3>
+					Order Status: <strong>{{order.get_order_status_display}}</strong>
+					<h3>Customer: {{order.order_billing.full_name}}, {{order.order_billing.city}}</h3>
+				</div>
+				{% if error %}
+				<div class = "col-12">
+					<div class = "form-group">
+						<div class="invalid-feedback">
+						  {{ error }}
+						</div>
+					</div>
+				</div>
+				{% endif %}
+				<div  class = "col-12">				
+					<hr>
+				</div>
+				<form method = "GET" action = "{% url 'order_addr_change_confirm' order.order_id %}">
+					<input hidden id = "order_id" name = "order_id" class = "form-control" value = "{{order.order_id}}">
+					<div  class = "col-12">				
+						<div class = "row">
+							<div class="col-12" style = "background-color:#f6f6f6;">
+								<h2><strong>BILLING ADDRESS</strong></h2>
+							</div>
+							<div class="col-12">
+								<div class="form-group">
+								<label>Bill to Name: </label>
+								<input type = "text" max="500" id = "bill_addr_full_name" 
+									name = "bill_addr_full_name" 
+									class = "form-control"
+									value =  "{{bill_form.full_name.value}}" required>
+								</div>
+							</div>
+							<div class="col-12 col-md-6">
+								<label>Bill to Company: </label> 
+								<input type = "text" max="500" id = "bill_addr_company"  
+									name = "bill_addr_company" 
+									class = "form-control"
+									value =  "{{bill_form.Company.value}}">
+							</div>
+							<div class="col-12 col-md-6">
+								<label>GST Number: </label>
+								<input type = "text" max="500" id = "bill_addr_gst_number"  
+									class = "form-control"
+									name = "bill_addr_gst_number" 
+									value =  "{{bill_form.gst_number.value}}">
+							</div>
+							<div class="col-12 col-md-6">
+								<label>Address: </label> 
+								<input type = "text" max="500" id = "bill_addr_1" 
+									name = "bill_addr_1" 
+									class = "form-control"
+									value =  "{{bill_form.address_1.value}}" required>
+							</div>
+							<div class="col-12 col-md-6">
+								<label>&nbsp;</label>
+								<input type = "text" max="500" id = "bill_addr_2" 
+									name = "bill_addr_2" 
+									class = "form-control"
+									value =  "{{bill_form.address_2.value}}">
+							</div>
+							<div class="col-12 col-md-6">
+								<label>Landmark: </label>
+								<input type = "text" max="500" id = "bill_addr_land_mark" 
+									name = "bill_addr_land_mark" 
+									class = "form-control"
+									value =  "{{bill_form.land_mark.value}}">
+							</div>
+							<div class="col-12 col-md-6">
+								<label>Pin Code: </label>
+								<input type = "text" max="500" id = "bill_addr_pin_code" 
+									name = "bill_addr_pin_code" 
+									class = "form-control"
+									value =  "{{bill_form.pin_code.value}}" required>
+							</div>
+							<div class="col-12 col-md-6">
+								<label>City: </label>
+								<input type = "text" max="500" id = "bill_addr_city" 
+									name = "bill_addr_city" 
+									class = "form-control"
+									value =  "{{bill_form.city.value}}" required>
+							</div>
+							<div class="col-12 col-md-6">
+								<label>State: </label>
+								<input type = "text" max="500" id = "bill_addr_state" 
+									name = "bill_addr_state" 
+									class = "form-control"
+									value =  "{{order.order_billing.state}}" required>
+							</div>
+							<div class="col-12 col-md-6">
+								<label>Country: </label>
+								<input type = "text" max="500" id = "bill_addr_country" 
+									name = "bill_addr_country" 
+									class = "form-control"
+									value =  "{{order.order_billing.country}}" required>
+							</div>
+							<div class="col-12 col-md-6">
+								<label>Phone Number: </label>
+								<input type = "text" max="500" id = "bill_addr_phone_number" 
+									name = "bill_addr_phone_number" 
+									class = "form-control"
+									value =  "{{bill_form.phone_number.value}}" required>
+							</div>
+							<div class="col-12 col-md-6">
+								<label>Email: </label>
+								<input type = "text" max="500" id = "bill_addr_email_id" 
+									name = "bill_addr_email_id" 
+									class = "form-control"
+									value =  "{{bill_form.email_id.value}}" required>
+							</div>
+						</div>
+					</div>
+					<div class = "col-12">
+						<hr>
+					</div>
+					<div  class = "col-12">				
+						<div class="form-group">
+							<label>
+								<input type="checkbox" onclick= "sameAddr();" id = "sameaddr" name = "sameaddr"> 
+								<span style = "color: #11b6bd; font-size:0.8rem;">Copy Shipping Address from Billing Address</span><br />
+							</label>
+						</div>
+					</div>
+					<div class = "col-12">
+						<hr>
+					</div>
+					<div  class = "col-12">				
+						<div class = "row">
+							<div class="col-12" style = "background-color:#f6f6f6;">
+								<h2><strong>SHIPPING ADDRESS</strong></h2>
+							</div>
+							<div class="col-12">
+								<div class="form-group">
+								<label>Ship to Name: </label>
+								<input type = "text" max="500" id = "ship_addr_full_name" 
+									name = "ship_addr_full_name" 
+									class = "form-control"
+									value =  "{{ship_form.full_name.value}}" required>
+								</div>
+							</div>
+							<div class="col-12 col-md-6">
+								<label>Ship to Company: </label> 
+								<input type = "text" max="500" id = "ship_addr_company" 
+									name = "ship_addr_company" 
+									class = "form-control"
+									value =  "{{ship_form.Company.value}}">
+							</div>
+							<div class="col-12 col-md-6">
+								<label>Address: </label> 
+								<input type = "text" max="500" id = "ship_addr_1" 
+									name = "ship_addr_1" 
+									class = "form-control"
+									value =  "{{ship_form.address_1.value}}" required>
+							</div>
+							<div class="col-12 col-md-6">
+								<label>&nbsp; </label>
+								<input type = "text" max="500" id = "ship_addr_2" 
+									name = "ship_addr_2" 
+									class = "form-control"
+									value =  "{{ship_form.address_2.value}}">
+							</div>
+							<div class="col-12 col-md-6">
+								<label>Landmark: </label>
+								<input type = "text" max="500" id = "ship_addr_land_mark" 
+									name = "ship_addr_land_mark" 
+									class = "form-control"
+									value =  "{{ship_form.land_mark.value}}">
+							</div>
+							<div class="col-12 col-md-6">
+								<label>Pin Code: </label>
+								<input type = "text" max="500" id = "ship_addr_pin_code" 
+									name = "ship_addr_pin_code" 
+									class = "form-control"
+									value =  "{{ship_form.pin_code.value}}" required>
+							</div>
+							<div class="col-12 col-md-6">
+								<label>City: </label>
+								<input type = "text" max="500" id = "ship_addr_city" 
+									name = "ship_addr_city" 
+									class = "form-control"
+									value =  "{{ship_form.city.value}}" required>
+							</div>
+							<div class="col-12 col-md-6">
+								<label>State: </label>
+								<input type = "text" max="500" id = "ship_addr_state" 
+									name = "ship_addr_state" 
+									class = "form-control"
+									value =  "{{order.order_shipping.state}}" required>
+							</div>
+							<div class="col-12 col-md-6">
+								<label>Country: </label>
+								<input type = "text" max="500" id = "ship_addr_country" 
+									name = "ship_addr_country" 
+									class = "form-control"
+									value =  "{{order.order_shipping.country}}" required>
+							</div>
+							<div class="col-12 col-md-6">
+								<label>Phone Number: </label>
+								<input type = "text" max="500" id = "ship_addr_phone_number" 
+									name = "ship_addr_phone_number" 
+									class = "form-control"
+									value =  "{{ship_form.phone_number.value}}" required>
+							</div>
+							<div class="col-12 col-md-6">
+								 <label>Email: </label>
+								<input type = "text" max="500" id = "ship_addr_email_id" 
+									name = "ship_addr_email_id" 
+									class = "form-control"
+									value =  "{{ship_form.email_id.value}}" required>
+							</div>
+						</div>
+					</div>
+					<div class = "col-12">
+						<hr>
+					</div>
+					<div class = "col-12 text-center">
+						<button class = "btn btn-primary" onclick="submitForms">
+							SUBMIT
+						</button>
+					</div>
+				</form>
+			</div>
+			<div class = "col-12">
+				<hr>
+			</div>
+			<div class = "col-12">
+				ORDER ITEMS:
+				<hr>
+			</div>
+			<div class = "col-12">
+				{% for oi in order_items %}
+				<div class="row d-flex d-align-items-center mt-3"  style = "background-color:#f6f6f6; padding:10px;">
+					<div class = "col-12 col-md-3">
+						<div class = "row">
+						<img src = "{% if oi.product_type_id|cut:' ' == 'USER-IMAGE' %} https://artevenue.com{{MEDIA_URL}}{{oi.product.image_to_frame_thumbnail}} {% else %} {% if env == 'DEV' or env == 'TESTING' %} {{ oi.product.thumbnail_url }} {% else %} {% static oi.product.thumbnail_url %} {% endif %} {% endif %}" style = "width:75px; height:75px; object-fit:contain; float: left;">
+						</div>
+						<div class = "row">
+						<form class = "form-inline">
+							PRODUCT ID: {{oi.product_id}}
+							PRODUCT TYPE: {{oi.product_type_id}}>
+						</form>
+						</div>
+					</div>
+					<div class = "col-12 col-md-9">
+						<div class = "row">
+							<div class = "col-8">
+								<div class = "row">
+									<form class = "form-inline">
+										<div class="col-12">
+											PRINT SURFACE: {{oi.print_medium_id}}
+											<!--
+											<select class = "form-control" readonly>
+												<option value = "{{oi.print_medium_id}}"
+													{% if oi.print_medium_id == 'PAPER' %} selected {% endif %}>
+													PAPER
+												</option>
+												<option value = "{{oi.print_medium_id}}"
+													{% if oi.print_medium_id == 'CANVAS' %} selected {% endif %}>
+													CANVAS
+												</option>
+											</select>
+											-->
+										</div>
+										<div class="col-6">
+											WIDTH: {{oi.image_width}}
+										</div>
+										<div class="col-6">
+											HEIGHT: {{oi.image_height}}
+										</div>
+										<div class="col-12 col-md-6">
+											FRAME: {{oi.get_moulding_id_display}}
+										</div>
+										<div class="col-12 col-md-6">
+											MOUNT COLOR: {{oi.get_mount_id_display}}
+										</div>
+										<div class="col-12 col-md-6">
+											MOUNT_SIZE: {{oi.mount_size}}
+										</div>
+										<div class="col-12 col-md-6">
+											{% if oi.stretch_id %}
+											STRETCHED CANVAS
+											{% endif %}
+										</div>
+									</form>
+								</div>
+							</div>
+							<div class = "col-4">
+								<div class = "row">
+									<div class="col-12">
+										SUB TOTAL: <span> {{oi.item_sub_total}} </span>
+									</div>
+									<div class="col-12">
+										TAX: <span>{{oi.item_tax}} </span>
+									</div>
+									<div class="col-12">
+										TOTAL: <span>{{oi.item_total}}</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class = "row">
+					<div class="col-12">
+					<hr>
+					</div>
+				</div>
+				{% endfor %}
+			</div>
+			<div class="col-12">
+				<div class = "row"  style = "background-color:#f6f6f6; padding:10px;">
+					<div class="col-12 col-md-3">
+						ORDER SUB TOTAL:{{order.sub_total}}
+					</div>
+					<div class="col-12 col-md-3">
+						ORDER TAX:{{order.tax}}
+					</div>
+					<div class="col-12 col-md-3">
+						<strong>ORDER TOTAL:{{order.order_total}}</strong>
+					</div>
+					<div class="col-12 col-md-6">
+						ORDER DISCOUNT APPLIED:{{order.order_discount_amt}}
+					</div>
+					<div class="col-12 col-md-6">
+						COUPON APPLIED:{{order.voucher.voucher_code}}, {{order.voucher.discount_type}} - {{order.voucher.discount_value}}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	{% endblock sitecontent %}
+
+	
+	{% block jscripts %}
+	<script>
+	function sameAddr(){
+		checkBox = document.getElementById("sameaddr").checked;
+		if (checkBox) {
+			copyAddr();
+		}
+	}
+
+	function copyAddr(){
+		$("#ship_addr_full_name").val( $("#bill_addr_full_name").val() );
+		$("#ship_addr_phone_number").val( $("#bill_addr_phone_number").val() );
+		$("#ship_addr_email_id").val( $("#bill_addr_email_id").val() );
+		$("#ship_addr_company").val( $("#bill_addr_company").val() );
+		$("#ship_addr_1").val( $("#bill_addr_1").val() );
+		$("#ship_addr_2").val( $("#bill_addr_2").val() );
+		$("#ship_addr_pin_code").val( $("#bill_addr_pin_code").val() );
+		$("#ship_addr_city").val( $("#bill_addr_city").val() );
+		$("#ship_addr_state").val( $("#bill_addr_state").val() );
+		$("#ship_addr_country").val( $("#bill_addr_country").val() );	
+	}
+	</script>
+	{% endblock jscripts %}
+	

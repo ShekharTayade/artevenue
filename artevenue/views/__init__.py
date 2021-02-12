@@ -32,3 +32,5 @@ from .av_amazon_views import *
 from .offers_email_sms_views import *
 
 from .category_with_sub_views import *
+
+from.staff_views import *

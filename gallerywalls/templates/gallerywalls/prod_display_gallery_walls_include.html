@@ -35,7 +35,7 @@
 									</span>
 								</div>
 								<div class = "col-12 text-center">
-									<i class = "fa fa-inr"></i> <span class="price"> {{gallery.gallery_id|get_gallery_parent_price|floatformat|intcomma_indian}}</span>
+									<i class = "fa fa-inr"></i> <span class="price"> {{gallery.price|floatformat|intcomma_indian}}</span>
 								</div>
 								<div class = "col-12 text-center">
 									({{gallery.wall_area_width}}" X {{gallery.wall_area_height}}" inch) - Size Options Available
@@ -53,7 +53,7 @@
 								<ul class = "pagination justify-content-center"style="margin-bottom:0px !important">
 									{% if galleries.has_previous %}
 									<li class="page-item">
-									  <button class="page-link" onclick="getAllFilters(page='1', sort='{{sortOrder}}', show='{{show}}', keywords='{{ikeywords}}');" aria-label="Previous">
+									  <button class="page-link" onclick="getGalleryWalls('{{room_name}}', '{{place_name}}', '{{f_color}}', '{{f_set_of}}', page='1');" aria-label="Previous">
 										<span aria-hidden="true">&laquo; First</span>
 										<span class="sr-only">begin</span>
 									  </button>
@@ -66,13 +66,13 @@
 										</li>
 									  {% elif n > galleries.number|add:'-5' and n < galleries.number|add:'5' %}
 										<li class="page-item">
-										<button class="page-link" onclick="getAllFilters(page='{{n}}', sort='{{sortOrder}}', show='{{show}}', keywords='{{ikeywords}}');">{{ n }}</li>
+										<button class="page-link" onclick="getGalleryWalls('{{room_name}}', '{{place_name}}', '{{f_color}}', '{{f_set_of}}', page='{{n}}');">{{ n }}</li>
 									  {% endif %}
 									{% endfor %}
 
 									{% if galleries.has_next %}
 									  <li class="page-item">
-										<button class="page-link" onclick="getAllFilters(page='{{galleries.paginator.num_pages}}', sort='{{sortOrder}}', show='{{show}}', keywords='{{ikeywords}}');" aria-label="Next">
+										<button class="page-link" onclick="getGalleryWalls('{{room_name}}', '{{place_name}}', '{{f_color}}', '{{f_set_of}}', page='{{galleries.paginator.num_pages}}');" aria-label="Next">
 										  <span aria-hidden="true">Last &raquo;</span>
 										  <span class="sr-only">end</span>
 										</button>
@@ -82,3 +82,33 @@
 							</div>
 						</div>
 					</div>
+
+					{% include 'artevenue/how_to_tips.html' %}
+					<!--
+					<div class = "row mt-5 mb-5">
+						<div class = "col-12 col-md-10">
+							USEFUL TIPS
+							<hr>
+							<div class="row">
+								<a href = "https://nextsteps.co.in" 
+									style = "color:#0e0e0e; text-decoration: none; padding:5px;" 
+									target="_blank">
+									<div class = "col-12 d-flex flex-row">
+										<img src = "{% static 'img/guide_for_choosing_paintings.png' %}" width=50 alt="How to choose paintings for home decor">
+										<h2 class = "align-self-center ml-2">
+											How to Choose Paintings For Home Décor
+										</h3>
+									</div>
+									<div class = "col-12">
+										<h5>Questions on mind - how should you choose paintings? What should
+											you consider? Where to buy paintings online? Quality?
+											Here is the only detailed guide you will find...
+											<i class = "fa fa-caret-right fa-2x"></i>
+										</h5>
+									</div>					
+								</a>
+							</div>
+						</div>
+					</div>
+					-->
+					

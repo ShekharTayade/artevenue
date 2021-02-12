@@ -13,8 +13,25 @@
 							{% for o in orders %}
 							<h3 style = "color:blue"}>Order Number : {{o.order_number}}
 							</h3>
-							<h4>Dated : {{o.order_date|date:"d m Y"}}  | Status: {{ o.get_order_status_display }}
-							</h4>
+							<h4>Dated : {{o.order_date|date:"d m Y"}}  | Status: {{ o.get_order_status_display }} 
+							{% if o.order_status == 'CO' %}
+								{% if o.delivery_date %}
+									on {{o.delivery_date | date:'d-M-Y'}}
+								{% endif %}
+							{% endif %}
+							{% if o.order_status == 'IN' %} 
+								{% if o.tracking_number %} 
+									<h4> Order Tracking:<br />
+									{% if o.shipper %}
+										Shipped by: {{ o.shipper.name }}, 
+									{% endif %}
+									Tracking No.: {{ o.tracking_number }} <br />
+									{% if o.tracking_url %}
+									Tracking url: <a href = "{{ o.tracking_url }}" target="_blank">Click to Track</a>
+									{% endif %}
+									</h4>
+								{% endif %}
+							{% endif %}
 						
 							<div class = "row">
 								{% if o.order_shipping %}

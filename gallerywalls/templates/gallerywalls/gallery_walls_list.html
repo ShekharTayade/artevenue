@@ -23,6 +23,10 @@
 {% block front.js %}
 {% endblock front.js %}
 
+{% block lazysizes %}
+<script src="{% static '/vendor/lazysizes/lazysizes.min.js' %}" async=""></script>
+{% endblock lazysizes %}
+
 {% block imagemap-resize-script %}
 {% endblock imagemap-resize-script %}
 
@@ -128,7 +132,7 @@
 					</div>
 				</div>
 				<form hidden id="cat-form" action = "{% url 'get_gallery_walls' %}">
-					<input id = "id_page_num" name = "page_num">
+					<input id = "id_page_num" name = "page">
 					<input id = "id_sort" name = "sort">
 					<input id = "id_show" name = "show">
 					<input id = "id_keywords" name = "keywords">
@@ -164,13 +168,12 @@
 	{% block jscripts %}
 
 	<script>
-		function getGalleryWalls(room_name, place_name, color, set_of){ 
-			
+		function getGalleryWalls(room_name, place_name, color, set_of, page='1'){ 		
 			$('#id_room_name').val(room_name);
 			$('#id_placement_name').val(place_name);
 			$('#id_color').val(color);
 			$('#id_set_of').val(set_of);
-			
+			$('#id_page_num').val(page);
 			$("#cat-form").submit();
 
 		}

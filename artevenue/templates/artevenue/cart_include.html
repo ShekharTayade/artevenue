@@ -25,17 +25,23 @@
 					{% if user_msg %}
 					<div class = "row">
 						<div class = "col-12 text-center" style ="color: #999; font-size: 0.8rem;">
-							<i class = "fa fa-exclamation-circle" style ="color: orange;"> </i> <span style = "font-size: 0.85rem;">{{user_msg}}</span>
+							<i class = "fa fa-exclamation-circle" style ="color: orange;"> </i> <span style = "font-size: 0.85rem; font-weight: 700; color: orange;">{{user_msg}}</span>
+							{% if not user.is_authenticated %}
+							<div class = "col-12" style = "font-size:0.8rem; cursor: pointer; color:#11b6bd; text-decoration:underline;"
+								onclick = "$('#signup_popup-modal').modal('show');">
+								Tap to Sign Up & login.
+							</div>
+							{% endif %}
 						</div>
 					</div>
 					{% endif %}
 					{% if usercart.voucher %} 
 					<div class = "row">
 						<div class = "col-12">
-							<div id "vouch_text" style ="color: #999; font-size: 0.8rem;">
+							<div id = "vouch_text" style ="font-size: 0.9rem; font-weight:700;">
 								<i class = "fa fa-exclamation-circle" style ="color: green;"> </i> 
 								Discount of <i class = "fa fa-inr"></i> {{usercart.voucher_disc_amount |floatformat }} is applied, 
-								(Coupon {{ usercart.voucher.voucher_code }}).
+								(Coupon {{ usercart.voucher.voucher_code }}). Amounts shown includes discount.
 							</div>
 						</div>
 					</div>
@@ -310,25 +316,30 @@
 				<div class="col-12 mb-3">
 					<div>Pay Using Any of These Modes</div>
 				</div>
-				<div class="col-3">
+				<div class="col-2">
 					<img src = "{% static 'img/payment_icons/credit_debit_card.png' %}"
 						alt = "Credit/Debit Cards" width=50 style="margin-left:auto; margin-right:auto;display: block;"> 
 						<p class = "text-center">Credit, Debit Cards</p>
 				</div>
-				<div class="col-3">
+				<div class="col-2">
 					<img src = "{% static 'img/payment_icons/net_banking.png' %}"
 						alt = "Credit/Debit Cards" width=50  style="margin-left:auto; margin-right:auto;display: block;"> 
 					<p class = "text-center">Net Banking</p>
 				</div>
-				<div class="col-3">
+				<div class="col-2">
 					<img src = "{% static 'img/payment_icons/upi.png' %}"
 						alt = "Credit/Debit Cards" width=50  style="margin-left:auto; margin-right:auto;display: block;"> 
 					<p class = "text-center">UPI</p>
 				</div>
-				<div class="col-3">
+				<div class="col-2">
 					<img src = "{% static 'img/payment_icons/wallet.png' %}"
 						alt = "Credit/Debit Cards" width=50 style="margin-left:auto; margin-right:auto;display: block;"> 
 					<p class = "text-center">Wallets</p>
+				</div>
+				<div class="col-2">
+					<img src = "{% static 'img/payment_icons/cod.png' %}"
+						alt = "Credit/Debit Cards" width=50 style="margin-left:auto; margin-right:auto;display: block;"> 
+					<p class = "text-center">Cash On Delivery</p>
 				</div>
 				<div class="col-12">
 					<p class = "text-center">Completely secured payments.</p>

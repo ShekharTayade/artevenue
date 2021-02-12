@@ -15,6 +15,6 @@ today = datetime.date.today()
 
 register = template.Library()
 @register.inclusion_tag('artevenue/announcement.html')
-def announcement():
-	return {}
+def announcement(request):
+	return {'request':request}
 

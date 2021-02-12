@@ -1,0 +1,258 @@
+{% load static %}
+{% load utils %}
+							<div class="row">
+								<div class= "col-12">
+									<p class="text-muted">
+										{% if count > 0 %} 
+											{{ count }} order(s) found {% if startDt != '' %} between {{startDt|date:'d-M-Y'}} and {{endDt|date:'d-M-Y'}} {% endif %} 
+										{% else %} 
+											No orders found {% if startDt %} between {{startDt|date:'d-M-Y'}} and {{endDt|date:'d-M-Y'}} {% endif %}
+										{% endif %}
+									</p>
+								</div>
+							</div>	
+							{% for o in orders %}
+							<div class="row">
+								<div class= "col-12">
+									
+									<div class="row">
+										<div class= "col-12 col-md-6">
+											<h3 style = "color:blue">Order Number : {{o.order_number}}
+											</h3>
+											<h4>Dated : {{o.order_date|date:"d m Y"}}  | Status: {{ o.get_order_status_display }} 
+											{% if o.order_status == 'CO' %}
+												{% if o.delivery_date %}
+													on {{o.delivery_date | date:'d-M-Y'}}
+												{% endif %}
+											{% endif %}
+											{% if o.order_status == 'IN' %} 
+												{% if o.tracking_number %} 
+													<h4> Order Tracking:<br />
+													{% if o.shipper %}
+														Shipped by: {{ o.shipper.name }}, 
+													{% endif %}
+													Tracking No.: {{ o.tracking_number }} <br />
+													{% if o.tracking_url %}
+													Tracking url: <a href = "{{ o.tracking_url }}" target="_blank">Click to Track</a>
+													{% endif %}
+													</h4>
+												{% endif %}
+											{% endif %}
+										</div>
+										<div class= "col-12 col-md-6">
+											<form action="{% url 'choose_products_for_return' %}"
+												method = "POST">
+												{% csrf_token %}
+												<input hidden value = '{{o.order_id}}' name = "order_id">
+												<button class = "pull-right btn btn-primary m-2">
+													Choose Products for Return
+												</button>
+											</form>
+										</div>
+									</div>
+									<div class = "row">
+										{% if o.order_shipping %}
+										<div class = "col-6 box">
+										<strong>Shipping Address:</strong><br />
+											{{o.order_shipping.full_name}} 
+											{% if o.order_shipping.Company %}
+												, {{o.order_shipping.Company}}
+											{% endif %}
+											<br />
+											{{o.order_shipping.address_1}}
+											{% if o.order_shipping.address_2 %}
+												{{o.order_shipping.address_2 }}
+											{% endif %}
+											{% if o.order_shipping.address_1 or o.order_shipping.address_2 %}
+												<br />
+											{% endif %}
+											{% if o.order_shipping.land_mark %}
+												{{o.order_shipping.land_mark}}
+												<br />
+											{% endif %}
+											
+											{{o.order_shipping.city}} {{o.order_shipping.state}} {{o.order_shipping.pin_code_id}}
+											<br />
+											Ph: {{o.order_shipping.phone_number}} Email: {{o.order_shipping.email_id}}
+										</div>
+										{% endif %}
+
+										{% if o.order_billing %}
+										<div class = "col-6 box">
+										<strong>Billing Address:</strong><br />
+											{{o.order_billing.full_name}} 
+											{% if o.order_billing.Company %}
+												, {{o.order_billing.Company}}
+											{% endif %}
+											{% if o.order_billing.gst_number %}
+												, GST No.:{{o.order_billing.gst_number}}
+											{% endif %}
+											
+											<br />
+											{{o.order_billing.address_1}}
+											{% if o.order_billing.address_2 %}
+												{{o.order_billing.address_2 }}
+											{% endif %}
+											{% if o.order_billing.address_1 or o.order_billing.address_2 %}
+												<br />
+											{% endif %}
+											{% if o.order_billing.land_mark %}
+												{{o.order_billing.land_mark}}
+												<br />
+											{% endif %}
+											
+											{{o.order_billing.city}} {{o.order_billing.state}} {{o.order_billing.pin_code_id}}
+											<br />
+											Ph: {{o.order_billing.phone_number}} Email: {{o.order_billing.email_id}}
+										</div>
+										{% endif %}
+
+									</div>
+									<div class="table table-responsive" style = "font-size: 14px;">
+										<table id = "ordTbl" class="table table-responsive table-striped">
+											<thead>
+												<tr>
+													<th width="15%">Name</th>
+													<th width="30%">Details</th>
+													<th width="12%" style="text-align:right">Unit Price</th>
+													<th width="12%" style="text-align:right">Quantity</th>
+													<th width="12%" style="text-align:right">Discount</th>
+													<th width="12%" style="text-align:right">Tax</th>
+													<th width="12%" style="text-align:right">Total</th>
+												</tr>
+											</thead>
+											<tbody>
+												{% for i in order_items_list %}
+												{% if i.order_id != o.order_id %}
+													<!-- Nothing -->
+													
+												{% else %}
+												<tr>
+													<td>
+														<img src = "{% if i.product_type|cut:' ' == 'USER-IMAGE' %} https://artevenue.com{{MEDIA_URL}}{{i.product.image_to_frame_thumbnail}} {% else %} {% if env == 'DEV' or env == 'TESTING' %} {{ i.product.thumbnail_url }} {% else %} {% static i.product.thumbnail_url %} {% endif %} {% endif %}" style = "width:75px; height:75px; object-fit:contain;">
+														<br />
+														<div class = "pull-left">
+															<small style = "padding-left:0px;" >
+																{% if i.product_type|cut:' ' == 'USER-IMAGE' %}  
+																	Customer Image
+																{% else %}
+																	{{i.product.name}}
+																{% endif %}
+																	
+															</small>
+														</div>
+													</td>
+													<td>
+														<span  style = "font-size: 11px;">
+														{% with width=i.moulding.width_inner_inches|add_width_frame_mount:i.mount_size %}
+														{% if i.product_type_id == 'ORIGINAL-ART' %}
+															<li>{{i.product.description}}</li>
+														{% else %}													
+															<li>Print on {{i.print_medium_id|title}}</li>
+														{% endif %}
+														
+														{% if i.moulding_id %}
+															<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+															<li>Frame: {{i.moulding.name }} ({{i.moulding.width_inches}} inch, Polystyrene)</li>
+															{% if i.mount_id %}
+																<li>Mount: {{i.mount_size }}", Color: {{i.mount.name|title }} </li>
+															{% endif %}
+															<li>Total Size: 
+																{{ i.image_width|add_width:width|add_width:width }}" X {{i.image_height|add_width:width|add_width:width }}"</li>
+														{% else %}
+															<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+														{% endif %}
+														
+														{% if i.acrylic_id %}
+															<li>Acrylic covered</li>
+														{% endif %}
+														{% if i.stretch_id %}
+															<li>Canvas Stretched</li>
+														{% endif %}
+														{% endwith %}
+														</span>
+
+													</td>
+													<td style = "text-align:right">
+														{{i.item_unit_price}}
+													</td>
+													<td style = "text-align:right">
+														{{i.quantity}}
+													</td>
+													<td style = "text-align:right">
+														{{i.item_disc_amt|floatformat}}
+														<!--
+														{% if i.promotion.discount_type == "PERCENTAGE" %}
+															{{i.promotion.discount_value|floatformat}}%
+														{% else %}
+															{{i.promotion.discount_value|floatformat}}
+														{% endif %}
+														-->
+													</td>
+													<td style = "text-align:right">{{i.item_tax|floatformat}}</td>
+													<td style = "text-align:right">{{i.item_total|floatformat}}</td>
+
+												</tr>
+												{% endif %}
+												{% endfor %}
+												
+											</tbody>
+											<tfoot>
+												<tr>
+													<th colspan="5"><small>Shipping & Handing</small></th>
+													<th colspan="2" style = "text-align:right">
+														<small>{{o.shipping_cost|floatformat}}</small>
+													</th>
+													<th></th>
+												</tr>
+												<!--
+												<tr>
+													<th colspan="4"><small>Discount</small></th>
+													<th colspan="1" style = "text-align:right">
+														{% if o.order_discount_amt %} <small>- ({{o.order_discount_amt|floatformat}})</small>{% endif %}
+													</th>
+													<th></th>
+												</tr>
+												-->
+												<tr>
+													<th colspan="5">Order Total</th>
+													<th colspan="2" style = "text-align:right">
+														<i class = "fa fa-inr"> </i> {{o.order_total|floatformat}}
+													</th>
+													<th></th>
+												</tr>
+											</tfoot>
+										</table>
+									</div>
+									<div class = "mb-5" style="padding-bottom:2px; background-color:blue;" >
+									</div>
+								</div>
+							</div>
+						{% endfor orders %}
+							
+							
+							{% if orders.number %}
+							<div class="box info-bar">
+								<div class="row">
+									<div class="col-md-12 col-lg-12 products-showing">
+										<div class = "text-center">
+											{% if orders.has_previous %}
+												<button type = "button" class="btn btn-sm btn-primary" onclick="get_orders('1');"><i class="fa fa-chevron-left"></i> First</button>  
+												<button type = "button" class="btn btn-sm btn-primary"  onclick="get_orders('{{ orders.previous_page_number }}');">Prev</button>
+											{% else %}
+												<button type = "button" class="btn btn-sm btn btn-secondary disabled" href="#"><i class = "fa fa-chevron-left"></i> First</button>
+												<button type = "button" class="btn btn-sm btn btn-secondary disabled"  href="#">Prev</button>
+											{% endif %}
+											Showing Page {{ orders.number }} of {{ orders.paginator.num_pages }}
+											{% if orders.has_next %}
+												<button type = "button" class="btn btn-sm btn-primary" onclick="get_orders('{{ orders.next_page_number }}');">Next</button>
+												<button type = "button" class="btn btn-sm btn-primary" onclick="get_orders('{{ orders.paginator.num_pages }}');">Last <i class = "fa fa-chevron-right"></i></button>
+											{% else %}
+												<button type = "button" class="btn btn-sm btn-secondary disabled" href="#">Next</button>
+												<button type = "button" class="btn btn-sm btn-secondary disabled" href="#">Last <i class = "fa fa-chevron-right"></i></button>
+											{% endif %}				
+										</div>
+									</div>
+								</div>
+							</div>
+							{% endif %}

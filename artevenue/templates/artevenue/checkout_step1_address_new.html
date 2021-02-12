@@ -393,17 +393,21 @@
 									<tr class="total">
 										<td>Cart Total</td>
 										<th class="pull-right"><span id ="cart_total" >{{order_total|floatformat}}</span></th>
-									</tr>
-
-									<tr>
-										<td>Discount</td>
-										<th id = "disc_amt" style = "color:green" class="pull-right">
-											{{disc_amt|floatformat}}
-										</th>
-										 
-									</tr>									
+									</tr>	
+									
 								</tbody>
 							</table>
+							<ul>
+							{% if order.order_discount_amt > 0 %} 
+								<strong>Your Savings:</strong> <span style = "color:green">{{order.order_discount_amt|floatformat}}</span>
+							{% endif %}
+							{% if order.voucher %} 
+								<div id "vouch_text" style ="color: #999; font-size: 0.6rem;">
+									You have used coupan "{{ order.voucher.voucher_code }}". 
+									Discount of <i class = "fa fa-inr"></i> {{order.voucher_disc_amount |floatformat }} is applied
+								</div>
+							{% endif %}
+							</ul>
 						</div>
 					</div>
 				

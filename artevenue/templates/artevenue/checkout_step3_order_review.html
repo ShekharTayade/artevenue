@@ -1,7 +1,28 @@
 {% extends 'artevenue/estore_base.html' %}
 {% load static %}
 {% load utils %}
-	<!-- Only Override the site content block -->
+{% block page-title %} 
+	<title>Checkout - Order Review | Arte'Venue </title>
+{% endblock page-title %} 
+{% block page-description %}
+	<meta name="description" content="Checkout - Order review at artevenue.com">
+{% endblock page-description %}
+{% block page-keywords %}
+	<meta name="keywords" content="artevenue, order, checkout order review">
+{% endblock page-keywords %}
+
+{% block page-author %}
+	<meta name="author" content="Arte'Venue">
+{% endblock page-author %}
+
+{% block jqueryui-stylesheet %}
+{% endblock jqueryui-stylesheet %}
+
+{% block jqueryui-script %}
+{% endblock jqueryui-script %}
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
 	{% block sitecontent %}
 	<div class="container-fluid">
         <div class="row">
@@ -11,7 +32,7 @@
 					<ol class="breadcrumb">
 						<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
 						<li class="breadcrumb-item"><a href="{% url 'show_cart' %}">Cart</a></li>
-						<li aria-current="page" class="breadcrumb-item active">Checkout - Address</li>
+						<li aria-current="page" class="breadcrumb-item active">Checkout - Order Review</li>
 					</ol>
 				</nav>
             </div>
@@ -143,36 +164,67 @@
 							</table>
 						</div>
 						<!-- /.row-->
-						<div class="box-footer d-flex justify-content-between">
-							<a href="{% url 'show_cart' %}" class="btn btn-outline-secondary"><i class="fa fa-chevron-left"></i>Back to Cart</a>
-							<button type="submit" class="btn btn-primary"
-									form="order_confirm_form">
-								Make Payment<i class="fa fa-chevron-right"></i>
-							</button>
+						<div class="row box-footer d-flex justify-content-between">
+							<div class = "col-6">
+								<a href="{% url 'show_cart' %}" class="btn btn-outline-secondary pull-left"><i class="fa fa-chevron-left"></i>Back to Cart</a>
+							</div>
+							<div class = "col-6">
+								<div class="row">
+									<div class = "col-12">
+										<button type="submit" class="btn btn-primary pull-right" id = "online_btn"
+												form="order_confirm_form">
+											Make Payment<i class="fa fa-chevron-right"></i>
+										</button>
+										<button  type="submit" class="btn btn-primary pull-right" id = "cod_btn"
+												form="order_confirm_form">
+											Confirm COD Order<i class="fa fa-chevron-right"></i>
+										</button>
+									</div>
+									<div class = "col-12" id = "cod_ret">
+										<span style="font-size: 0.75rem; font-weight:700;" class = "pull-right"> 
+											<i class = "fa fa-exclamation-circle" style = "color: #FFC20F;"></i> 
+											COD order not eligible for return
+										</span>
+									</div>
+									<div class = "col-12 mt-1">
+										<span class = "pull-right" id = "cod_span">
+											<input  id = "cod_chk" name = "cod_chk" type = "checkbox" onclick="pay_cod();"> Cash on Delivery(COD)
+										</span>
+										<span   class = "pull-right" id = "online_span">
+											<input  id = "online_chk" name = "online_chk" type = "checkbox" onclick="pay_online();" checked> Pay Online
+										</span>
+									</div>
+								</div>
+							</div>
 						</div>
 						<div class="box-footer row">
 							<div class="col-12 mb-3">
 								<div>Pay Using Any of These Modes</div>
 							</div>
-							<div class="col-3">
+							<div class="col-2">
 								<img src = "{% static 'img/payment_icons/credit_debit_card.png' %}"
 									alt = "Credit/Debit Cards" width=50 style="margin-left:auto; margin-right:auto;display: block;"> 
 									<p class = "text-center">Credit, Debit Cards</p>
 							</div>
-							<div class="col-3">
+							<div class="col-2">
 								<img src = "{% static 'img/payment_icons/net_banking.png' %}"
 									alt = "Credit/Debit Cards" width=50  style="margin-left:auto; margin-right:auto;display: block;"> 
 								<p class = "text-center">Net Banking</p>
 							</div>
-							<div class="col-3">
+							<div class="col-2">
 								<img src = "{% static 'img/payment_icons/upi.png' %}"
 									alt = "Credit/Debit Cards" width=50  style="margin-left:auto; margin-right:auto;display: block;"> 
 								<p class = "text-center">UPI</p>
 							</div>
-							<div class="col-3">
+							<div class="col-2">
 								<img src = "{% static 'img/payment_icons/wallet.png' %}"
 									alt = "Credit/Debit Cards" width=50 style="margin-left:auto; margin-right:auto;display: block;"> 
 								<p class = "text-center">Wallets</p>
+							</div>
+							<div class="col-2">
+								<img src = "{% static 'img/payment_icons/cod.png' %}"
+									alt = "Credit/Debit Cards" width=50 style="margin-left:auto; margin-right:auto;display: block;"> 
+								<p class = "text-center">Cash On Delivery</p>
 							</div>
 						</div>
 					</form>
@@ -194,9 +246,7 @@
 									<tr>
 										<td>Tax</td>
 										<th class="pull-right">{{order.tax|floatformat}}</th>
-									</tr>
-
-								
+									</tr>					
 									<tr>
 										<td>Shipping & handling</td>
 										<th><span class="pull-right">{{order.shipping_cost|floatformat}}</span></th>
@@ -302,5 +352,34 @@
 	
 	
 	{% block jscripts %}
+	<script>
+		$("#online_btn").show();
+		$("#cod_btn").hide();
+		$("#cod_span").show();
+		$("#online_span").hide();
+		$("#cod_ret").hide();
+		$('#online_chk').prop('checked', true);
+		$('#cod_chk').prop('checked', false);
+	</script>
+	<script>
+	function pay_cod(){
+		$("#online_btn").hide();
+		$("#cod_btn").show();
+		$("#cod_span").hide();
+		$("#online_span").show();
+		$("#cod_ret").show();
+		$('#online_chk').prop('checked', false);
+		$('#cod_chk').prop('checked', true);
+	}
+	function pay_online(){
+		$("#online_btn").show();
+		$("#cod_btn").hide();
+		$("#cod_span").show();
+		$("#online_span").hide();
+		$("#cod_ret").hide();
+		$('#online_chk').prop('checked', true);
+		$('#cod_chk').prop('checked', false);
+	}
+	</script>
 	
 	{% endblock jscripts %}

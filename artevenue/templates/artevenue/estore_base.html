@@ -2,7 +2,6 @@
 
 {% load static %}
 {% load topbar from estore_base %}
-{% load admin_menu from estore_base %}
 {% load menubar from estore_base %}
 {% load announcement from announcement %}
 {% load show_main_slider_section from prod_template_tags %}
@@ -191,23 +190,6 @@
 		</script>
 		{% endblock google-analytics %}
 		
-		<!-- Facebook Pixel Code -->
-		<script async>
-		  !function(f,b,e,v,n,t,s)
-		  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-		  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-		  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-		  n.queue=[];t=b.createElement(e);t.async=!0;
-		  t.src=v;s=b.getElementsByTagName(e)[0];
-		  s.parentNode.insertBefore(t,s)}(window, document,'script',
-		  'https://connect.facebook.net/en_US/fbevents.js');
-		  fbq('init', '506471883218823');
-		  fbq('track', 'PageView');
-		</script>
-		<noscript><img height="1" width="1" style="display:none"
-		  src="https://www.facebook.com/tr?id=506471883218823&ev=PageView&noscript=1"
-		/></noscript>
-		<!-- End Facebook Pixel Code -->
 		{% endif %}
 	
 		{% block cropper %}
@@ -239,26 +221,25 @@
 	</head>
 
 	<body data-gr-c-s-loaded="true" cz-shortcut-listen="true">	
-	
 		{% if env == 'PROD' %}
-		<!-- Google Tag Manager (noscript) -->
-		<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KKN69MB"
-		height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-		<!-- End Google Tag Manager (noscript) -->
+			<!-- Google Tag Manager (noscript) -->
+			<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KKN69MB"
+			height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+			<!-- End Google Tag Manager (noscript) -->
 
-		<script
-			type="text/javascript"
-			async defer
-			src="//assets.pinterest.com/js/pinit.js">
-		</script>	
+			<script
+				type="text/javascript"
+				async defer
+				src="//assets.pinterest.com/js/pinit.js">
+			</script>	
 		{% endif %}
 
-		{% announcement %}
+		{% announcement request %}
 		
 		<!-- Header Section with top slim line, logo/search/cart and menu-->
 		{% block siteheader %}
 		<header class="header">
-			{% admin_menu request %}
+
 			{% include 'artevenue/whatsapp.html' %}
 			
 			{% block menu %}				
@@ -479,23 +460,21 @@
 		</script>
 
 		{% if env == 'PROD' %}
-
-		{% block tawkto %} 
-		<!--Start of Tawk.to Script-->		
-		<script type="text/javascript">		
-			var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-			(function(){
-			var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-			s1.async=true;
-			s1.src='https://embed.tawk.to/5da6fe47fbec0f2fe3ba07cc/default';
-			s1.charset='UTF-8';
-			s1.setAttribute('crossorigin','*');
-			s0.parentNode.insertBefore(s1,s0);
-			})();
-		</script>
-		<!--End of Tawk.to Script-->
-		{% endblock tawkto %}
-		
+			{% block tawkto %} 
+			<!--Start of Tawk.to Script-->		
+			<script type="text/javascript">		
+				var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+				(function(){
+				var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+				s1.async=true;
+				s1.src='https://embed.tawk.to/5da6fe47fbec0f2fe3ba07cc/default';
+				s1.charset='UTF-8';
+				s1.setAttribute('crossorigin','*');
+				s0.parentNode.insertBefore(s1,s0);
+				})();
+			</script>
+			<!--End of Tawk.to Script-->
+			{% endblock tawkto %}		
 		{% endif %}
 	</body>
 	

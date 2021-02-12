@@ -12,7 +12,7 @@ import datetime
 from decimal import Decimal
 
 from artevenue.models import Ecom_site, Mount, Moulding_image
-from artevenue.models import Moulding, Acrylic, Board, Stretch
+from artevenue.models import Moulding, Acrylic, Board, Stretch, Framing_price
 
 
 today = datetime.date.today()
@@ -58,7 +58,6 @@ def get_mouldings(request):
 			 'moulding_diagrams':moulding_diagrams, 'canvas_mouldings_corner':canvas_mouldings_corner,
 			 'paper_mouldings_corner':paper_mouldings_corner})
 
-
 def get_mounts(request):
 
 	mounts = Mount.objects.all()
@@ -85,113 +84,207 @@ def get_stretches(request):
 	stretches = Stretch.objects.first()
 	
 	return (stretches)	
-	
 
-def get_moulding_price(request):
+def get_moulding_price(request, eff_date=None):
 	id = request.GET.get("id", "")
 	if id == "":
 		return JsonResponse({"sqin_price" : "0"})
-	moulding = Moulding.objects.filter(moulding_id = id).first()
+		
+	if eff_date == None:
+		eff_date = datetime.date.today()
 
+	return get_framing_price("MOULDING", id, eff_date)
+
+	'''
+	moulding = Moulding.objects.filter(moulding_id = id,
+		effective_from__lte = eff_date,
+		effective_to__gte = eff_date).first()
+		
 	if moulding :
 		return JsonResponse({"sqin_price" : moulding.price})
 	else :
 		return JsonResponse({"sqin_price" : "0"})
-
-def get_moulding_price_by_id(id):	
+	'''
+	
+def get_moulding_price_by_id(id, eff_date=None):	
 	if id == "":
 		return JsonResponse({"sqin_price" : "0"})
-	moulding = Moulding.objects.filter(moulding_id = id).first()
+
+	if eff_date == None:
+		eff_date = datetime.date.today()
+	return get_framing_price("MOULDING", id, eff_date)
+	'''
+	moulding = Moulding.objects.filter(moulding_id = id,
+		effective_from__lte = eff_date,
+		effective_to__gte = eff_date).first()
 
 	if moulding :
 		return moulding.price
 	else :
 		return 0
-	
-def get_mount_price(request):
+	'''
+def get_mount_price(request, eff_date=None):
 	id = request.GET.get("id", "")
 	if id == "":
 		return JsonResponse({"sqin_price" : "0"})
-	mount = Mount.objects.filter(mount_id = id).first()
+
+	if eff_date == None:
+		eff_date = datetime.date.today()
+
+	return get_framing_price("MOUNT", id, eff_date)
+	'''
+	mount = Mount.objects.filter(mount_id = id,
+		effective_from__lte = eff_date,
+		effective_to__gte = eff_date).first()
 
 	if mount :
 		return JsonResponse({"sqin_price" : mount.price})		
 	else :
 		return JsonResponse({"sqin_price" : "0"})
-
-def get_mount_price_by_id(id):
+	'''
+def get_mount_price_by_id(id, eff_date=None):
 	if id == "":
 		return JsonResponse({"sqin_price" : "0"})
-	mount = Mount.objects.filter(mount_id = id).first()
+
+	if eff_date == None:
+		eff_date = datetime.date.today()
+
+	return get_framing_price("MOUNT", id, eff_date)
+
+	'''
+	mount = Mount.objects.filter(mount_id = id,
+		effective_from__lte = eff_date,
+		effective_to__gte = eff_date).first()
 
 	if mount :
 		return mount.price
 	else :
 		return 0
-		
-def get_board_price(request) :
+	'''
+def get_board_price(request, eff_date=None) :
 	board = request.GET.get("id", "")
 	if board == "":
 		return JsonResponse({"sqin_price" : "0"})
-	boardObj = Board.objects.filter(board_id = board).first()
+
+	if eff_date == None:
+		eff_date = datetime.date.today()
+
+	return get_framing_price("BOARD", board, eff_date)
+	'''
+	boardObj = Board.objects.filter(board_id = board,
+		effective_from__lte = eff_date,
+		effective_to__gte = eff_date).first()
 
 	if boardObj :
 		return JsonResponse({"sqin_price" : boardObj.price})
 	else :
 		return JsonResponse({"sqin_price" : "0"})
+	'''
 
-	
-def get_board_price_by_id(id) :
+def get_board_price_by_id(id, eff_date=None) :
 	if id == "":
 		return JsonResponse({"sqin_price" : "0"})
-	boardObj = Board.objects.filter(board_id = id).first()
+
+	if eff_date == None:
+		eff_date = datetime.date.today()
+		
+	return get_framing_price("BOARD", id, eff_date)
+	'''
+	boardObj = Board.objects.filter(board_id = id,
+		effective_from__lte = eff_date,
+		effective_to__gte = eff_date).first()
 
 	if boardObj :
 		return boardObj.price
 	else :
 		return Decimal(0)
-	
-def get_acrylic_price(request) :
+	'''
+def get_acrylic_price(request, eff_date=None) :
 	acrylic = request.GET.get("id", "")
 	if acrylic == "":
 		return JsonResponse({"sqin_price" : "0"})
-	acrylicObj = Acrylic.objects.filter(acrylic_id = acrylic).first()
+
+	if eff_date == None:
+		eff_date = datetime.date.today()
+
+	return get_framing_price("ACRYLIC", acrylic, eff_date)
+	'''
+	acrylicObj = Acrylic.objects.filter(acrylic_id = acrylic,
+		effective_from__lte = eff_date,
+		effective_to__gte = eff_date).first()
 	
 	if acrylicObj :
 		return JsonResponse({"sqin_price" : acrylicObj.price})
 	else :
 		return JsonResponse({"sqin_price" : "0"})
-	
-def get_acrylic_price_by_id(acr_id) :
+	'''
+def get_acrylic_price_by_id(acr_id, eff_date=None) :
 	if acr_id == "":
 		return JsonResponse({"sqin_price" : "0"})
-	acrylicObj = Acrylic.objects.filter(acrylic_id = acr_id).first()
+
+	if eff_date == None:
+		eff_date = datetime.date.today()
+
+	return get_framing_price("ACRYLIC", acr_id, eff_date)
+
+	'''
+	acrylicObj = Acrylic.objects.filter(acrylic_id = acr_id,
+		effective_from__lte = eff_date,
+		effective_to__gte = eff_date).first()
+		
 	if acrylicObj :
 		return acrylicObj.price
 	else :
-		return 0
-	
-	
-def get_stretch_price(request) :
+		return 0	
+	'''
+def get_stretch_price(request, eff_date=None) :
 	stretch = request.GET.get("id", "")
 	if stretch == "":
 		return JsonResponse({"sqin_price" : "0"})
-	stretchObj = Stretch.objects.filter(stretch_id = stretch).first()
+		
+	if eff_date == None:
+		eff_date = datetime.date.today()
+		
+	return get_framing_price("STRETCHER", stretch, eff_date)
+	'''
+	stretchObj = Stretch.objects.filter(stretch_id = stretch,
+		effective_from__lte = eff_date,
+		effective_to__gte = eff_date).first()
 
 	if stretchObj :
 		return JsonResponse({"sqin_price" : stretchObj.price})
 	else :
 		return JsonResponse({"sqin_price" : "0"})
-	
-def get_stretch_price_by_id(strt_id) :
+	'''
+def get_stretch_price_by_id(strt_id, eff_date=None) :
 	if strt_id == "":
 		return JsonResponse({"sqin_price" : "0"})
-	stretchObj = Stretch.objects.filter(stretch_id = strt_id).first()
+
+	if eff_date == None:
+		eff_date = datetime.date.today()
+
+	return get_framing_price("STRETCHER", strt_id, eff_date)
+	
+	'''
+	stretchObj = Stretch.objects.filter(stretch_id = strt_id,
+		effective_from__lte = eff_date,
+		effective_to__gte = eff_date).first()
 
 	if stretchObj :
 		return stretchObj.price
 	else :
 		return 0
+	'''
+def get_framing_price(component_type, id, eff_date = None):
+	if eff_date == None:
+		eff_date = datetime.date.today()
 
+	Obj = Framing_price.objects.filter(component_type= component_type,
+		component_id = id,
+		effective_from__lte = eff_date,
+		effective_to__gte = eff_date).first()
 
-	
+	if Obj :
+		return Obj.price
+	else :
+		return 0

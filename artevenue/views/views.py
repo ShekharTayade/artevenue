@@ -11,7 +11,7 @@ from django.shortcuts import render,redirect
 from django.contrib import messages
 
 from artevenue.models import Ecom_site, Cart
-from artevenue.forms import contactUsForm, referralForm, egiftForm
+from artevenue.forms import contactUsForm, referralForm, egiftForm, ship_addressForm, bill_addressForm
 
 from artevenue.models import Pin_code, City, State, Country, Pin_city_state_country, Newsletter_subscription
 from artevenue.models import Referral, Egift_card_design, Egift, Voucher, Voucher_user, User_ip_address
@@ -98,7 +98,7 @@ def about_us(request):
 	
 def terms_conditions(request):
 
-	return render(request, "artevenue/terms_of_use_apr2020.html", {})
+	return render(request, "artevenue/terms_of_use.html", {})
 	
 def privacy_policy(request):
 
@@ -160,62 +160,56 @@ def sync_cart_session_user(request, sessionid):
 	
 	if sessioncart:
 		if request.user.is_authenticated:
-			try:
-			
+			try:			
 				# Check if the user already has a cart open
 				user = User.objects.get(username = request.user)
 
 				cart = Cart.objects.filter(user = user, cart_status = "AC")
-				# User already has a cart open
+				
+				# If user already has a cart open, add current item to that cart
 				if cart:
+					cartitems = Cart_item_view.objects.filter(cart_id = sessioncart.cart_id)
+					
+					for i in cartitems:
+						sqin = i.image_width * i.image_height;
+						print_medium_size = sqin
+						acrylic_size = sqin
+						stretch_size = sqin
+						
+						if i.mount_size == '' or i.mount_size == None:
+							mnt_size = '0'
+						else:
+							mnt_size = i.mount_size
+						
+						request.POST = {'prod_id':i.product_id, 'qty':1, 'moulding_id': i.moulding_id,
+											'width':i.image_width, 'height': i.image_height,
+											'moulding_size' : i.moulding_size,
+											'print_medium_id':i.print_medium_id, 'print_medium_size': print_medium_size, 
+											'mount_id':i.mount_id, 'mount_size': mnt_size,
+											'mount_w_left' : 0, 'mount_w_right': 0, 
+											'mount_w_top': 0, 'mount_w_bottom' : 0, 
+											'acrylic_id': i.acrylic_id, 'acrylic_size':sqin,
+											'board_id': i.board_id, 'board_size': sqin, 'stretch_id': i.stretch_id,
+											'stretch_size': sqin, 
+											'total_price': 0, 'image_width': i.image_width, 'image_height': i.image_height,
+											'discount':0, 'promotion_id':None, 'disc_amt':0,
+											'item_unit_price':0, 'prod_type': i.product_type_id
+						}
+						
+						resp = add_to_cart_new(request)
+						result = json.loads(resp.content)	
+						if 'status' in result:
+							status = result['status']
+						else:
+							status = ''
+						
+						if 'cart_qty' in result:
+							total_cart_qty = total_cart_qty + result['cart_qty']
+							msg = 'SUCCESS'					
+
 					# Abondon the existing session cart
 					cnt = cart.update(cart_status = 'AB', updated_date = datetime.datetime.now())
-					'''
-					updcart = Cart(
-						cart_id = sessioncart.cart_id,
-						store = sessioncart.store,
-						session_id = sessioncart.session_id,
-						user = user,
-						voucher = sessioncart,
-						voucher_disc_amount = sessioncart.voucher_disc_amount,
-						quantity = sessioncart.quantity,
-						cart_sub_total = sessioncart.cart_sub_total,
-						cart_disc_amt  = sessioncart.cart_disc_amt,
-						cart_tax  = sessioncart.cart_tax,
-						cart_total = sessioncart.cart_total,
-						cart_status = 'AB',
-						created_date = sessioncart.created_date
-					)						
-					updcart.save()
-					'''
-					##return JsonResponse({"status":"CARTOPEN"})
-			
-				# Update the session Cart with current user id
-				cnt_s = Cart.objects.filter(cart_id = sessioncart.cart_id).update(
-						user = user, updated_date = datetime.datetime.now())
-				'''
-				updcart = Cart(
-						cart_id = sessioncart.cart_id,
-						store = sessioncart.store,
-						session_id = sessioncart.session_id,
-						user = user,
-						voucher = sessioncart.voucher,
-						voucher_disc_amount = sessioncart.voucher_disc_amount,
-						quantity = sessioncart.quantity,
-						cart_sub_total = sessioncart.cart_sub_total,
-						cart_disc_amt  = sessioncart.cart_disc_amt,
-						cart_tax  = sessioncart.cart_tax,
-						cart_total = sessioncart.cart_total,
-						cart_status = sessioncart.cart_status,
-						created_date = sessioncart.created_date
-				)						
-				
-				updcart.save()
-				'''
-				## Check is any order exists based on this cart, update it with the user
-				order = Order.objects.filter(cart_id = sessioncart.cart_id).update(
-					user = user, updated_date = datetime.datetime.now())
-				
+
 			finally:
 				return JsonResponse({"status":"NOUSER"})
 				
@@ -815,10 +809,16 @@ def manage_order_details(request):
 				product__product_type_id = F('product_type_id') ).order_by('product_id')
 	orderitems = Order_items_view.objects.select_related('product').filter(order = order,
 				product__product_type_id = F('product_type_id') ).order_by('product_id')
+
+	mod_addr_flag = True
+	ord_mod_flag = True
+	if order.order_status == 'IN' or order.order_status == 'CO' or order.order_status == 'CN':
+		mod_addr_flag = False
+		ord_mod_flag = False
 			
 	return render(request, "artevenue/manage_order_details.html",
 		{ 'msg': msg, 'env': env,
-		 'order': order, 'cart': cart,
+		 'order': order, 'cart': cart, 'mod_addr_flag': mod_addr_flag, 'ord_mod_flag': ord_mod_flag,
 		 'orderitems': orderitems, 'cartitems': cartitems})	
 	
 @staff_member_required
@@ -826,7 +826,7 @@ def start_production(request):
 
 	orders = Order.objects.filter(order_status = 'PC').order_by('order_date')
 	orderitems = Order_items_view.objects.select_related('product').filter(order__in = orders,
-				product__product_type_id = F('product_type_id') ).order_by('product_id')
+				product__product_type_id = F('product_type_id'), quantity__gt = 0 ).order_by('product_id')
 	
 	c_ids = orderitems.values('product_id')
 	collage = Collage_stock_image.objects.filter(stock_collage_id__in = c_ids).order_by('stock_collage_id')
@@ -859,7 +859,7 @@ def make_ready_for_shipping(request):
 
 	orders = Order.objects.filter(order_status = 'PR').order_by('order_date')
 	orderitems = Order_items_view.objects.select_related('product').filter(order__in = orders,
-				product__product_type_id = F('product_type_id') ).order_by('product_id')
+				product__product_type_id = F('product_type_id'), quantity__gt = 0 ).order_by('product_id')
 	
 	c_ids = orderitems.values('product_id')
 	collage = Collage_stock_image.objects.filter(stock_collage_id__in = c_ids).order_by('stock_collage_id')
@@ -923,7 +923,7 @@ def order_shipping(request):
 
 	orders = Order.objects.filter(order_status = 'SH').order_by('order_date')
 	orderitems = Order_items_view.objects.select_related('product').filter(order__in = orders,
-				product__product_type_id = F('product_type_id') ).order_by('product_id')
+				product__product_type_id = F('product_type_id'), quantity__gt = 0 ).order_by('product_id')
 	
 	c_ids = orderitems.values('product_id')
 	collage = Collage_stock_image.objects.filter(stock_collage_id__in = c_ids).order_by('stock_collage_id')
@@ -965,7 +965,7 @@ def make_in_transit(request):
 	if sts == 'FAILURE':
 		orders = Order.objects.filter(order_status = 'SH').order_by('order_date')
 		orderitems = Order_items_view.objects.select_related('product').filter(order__in = orders,
-					product__product_type_id = F('product_type_id') ).order_by('product_id')
+					product__product_type_id = F('product_type_id'), quantity__gt = 0 ).order_by('product_id')
 		
 		c_ids = orderitems.values('product_id')
 		collage = Collage_stock_image.objects.filter(stock_collage_id__in = c_ids).order_by('stock_collage_id')
@@ -1109,7 +1109,7 @@ def order_dashboard(request):
 	in_transit = orders.filter(order_status = 'IN').count()	
 
 	orderitems = Order_items_view.objects.select_related('product').filter(order__in = orders,
-				product__product_type_id = F('product_type_id') ).order_by('product_id')
+				product__product_type_id = F('product_type_id'), quantity__gt = 0 ).order_by('product_id')
 	c_ids = orderitems.values('product_id')
 	collage = Collage_stock_image.objects.filter(stock_collage_id__in = c_ids).order_by('stock_collage_id')
 
@@ -1131,7 +1131,7 @@ def print_pf_labels (request, order_id):
 	
 	order = Order.objects.filter(order_id = order_id).first()
 	orderitems = Order_items_view.objects.select_related('product').filter(order = order,
-				product__product_type_id = F('product_type_id') ).order_by('product_id')
+				product__product_type_id = F('product_type_id'), quantity__gt = 0 ).order_by('product_id')
 	
 	c_ids = orderitems.values('product_id')
 	collage = Collage_stock_image.objects.filter(stock_collage_id__in = c_ids).order_by('stock_collage_id')
@@ -1158,7 +1158,7 @@ def order_delivery(request):
 
 	orders = Order.objects.filter(order_status = 'IN').order_by('order_date')
 	orderitems = Order_items_view.objects.select_related('product').filter(order__in = orders,
-				product__product_type_id = F('product_type_id') ).order_by('product_id')
+				product__product_type_id = F('product_type_id'), quantity__gt = 0 ).order_by('product_id')
 	
 	c_ids = orderitems.values('product_id')
 	collage = Collage_stock_image.objects.filter(stock_collage_id__in = c_ids).order_by('stock_collage_id')
@@ -1216,7 +1216,7 @@ def order_modification( request, order_id ):
 
 	if order:
 		order_items = Order_items_view.objects.select_related('product').filter(order = order,
-					product__product_type_id = F('product_type_id') ).order_by('product_id')
+					product__product_type_id = F('product_type_id'), quantity__gt = 0 ).order_by('product_id')
 		c_ids = order_items.values('product_id')
 		collage = Collage_stock_image.objects.filter(stock_collage_id__in = c_ids).order_by('stock_collage_id')
 	else: 
@@ -1227,3 +1227,380 @@ def order_modification( request, order_id ):
 			{ 'msg': msg, 'env': env,
 			 'order': order, 'order_items': order_items, 'collage': collage,
 			 })	
+			 
+def order_addr_change(request, order_id=None):
+	today = datetime.datetime.today()
+	msg = None
+
+	if not order_id:
+		order_id = request.POST.get("order_id", "")
+	
+	order = Order.objects.filter(order_id = order_id).first()
+		
+	if order:
+		order_items = Order_items_view.objects.select_related('product').filter(order = order,
+					product__product_type_id = F('product_type_id'), quantity__gt = 0 ).order_by('product_id')
+		c_ids = order_items.values('product_id')
+		collage = Collage_stock_image.objects.filter(stock_collage_id__in = c_ids).order_by('stock_collage_id')
+		
+		try: 
+			ord_s = order.order_shipping
+		except Order_shipping.DoesNotExist:
+			ord_s = None
+
+		try: 
+			ord_b = order.order_billing
+		except Order_billing.DoesNotExist:
+			ord_b = None
+			
+		if ord_s:
+			ship_form = ship_addressForm(instance = order.order_shipping)
+		else:
+			ship_form = ship_addressForm()
+		if ord_b:
+			bill_form = bill_addressForm(instance = order.order_billing)
+		else:
+			bill_form = bill_addressForm()		
+		
+	else: 
+		order_items = None
+		collage = None
+		ship_form = None
+		bill_form = None
+
+	return render(request, "artevenue/order_addr_change.html",
+			{ 'msg': msg, 'env': env,
+			 'order': order, 'order_items': order_items, 'collage': collage,
+			 'bill_form': bill_form, 'ship_form': ship_form
+			 })	
+		
+def order_addr_change_confirm(request, order_id=None):
+	today = datetime.datetime.today()
+
+	err_msg = []
+	sts = 'SUCCESS'
+	
+	if not order_id :
+		order_id = request.GET.get('order_id', '')
+	order = Order.objects.filter(order_id = order_id).first()
+	
+	bill_addr_full_name = request.GET.get('bill_addr_full_name', '')
+	bill_addr_company = request.GET.get('bill_addr_company', '')
+	bill_addr_gst_number = request.GET.get('bill_addr_gst_number', '' )
+	bill_addr_1 = request.GET.get('bill_addr_1', '' )
+	bill_addr_2 = request.GET.get('bill_addr_2', '' )
+	bill_addr_land_mark = request.GET.get('bill_addr_land_mark', '' )
+	bill_addr_pin_code = request.GET.get('bill_addr_pin_code', '' )
+	bill_addr_city = request.GET.get('bill_addr_city', '')
+	bill_addr_state = request.GET.get('bill_addr_state', '')
+	bill_addr_country = request.GET.get('bill_addr_country', '')
+	bill_addr_phone_number = request.GET.get('bill_addr_phone_number', '')
+	bill_addr_email_id = request.GET.get('bill_addr_email_id', '')
+	
+	ship_addr_full_name = request.GET.get('ship_addr_full_name', '')
+	ship_addr_company = request.GET.get('ship_addr_company', '')
+	ship_addr_gst_number = request.GET.get('ship_addr_gst_number', '' )
+	ship_addr_1 = request.GET.get('ship_addr_1', '' )
+	ship_addr_2 = request.GET.get('ship_addr_2', '' )
+	ship_addr_land_mark = request.GET.get('ship_addr_land_mark', '' )
+	ship_addr_pin_code = request.GET.get('ship_addr_pin_code', '' )
+	ship_addr_city = request.GET.get('ship_addr_city', '')
+	ship_addr_state = request.GET.get('ship_addr_state', '')
+	ship_addr_country = request.GET.get('ship_addr_country', '')
+	ship_addr_phone_number = request.GET.get('ship_addr_phone_number', '')
+	ship_addr_email_id = request.GET.get('ship_addr_email_id', '')
+	
+	#################################
+	## Billing address validation  ## 
+	#################################
+	if bill_addr_full_name == '':
+		err_msg.append("Bill To Name can't be blank")
+		sts = 'FAILURE'
+	if bill_addr_1 == '':
+		err_msg.append("Billing address 1st line can't be blank")
+		sts = 'FAILURE'	
+	if bill_addr_pin_code == '':
+		err_msg.append("Billing address pin code is required")
+		sts = 'FAILURE'
+	else: 
+		b_pin = Pin_code.objects.filter(pin_code = bill_addr_pin_code).first()
+		if not b_pin:
+			err_msg.append("Entered billing address pin code is not found")
+			sts = 'FAILURE'			
+	if bill_addr_city == '':
+		err_msg.append("Billing address city is required")
+		sts = 'FAILURE'
+	else: 
+		b_city = City.objects.filter(city__iexact = bill_addr_city).first()
+		if not b_city:
+			err_msg.append("Entered billing address city is not found")
+			sts = 'FAILURE'
+	if bill_addr_state == '':
+		err_msg.append("Billing address state is required")
+		sts = 'FAILURE'
+	else: 
+		b_state = State.objects.filter(state_name__iexact = bill_addr_state).first()
+		if not b_state:
+			err_msg.append("Entered billing address state is not found")
+			sts = 'FAILURE'
+	if bill_addr_country == '':
+		err_msg.append("Billing address country is required")
+		sts = 'FAILURE'
+	else: 
+		b_country = Country.objects.filter(country_name__iexact = bill_addr_country).first()
+		if not b_country:
+			err_msg.append("Entered billing address country is not found")
+			sts = 'FAILURE'
+
+	if sts != 'FAILURE':
+		request.POST = {'pin_code': bill_addr_pin_code, 'city': b_city.city, 'cstate': b_state.state_name,
+		'country': b_country.country_name}	
+		val = validate_address(request)
+		result = json.loads(val.content)	
+		if 'msg' in result:
+			if result['msg'] != ['SUCCESS']:
+				err_msg.append(result['msg'])
+				sts = 'FAILURE'	
+
+	#################################
+	## Shipping address validation ## 
+	#################################
+	if ship_addr_full_name == '':
+		err_msg.append("Bill To Name can't be blank")
+		sts = 'FAILURE'
+	if ship_addr_1 == '':
+		err_msg.append("Shipping address 1st line can't be blank")
+		sts = 'FAILURE'	
+	if ship_addr_pin_code == '':
+		err_msg.append("Shipping address pin code is required")
+		sts = 'FAILURE'
+	else: 
+		s_pin = Pin_code.objects.filter(pin_code = ship_addr_pin_code).first()
+		if not s_pin:
+			err_msg.append("Entered shipping address pin code is not found")
+			sts = 'FAILURE'			
+	if ship_addr_city == '':
+		err_msg.append("Shipping address city is required")
+		sts = 'FAILURE'
+	else: 
+		s_city = City.objects.filter(city__iexact = ship_addr_city).first()
+		if not s_city:
+			err_msg.append("Entered shipping address city is not found")
+			sts = 'FAILURE'
+	if ship_addr_state == '':
+		err_msg.append("Shipping address state is required")
+		sts = 'FAILURE'
+	else: 
+		s_state = State.objects.filter(state_name__iexact = ship_addr_state).first()
+		if not s_state:
+			err_msg.append("Entered shipping address state is not found")
+			sts = 'FAILURE'
+	if ship_addr_country == '':
+		err_msg.append("Shipping address country is required")
+		sts = 'FAILURE'
+	else: 
+		s_country = Country.objects.filter(country_name__iexact = ship_addr_country).first()
+		if not s_country:
+			err_msg.append("Entered shipping address country is not found")
+			sts = 'FAILURE'
+
+	if sts == 'SUCCESS':
+		request.POST = {'pin_code': ship_addr_pin_code, 'city': s_city.city, 'cstate': s_state.state_name,
+		'country': s_country.country_name}	
+		val = validate_address(request)
+		result = json.loads(val.content)	
+		if 'msg' in result:
+			if result['msg'] != ['SUCCESS']:
+				err_msg.append(result['msg'])
+				sts = 'FAILURE'	
+
+	#################################
+	## Update shipping address  #####
+	#################################
+	if sts == 'SUCCESS':
+		try:
+			ord_s = order.order_shipping						
+		except Order_shipping.DoesNotExist:
+			ord_s = None
+		if ord_s:
+			s_ord = Order_shipping.objects.filter( order_id = order_id).update(
+				full_name = ship_addr_full_name,
+				Company = ship_addr_company,
+				address_1 = ship_addr_1,
+				address_2 = ship_addr_2,
+				land_mark = ship_addr_land_mark,
+				city = s_city.city,
+				state = s_state,
+				pin_code = s_pin,
+				country = s_country,
+				phone_number = ship_addr_phone_number,
+				email_id = ship_addr_email_id,
+				updated_date = today
+			)
+		else:
+			if request.user.is_authenticated:
+				try:			
+					user = User.objects.get(username = request.user)
+				except User.DoesNotExist:
+					user = None
+			else:
+				user = None
+			s_ord = Order_shipping( 
+				store_id = settings.STORE_ID,
+				order = order,
+				user = user,
+				full_name = ship_addr_full_name,
+				Company = ship_addr_company,
+				address_1 = ship_addr_1,
+				address_2 = ship_addr_2,
+				land_mark = ship_addr_land_mark,
+				city = s_city.city,
+				state = s_state,
+				pin_code = s_pin,
+				country = s_country,
+				phone_number = ship_addr_phone_number,
+				email_id = ship_addr_email_id,
+				created_date = today,
+				updated_date = today
+			)
+			s_ord.save()
+			
+	#################################
+	## Update billing address  #####
+	#################################
+	if sts == 'SUCCESS':
+		try:
+			ord_b = order.order_billing						
+		except Order_billing.DoesNotExist:
+			ord_b = None
+		if ord_b:
+			b_ord = Order_billing.objects.filter( order_id = order_id).update(
+				full_name = bill_addr_full_name,
+				Company = bill_addr_company,
+				address_1 = bill_addr_1,
+				address_2 = bill_addr_2,
+				land_mark = bill_addr_land_mark,
+				city = b_city.city,
+				state = b_state,
+				pin_code = b_pin,
+				country = b_country,
+				phone_number = bill_addr_phone_number,
+				email_id = bill_addr_email_id,
+				gst_number = bill_addr_gst_number,
+				updated_date = today
+			)
+		else:
+			if request.user.is_authenticated:
+				try:			
+					user = User.objects.get(username = request.user)
+				except User.DoesNotExist:
+					user = None
+			else:
+				user = None
+				
+			b_ord = Order_billing( 
+				store_id = settings.STORE_ID,
+				order = order,
+				user = user,
+				full_name = bill_addr_full_name,
+				Company = bill_addr_company,
+				address_1 = bill_addr_1,
+				address_2 = bill_addr_2,
+				land_mark = bill_addr_land_mark,
+				city = b_city.city,
+				state = b_state,
+				pin_code = b_pin,
+				country = b_country,
+				phone_number = bill_addr_phone_number,
+				email_id = bill_addr_email_id,
+				gst_number = bill_addr_gst_number,
+				created_date = today,
+				updated_date = today
+			)
+			b_ord.save()
+
+		## retrive order again to get updated values
+		order = Order.objects.filter(order_id = order_id).first()
+
+	if order:
+		order_items = Order_items_view.objects.select_related('product').filter(order = order,
+					product__product_type_id = F('product_type_id'), quantity__gt = 0 ).order_by('product_id')
+		c_ids = order_items.values('product_id')
+		collage = Collage_stock_image.objects.filter(stock_collage_id__in = c_ids).order_by('stock_collage_id')
+		
+		try:
+			ord_s = order.order_shipping						
+		except Order_shipping.DoesNotExist:
+			ord_s = None
+		if ord_s:
+			ship_form = ship_addressForm(instance = order.order_shipping)
+		else:
+			ship_form = ship_addressForm()
+			
+		try:
+			ord_b = order.order_billing						
+		except Order_billing.DoesNotExist:
+			ord_b = None
+		if ord_b:
+			bill_form = bill_addressForm(instance = order.order_billing)
+		else:
+			bill_form = bill_addressForm()				
+	else: 
+		order_items = None
+		collage = None
+		ship_form = None
+		bill_form = None
+
+	return render(request, "artevenue/order_addr_change.html",
+			{ 'sts': sts, 'err_msg': err_msg, 'order': order, 'order_items': order_items,
+			'collage': collage, 'ship_form': ship_form, 'bill_form': bill_form}
+			)	
+
+def order_modify_items(request, order_id = None):
+	today = datetime.datetime.today()
+
+	err_msg = []
+	sts = 'SUCCESS'
+	
+	if not order_id :
+		order_id = request.GET.get('order_id', '')
+	order = Order.objects.filter(order_id = order_id).first()
+
+	if order:
+		order_items = Order_items_view.objects.select_related('product').filter(order = order,
+					product__product_type_id = F('product_type_id') ).order_by('product_id')
+
+	# Get print mediums
+	printmedium = Print_medium.objects.all()
+	# get mouldings
+	mouldings = get_mouldings(request)
+	# defaul we send is for PAPER
+	paper_mouldings_apply = mouldings['paper_mouldings_apply']
+	paper_mouldings_show = mouldings['paper_mouldings_show']
+	moulding_diagrams = mouldings['moulding_diagrams']
+	paper_mouldings_corner = mouldings['paper_mouldings_corner']
+	canvas_mouldings_corner = mouldings['canvas_mouldings_corner']
+	# get mounts
+	mounts = get_mounts(request)
+
+	# get arylics
+	acrylics = get_acrylics(request)
+	
+	# get boards
+	boards = get_boards(request)
+
+	# get Stretches
+	stretches = get_stretches(request)
+
+
+	return render(request, "artevenue/order_modify_items.html",
+			{ 'sts': sts, 'err_msg': err_msg, 'order': order, 'order_items': order_items,
+			'printmedium':printmedium, 'mouldings_show':paper_mouldings_show, 
+			'mounts': mounts, 'env':settings.EXEC_ENV,
+			})	
+
+@staff_member_required		
+@csrf_exempt
+def staff_page(request):
+	return render(request, "artevenue/staff_page.html")
+	

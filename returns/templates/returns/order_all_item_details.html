@@ -1,0 +1,138 @@
+{% load static %}
+{% load utils %}
+<div id="all-items" tabindex="-1" role="dialog" aria-labelledby="Message_OK" aria-hidden="true" class="modal fade">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h3 class="modal-title"><span id = "modal-hedline">Order Details</span></h3>
+				<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class = "col-12">
+						<div class="table table-responsive" style = "font-size: 14px;">
+							{% for o in orders %}
+							<table id = "ordTbl" class="table table-responsive table-striped">
+								<thead>
+									<tr>
+										<th width="15%">Name</th>
+										<th width="30%">Details</th>
+										<th width="12%" style="text-align:right">Unit Price</th>
+										<th width="12%" style="text-align:right">Quantity</th>
+										<th width="12%" style="text-align:right">Discount</th>
+										<th width="12%" style="text-align:right">Tax</th>
+										<th width="12%" style="text-align:right">Total</th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for i in order_items_list %}
+									{% if i.order_id != o.order_id %}
+										<!-- Nothing -->
+										
+									{% else %}
+									<tr>
+										<td>
+											<img src = "{% if i.product_type|cut:' ' == 'USER-IMAGE' %} https://artevenue.com{{MEDIA_URL}}{{i.product.image_to_frame_thumbnail}} {% else %} {% if env == 'DEV' or env == 'TESTING' %} {{ i.product.thumbnail_url }} {% else %} {% static i.product.thumbnail_url %} {% endif %} {% endif %}" style = "width:75px; height:75px; object-fit:contain;">
+											<br />
+											<div class = "pull-left">
+												<small style = "padding-left:0px;" >
+													{% if i.product_type|cut:' ' == 'USER-IMAGE' %}  
+														Customer Image
+													{% else %}
+														{{i.product.name}}
+													{% endif %}
+														
+												</small>
+											</div>
+										</td>
+										<td>
+											<span  style = "font-size: 11px;">
+											{% with width=i.moulding.width_inner_inches|add_width_frame_mount:i.mount_size %}
+											{% if i.product_type_id == 'ORIGINAL-ART' %}
+												<li>{{i.product.description}}</li>
+											{% else %}													
+												<li>Print on {{i.print_medium_id|title}}</li>
+											{% endif %}
+											
+											{% if i.moulding_id %}
+												<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+												<li>Frame: {{i.moulding.name }} ({{i.moulding.width_inches}} inch, Polystyrene)</li>
+												{% if i.mount_id %}
+													<li>Mount: {{i.mount_size }}", Color: {{i.mount.name|title }} </li>
+												{% endif %}
+												<li>Total Size: 
+													{{ i.image_width|add_width:width|add_width:width }}" X {{i.image_height|add_width:width|add_width:width }}"</li>
+											{% else %}
+												<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+											{% endif %}
+											
+											{% if i.acrylic_id %}
+												<li>Acrylic covered</li>
+											{% endif %}
+											{% if i.stretch_id %}
+												<li>Canvas Stretched</li>
+											{% endif %}
+											{% endwith %}
+											</span>
+
+										</td>
+										<td style = "text-align:right">
+											{{i.item_unit_price}}
+										</td>
+										<td style = "text-align:right">
+											{{i.quantity}}
+										</td>
+										<td style = "text-align:right">
+											{{i.item_disc_amt|floatformat}}
+											<!--
+											{% if i.promotion.discount_type == "PERCENTAGE" %}
+												{{i.promotion.discount_value|floatformat}}%
+											{% else %}
+												{{i.promotion.discount_value|floatformat}}
+											{% endif %}
+											-->
+										</td>
+										<td style = "text-align:right">{{i.item_tax|floatformat}}</td>
+										<td style = "text-align:right">{{i.item_total|floatformat}}</td>
+
+									</tr>
+									{% endif %}
+									{% endfor %}
+									
+								</tbody>
+								<tfoot>
+									<tr>
+										<th colspan="5"><small>Shipping & Handing</small></th>
+										<th colspan="2" style = "text-align:right">
+											<small>{{o.shipping_cost|floatformat}}</small>
+										</th>
+										<th></th>
+									</tr>
+									<tr>
+										<th colspan="5">Order Total</th>
+										<th colspan="2" style = "text-align:right">
+											<i class = "fa fa-inr"> </i> {{o.order_total|floatformat}}
+										</th>
+										<th></th>
+									</tr>
+								</tfoot>
+							</table>
+							{% endfor %}
+						</div>
+					</div>
+					<div class = "col-12">
+						<div class = "text-center">
+							<button class="btn btn-primary" onclick="$('#all-items').modal('hide');"><i class="fa fa-chevron-right"></i>Cancel</button>
+						</div>					
+					</div>
+					<div class = "col-12">
+						<div class = "text-center">
+							<button class="btn btn-primary" onclick=""><i class="fa fa-chevron-right"></i>Initiate Return of All Products</button>
+						</div>					
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- END: Message modal -->		

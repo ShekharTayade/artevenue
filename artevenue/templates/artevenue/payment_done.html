@@ -24,7 +24,9 @@
 {% block imagemap-resize-script %}
 {% endblock imagemap-resize-script %}
 
-{% if env == 'PROD' %}
+
+
+
 {% block add_to_head %}
 	<script>
 	gtag('event', 'purchase', {
@@ -60,9 +62,9 @@
 		  'currency': 'INR',
 		  'transaction_id': '{{order.order_number}}'
 	  });
-	</script>	
+	</script>
+	
 {% endblock add_to_head %}
-{% endif %}
 	<!-- Only Override the site content block -->
 	{% block sitecontent %}
         <div class="container">
@@ -129,6 +131,7 @@
 											</div>
 											<div class = "col-sm-12">		
 												<span id ="ord-total" class = "ord-row"><strong>{{order.order_total|floatformat}}</strong></span>
+												<span hidden id = "total_amount">{{order.order_total|floatformat}}<span>
 											</div>
 										</div>
 										{% if order.order_discount_amt %}

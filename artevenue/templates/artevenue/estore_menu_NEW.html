@@ -35,9 +35,9 @@
 		<ul class="d-none navbar-nav d-md-flex w-100" style = "background-color:#fff;">
 			<div class = "d-none d-md-flex" style = "width: 70%">
 				<li class="list-inline-item clickable w-100">
-				<form role="search" class="form-inline d-none d-md-block search_form" action = "{% url 'art_by_category' %}">
+				<form id = "search_form"role="search" class="form-inline d-none d-md-block search_form" action = "{% url 'art_by_category' %}">
 					<input type="text" placeholder="Ex. Van Gogh, Blue, Abstract etc." id ="keywords" name="keywords" class="form-control w-100" required>
-					<button class="btn btn-outline-success" type="submit" style = "background-color: #000; border-radius: 0;">
+					<button class="btn btn-outline-success" type="submit" style = "background-color: #000; border-radius: 0;" form= "search_form">
 						<!--<img src="{% static 'img/search_head_white.png' %}" alt = "Search Button" width=20 height=20>-->
 						<i class="fa fa-search" style="color:#fff;"></i>
 					</button>
@@ -48,7 +48,8 @@
 				{% if ecom_site.phone_support_available %}
 				<li class="list-inline-item clickable">
 					<a class = "clickable" data-toggle="modal" data-target="#phone-help" style = "color: #77899e;">
-						<img src="{% static 'img/phone_support.png' %}" alt="Phone Support" width=15> Call us
+						<img src="{% static 'img/help.png' %}" alt="Phone Support" width=15> Help
+						<!--<img src="{% static 'img/help.png' %}" alt="Phone Support" width=15> Contact us-->
 					</a>
 				</li>
 				{% endif %}
@@ -160,7 +161,8 @@
 				{% if ecom_site.phone_support_available %}
 				<li class="list-inline-item clickable">
 					<a class = "clickable" data-toggle="modal" data-target="#phone-help" style = "color: #77899e;">
-						<img src="{% static 'img/phone_support.png' %}" alt="Phone Support" width=15> Call us
+						<img src="{% static 'img/help.png' %}" alt="Phone Support" width=15> Help
+						<!--<img src="{% static 'img/phone_support.png' %}" alt="Phone Support" width=15> Contact us-->
 					</a>
 				</li>
 				{% endif %}
@@ -323,6 +325,14 @@
 				</li>
 				{% endif %}
 				
+				{% if user.is_staff %}
+				<li class= "mt-2 mb-2 mt-md-0 mb-md-0">
+					<a href="{% url 'staff_page' %}"
+						style = "text-decoration:underline;">
+						Staff Page
+					</a>
+				</li>				
+				{% endif %}
 			</ul>	
 		</div>
 	</div>	
@@ -335,11 +345,11 @@
 <!-- Search open up -->
 <div id="search" class="d-block d-md-none">
 	<div class="container">
-		<form role="search"  class="form-inline search_form" action = "{% url 'art_by_category' %}">
+		<form id = "search_form_m" role="search"  class="form-inline search_form" action = "{% url 'art_by_category' %}">
 			<div class="input-group" style = "width:100% !important; float:right;">
-				<input type="text" placeholder="Ex. Van Gogh, Blue, Abstract etc." id ="keywords" name="keywords" class="form-control" required>
+				<input type="text" placeholder="Ex. Van Gogh, Blue, Abstract etc." id ="keywords_m" name="keywords" class="form-control keywords" required>
 				<div class="input-group-append">
-					<button type="submit" class="btn btn-primary">
+					<button type="submit" class="btn btn-primary" form = "search_form_m">
 						<i class="fa fa-search"></i>
 					</button>
 				</div>
@@ -353,31 +363,58 @@
 	<div class="modal-dialog modal-md">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h3 class="modal-title">Please call us at: <strong>{{ecom_site.support_phonenumber }}</strong></h3>
+				<h3 class="modal-title">
+					<strong> Get In Touch</strong>
+				</h3>
 				<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
 			</div>
 			<div class="modal-body">	
-				<div id = "framing-card" class = "row ">
-					<div class="card col-12">
+				<div id = "framing-card" class = "row">
+					<div class = "col-6 text-center mt-2">
+						<a href = "https://wa.me/919535805505?text=Hi,%20I%20need%20help%20with"
+							style = "font-size: 0.75rem;" 
+							target = "_blank">
+							<img src = "{% static 'img/whatsapp_logo.png' %}" width=40 alt="WhatsApp Logo"> 
+							<span style = "text-decoration: underline;
+								font-family: 'Lato', sans-serif; font-size: 14px; color: #212529;
+								letter-spacing: 0.5px;">
+								95358 05505
+							</span>
+						</a>						
+					</div>
+					<div class = "col-6 text-center mt-2">
+						<img src = "{% static 'img/phone_support.png' %}" width=40 alt="Phone Support"> 
+						<a href="tel:{{ecom_site.support_phonenumber }}">
+							<span style = "text-decoration: underline;
+								font-family: 'Lato', sans-serif; font-size: 14px; color: #212529;
+								letter-spacing: 0.5px;">
+								{{ecom_site.support_phonenumber }}
+							</span>
+						</a>
+					</div>
+					<div class="card col-12 mt-3">
 						<div class="card-body">
 							<h3 class="card-title">Have a question or need some help?</h3>
 							<p class = "card-text mt-3">
 								<ul>
 									<li>How to choose artworks and size</li>
 									<li>How to customize artworks</li>
-									<li>Questions on photo framing, custom framing</li>
-									<li>Ordering, shipping</li>
+									<li>Questions on ordering, shipping, returns, status</li>
 									<li>Ask our designers</li>
 									<li>Anything else....</li>
 								</ul>
+								For Most General Questions:
+								<a href="{% url 'faq' %}">FAQ</a>
 								<hr>
 								<span class = "pull-left">
 									We are here to help!<br />
 									<small>Timing: {{ecom_site.phone_support_start_time}} to {{ecom_site.phone_support_end_time}}</small>
 								</span>
+								<!--
 								<span class = "pull-right" style = "font-size: 1.5rem;">
 									<img src="{% static 'img/phone_support.png' %}" alt="Phone Support" width=15> {{ecom_site.support_phonenumber }}
 								</span>
+								-->
 							</p>
 						</div>			
 					</div>
@@ -512,3 +549,16 @@
 		</div>
 	</div>
 </div>
+
+<script>
+	$("#search_form_m").submit(function(){
+		var s_txt = $("#keywords_m").val();		
+		var txt = s_txt.replace(/[&<>]/g, '');
+		$("#keywords_m").val(txt);
+	});
+	$("#search_form").submit(function(){
+		var s_txt = $("#keywords").val();
+		var txt = s_txt.replace(/[&<>]/g, '');
+		$("#keywords").val(txt);
+	});
+</script>

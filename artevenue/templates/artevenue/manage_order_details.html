@@ -3,13 +3,13 @@
 {% load utils %}
 {% load widget_tweaks %}
 {% block page-title %} 
-<title>Arte'Venue - Process Order</title>
+<title>Arte'Venue - Order Management</title>
 {% endblock page-title %} 
 {% block page-description %}
-<meta name="description" content="Arte'Venue | Order Processing ">
+<meta name="description" content="Arte'Venue | Order Management ">
 {% endblock page-description %}
 {% block page-keywords %}
-<meta name="keywords" content="Art, artevenue, orders">
+<meta name="keywords" content="Art, artevenue, order management">
 {% endblock page-keywords %}
 
 
@@ -226,18 +226,6 @@
 							<small>Sub: {{oi.item_sub_total|floatformat}}; </small>
 							<small>Tax: {{oi.item_tax|floatformat}}; </small>
 							Total: {{oi.item_total|floatformat}};
-							<br />
-							<div class = "row">
-								<div class = "col-6 text-center">
-									<button type = "button" class = "btn btn-sm">Modify Item</button>
-								</div>
-								<div class = "col-6  text-center">
-									<button type = "button" class = "btn btn-sm">Delete Item</button>
-								</div>
-							</div>
-							<br />
-							<br />
-							<br />
 						{% endfor %}
 					</div>
 					<div class = "col-6" style = "display: table-cell">
@@ -290,43 +278,47 @@
 							<small>Sub: {{i.item_sub_total|floatformat}}; </small>
 							<small>Tax: {{i.item_tax|floatformat}}; </small>
 							Total: {{i.item_total|floatformat}};
-							<br />
-							<div class = "row">
-								<div class = "col-6 text-center">
-									<button type = "button" disabled class = "btn btn-sm">Modify Item</button>
-								</div>
-								<div class = "col-6  text-center">
-									<button type = "button" disabled class = "btn btn-sm">Delete Item</button>
-								</div>
-							</div>
-							<br />
-							<br />
-							<br />
 						{% endfor %}
 					</div>
 
 				</div>
 				<div class = "row mt-3">
-					<div class = "col-12 col-md-4 text-center">
-						<input type = "submit" class = "btn btn-primary" 
+					<div class = "col-12 col-md-4 text-center" style = "border-radius: 5px; border: 1px solid #11b5bd; padding: 15px 15px 0px 15px;">
+						<input type = "submit" class = "btn btn-success" 
 							name="process_order" value="PROCESS PAYMENT" 
 							{% if msg %} disabled {% endif %}>
-						<p>When payment is not getting processed through
+						<p style = "margin-bottom: 0px;">When payment is not getting processed through
 						the website, use this to manually process the payment for this order.
 						Order will be confirmed and order emails will be sent.</p>
 					</div>
-					<div class = "col-12 col-md-4 text-center">
-						<a class = "btn btn-primary"  href= "{% url 'order_modification' order.order_id %}"
-							{% if msg %} disabled {% endif %}>
-							MODIFY ORDER
+					<div class = "col-12 col-md-4 text-center" style = "border-radius: 5px; border: 1px solid #11b5bd; padding: 15px 15px 0px 15px;">
+						<a class = "btn btn-primary" 
+							{% if mod_addr_flag %} 
+							href= "{% url 'order_addr_change' order.order_id %}"
+							{% endif %}>
+							MODIFY ORDER ADDRESS
 						</a>
-						<p>Make modifications to the order, order items.</p>
+						{% if mod_addr_flag %}
+						<p style = "margin-bottom: 0px;">Make modifications or add billing and shipping address to the order.</p>
+						{% else %}
+						<p style = "margin-bottom: 0px;">This order is in transit, delivered, or is cancelled, hence address can't be changed.</p>						
+						{% endif %}
 					</div>
-					<div class = "col-12 col-md-4 text-center">
-						<input type = "submit"  class = "btn btn-primary" 
+					<div class = "col-12 col-md-4 text-center" style = "border-radius: 5px; border: 1px solid #11b5bd; padding: 15px 15px 0px 15px;">
+						<input type = "submit"  class = "btn btn-danger" 
 							name="cancel_order" value="CANCEL ORDER"
 							{% if msg %} disabled {% endif %}>
-						<p>This will mark order as cancelled. Any refund due will have to done separately.</p>
+						<p style = "margin-bottom: 0px;">This will mark order as cancelled. It will create a credit note, in case the payment was done. The refund due will have to processed separately.</p>
+					</div>
+					<div class = "col-12 col-md-4 text-center" style = "border-radius: 5px; border: 1px solid #11b5bd; padding: 15px 15px 0px 15px;">
+						<a class = "btn btn-warning"> 
+							MODIFY ORDER ITEMS
+						</a>
+						{% if ord_mod_flag %}
+						<p style = "margin-bottom: 0px;">Make modifications to order items - Add, remove items or change frame, size, or other details.</p>
+						{% else %}
+						<p style = "margin-bottom: 0px;">This order is in transit, delivered, or is cancelled, hence can't be changed.</p>						
+						{% endif %}
 					</div>
 				</div>
 			</form>

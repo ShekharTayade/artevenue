@@ -357,9 +357,20 @@
 							<li>'BOTH': Original art and it's print both will be available for customers to order.
 								Customers can choose to order the original art or it's art print.</li>
 						</ul>
-						<strong>Photographs can only be sold as art print</strong>
+						<!--<strong>Photographs can only be sold as art print</strong>-->
 					</div>
-				</div>
+					
+					<div class="col-12" style = "color:Orange; padding:5px; font-weight:600;">				
+					PLEASE SELECT "ONLY ORIGINAL"<br /> The sales for art prints are disabled. 
+					Our aim is to retain 
+					the high customer satisfaction on art prints. We will procure the 
+					necessary scanner to produce the highest quality scans of your original 
+					artworks and then enable the sales of art prints. Until then only original 
+					artwork can be sold through our website. Looking forward to your kind 
+					cooperation and patience.<br />
+					YOU MAY UPLOAD WITH ART PRINT OPTION, HOWEVER, IT WILL NOT BE LISTED FOR SALES
+					CURRENTLY.
+					</div>
 			</div>
 		</div>
 		<div class="row box mt-5">		
@@ -541,7 +552,7 @@
 			{% if orig_artwork %}
 				allow_art_print('{{orig_artwork.sell_mode}}');
 			{% else %}
-				allow_art_print('B');				
+				allow_art_print('O');				
 			{% endif %}
 			
 			{% if category %}
@@ -654,7 +665,7 @@
 			$("#both").removeClass('p_clicked');
 			return;
 		}
-		
+		mode = 'O';
 		switch (mode){
 			case 'O':
 				sell_mode = 'O';

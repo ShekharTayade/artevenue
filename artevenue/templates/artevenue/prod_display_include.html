@@ -69,7 +69,6 @@
 							</div>
 						</div>
 					</div>
-
 					
 					<div class="row">
 						{% for prod in prods %}
@@ -79,31 +78,27 @@
 								<div class="img-container">
 									<a id = "alink_{{prod.product_id}}" href="{% url 'stock_image_detail' prod.product_id %}">
 										{% if env == 'DEV' or env == 'TESTING' %}
-										<img data-src="{{ prod.url }}" alt="Wall art: {{prod.name}}, by {{prod.artist}}" class="img-fluid image-display lazyload"
-												style = "filter: drop-shadow(0.25rem 0.25rem 0.25rem grey);" onclick="$('#img-form_{{prod.product_id}}').submit();">
-										<!--<picture>
+										<picture>
 											<source media="(max-width:465px)" srcset="{{ prod.thumbnail_url }}">
 											<source media="(min-width:465px)" srcset="{{ prod.url }}">
 											<img data-src="{{ prod.url }}" alt="Wall art: {{prod.name}}, by {{prod.artist}}" class="img-fluid image-display lazyload" 
 													style = "filter: drop-shadow(0.25rem 0.25rem 0.25rem grey);" onclick="$('#img-form_{{prod.product_id}}').submit();">
-										</picture>-->
+										</picture>										
 										{% else %}
-										<img data-src="{% static prod.url %}" alt="Wall art: {{prod.name}}, by {{prod.artist}}" class="img-fluid image-display lazyload" 
-												style = "filter: drop-shadow(0.25rem 0.25rem 0.25rem grey);" onclick="$('#img-form_{{prod.product_id}}').submit();">
-										<!--<picture>
-											<source media="(max-width:465px)" srcset="{{ prod.thumbnail_url }}">
-											<source media="(min-width:465px)" srcset="{{ prod.url }}">
-											<img data-src="{% static prod.url %}" alt="Wall art: {{prod.name}}, by {{prod.artist}}" class="img-fluid image-display lazyload"
+										<picture>
+											<source media="(max-width:465px)" srcset="{% static prod.thumbnail_url %}">
+											<source media="(min-width:465px)" srcset="{% static prod.url %}">
+											<img data-src="{% static prod.url %}" alt="Wall art: {{prod.name}}, by {{prod.artist}}" class="img-fluid image-display lazyload" 
 													style = "filter: drop-shadow(0.25rem 0.25rem 0.25rem grey);" onclick="$('#img-form_{{prod.product_id}}').submit();">
-										</picture>-->
-										{% endif %}		
+										</picture>
+										{% endif %}
 									</a>
 								</div>
 
 								<div class="text " style = "margin-top: 5px; width:150px; padding-left: 15px;">
 									<div class = "row">
 										<div class = "col-12">
-										<span class = "text-center" style="color: #11b6bd !important; font-size:0.8rem;">
+										<span class = "text-center" style="color: #11b6bd !important; font-size:0.8rem; font-weight:700;">
 											{{prod.name}}
 										</span>
 										{% if prod.product_id in wishlist_prods %}
@@ -123,9 +118,9 @@
 									</div>
 									<div style = "color:#888 !important;">{{prod.artist}}</div>
 									<div style = "margin-top:2px;">
-										{% for p in price %} {% if p.publisher_id == prod.publisher %} <i class = "fa fa-inr"></i> <span class="price"> {% get_price prod.max_width prod.aspect_ratio p.price 0 %} </span>{% endif %}{% endfor %} <span style="color:#888;">(10"X{{10|get_height:prod.aspect_ratio}}")</span>
+										{% for p in price %} {% if p.publisher_id == prod.publisher %} <i class = "fa fa-inr"></i> <span class="price"> {% get_price prod.max_width prod.aspect_ratio p.price 0 %} </span>{% endif %}{% endfor %} <span style="color:#888;">(for 10"X{{10|get_height:prod.aspect_ratio}}")</span>
 										<span class="price text-center">
-											<a style="color:#888 !important;" href="{% url 'stock_image_detail' prod.product_id %}">, Multiple Sizes</a>
+											<a style="color:#000 !important; font-weight:600;" href="{% url 'stock_image_detail' prod.product_id %}">, Multiple Sizes</a>
 										</span>
 									</div>
 									</p>
@@ -170,6 +165,31 @@
 									  </li>
 									  {% endif %}   
 								</ul> 
+							</div>
+						</div>
+					</div>
+					<div class = "row">
+						<div class = "col-12 col-md-10 mb-5">
+							USEFUL TIPS
+							<hr>
+							<div class="row">
+								<a href = "https://nextsteps.co.in" 
+									style = "color:#0e0e0e; text-decoration: none; padding:5px;" 
+									target="_blank">
+									<div class = "col-12 d-flex flex-row">
+										<img src = "{% static 'img/guide_for_choosing_paintings.png' %}" width=50 alt="How to choose paintings for home decor">
+										<h2 class = "align-self-center ml-2">
+											How to Choose Paintings For Home Décor
+										</h3>
+									</div>
+									<div class = "col-12">
+										<h5>Questions on mind - how should you choose paintings? What should
+											you consider? Where to buy paintings online? Quality?
+											Here is the only detailed guide you will find...
+											<i class = "fa fa-caret-right fa-2x"></i>
+										</h5>
+									</div>					
+								</a>
 							</div>
 						</div>
 					</div>

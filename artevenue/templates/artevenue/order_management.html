@@ -39,6 +39,7 @@
 					<nav aria-label="breadcrumb">
 						<ol class="breadcrumb">
 							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+								<li class="breadcrumb-item"><a href="{% url 'staff_page' %}">Staff Page</a></li>
 							<li aria-current="page" class="breadcrumb-item active">Order Management</li>
 						</ol>
 					</nav>
@@ -54,13 +55,16 @@
 							Once the order payment is processed, order will be confirmed and 
 							order confirmation emails will be sent to customer and factory.
 						</li>
+						<li> <strong>Order Address Change:</strong> 
+							Change the order shipping and billing address.
+						</li>
 						<li> <strong>Order Cancellation:</strong> 
 							Cancel the order. It mark the status of an order as cancelled.
 						</li>
 				</div>
 			</div>
 	
-			<form id = "ord_submit" method = "get" action = "{% url 'manage_order_details' %}">
+			<form id = "ord_submit" method = "get" action = "{% url 'manage_order_details' %}">				
 				<div class="row text-center mb-5">
 					<div class = "col-12 col-md-6">
 						<div class="form-group">

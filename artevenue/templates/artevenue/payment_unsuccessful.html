@@ -26,6 +26,7 @@
 				<h3 class="tag-title">Hey {{firstname}}, the payment for order no. {{order.order_number}} didn't not go through!</h3>
 				<P>Transaction status is: {{ status | upper}}</p>
 				<P>ID for this transaction is: {{ txnid }}</p>
+				<p><span id = "total_amount">Order Total: {{order.order_total|floatformat}}<span></p>
 				<div class = "row">
 					<div class = "col-12">
 						<span class="pull-left">

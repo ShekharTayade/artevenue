@@ -870,7 +870,6 @@ top #phone-help .modal-header h5 {
 
 #accordion table td, table th {
 	padding: 5px !important;
-	color:darkgrey;
 	font-size: 0.8rem;
 }
 
@@ -880,8 +879,8 @@ hr.hr-thick {
 
 
 .img-in-menu {
-	width:120px !important;
-    height: 120px;
+	width:100px !important;
+    height: 100px;
     object-fit: cover;	
 	display: block;
 	margin-left: auto;
@@ -1738,7 +1737,6 @@ nav > div a.nav-item.nav-link:focus
 
 .why-artevenue-text{
 	font-size: 0.6rem;
-	color: #666;
 	text-align:center;
 }
 
@@ -2224,4 +2222,28 @@ blockquote.right small {
 @media screen and (max-height: 450px) {
   .wanav {padding-top: 15px; left: 15%;}
   .wanav a {font-size: 18px;}
+}
+
+.staffpg-card {
+	border: 2px solid #cfcfcf;
+	border-radius: 5px;
+	padding: 0px;	
+}
+
+.staffpg-card .stitle{
+	font-weight: 700;
+	background-color: #11b6bd;
+	color: #fff;
+	text-transform: uppercase;
+	padding: 15px;
+}
+
+.staffpg-card .nav-link{
+	color: #000;
+	padding: 8px;
+}
+.staffpg-card .nav-link:after{
+    font-family: 'FontAwesome';  
+    content: "\f0da";
+
 }

@@ -626,12 +626,12 @@ def checkout_step1_address(request):
 	pin_code_arr = []
 	for p in pin_code_list:
 		pin_code_arr.append(p.pin_code)
-		
+	
 	if order:
 		disc_amt = order.order_discount_amt
 	else:
 		disc_amt = 0
-	return render(request, "artevenue/checkout_step1_address_new.html", {'order_total':order_total,
+	return render(request, "artevenue/checkout_step1_address_new.html", {'order_total':order_total, 'order': order,
 					'sub_total':sub_total, 'tax':tax,'shipping_addr':shipping_addr, 'billing_addr':billing_addr,
 					'disc_amt':disc_amt, 'country_arr':country_arr, 'state_arr':state_arr,  'shipping_cost':shipping_cost,
 					'city_arr':city_arr, 'pin_code_arr':pin_code_arr, 'order_number':order_number,

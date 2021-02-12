@@ -117,26 +117,29 @@
 					</nav>
 				</div>
 				<div class="col-12" style = "padding:30px;">
+					<span class="id" hidden>{{product.product_id}}</span>
 					<div id="productMain" class="row">
 						<div class = "d-none d-md-block col-12 col-md-2 img-thumbs">
 								<div class = "col-2">
-									<img alt ="Wall Art Painting full view" class = "card-thumb" id = "card0">
+									<img alt ="full view" class = "card-thumb" id = "card0" >
 								</div>
 								<div class = "col-2">
-									<img alt ="Painting in living room" class = "card-thumb" id = "card1">
+									<img alt ="living room view" class = "card-thumb" id = "card1" >
 								</div>
 								<div class = "col-2">
-									<img src = '' alt ="Painting in a room" class = "card-thumb" id = "card2">
+									<img src = '' alt ="room view" class = "card-thumb" id = "card2" >
 								</div>
 								<div class = "col-2">
-									<img src = '' alt ="Painting in bedroom" class = "card-thumb" id = "card3">
+									<img src = '' alt ="bedroom view" class = "card-thumb" id = "card3" >
 								</div>
 								<div class = "col-2">
-									<img src = '' alt ="Artwork features" class = "card-thumb" id = "card4">
-								</div>							
+									<img src = "{% static 'img/catalog/all_features.jpg' %}" alt ="features" class = "card-thumb" id = "card4" >
+								</div>			
+								<!--	
 								<div class = "col-2">
-									<img src = '' alt ="Art work freatures more" class = "card-thumb" id = "card5">
+									<img src = '' alt ="more features" class = "card-thumb" id = "card5" width=62 >
 								</div>
+								-->
 						</div>
 						<div class = "d-none d-md-block col-12 col-md-5 img-div">
 							<div class = "show_on_large_only mt-5">
@@ -152,7 +155,7 @@
 									<!-- <img id = "prod-img" src="{% static product.url %}" data-action = "zoom" class="img-fluid"/> -->
 									<img id = "prod-img" src="{% static product.url %}" 
 										alt = "Wall Art Painting id:{{product.product_id}}, Name: {{product.name}}, Artist: {{product.artist}}" 
-										style = "max-width: 100%; max-height:500px; margin:0px;"/>
+										style = "max-width: 100%; max-height:400px; min-height:300px; margin:0px;"/>
 								</div>
 							
 							{% else %}
@@ -161,20 +164,27 @@
 										onmouseleave="stopMagnify()"
 										ontouchstart="startMagnify()" 
 										ontouchend="stopMagnify()"
-										id = "image-div">
+										id = "image-div"
+										style = "height: 400px;">
 									<img id = "prod-img" src="{% static product.url %}" alt="Art Print: {{product.name}}"  data-action = "zoom" class="img-fluid"
-											style = "max-width: 100%; max-height:500px; margin:0px;"
+											style = "max-width: 100%; max-height:400px; min-height:300px; margin:0px;" 
 											alt = "Wall Art Painting id:{{product.product_id}}, Name: {{product.name}}, Artist: {{product.artist}}" />
 								</div>
 							{% endif %}
-							<img src = "{% static '/img/licensed_artprint.jpg' %}" alt="Licensed Art Print"
-								height = 20>
-							<div class = "pull-right">
+							<div class = "col-12">
+								<img src = "{% static '/img/licensed_artprint.jpg' %}" alt="Licensed Art Print"
+								height = 23>
 								<button data-target='tooltip' title = "Add to favourites" 
-										class="btn btn-sm" style = "background-color:#fff;"
+										class="btn btn-sm pull-right" style = "background-color:#fff;"
 										onclick="addProdToWishlist({{product.product_id}},1)">
 									<i class="fa fa-heart-o fa-lg" ></i>
-								</button>
+								</button>								
+								{% if img_download_flg %}
+								<div class = "row">
+									<img src = "{% static 'img/download_btn.png' %}" width=80 alt="download image"
+										onclick = "donwloadImage()">
+								</div>
+								{% endif %}
 							</div>
 							<div class = "mt-4 d-flex flex-column align-items-center justify-content-center">
 								<button class = "btn btn-primary"
@@ -186,41 +196,50 @@
 								</div>
 							</div>
 						</div>
-						<div class = "d-block d-md-none" style = "width: 100%;">
+						<div class = "d-block d-md-none" style = "max-width: 100%;">
 							<section id="card-slider" class="slider">
 								<div class=" card-img">
 									<img id = "prod-img-card" src="" 
-										alt ="Wall Art Painting full view">
+										alt ="full view">
 								</div>
-								<div class=" card-img">
+								<div class="card-img">
 									<img id= "prod-card1" src="" 
-										alt="Painting in living room">
+										alt="living room view">
 								</div>
 								<div class=" card-img">
 									<img id= "prod-card2" src="" 
-										alt="Painting in a room">
+										alt="room view">
 								</div>
 								<div class=" card-img">
 									<img id= "prod-card3" src="" 
-										alt="Painting in bedroom">
+										alt="bedroom view">
 								</div>
 								<div class=" card-img">
-									<img id= "prod-card4" src="" 
-										alt="Artwork features">
+									<img id= "prod-card4" src="{% static 'img/catalog/all_features.jpg' %}" 
+										alt="features">
 								</div>
+								<!--				
 								<div class=" card-img">
 									<img id= "prod-card5" src="" 
 										alt="More artwork feaures">
 								</div>
+								-->
 							</section>
-							<img src = "{% static '/img/licensed_artprint.jpg' %}" 
-							alt="Licensed Art Print" height = 20>
-							<div class = "pull-right">
+							<div class = "col-12">
+								<img src = "{% static '/img/licensed_artprint.jpg' %}" 
+								alt="Licensed Art Print" height = 23>
+								
 								<button data-target='tooltip' title = "Add to favourites" 
-										class="btn btn-sm" style = "background-color:#fff;"
+										class="btn btn-sm pull-right" style = "background-color:#fff;"
 										onclick="addProdToWishlist({{product.product_id}},1)">
 									<i class="fa fa-heart-o fa-lg" ></i>
 								</button>
+								{% if img_download_flg %}
+								<div class = "row">
+									<img src = "{% static 'img/download_btn.png' %}" width=80 alt="download image"
+										onclick = "donwloadImage()">
+								</div>
+								{% endif %}
 							</div>
 							<div class = "mt-4 d-none d-md-flex flex-column align-items-center">
 								<button class = "btn btn-primary"
@@ -245,14 +264,16 @@
 										<h3 id = "artist"> {% if product.artist %} By {{product.artist}} {% endif %} </h3>
 									</div>
 									<div class="price pull-right">
-										<div id = "promo-display" style = "display:none">
+										<div id = "promo-display" style = "display:none; line-height: 1;">
 											<!--<small><i class="fa fa-inr" aria-hidden="true">&nbsp;</i></small>-->
 											<small id = "item_unit_price" style = "color:red; text-decoration: line-through;">{{product.price|floatformat:"0"}}</small>
 											<i class="fa fa-inr" aria-hidden="true">&nbsp;</i><span id = "item_total_price" style = "text-decoration: underline;">{{product.price|floatformat:"0"}}</span>
 											<br /><span id = "disc" style = "font-size:0.75rem;" class = "pull-right text-muted"></span>
+											<br /><span style = "font-size: 0.65rem;">(Including taxes)</span>											
 										</div>	
-										<div id = "no-disc">
+										<div id = "no-disc" style = "line-height: 1;">
 											<i class="fa fa-inr" aria-hidden="true">&nbsp;</i><span id="prod-price">{{product.price|floatformat:"0"}}</span>
+											<br /><span style = "font-size: 0.65rem;">(Including taxes)</span>
 										</div>
 										<div id = "item_unit_price_nv" style = "display:none;"></div>
 										<div id = "promotion_id_nv" style = "display:none;"></div>
@@ -334,11 +355,11 @@
 							</div>
 
 							<div class="row mt-4">
-								<div class="col-6 text-center">
-									<span style = "font-size:0.75rem;">Finished sizes with frame</span>
+								<div class="col-6 text-center mb-1" style = "line-height: 1;">
+									<span class = "fa fa-arrow-down" style = "font-size:0.7rem;">Choose framed sizes</span>
 								</div>
-								<div class="col-6 text-center">
-									<span style = "font-size:0.75rem;">Customize size, frame</span>
+								<div class="col-6 text-center mb-1" style = "line-height: 1;">
+									<span class = "fa fa-arrow-down" style = "font-size:0.7rem;">Customize size, frame etc.</span>
 								</div>
 								<div class="col-12">
 									<nav class = "nav-justified">		
@@ -455,27 +476,6 @@
 											</div>
 										</div>
 									</span>
-
-									<!--<div class = "row" id ="stretched">
-										<div class = "col-12" style = "margin-top:-5px; font: 0.85rem 'Roboto', sans-serif;" class = "checkbox row">
-											<label class="checkbox-inline">
-												<input id="in_stretched" name="in_stretched"
-													onchange = "stretch_changed();"
-													type = "checkbox"> <strong>Stretched?</strong>
-											</label>
-										</div>
-										<div class = "col-12" style = "margin-bottom:15px;">
-											<small>Check the checkbox to get the canvas streched on a wooden frame</small>
-											<span class = "">
-												<i class = "fa fa-question-circle" 
-													data-toggle="tooltip" title="Click to know more!"
-													id="strt" 
-													onclick="$('#stretched-modal').modal('show');">
-													<span style = "color:#11b6bd; font-size:0.7rem; text-decoration:underline;">What does 'Stretched' mean</span>
-												</i>
-											</span>
-										</div>
-									</div>-->
 								</div>
 							</div>
 							<div class = "row mt-1 mb-5">
@@ -489,6 +489,52 @@
 										href = "{% url 'how_to_hang' %}">
 										See all How-To tips
 									</a>
+								</div>
+							</div>
+							<div class = "row">
+								<div class = "col-12">
+									<hr>
+								</div>
+							</div>
+							{% if not user.is_authenticated %}
+							<div class = "row mt-3 d-flex px-3">
+								<div id = "signupsave" class = "col-12 text-center d-flex py-1" style = "border: 1px solid #11b6bd; cursor:pointer;">
+									<img src="{% static 'img/signup_callout.png' %}" alt="Sign and save 15% on Wall art painting" width=40 onclick = "$('#signup_popup-modal').modal('show');" align="left" style = "margin:auto;">
+									<ul style = "list-style: none; margin: auto;">
+									<li class = "align-middle" style = "font-size:0.9rem; cursor: pointer; color:#11b6bd;"
+										onclick = "$('#signup_popup-modal').modal('show');">
+										Tap to Sign Up & Save 15%.
+									</li>
+									</ul>
+								</div>
+								<div class = "col-12 text-center py-2">
+									<div style = "font-size:0.6rem; line-height: 1;"> Discount coupon gets automatically applied 
+										in your cart. Price shown here is before discount.
+									</div>
+								</div>	
+							</div>
+							{% else %}
+								{% if v15off %}
+								<div class = "row mt-3 d-flex px-3">
+									<div class = "col-12 text-center d-flex py-1" style = "border: 1px solid #11b6bd;">
+										<img src="{% static 'img/signup_callout.png' %}" alt="Save 15% on Wall art painting" width=40 align="left" style = "margin:auto;">
+										<ul style = "list-style: none; margin-left: 15px; margin-top: 0px; margin-bottom:0px;">
+										<li class = "align-top" style = "font-size:0.9rem; cursor: pointer; color:#11b6bd;">
+											You are eligible to get 15% off on total cart value.
+										</li>
+										</ul>
+									</div>
+									<div class = "col-12 text-center py-2">
+										<div style = "font-size:0.6rem; line-height: 1;"> Discount coupon gets automatically applied 
+											in your cart. Price shown here is before discount.
+										</div>
+									</div>	
+								</div>
+								{% endif %}							
+							{% endif %}
+							<div class = "row">
+								<div class = "col-12">
+									<hr>
 								</div>
 							</div>
 							<div class = "col-12 sticky d-flex justify-content-around">
@@ -508,26 +554,9 @@
 									</button>
 								</div>
 							</div>
-							{% if not user.is_authenticated %}
-							<div class = "row mt-3">
-								<div id = "signupsave" class = "col-12">
-									<img src="{% static 'img/signup_callout.png' %}" alt="Sign and save 15% on Wall art painting" width=50 onclick = "$('#signup_popup-modal').modal('show');" align="left">
-									<ul style = "list-style: none; margin-left: 25px;">
-									<li class = "align-top" style = "font-size:0.8rem; cursor: pointer; text-decoration:underline; color:#11b6bd;"
-										onclick = "$('#signup_popup-modal').modal('show');">
-										Sign Up In seconds & Save 15%
-									</li>
-									<li style = "line-height:1;">
-										<small>Sign up, add the artworks to the cart and coupon 'FIRST15' (flat 15% off) is applied automatically</small>
-									</li>
-									</ul>
-								</div>
-							</div>
-							{% endif %}
-							<div class = "col-12 text-muted mt-3"
-									style= "font-size: 0.65rem; text-align: left; padding:15px;
-									background-color:#efefef;">
-								ARTWORK DETAILS<br /> 
+							<div class = "col-12 mt-1"
+									style= "font-size: 0.65rem; text-align: left; padding:15px; background-color:#efefef; border: 1px solid #11b6bd;">
+								<span style = "font-weight: 600; ">SELECTED ARTWORK SPECIFICATIONS</span><br /> 
 								<span id = "prod-details">
 								</span>
 							</div>								
@@ -545,55 +574,58 @@
 									</div>
 								</div>
 								<hr>
-								<div class="row">
-									<div class="col-4 mb-3 why-artevenue-div">
-										<div onclick = "show_modal('GUARANTEE');">
+								<div class="row mb-3">
+									<div class="col-4 why-artevenue-div ">
+										<div onclick = "show_modal('GUARANTEE');" 
+											style = "border:1px solid #cfcfcf; border-radius: 8px; padding:5px;">
 											<img src="{% static 'img/why_artevenue/guarantee.png' %}"
 												alt="100% Guranteed" class = "why_artevenue">
 											<div class = "why-artevenue-head">
-												Free Returns
+												Guarantee
 											</div>
 											<div class = "why-artevenue-text">
-												Don't like it? Return it in 5 days and get the refund
+												Don't like Quality? Inform us within 5 days and get 
+												the full refund.												
 											</div>
 										</div>
 									</div>
-									<div class="col-4 mb-3 why-artevenue-div">
-										<div onclick = "show_modal('FREE_SHIPPING');">
+									<div class="col-4 why-artevenue-div">
+										<div onclick = "show_modal('FREE_SHIPPING');" 
+											style = "border:1px solid #cfcfcf; border-radius: 8px; padding:5px;">
 											<img src="{% static 'img/why_artevenue/truck.png' %}" 
 											alt = "Free Shipping of wall art painting" class = "why_artevenue">
 											<div class = "why-artevenue-head">
 												Free Shipping
 											</div>
 											<div class = "why-artevenue-text">
-												Don't pay to bring it home, ships in 1-3 days
+												We ship in 1-3 days & courier takes about 4-7 days to deliver in all major cities in India.
 											</div>
 										</div>
 									</div>
-									<div class="col-4 mb-3 why-artevenue-div" >
-										<div onclick = "show_modal('CUSTOMIZATION');">
+									<div class="col-4 why-artevenue-div">
+										<div onclick = "show_modal('CUSTOMIZATION');" 
+											style = "border:1px solid #cfcfcf; border-radius: 8px; padding:5px;">
 											<img src="{% static 'img/why_artevenue/customize.png' %}" 
 											alt= "Customize the wall art painting" class = "why_artevenue">
 											<div class = "why-artevenue-head">
 												Customize it
 											</div>
 											<div class = "why-artevenue-text">
-												Every artwork can be customized - surface, size, frame and more
+												Every artwork can be customized - surface, size, frame and more. You can choose your own size.
 											</div>
 										</div>
 									</div>
 								</div>
 							</div>
 						</div>
-					</div>
-					
-					<div class = "row">
+					</div>					
+					<div class = "row mt-3">
 						<div class = "col-12 col-md-1 img-thumbs">
 						</div>
 						<div class = "col-12 col-md-10">
-							ABOUT THIS ART
+							ABOUT THIS ARTWORK
 							<hr>
-							<span style = "color: darkgrey; font-size: 0.8rem;">
+							<span style = "font-size: 0.8rem;">
 							This high quality art is produced using the fine art
 							printer, bringing out vivid colors, giving 
 							you more realistic reproduction.
@@ -633,10 +665,13 @@
 											</tbody>
 										</table>
 									</div>
-									<div class="card-header collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">
+									<div class="card-header" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">
 										<a class="card-title">SPECIFICATIONS</a>
 									</div>
-									<div id="collapseTwo" class="card-body collapse" data-parent="#accordion">
+									<div id="collapseTwo" class="card-body " data-parent="#accordion">
+										<div class = "text-center"><strong> All materials are sourced from the best in the industry. 
+										Print quality is top notch. Frame has very good finish, is strong and highly durable.</strong>
+										</div>
 										<table class = "table table-borderless">
 											<tbody>
 												<tr>
@@ -666,14 +701,21 @@
 												<tr>													
 													<td class="accordian-subhead">WITHOUT FRAME</td>
 													<td class = "comp-frame">
-														When you choose art print without frame, we roll and deliver it in a tube.
+														When you choose art print without frame, we roll and dispatch it in a tube container.
 													</td>
 												</tr>
 												<tr>													
 													<td class="accordian-subhead">STRETCHED CANVAS</td>
 													<td class = "comp-frame">
 														When you choose Canvas print without frame, you can have it stretched. The canvas is
-														stretched on a wooden frame at the back. If not stretched, then we roll and deliver it in a tube.
+														stretched on a wooden frame at the back. If not stretched, then we roll and dispatch it in a tube container.
+													</td>
+												</tr>
+												<tr>													
+													<td class="accordian-subhead">COMES WITH HOOKS</td>
+													<td class = "comp-frame">
+														When you order this artwork with frame or stretched canvas, it comes with hooks at the back and
+														is ready to be hung.
 													</td>
 												</tr>
 											</tbody>
@@ -695,7 +737,7 @@
 													<td class="accordian-subhead">SHIPPING TIME</td>
 													<td class = "comp-frame">
 														Ships by courier in 1-3 days. Usually deliveres in 3-10 days in most parts of India.
-														It ususally takes between 3-5 days to deliver in all metro and major cities.
+														It ususally takes between 4-7 days to deliver in all metro and major cities.
 													</td>
 												</tr>
 											</tbody>
@@ -718,7 +760,7 @@
 												<tr>
 													<td class="accordian-subhead"> RETURNS</td>
 													<td class = "comp-frame">
-														If you are not happy we accept return within 5 days and give you refund. No questions asked!
+														If you are not happy with the quality we accept returns within 5 days and give you refund. No questions asked! You only pay for the return shipment.
 													</td>
 												</tr>
 											</tbody>
@@ -732,6 +774,33 @@
 					</div>
 					<div class = "row mt-2">
 						<hr>
+					</div>
+					<div class = "row">
+						<div class = "col-12 col-md-1">
+						</div>
+						<div class = "col-12 col-md-10 mb-5">
+							USEFUL TIPS
+							<hr>
+							<div class="row">
+								<a href = "https://nextsteps.co.in" 
+									style = "color:#0e0e0e; text-decoration: none; padding:5px;" 
+									target="_blank">
+									<div class = "col-12 d-flex flex-row">
+										<img src = "{% static 'img/guide_for_choosing_paintings.png' %}" width=50 alt="How to choose paintings for home decor">
+										<h2 class = "align-self-center ml-2">
+											How to Choose Paintings For Home Décor
+										</h3>
+									</div>
+									<div class = "col-12">
+										<h5>Questions on mind - how should you choose paintings? What should
+											you consider? Where to buy paintings online? Quality?
+											Here is the only detailed guide you will find...
+											<i class = "fa fa-caret-right fa-2x"></i>
+										</h5>
+									</div>					
+								</a>
+							</div>
+						</div>
 					</div>
 					<!-- Similar products -->
 					<div class = "row mt-4">
@@ -1411,19 +1480,10 @@
 			{% endif %}	
 
 			
-			{% if not user.is_authenticated %}
+			{% if not user.is_authenticated %}			
 				{% if user.usename != "livspace" %}
-				val = sessionStorage.getItem("SignUpPopupShown");
-				if ( val == null){
-					setTimeout(function() {
-						$("#signup-ask-modal").modal('show');
-						sessionStorage.setItem("SignUpPopupShown", "yes");
-					}, 10000);
-				}
+				$('#signupsave').effect("highlight", {}, 3000);
 				{% endif %}
-				//setTimeout(function() {
-				//	$("#signup-ask-modal").modal('show');
-				//	}, 10000);
 			{% endif %}
 
 			{% if cart_item or wishlist_item %}
@@ -1657,7 +1717,6 @@
 				//////
 				minsize = Math.round(8 * ratio);
 			}
-
 			
 			if ( $( "size-slider" ).slider( "instance" ) != null ) { 
 				if (isize == $( "#size-slider" ).slider( "value" ) ){
@@ -1665,6 +1724,26 @@
 				}
 			}
 			
+			/*
+			var mnt = get_mount_id();
+			if ( parseFloat(get_mount_size()) > 0 )  {
+				if (mnt == 2 || mnt == 5) {
+					if (ratio > 1) {
+						maxsize = 33
+					} else {
+						maxsize = Math.ceil( 44 * ratio );;
+					}
+				} else {
+					if (mnt == 1 || mnt == 3 || mnt == 4) {
+						if (ratio > 1) {
+							maxsize = 40
+						} else {
+							maxsize = Math.ceil( 60 * ratio );;
+						}
+					}
+				}
+			}
+			*/
 			
 			$("#size-slider").slider({
 				value:isize,
@@ -2184,7 +2263,7 @@
 			switch(param) {
 		  case 'FREE_SHIPPING':
 			$("#modal-hedline").html('FREE DELIVERY ANYWHERE IN INDIA');
-			$("#msg").html('<p>We produce the artwork and ship it within 1-3 days on receipt of an order.</p><p> Ususally courier delivers to most parts of India in 3-10 days.</p><p>It ususally takes between 3-5 days to deliver in all metro and major cities.</p>');
+			$("#msg").html('<p>We produce the artwork and ship it within 1-3 days on receipt of an order.</p><p> Ususally courier delivers to most parts of India in 3-10 days.</p><p>It ususally takes between 4-7 days to deliver in all metro and major cities.</p>');
 			break;
 		  case 'CUSTOMIZATION':
 			$("#modal-hedline").html('CUSTOMIZE THE ARTWORK AS YOU LIKE');
@@ -2192,7 +2271,7 @@
 			break;
 		  case 'GUARANTEE':
 			$("#modal-hedline").html('YOUR SATISFACTION IS GUARANTEED');	  
-			$("#msg").html("<p><strong>RETURNS</strong>: If you are not satisfied, we accept the returns, no questions asked. Returns apply only to art prints. Custom photo framing items, where you upload pictures and we print & frame, are not eligible for returns.</p> <p><strong>REPLACEMENT:</strong> If you receive the artwork with damages, or having quality issues, we will replace it without any additional cost to you.</p><p><small>You may go through our returns, refund policy in footer of this webpage.</small></p>");
+			$("#msg").html("<p><strong>RETURNS</strong>: If you are not satisfied with the quality, we accept the returns, no questions asked. You need to ship the products to our address. Returns apply only to art prints. Custom photo framing items, where you upload pictures and we print & frame, and framed original artworks are not eligible for returns.</p> <p><strong>REPLACEMENT:</strong> If you receive the artwork with damages, or having quality issues, we will replace it without any additional cost to you.</p><p><small>You may go through our returns, refund policy in footer of this webpage.</small></p>");
 			break;
 		  case 'LICENSED':
 			$("#modal-hedline").html('LICENSED ARTWORKS');			  
@@ -2277,6 +2356,8 @@
 				alert("An error occured: " + xhr.status + " " + xhr.statusText); 
 			}
 		});
+		
+		/*
 		$.ajax({
 				url: "{% url 'get_catalog_card' %}", 
 				data: {'card_no': '4', 'prod_id':prod_id, 'moulding_id': m_id,
@@ -2308,7 +2389,7 @@
 				alert("An error occured: " + xhr.status + " " + xhr.statusText); 
 			}
 		});
-		
+		*/
 	}
 	</script>
 	<script>
@@ -2333,10 +2414,12 @@
 		document.getElementById("prod-img").src = src;
 	});
 	
+	/*
 	$( "#card5" ).hover(function() {
 		var src = document.getElementById("card5").src;
 		document.getElementById("prod-img").src = src;
 	});
+	*/
 	</script>
 	
 	<script>
@@ -2376,6 +2459,19 @@
 		});		
 		
 	</script>
+	
+	<script>
+		function donwloadImage() {		
+			var img_src = document.getElementById("prod-img").src;
+			var fileName = String(get_product_id()) + "_img.jpg";			
+			var link = document.createElement("a");
+			document.body.appendChild(link); // for Firefox
+			link.setAttribute("href", img_src);
+			link.setAttribute("download", fileName);
+			link.click();
+		}
+	</script>
+	
 	{% endblock jscripts %}	
 	{% block tawkto %}
 	{% endblock tawkto %}

@@ -1,0 +1,110 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% block page-title %} 
+<title>Arte'Venue - Order Management</title>
+{% endblock page-title %} 
+{% block page-description %}
+<meta name="description" content="Arte'Venue | Coupon Management">
+{% endblock page-description %}
+{% block page-keywords %}
+<meta name="keywords" content="Art, artevenue, Coupon management">
+{% endblock page-keywords %}
+
+
+{% block coursel-stylesheet %}
+{% endblock coursel-stylesheet %}
+
+{% block jqueryui-script %}
+{% endblock jqueryui-script %}
+
+{% block coursel-script %}
+{% endblock coursel-script %}
+
+{% block front.js %}
+{% endblock front.js %}
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+{% block google-recaptcha-3 %}
+{% endblock google-recaptcha-3 %}
+
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+        <div class="container">
+			<div class="row">
+				<!-- breadcrumb-->
+				<div class="col-sm-12">
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+							<li class="breadcrumb-item"><a href="{% url 'staff_page' %}">Staff Page</a></li>
+							<li aria-current="page" class="breadcrumb-item active">Apply Coupons</li>
+						</ol>
+					</nav>
+				</div>
+			</div>
+			<div class="row mb-5">
+				<div class="col-12 tex-center">
+					<form>
+						<label class="radio-inline mr-3">
+						  <input type="radio" name="optradio" checked> Apply Discount Coupon to a Cart
+						</label>
+						<label class="radio-inline"  style = "display: none;">
+						  <input type="radio" name="optradio"> Manage Coupons
+						</label>
+					</form>									
+				</div>
+			</div>
+	
+			<form id = "ord_submit" method = "get" action = "{% url 'apply_coupon' %}">
+				<div class="row box text-center mb-5">
+					<div class = "col-12 col-md-6">
+						<div class="form-group">
+							<label>Order Number</label>
+							<input id = "order_num" name = "order_num" class = "form-control">
+						</div>
+					</div>
+					<div class = "col-12 col-md-6">
+						<div class="form-group">
+							<label>Cart ID</label>
+							<input id = "cart_id" name = "cart_id" class = "form-control">
+						</div>
+					</div>
+					<div class = "col-12">
+						<button class = "btn btn-primary">
+							Submit
+						</button>
+					</div>
+					{% if msg %}
+					<div class = "col-12" style = "color: red;">
+						{{ msg }}
+					</div>
+					{% endif %}
+				</div>			
+			</form>
+			<div class="row box text-center mb-5" id = "c_mgmt" style = "display: none;">
+				<div class = "col-12">
+					<strong> <i class = "fa fa-exclamation fa-lg"></i>
+						RESTRICTED ACCESS: Create, Edit, Remove Coupon Codes 
+					</strong> 
+					<button class = "btn btn-primary"> 
+						 Go
+					</button>
+				</div>
+			</div>
+		</div>
+		{% include "artevenue/fix-error-message.html" %}
+
+	{% endblock sitecontent %}
+	
+	{% block jscripts %}	
+	<script>
+		$( document ).ready(function() {
+		});	
+	</script>
+	{% endblock jscripts %}
+			
+	{% block tawkto %} 
+	{% endblock tawkto %} 	

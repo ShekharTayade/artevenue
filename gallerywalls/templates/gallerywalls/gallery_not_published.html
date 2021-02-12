@@ -1,0 +1,117 @@
+
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load utils %}
+{% block page-title %} 
+
+	<title>Gallery Wall - {{gal.gallery.title}}, Set of {{gal.gallery.set_of}}, Customization Available</title>
+{% endblock page-title %} 
+{% block page-description %}
+	<meta name="description" content="Designer curated gallery wall. pucture wall, collage set for your home and office decor.">
+{% endblock page-description %}
+{% block page-keywords %}
+	<meta name="keywords" content="gallery wall, set of paintings, set of 2 paintings, set of 3 paintings, picture wall, collage frames">
+{% endblock page-keywords %}
+
+{% block page-author %}
+	<meta name="author" content="Arte'Venue">
+{% endblock page-author %}
+
+{% block jqueryui-stylesheet %}
+{% endblock jqueryui-stylesheet %}
+
+{% block jqueryui-script %}
+{% endblock jqueryui-script %}
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+{% block popper-script %}
+	<script src="{% static 'vendor/popper.js/umd/popper.min.js' %}"> </script>
+{% endblock popper-script %}
+
+
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+	<div class="container mt-4">
+		<div class="row">
+			<!-- breadcrumb-->
+			<div class="col-xs-12 col-lg-12">
+				<nav aria-label="breadcrumb">
+					<ol class="breadcrumb">
+						<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+						<li class="breadcrumb-item"><a href="{% url 'get_gallery_walls' %}">Gallery Walls</a></li>
+						<li aria-current="page" class="breadcrumb-item active">{{gal.gallery.title}}</li>
+					</ol>
+				</nav>
+			</div>
+		</div>
+		<div class="row">
+			<div class = "col-12 text-center">
+				<h1 style = "font-size: 1.3rem;">
+					Gallery Wall  <br /> <strong>{{gal.gallery.title}}</strong>
+				</h1>
+				<span style = "font-size: 0.7rem;">	
+					{{gal.gallery.description}}
+				</span>
+				<span class="id" hidden>{{gal.gallery.gallery_id}}</span>
+			</div>
+			<div class="col-12 col-md-6 mt-3">		
+				<img src="{% static  gal.gallery.room_view_url %}" alt="Gallery: {{gal.gallery.name}}" class="img-fluid lazyload">
+			</div>
+			<div id ="frame-sec" class="col-12 col-md-6 mt-3">
+				<div class = "row">
+					<div class = "col-12 alert alert-info" style = "font-weith:700;">
+						We sincerely apologize. Due to some components being unavailable, we are unable
+						to take order for this gallery wall right now. Please check back shortly. We will
+						have it back soon.<br/>
+					</div>
+					<div class = "col-12" style = "font-weith:700;">
+						Meanwhile, check out our large collection of 
+						<a style = "font-weight: 700; color: #000; text-decoration: underline;"
+						href = "{% url 'get_gallery_walls' %}">gallery walls available for sale </a>. May be
+						you will find some you that like.
+					</div>
+					{% if gallery_variations %}					
+					<div class = "col-12 text-center mt-5">
+						WALL AREA (in inches)
+					</div>
+					<div class = "col-12 text-center">
+						<div class = "row">
+							{% for v in gallery_variations %}
+							<div class = "col-4 col-lg-3 mt-3">
+								<span id="print-surface" title='Choose print surface'
+									data-placement="right">
+										<span id= "s-{{v.id}}" class = "p_size"
+											onclick = "get_variation('{{v.id}}');">
+											{{v.wall_area_width|floatformat}}" X {{v.wall_area_height|floatformat}}"
+										</span>
+								</span>
+							</div>
+							{% endfor %}
+						</div>
+					</div>
+					{% endif %}
+					<div class = "col-12">
+						<hr>
+					</div>		
+				</div>
+			</div>			
+		</div>
+	</div>
+	{% endblock sitecontent %}
+	
+	{% block footer-text %}
+		<div class = "text-center">
+			Our designers have specially curated the gallery wall collage sets for you. These are sure to set your home decor apart.
+		</div>
+	{% endblock footer-text %}
+	
+	{% block jscripts %}
+	<script>
+		$(document).ready(function(){			
+		});
+	</script>
+		
+	{% endblock jscripts %}
+	

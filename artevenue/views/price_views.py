@@ -3,6 +3,9 @@ from .frame_views import *
 from artevenue.models import Stock_image, Publisher_price, Product_view, Moulding, Collage_stock_image
 
 from .tax_views import *
+
+from datetime import datetime
+import datetime
 from decimal import Decimal
 
 def get_prod_price(prod_id,**kwargs):
@@ -105,7 +108,7 @@ def get_prod_price(prod_id,**kwargs):
 			
 			# Stretch price
 			if stretch_id:			
-				stretch_price = image_width * image_height * get_stretch_price_by_id(stretch_id)
+				stretch_price = (image_width + image_height) * 2 * get_stretch_price_by_id(stretch_id)
 				item_price = Decimal(item_price + stretch_price)
 			
 	elif prod_type == 'ORIGINAL-ART':
@@ -134,7 +137,7 @@ def get_prod_price(prod_id,**kwargs):
 		
 		if prod.art_surface == 'CVS':
 			if stretch_id:			
-				stretch_price = image_width * image_height * get_stretch_price_by_id(stretch_id)
+				stretch_price = (image_width + image_height) * 2 * get_stretch_price_by_id(stretch_id)
 				item_price = Decimal(item_price + stretch_price)
 
 	## Not STOCK-IMAGE or USER-IMAGE
@@ -222,13 +225,19 @@ def get_prod_price(prod_id,**kwargs):
 				'disc_amt':disc_amt, 'disc_applied':disc_applied, 'promotion_id':promotion_id,
 				'item_price_without_disc':item_price_without_disc})		
 		
-def get_per_sqinch_price(prod_id, prod_type):
+def get_per_sqinch_price(prod_id, prod_type, eff_date=None):
+	if eff_date == None:
+		eff_date = datetime.date.today()
+		
 	per_sqin_paper = 0
 	per_sqin_canvas = 0
 	if prod_type == 'STOCK-IMAGE':
 
 		prod = Stock_image.objects.filter(product_id = prod_id).first()
 		publisher_price = Publisher_price.objects.filter(publisher_id = prod.publisher )
+		
+		publisher_price = publisher_price.filter(effective_from__lte = eff_date,
+			effective_to__gte = eff_date)
 		
 		for p in publisher_price:
 			if p.print_medium_id == "PAPER" :
@@ -265,11 +274,11 @@ def get_price_reduction_by_size(price, size):
 
 	# increase price for samller sizes
 	if size <= 100:
-		reduced_price = price * size + (price * size * 20/100)
+		reduced_price = price * size + (price * size * 30/100)
 	elif size <= 256:
-		reduced_price = price * size + (price * size * 15/100)
+		reduced_price = price * size + (price * size * 25/100)
 	elif size <= 500:
-		reduced_price = price * size + (price * size * 10/100)
+		reduced_price = price * size + (price * size * 20/100)
 	elif size <= 1299:
 		reduced_price = (price * size)  ## no reduction
 	# decrease price for larger sizes
@@ -393,7 +402,7 @@ def get_price_for_6_prods(prod_id, aspect_ratio, prod_type='STOCK-IMAGE'):
 		
 		# Stretch price
 		if stretch_id:			
-			stretch_price = image_width * image_height * get_stretch_price_by_id(stretch_id)
+			stretch_price = (image_width + image_height) * 2 * get_stretch_price_by_id(stretch_id)
 			item_price = Decimal(item_price + stretch_price)
 
 		i_width = image_width + moulding.width_inner_inches * 2
@@ -530,7 +539,7 @@ def get_artset_price_for_6_prods(prod_id, aspect_ratio, prod_type='STOCK-IMAGE')
 			
 			# Stretch price
 			if stretch_id:			
-				stretch_price = image_width * image_height * get_stretch_price_by_id(stretch_id)
+				stretch_price = (image_width + image_height) * 2 * get_stretch_price_by_id(stretch_id)
 				item_price = Decimal(item_price + stretch_price)
 
 			i_width = image_width + moulding.width_inner_inches * 2
