@@ -17,12 +17,11 @@ from django.template.loader import render_to_string
 from weasyprint import HTML, CSS
 
 
-from artevenue.models import Order, Generate_number_by_month, Order_items_view, Ecom_site
+from artevenue.models import Order, Generate_number_by_month, Order_items_view, Ecom_site, Generate_number_by_year
 import datetime 
 
 from artevenue.models import Generate_number_by_month
 
-today = datetime.datetime.today()
 ecom = get_object_or_404 (Ecom_site, store_id=settings.STORE_ID )
 
 @staff_member_required
@@ -39,9 +38,6 @@ def get_invoices(request, order_number=None, printpdf=''):
 	page = request.POST.get('page', 1)
 	order_number = request.POST.get('order_num','')
 	invoice_number = request.POST.get('invoice_num', '')
-	
-	import pdb
-	pdb.set_trace()
 	
 	if printpdf == '':
 		printpdf = request.POST.get('printpdf', 'NO')
@@ -127,36 +123,68 @@ def get_invoices(request, order_number=None, printpdf=''):
 
 def get_next_invoice_number():
 	num = 0
-	#Get curentyear, month in format YYYYMM
-	dt = datetime.datetime.now()
-	mnth = dt.strftime("%Y%m")
+	today = datetime.datetime.today().date()
+	  	
+	mnth = today.strftime("%Y%m")
+	yr = today.strftime("%Y")
 
-	# Get suffix required 
-	suffix = '-'
-	# Get prefix required 
-	prefix = 'INV-'
-	
-	monthyear = Generate_number_by_month.objects.filter(type='INVOICE-NUMBER', month_year = mnth).first()
-	if monthyear :
-		num = monthyear.current_number + 1
-	else :
-		num = 1
-		
-	# Update generated number in DB
-	gen_num = Generate_number_by_month(
-		type = 'INVOICE-NUMBER',
-		description = "Invoice number generation",
-		month_year = mnth,
-		current_number = num
-		)
-	
-	gen_num.save()
-		
-	generated_num = 0
-	if prefix:
-		mnth = prefix + mnth
-	if suffix:
-		generated_num = (mnth + suffix + str(num))
+	## Get current financial year
+	if int(yr[2:]) <= 0:
+		prev_yr = 99
 	else:
-		generated_num = (mnth + str(num))
+		prev_yr = int(yr[2:]) - 1
+		
+	if today.strftime("%m") <= '03':
+		finyr = str(prev_yr) + yr[2:]
+	else:
+		finyr = yr[2:] + str(int(yr[2:])+1)
+
+	#Invoice number format change from 1-Apr-2021
+	cut_off_dt = datetime.datetime(2021, 3, 31).date()
+	if today <= cut_off_dt:
+		prefix = 'INV-'
+		suffix = '-'
+		monthyear = Generate_number_by_month.objects.filter(type='INVOICE-NUMBER', month_year = mnth).first()
+		if monthyear :
+			num = monthyear.current_number + 1
+		else :
+			num = 1
+			
+		# Update generated number in DB
+		gen_num = Generate_number_by_month(
+			type = 'INVOICE-NUMBER',
+			description = "Invoice number generation",
+			month_year = mnth,
+			current_number = num
+			)
+		
+		gen_num.save()
+			
+		generated_num = 0
+		if prefix:
+			mnth = prefix + mnth
+		if suffix:
+			generated_num = (mnth + suffix + str(num))
+		else:
+			generated_num = (mnth + str(num))
+			
+	else:
+		year = Generate_number_by_year.objects.filter(type='INVOICE-NUMBER', year = finyr).first()
+		if year :
+			num = year.current_number + 1
+		else :
+			num = 1
+			
+		# Update generated number in DB
+		gen_num = Generate_number_by_year(
+			type = 'INVOICE-NUMBER',
+			description = "Invoice number generation",
+			year = finyr,
+			current_number = num
+			)
+		
+		gen_num.save()
+			
+		generated_num = 'MAPL/' + finyr + "/" + str(num)
+		
 	return generated_num 	

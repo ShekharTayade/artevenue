@@ -124,13 +124,15 @@ def payment_submit(request):
 				deferred_payment = True
 
 	cod_flag = False
-	if 'cod_chk' in posted:
+	if 'cod_val' in posted:
 		cod_flag = True
 	else:
 		cod_flag = False
-		
+
 	if deferred_payment or cod_flag :
-		order_items = Order_items_view.objects.filter(order = order)
+		order_items = Order_items_view.objects.select_related(
+				'product', 'promotion').filter(
+				order = order, product__product_type_id = F('product_type_id'))		
 		
 		if cod_flag:
 			o = Order.objects.filter(order_id = order_id).update(

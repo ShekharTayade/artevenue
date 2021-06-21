@@ -12,8 +12,8 @@ Disallow: /ajax/show_mouldings/
 Disallow: /ajax/add_to_cart/
 Disallow: /ajax/add_to_wishlist/
 Disallow: /ajax/delete_wishlist_item/
-Disallow: /ajax/get_FramedUserImage_by_id/
 Disallow: /ajax/move_all_to_cart/
 Disallow: /ajax/move_item_to_cart/
+
 
 Sitemap: https://www.artevenue.com/static/sitemap.xml

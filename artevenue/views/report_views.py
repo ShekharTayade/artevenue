@@ -29,7 +29,7 @@ today = datetime.datetime.today()
 ecom_site = Ecom_site.objects.get(store_id=settings.STORE_ID )
 
 @csrf_exempt
-@is_manager
+@staff_member_required
 def get_order_summary(request):
 	startDt = ''
 	endDt = ''	
@@ -112,6 +112,8 @@ def get_order_summary(request):
 			'total_igst':total_igst, 'ord_cnt': ord_cnt})
 
 
+@csrf_exempt
+@staff_member_required
 def store_order_summary(request):
 	return render(request, 'artevenue/store_order_summary.html')
 	
@@ -594,11 +596,12 @@ def get_orders_for_shipping_template(request, order_number=None, printpdf=''):
 				shipping_addrs = shipping_addrs_pin = s_name = s_company = s_ph = s_email = 'N/A'
 
 			row = [order.order_number, '', '', '', '', order.order_total, 'Artwork', 'No', 
-				'Montage Art Pvt Ltd, #58 MKR Plaza, JP nagar 1st phase, Sarakki Main road, Bangalore',
-				'560078', 'Montage Art Pvt Ltd, #58 MKR Plaza, JP nagar 1st phase, Sarakki Main road, Bangalore',
+				'Montage Art Pvt Ltd, #177/4 A, Dorasani Palya,Industrial Layout, J.P. Nagar 4th Phase, Bangalore',
+				'560078', 
+				'Montage Art Pvt Ltd, #177/4 A, Dorasani Palya,Industrial Layout, J.P. Nagar 4th Phase, Bangalore',
 				'560078', 'Montage Art Pvt Ltd', 'Montage Art Pvt Ltd', '9880337048', 
 				'montageframe@gmail.com', shipping_addrs, shipping_addrs_pin, s_name, s_company, 
-				s_ph, s_email, 'No']
+				s_ph, s_email, 'YES' if order.payment_type == 'COD' else 'NO']
 				
 			writer.writerow(row)
 

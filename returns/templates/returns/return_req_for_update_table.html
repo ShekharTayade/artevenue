@@ -1,0 +1,163 @@
+{% load static %}
+{% load utils %}
+		<div class = "row">
+			{% if ret.order.order_shipping %}
+			<div class = "col-12 col-md-6 box">
+			<strong>Shipping Address:</strong><br />
+				{{ret.order.order_shipping.full_name}} 
+				{% if ret.order.order_shipping.Company %}
+					, {{ret.order.order_shipping.Company}}
+				{% endif %}
+				<br />
+				{{ret.order.order_shipping.address_1}}
+				{% if ret.order.order_shipping.address_2 %}
+					{{ret.order.order_shipping.address_2 }}
+				{% endif %}
+				{% if ret.order.order_shipping.address_1 or ret.order_shipping.address_2 %}
+					<br />
+				{% endif %}
+				{% if ret.order.order_shipping.land_mark %}
+					{{ret.order.order_shipping.land_mark}}
+					<br />
+				{% endif %}
+				
+				{{ret.order.order_shipping.city}} {{ret.order.order_shipping.state}} {{ret.order.order_shipping.pin_code_id}}
+				<br />
+				Ph: {{ret.order.order_shipping.phone_number}} Email: {{ret.order.order_shipping.email_id}}
+			</div>
+			{% endif %}
+
+			{% if ret.order.order_billing %}
+			<div class = "col-12 col-md-6 box">
+				<strong>Billing Address:</strong><br />
+				{{ret.order.order_billing.full_name}} 
+				{% if ret.order.order_billing.Company %}
+					, {{ret.order.order_billing.Company}}
+				{% endif %}
+				{% if ret.order.order_billing.gst_number %}
+					, GST No.:{{ret.order.order_billing.gst_number}}
+				{% endif %}
+				
+				<br />
+				{{ret.order.order_billing.address_1}}
+				{% if ret.order.order_billing.address_2 %}
+					{{ret.order.order_billing.address_2 }}
+				{% endif %}
+				{% if ret.order.order_billing.address_1 or ret.order.order_billing.address_2 %}
+					<br />
+				{% endif %}
+				{% if ret.order.order_billing.land_mark %}
+					{{ret.order.order_billing.land_mark}}
+					<br />
+				{% endif %}
+				
+				{{ret.order.order_billing.city}} {{ret.order.order_billing.state}} {{ret.order.order_billing.pin_code_id}}
+				<br />
+				Ph: {{ret.order.order_billing.phone_number}} Email: {{ret.order.order_billing.email_id}}
+			</div>
+			{% endif %}
+		</div>
+		<div class = "row">
+			<div class = "col-12 mt-3">
+				<strong>PRODUCTS BEING RETURNED:</strong>
+			</div>
+		</div>
+		<div class="table table-responsive" style = "font-size: 14px;">
+			<table id = "ordTbl" class="table table-responsive table-striped">
+				<thead>
+					<tr>
+						<th width="15%">Name</th>
+						<th width="30%">Details</th>
+						<th width="12%" style="text-align:right">Unit Price</th>
+						<th width="12%" style="text-align:right">Quantity</th>
+						<th width="12%" style="text-align:right">Discount</th>
+						<th width="12%" style="text-align:right">Tax</th>
+						<th width="12%" style="text-align:right">Total</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for i in ret_items %}
+					<tr>
+						<td>
+							<img src = "{% if i.product_type|cut:' ' == 'USER-IMAGE' %} https://artevenue.com{{MEDIA_URL}}{{i.product.image_to_frame_thumbnail}} {% else %} {% if env == 'DEV' or env == 'TESTING' %} {{ i.product.thumbnail_url }} {% else %} {% static i.product.thumbnail_url %} {% endif %} {% endif %}" style = "width:75px; height:75px; object-fit:contain;">
+							<br />
+							<div class = "pull-left">
+								<small style = "padding-left:0px;" >
+									{% if i.product_type|cut:' ' == 'USER-IMAGE' %}  
+										Customer Image
+									{% else %}
+										{{i.product.name}}
+									{% endif %}
+										
+								</small>
+							</div>
+						</td>
+						<td>
+							<span  style = "font-size: 11px;">
+							{% with width=i.moulding.width_inner_inches|add_width_frame_mount:i.mount_size %}
+							{% if i.product_type_id == 'ORIGINAL-ART' %}
+								<li>{{i.product.description}}</li>
+							{% else %}													
+								<li>Print on {{i.print_medium_id|title}}</li>
+							{% endif %}
+							
+							{% if i.moulding_id %}
+								<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+								<li>Frame: {{i.moulding.name }} ({{i.moulding.width_inches}} inch, Polystyrene)</li>
+								{% if i.mount_id %}
+									<li>Mount: {{i.mount_size }}", Color: {{i.mount.name|title }} </li>
+								{% endif %}
+								<li>Total Size: 
+									{{ i.image_width|add_width:width|add_width:width }}" X {{i.image_height|add_width:width|add_width:width }}"</li>
+							{% else %}
+								<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+							{% endif %}
+							
+							{% if i.acrylic_id %}
+								<li>Acrylic covered</li>
+							{% endif %}
+							{% if i.stretch_id %}
+								<li>Canvas Stretched</li>
+							{% endif %}
+							{% endwith %}
+							</span>
+
+						</td>
+						<td style = "text-align:right">
+							{{i.item_unit_price}}
+						</td>
+						<td style = "text-align:right">
+							{{i.quantity}}
+						</td>
+						<td style = "text-align:right">
+							{{i.item_disc_amt|floatformat}}
+							<!--
+							{% if i.promotion.discount_type == "PERCENTAGE" %}
+								{{i.promotion.discount_value|floatformat}}%
+							{% else %}
+								{{i.promotion.discount_value|floatformat}}
+							{% endif %}
+							-->
+						</td>
+						<td style = "text-align:right">{{i.item_tax|floatformat}}</td>
+						<td style = "text-align:right">{{i.item_total|floatformat}}</td>
+
+					</tr>
+					{% endfor %}
+					
+				</tbody>
+				<tfoot>
+					<tr>
+						<th colspan="5">Refund Amount</th>
+						<th colspan="2" style = "text-align:right">
+							<strong><i class = "fa fa-inr"> </i> {{ret.refund_amount|floatformat}}</strong>
+						</th>
+					</tr>
+					<tr>
+						<th colspan="5">Remarks: {{ret.remarks}}</th>
+					</tr>
+				</tfoot>
+			</table>
+		</div>
+		<div class = "mb-5" style="padding-bottom:2px; background-color:blue;" >
+		</div>

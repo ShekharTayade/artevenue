@@ -132,6 +132,7 @@
 									  <img src="{% static 'img/fb_login.png' %}" alt="Facebook Login" style="height:auto; border:0; width:150px; ">
 									</a>
 								</div>
+								<!--
 								<div class="col-12 text-center"
 										style = "padding:10px;">
 									<a class="btn auth-provider-button" href="{% provider_login_url 'instagram' %}"
@@ -139,6 +140,7 @@
 									  <img src="{% static 'img/instagram_login.png' %}" alt="Instagram Login" style="height:auto; border:0; width:150px; ">
 									</a>
 								</div>
+								-->
 								<div class="col-12 text-center"
 										style = "padding:10px;">
 									<a class="btn auth-provider-button" href="{% provider_login_url 'google' %}"
@@ -163,11 +165,20 @@
 	</div>
 	
 	<script>
-	  grecaptcha.ready(function() {
-		  grecaptcha.execute('6Le2ZqAUAAAAAIAvZ7dRPJkj5zLI2IYAxfPktXqE', {action: 'signup'}).then(function(token) {
-			$("#signup-recaptcha").val(token);
-		  });
-	  });
+	setTimeout(function(){
+		var head = document.getElementsByTagName('head')[0];
+		var script = document.createElement('script');
+		script.type = 'text/javascript';
+		script.onload = function() {
+			grecaptcha.ready(function() {
+				grecaptcha.execute('6Le2ZqAUAAAAAIAvZ7dRPJkj5zLI2IYAxfPktXqE', {action: 'signup'}).then(function(token) {
+					$("#signup-recaptcha").val(token);
+				});
+			});
+		}
+		script.src = "https://www.google.com/recaptcha/api.js?render=_reCAPTCHA_site_key";
+		head.appendChild(script);
+	}, 5000);			
 	</script>
 
 	<script> 

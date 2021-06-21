@@ -1,0 +1,107 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+
+{% block page-title %} 
+<title>Arte'Venue | Returns Confirmation</title>
+{% endblock page-title %} 
+  
+{% block page-description %}
+<meta name="description" content="Arte'Venue | Returns Confirmation">
+{% endblock page-description %}
+  
+{% block page-keywords %}
+<meta name="keywords" content="artevenue, returns confirmation">
+{% endblock page-keywords %}
+  
+{% block page-author %}
+<meta name="author" content="Arte'Venue">
+{% endblock page-author %}
+
+{% block coursel-stylesheet %}
+{% endblock coursel-stylesheet %}
+
+{% block jqueryui-script %}
+{% endblock jqueryui-script %}
+
+{% block coursel-script %}
+{% endblock coursel-script %}
+
+{% block front.js %}
+{% endblock front.js %}
+
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+{% load widget_tweaks %}
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+
+    <div id="all">
+		<div id="content">
+			<div class="container">
+				<div class = "row">
+					<div class="col-12">
+						<!-- breadcrumb-->
+						<nav aria-label="breadcrumb">
+							<ol class="breadcrumb">
+								<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+								<li class="breadcrumb-item"><a href="{% url 'staff_page' %}">Staff Page</a></li>
+								<li class="breadcrumb-item"><a href="{% url 'initiate_returns' %}">Returns</a></li>
+								<li aria-current="page" class="breadcrumb-item active">Returns Confirmation</li>
+							</ol>
+						</nav>
+					</div>
+				</div>
+				<div class = "row">				
+					<div class = "col-12 text-center">
+						<h1 style = "font-weight:700;">RETURN CONFIRMATION</h1>
+					</div>				
+					<div class = "col-12 text-center mt-5">
+						Return Initatiated for Order No: {{ret_order.order.order_number}}, dated : {{ret_order.order.order_date|date:"d m Y"}}  | Status: {{ ret_order.order.get_order_status_display }} 
+					</div>
+					<div class= "col-12">
+						<h4>
+						{% if ret_order.order.order_status == 'CO' %}
+							{% if ret_order.order.delivery_date %}
+								on {{ret_order.order.delivery_date | date:'d-M-Y'}}
+							{% endif %}
+						{% endif %}
+						{% if ret_order.order.order_status == 'IN' %} 
+							{% if ret_order.order.tracking_number %} 
+								<h4> Order Tracking:<br />
+								{% if ret_order.order.shipper %}
+									Shipped by: {{ ret_order.order.shipper.name }}, 
+								{% endif %}
+								Tracking no.: {{ ret_order.order.tracking_number }} <br />
+								{% if ret_order.order.tracking_url %}
+								Tracking url: <a href = "{{ ret_order.order.tracking_url }}" target="_blank">Click to Track</a>
+								{% endif %}
+								</h4>
+							{% endif %}
+						{% endif %}
+					</div>
+					
+					<div class = "col-12 text-center mt-3">
+						<strong>RETURN REQUEST NO: {{ret_order.ret_number}}</strong>
+					</div>
+				</div>
+				{% include 'returns/returns_confirmation_table.html' %}
+			</div>
+        </div>
+    </div>
+	{% endblock sitecontent %}
+
+
+	{% block jscripts %}	
+	<script>
+		$( document ).ready(function() {
+ 			$body = $("body");
+			$(document).on({
+				ajaxStart: function() { $body.addClass("loading");    },
+				ajaxStop: function() { $body.removeClass("loading"); }    
+			});		
+		});
+	</script>
+
+	{% endblock jscripts %}

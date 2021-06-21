@@ -1,0 +1,403 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load utils %}
+
+{% block page-title %} 
+<title>Arte'Venue | Store Orders</title>
+{% endblock page-title %} 
+  
+{% block page-description %}
+<meta name="description" content="Arte'Venue | Cancel Return Request">
+{% endblock page-description %}
+  
+{% block page-keywords %}
+<meta name="keywords" content="artevenue, returns, cencel return">
+{% endblock page-keywords %}
+  
+{% block page-author %}
+<meta name="author" content="Arte'Venue">
+{% endblock page-author %}
+
+{% block coursel-stylesheet %}
+{% endblock coursel-stylesheet %}
+
+{% block jqueryui-script %}
+{% endblock jqueryui-script %}
+
+{% block coursel-script %}
+{% endblock coursel-script %}
+
+{% block front.js %}
+{% endblock front.js %}
+
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+	{% block sitecontent %}
+
+    <div id="all">
+		<div id="content">
+			<div class="container mb-5">
+				<div class = "row">
+					<div class="col-12">
+						<nav aria-label="breadcrumb">
+							<ol class="breadcrumb">
+								<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+								<li class="breadcrumb-item"><a href="{% url 'staff_page' %}">Staff Page</a></li>
+								<li class="breadcrumb-item"><a href="{% url 'initiate_returns' %}">Return Request</a></li>
+								<li aria-current="page" class="breadcrumb-item active">Cancel Return Request</li>
+							</ol>
+						</nav>
+					</div>
+				</div>
+				<div class = "row">				
+					<div class = "col-12 text-center">
+						<h1 style = "font-weight:700;">ORDER NO.: {{order.order_number}}</h1>
+					</div>
+					<div class = "col-12 text-center">
+						<h3>{{order.order_billing.full_name}}, {{order.order_billing.city}}</h3>
+					</div>
+					{% if ret_order %}
+					<div class = "col-12 text-center">
+						<h2 style = "font-weight:700;">RETURN REQUEST NO: {{ret_order.ret_number}}</h2>
+					</div>
+					<div class = "col-12 col-md-6 text-center">
+						<h3>REQUEST DATE: {{ret_order.ret_request_date|date:'d M Y'}}</h3>
+					</div>
+					<div class = "col-12 col-md-6 text-center">
+						<h3>STATUS: {{ret_order.get_ret_status_display}}</h3>
+					</div>
+						{% if ret_order.ret_status == 'X' %}
+						<div class = "col-12 text-center mt-5">
+							<h3 style = "font-weight:500;">RETURN ALREADY CANCELLED.</h3>
+						</div>					
+						{% elif ret_order.ret_status > '2' %}
+						<div class = "col-12 text-center mt-5">
+							<h3 style = "font-weight:500;">RETURN ALREADY IN PROCESS. CANNOT CANCEL.</h3>
+						</div>					
+						{% else %}
+						<div class = "col-12 text-center mt-5">
+							<form action = "{% url 'initiate_returns' %}" id='cancel-form'>
+							</form>
+						</div>
+						{% endif %}
+					
+					{% endif %}
+				</div>
+				<div class="row mt-2">
+					<div class = "col-12">
+						<table id = "ordTbl" class="table table-responsive table-striped">
+							<thead>
+								<tr>
+									<th width="5%">Select</th>
+									<th width="15%">Name</th>
+									<th width="25%">Details</th>
+									<th width="12%" style="text-align:right">Unit Price</th>
+									<th width="12%" style="text-align:right">Quantity</th>
+									<th width="12%" style="text-align:right">Discount</th>
+									<th width="12%" style="text-align:right">Tax</th>
+									<th width="12%" style="text-align:right">Total</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for i in choose_order_items %}
+								<tr>
+									<td>
+										<input disabled class = "form-control item-chk" type = "checkbox" id = "chk_{{i.order_item_id}}">
+									</td>
+									<td>
+										<img src = "{% if i.product_type|cut:' ' == 'USER-IMAGE' %} https://artevenue.com{{MEDIA_URL}}{{i.product.image_to_frame_thumbnail}} {% else %} {% if env == 'DEV' or env == 'TESTING' %} {{ i.product.thumbnail_url }} {% else %} {% static i.product.thumbnail_url %} {% endif %} {% endif %}" style = "width:75px; height:75px; object-fit:contain;">
+										<br />
+										<div class = "pull-left">
+											<small style = "padding-left:0px;" >
+												{% if i.product_type|cut:' ' == 'USER-IMAGE' %}  
+													Customer Image
+												{% else %}
+													{{i.product.name}}
+												{% endif %}
+													
+											</small>
+										</div>
+									</td>
+									<td>
+										<span  style = "font-size: 11px;">
+										{% with width=i.moulding.width_inner_inches|add_width_frame_mount:i.mount_size %}
+										{% if i.product_type_id == 'ORIGINAL-ART' %}
+											<li>{{i.product.description}}</li>
+										{% else %}													
+											<li>Print on {{i.print_medium_id|title}}</li>
+										{% endif %}
+										
+										{% if i.moulding_id %}
+											<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+											<li>Frame: {{i.moulding.name }} ({{i.moulding.width_inches}} inch, Polystyrene)</li>
+											{% if i.mount_id %}
+												<li>Mount: {{i.mount_size }}", Color: {{i.mount.name|title }} </li>
+											{% endif %}
+											<li>Total Size: 
+												{{ i.image_width|add_width:width|add_width:width }}" X {{i.image_height|add_width:width|add_width:width }}"</li>
+										{% else %}
+											<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+										{% endif %}
+										
+										{% if i.acrylic_id %}
+											<li>Acrylic covered</li>
+										{% endif %}
+										{% if i.stretch_id %}
+											<li>Canvas Stretched</li>
+										{% endif %}
+										{% endwith %}
+										</span>
+
+									</td>
+									<td style = "text-align:right">
+										{{i.item_unit_price}}
+									</td>
+									<td style = "text-align:right">
+										{{i.quantity}}
+									</td>
+									<td style = "text-align:right">
+										{{i.item_disc_amt|floatformat}}
+									</td>
+									<td style = "text-align:right">{{i.item_tax|floatformat}}</td>
+									<td style = "text-align:right">{{i.item_total|floatformat}}</td>
+
+								</tr>
+								{% endfor %}
+								
+							</tbody>
+							<tfoot>
+								<tr>
+									<th colspan="5"><small>Shipping & Handing</small></th>
+									<th colspan="2" style = "text-align:right">
+										<small>{{order.shipping_cost|floatformat}}</small>
+									</th>
+									<th></th>
+								</tr>
+								<tr>
+									<th colspan="5">Order Total</th>
+									<th colspan="2" style = "text-align:right">
+										<i class = "fa fa-inr"> </i> {{order.order_total|floatformat}}
+									</th>
+									<th></th>
+								</tr>
+							</tfoot>
+						</table>
+					</div>
+				</div>
+				<hr>
+				<div class = "row mt-3 p-2" style = "background-color:#F0E68C;">
+					<div class = "col-6 col-md-3 text-center" style = "font-weight: 700;">				
+						<span class = "pull-right">
+							Return Reason:
+							<Select disabled class = "form-control" id = "id_ret_reason">
+							{% for k, v in ret_reason %}
+								<option value='{{k}}'>{{v}}</option>
+							{% endfor %}
+							</select>
+						</span>
+					</div>
+					<div class = "col-6 col-md-3 text-center" style = "font-weight: 700;">				
+						<span class = "pull-right">
+							Request Dt:
+							<input disabled class = "form-control" type = "date" 
+							name = "id_req_date" id = "id_req_date">
+						</span>
+					</div>
+					<div class = "col-6 col-md-3 text-center" style = "font-weight: 700;">
+						<span class = "pull-right">
+							Products Selected:<br />
+							<span id = "sel-cnt"></span>
+						</span>
+					</div>
+					<div class = "col-12 col-md-3 text-center" style = "font-weight: 700;">
+						<span class = "pull-right p-2" style = "border: 1px solid #11b6bd;">
+							REFUND AMOUNT: <br />
+							<i class = "fa fa-inr"></i> 
+							<span id="refund-due"> </span>
+						</span>
+					</div>
+					<div class = "col-12 text-center mt-4" style = "font-weight: 700;">
+						Remarks:
+						<input class = "form-control" type = "text" 
+						name = "id_remarks" id = "id_remarks">
+					</div>
+				</div>
+				<hr>
+				<div class = "row mt-3">
+					<div class = "col-6">
+						<div class = "pull-left">
+							<form action = "{% url 'initiate_returns' %}" id='cancel-form'>
+								<button class="btn btn-primary" type = 'button' form = 'cancel-form'>
+									<i class="fa fa-times"></i> GO BACK
+								</button>
+							</form>
+						</div>					
+					</div>
+					<div class = "col-6">
+						{% if ret_order.ret_status == 'X' or ret_order.ret_status < '8' %}
+						<div class = "pull-right">
+							<form action = "{% url 'process_returns' %}" id='ini-ret' 
+								method = 'post' onsubmit="return validateRet();">
+								{% csrf_token %}
+								<input hidden name = 'order_id' value = '{{order.order_id}}' id = "order_id">
+								<input hidden name = "selected_items" id = "selected_items" >
+								<input hidden name = "ret_order_id" value = "{{ret_order.ret_id}}" id = "ret_order_id" >
+								<input hidden name = "ini_items" id = "ini_items" >
+								<input hidden name = "ret_reason" id = "ret_reason" >
+								<input hidden name = "req_date" id = "req_date">
+								<input hidden name = "refund_amount" id = "refund_amount">
+								<input hidden name = "remarks" id = "remarks">
+								
+								<button class="btn btn-primary" type = 'button' form = 'cancel-form'>
+									<i class="fa fa-times"></i> CANCEL RETURN REQ
+								</button>
+							</form>
+						</div>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	{% endblock sitecontent %}
+
+	{% block jscripts %}
+	<script>
+		$("#id_req_date").change(function(){
+			$("#req_date").val( $(this).val() );
+		});
+		$("#id_remarks").change(function(){
+			$("#remarks").val( $("#remarks").val() + $(this).val() );
+		});
+	
+		$(".item-chk").change(function(){
+			$("#selected_items").val('');
+			{% for i in choose_order_items %}
+				if ($("#chk_{{i.order_item_id}}").prop("checked") == true) {
+					var v = $("#selected_items").val();
+					$("#selected_items").val(v + "{{i.order_item_id}},");
+				}
+			{% endfor %}
+		});
+	
+		$("#id_ret_reason").change(function(){
+			$("#ret_reason").val( $(this).val() );
+		});
+		
+	</script>
+	<script>
+		$( document ).ready(function() {
+			var today = new Date();
+			var to_dt = today.getDate();
+			var to_mn = today.getMonth();
+			var to_mn = to_mn + 1;
+			var to_yy = today.getFullYear();						
+			$("#id_req_date").val( parseInt(to_yy) + "-" + zeroPad(to_mn) + "-" + zeroPad(to_dt) );
+			$("#req_date").val( parseInt(to_yy) + "-" + zeroPad(to_mn) + "-" + zeroPad(to_dt)  );
+			$("#ret_reason").val( $("#id_ret_reason").val() );
+			
+			// Mark items already initiated for return
+			{% for i in ret_order_items %}
+				$("#chk_{{i.order_item_id}}").prop( "checked", true );
+				$("#selected_items").val($("#selected_items").val() + "{{i.order_item_id}},");
+				//Items previously selected for returns
+				$("#ini_items").val($("#ini_items").val() + "{{i.order_item_id}},");
+				$("#ret_reason").val( "{{i.return_order.ret_reason}}" );
+				$("#id_ret_reason").val( "{{i.return_order.ret_reason}}" );
+				$("#req_date").val( "{{i.return_order.ret_request_date|date:'Y-m-d'}}" ); 
+				$("#id_req_date").val( "{{i.return_order.ret_request_date|date:'Y-m-d'}}" ); 
+				$("#refund_amount").val("{{ret_order.refund_amount}}");
+				$("#id_remarks").val("{{ret_order.remarks}}");
+				calcRefund();
+			{% endfor %}
+			
+			{% if ret_order.ret_status > '2' %}
+				doNotModify();
+			{% endif %}
+		});
+
+		function zeroPad(val){
+			if(val < 10){
+				ret = "0" + String(val);
+			} else {
+				ret = String(val);
+			}
+			return ret;
+		}
+		
+		function doNotModify(){
+			$("#btn-submit").prop('disabled', true);
+			$("#check-all").prop('disabled', true);
+			{% for i in choose_order_items %}
+				$("#chk_{{i.order_item_id}}").prop('disabled', true);			
+			{% endfor %}
+			$("#id_ret_reason").prop('disabled', true);
+			$("#id_req_date").prop('disabled', true);		
+		}
+	</script>
+	<script>
+		$('#check-all').change(function() {
+			$("#selected_items").val('');
+			if(this.checked) {			
+				{% for i in choose_order_items %}
+					$("#chk_{{i.order_item_id}}").prop('checked', true);
+					$("#selected_items").val($("#selected_items").val() + "{{i.order_item_id}},");
+				{% endfor %}
+			} else {
+				{% for i in choose_order_items %}
+					$("#chk_{{i.order_item_id}}").prop('checked', false);
+				{% endfor %}			
+				$("#selected_items").val("");
+			}			
+			calcRefund();
+		});
+		
+		$( ".item-chk" ).change(function() {
+		  calcRefund();
+		  
+		  if(this.checked == false) {
+				$('#check-all').prop('checked', false);
+			}
+		});		
+		
+		function calcRefund(){
+			var amt = 0;
+			var cnt = 0;
+			var itms = '';
+			{% for i in choose_order_items %}
+				if ($("#chk_{{i.order_item_id}}").prop("checked") == true) {
+					amt = amt + {{i.item_total}};
+					cnt = cnt + 1;
+					itms = itms + ", " + String({{i.order_item_id}});
+				}
+				$("#refund-due").html(amt);
+				$("#refund_amount").val(amt);
+				$("#sel-cnt").html(cnt);
+			{% endfor %}
+		}
+	</script>
+
+	<script>
+		function validateRet(){
+			var cnt = parseInt($("#sel-cnt").html());
+			if (isNaN(cnt)){
+				alert("Please selects products for return");
+				return false;
+			}
+			
+			if (cnt < 1){
+				alert("Please selects products for return");
+				return false;
+			}
+			
+			if (confirm('Are you sure you want to process this return?')) {
+			   return true;
+			} else {
+			   return false;
+		   }
+		}
+	</script>
+		
+	{% endblock jscripts %}

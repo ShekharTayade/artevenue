@@ -1,0 +1,292 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+
+{% block page-title %} 
+<title>Arte'Venue | Returns Report</title>
+{% endblock page-title %} 
+  
+{% block page-description %}
+<meta name="description" content="Arte'Venue | Store Returns - Restricted Access.">
+{% endblock page-description %}
+  
+{% block page-keywords %}
+<meta name="keywords" content="artevenue, store returns">
+{% endblock page-keywords %}
+  
+{% block page-author %}
+<meta name="author" content="Arte'Venue">
+{% endblock page-author %}
+
+{% block coursel-stylesheet %}
+{% endblock coursel-stylesheet %}
+
+{% block jqueryui-script %}
+{% endblock jqueryui-script %}
+
+{% block coursel-script %}
+{% endblock coursel-script %}
+
+{% block front.js %}
+{% endblock front.js %}
+
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+{% block add_to_head %}	
+	<link rel="stylesheet" href="{% static  'vendor/DataTables/datatables.min.css' %}">
+	<script src="{% static 'vendor/DataTables/datatables.min.js' %}" async></script>
+{% endblock add_to_head %}
+
+{% load widget_tweaks %}
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+
+    <div id="all">
+		<div id="content">
+			<div class="container">
+				<div class = "row">
+					<div class="col-12">
+						<!-- breadcrumb-->
+						<nav aria-label="breadcrumb">
+							<ol class="breadcrumb">
+								<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+								<li class="breadcrumb-item"><a href="{% url 'staff_page' %}">Staff Page</a></li>
+								<li aria-current="page" class="breadcrumb-item active">Returns Report</li>
+							</ol>
+						</nav>
+					</div>
+				</div>
+				<div class = "row">
+					<div class = "col-12">
+						<div class="box">
+							<h3>Returns Report</h3>
+						</div>
+					</div>				
+					<div class = "col-12">
+						<div class="box info-bar">
+							<div class = "row">
+								<div class = "col-6 col-md-3">
+									<div class="form-group">
+										<label>Return Dt From:</label>
+										<input name = "fromdate" id = "fromdate" 
+											class = "form-control" type="date" onchange = "copy_date('FROMDATE');"/>
+									</div>
+								</div>
+								<div class = "col-6 col-md-3">
+									<div class="form-group">
+										<label>Return Dt To:</label>
+										<input name = "todate" id = "todate" 
+											class = "form-control" type="date" onchange = "copy_date('TODATE');" />
+									</div>
+								</div>
+								<div class = "col-12">
+									Return Status:
+								</div>
+								<div class = "col-12">
+									{% for k, v in status_list %}
+										<label class = "checkbox-inline  px-2">
+											<input type="checkbox" value="NEW" name ="sts_{{k}}" id = "id_sts_{{k}}" value = "{{k}}" {% if f_new %} checked {% endif %}> {{v}} 
+										</label>
+									{% endfor %}
+								</div>
+
+
+								<div class = "col-12 text-center">
+									<div class="form-group">
+										<label>&nbsp; </label><br />
+										<button type="button" id = "date-submit" 
+										class = "btn btn-primary"
+										onclick = "get_returns('1');">Submit</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class = "col-sm-12">
+						<div class = "box info-bar">
+							<div id = "returns_report_table">
+								{% include 'returns/returns_report_table.html' %}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+					
+        </div>
+    </div>
+	{% include 'artevenue/message-modal_ok.html' %}
+	{% endblock sitecontent %}
+
+
+	{% block jscripts %}
+	<script>
+		$( document ).ready(function() {
+			var today = new Date();
+			var from_dt = new Date();
+			from_dt.setDate( 1 ) 
+			var fm_dt = from_dt.getDate();
+			var fm_mn = from_dt.getMonth();
+			var fm_mn = fm_mn + 1; //Javascript month start from 0
+			var fm_yy = from_dt.getFullYear();			
+			document.getElementById("fromdate").value = ( parseInt(fm_yy) + "-" + zeroPad(fm_mn) + "-" + zeroPad(fm_dt) );
+
+			var to_dt = today.getDate();
+			var to_mn = today.getMonth();
+			var to_mn = to_mn + 1;
+			var to_yy = today.getFullYear();			
+			
+			document.getElementById("todate").value = ( parseInt(to_yy) + "-" + zeroPad(to_mn) + "-" + zeroPad(to_dt) );
+		
+		
+			// Trigger the inital fetch of orders
+			document.getElementById("date-submit").click();
+
+		});
+	
+		function get_returns(page){
+		
+			var query_data = {};
+			//Get the from, to dates
+			var fm_d = new Date(document.getElementById("fromdate").value);
+			if (fm_d > new Date()) {
+				$("#msg").html("From Date can't be greater than today");
+				$("#msg-modal").modal("show");
+				return;
+			}
+			var fm_dt = fm_d.getDate();
+			var fm_mn = fm_d.getMonth();
+			var fm_mn = fm_mn + 1; //Javascript month start from 0
+			var fm_yy = fm_d.getFullYear();			
+			var from_date = fm_yy + "-" + fm_mn + "-" + fm_dt;
+			  
+			var to_d = new Date(document.getElementById("todate").value);
+			var to_dt = to_d.getDate();
+			var to_mn = to_d.getMonth();
+			var to_mn = to_mn + 1; //Javascript month start from 0
+			var to_yy = to_d.getFullYear();			
+			var to_date = to_yy + "-" + to_mn + "-" + to_dt;
+			
+			if ( to_d < fm_d ) {
+				$("#msg").html("To Date can't be earlier than From Date");
+				$("#msg-modal").modal("show");
+				return;
+			}
+			var checked_sts = [];
+			{% for k, v in status_list %}
+				var sts_{{k}} = document.getElementById("id_sts_{{k}}").checked;
+				if (sts_{{k}} == true) {
+					checked_sts.push("{{k}}")
+				}
+			{% endfor %}
+			query_data = {'fromdate':from_date, 'todate':to_date, 'page':page, 'checked_sts': checked_sts}
+
+			$.ajax({
+				url: "{% url 'get_returns_report' %}", 
+				dataType: 'text',
+				data: query_data,
+				type: 'POST',
+				success: function (data) {
+					$("#returns_report_table").html(data);
+					set_datatable();
+				},
+				error: function(xhr){
+					alert("An error occured: " + xhr.status + " " + xhr.statusText + " Apologies for the inconvenience!! Please let us know the details and we will be happy to help sort it out."); 
+					return;
+				}
+			});
+		}
+		
+		
+		function zeroPad(val){
+			if(val < 10){
+				ret = "0" + String(val);
+			} else {
+				ret = String(val);
+			}
+			return ret;
+		}
+	</script>
+
+	
+	<script>
+	function copy_date(type){
+		if (type == "FROMDATE") {
+			var fm_d = new Date(document.getElementById("fromdate").value);
+			var fm_dt = fm_d.getDate();
+			var fm_mn = fm_d.getMonth();
+			var fm_mn = fm_mn + 1; //Javascript month start from 0
+			var fm_yy = fm_d.getFullYear();			
+			var from_date = fm_yy + "-" + fm_mn + "-" + fm_dt;
+			$('#fromdate_pdf').val(from_date);
+		} 
+		if (type == "TODATE") {
+			var to_d = new Date(document.getElementById("todate").value);
+			var to_dt = to_d.getDate();
+			var to_mn = to_d.getMonth();
+			var to_mn = to_mn + 1; //Javascript month start from 0
+			var to_yy = to_d.getFullYear();			
+			var to_date = to_yy + "-" + to_mn + "-" + to_dt;
+			$('#todate_pdf').val(to_date);
+		}
+	}
+	</script>
+	
+	<script>
+	function set_datatable(){ 
+		//Get the from, to dates
+		var fm_d = new Date(document.getElementById("fromdate").value);
+		if (fm_d > new Date()) {
+			$("#msg").html("From Date can't be greatrer than today");
+			$("#msg-modal").modal("show");
+			return;
+		}
+		var fm_dt = fm_d.getDate();
+		var fm_mn = fm_d.getMonth();
+		var fm_mn = fm_mn + 1; //Javascript month start from 0
+		var fm_yy = fm_d.getFullYear();			
+		var from_date = fm_yy + "-" + fm_mn + "-" + fm_dt;
+		  
+		var to_d = new Date(document.getElementById("todate").value);
+		var to_dt = to_d.getDate();
+		var to_mn = to_d.getMonth();
+		var to_mn = to_mn + 1; //Javascript month start from 0
+		var to_yy = to_d.getFullYear();			
+		var to_date = to_yy + "-" + to_mn + "-" + to_dt;
+
+        var table = $('#ordTbl').DataTable( {
+			retrieve: true,
+			paging: true,
+			header: true,
+            footer: true,
+			pagingType: "simple_numbers",
+			lengthMenu: [ [10, 25, 50, 100, -1], [10, 25, 50, 100, "All"] ],
+			dom: 'Bfrtip',
+			buttons: [
+				{
+					extend: 'excel', 
+					messageTop: 'Returns from ' + from_date + ' to ' + to_date,
+					title : "Arte'Venue: Returns Summary Report", 
+					footer: true
+				},
+				
+				{
+					extend: 'pdfHtml5',
+					messageTop: 'Returns from ' + from_date + ' to ' + to_date,
+					title : "Arte'Venue: Returns Summary Report",
+					orientation: 'landscape', 
+					footer: true
+				},
+				{
+					extend: 'print',
+					messageTop: 'Returns from ' + from_date + ' to ' + to_date,
+					title : "Arte'Venue: Returns Summary Report", 
+					footer: true
+				}
+			]
+        
+        } );
+	}
+	</script>
+	
+	{% endblock jscripts %}

@@ -57,14 +57,7 @@
 										{% for i in userwishlistitems %}
 										<tr>
 											<td>												
-												<img src = "{% if i.product_type == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product__image_to_frame}} {% else %} {% static i.product__thumbnail_url %} {% endif %}" style = "width:75px; height:75px; object-fit:contain;">
-												<!--
-												{% if i.product__publisher == '1001' %}
-													<img src = "{% if i.product_type == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product__image_to_frame}} {% else %} {% static i.product__thumbnail_url %} {% endif %}" style = "width:75px; height:75px; object-fit:contain;">
-												{% else %}
-													<img src = "{% if i.product_type == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product__image_to_frame}} {% else %} {{i.product__thumbnail_url}} {% endif %}" style = "width:75px; height:75px; object-fit:contain;">
-												{% endif %}
-												-->
+												<img src = "{% if i.product_type == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product__image_to_frame}} {% else %} {% if env == 'DEV' or env == 'TESTING' %} {% if i.product_type == 'ORIGINAL-ART' %} {% static i.product__thumbnail_url %} {% else %} {{i.product__thumbnail_url}} {% endif %} {% else %} {% static i.product__thumbnail_url %} {% endif %} {% endif %}" style = "width:75px; height:75px; object-fit:contain;">
 												<br />
 												<div class = "pull-left">
 													<button style="padding-left:0px;" type ="button" class = "btn btn-link pull-left" onclick = "getFramedImg('{{i.product_id}}', '{{i.image_width}}', '{{i.moulding_id | default_if_none:0}}', '{{i.mount__color | default_if_none:0}}','{{i.mount_size | default_if_none:0}}', '{{i.product__product_image__url | default_if_none:""}}');">

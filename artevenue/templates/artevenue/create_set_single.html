@@ -1,0 +1,132 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load utils %}
+
+{% block page-title %} 
+	<title>
+		Arte'Venue | Sets, Singles
+	</title>
+{% endblock page-title %} 
+
+{% block page-description %}
+<meta name="description" content="Create a set or singles">
+{% endblock page-description %}
+  
+{% block page-keywords %}
+<meta name="keywords" content="">
+{% endblock page-keywords %}
+  
+{% block page-author %}
+<meta name="author" content="Arte'venue">
+{% endblock page-author %}
+
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+
+
+{% block sitecontent %}
+<div class="container  mb-5">
+	<div class="row">
+		<!-- breadcrumb-->
+		<div class="col-sm-12">
+			<nav aria-label="breadcrumb">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+						<li class="breadcrumb-item"><a href="{% url 'staff_page' %}">Staff Page</a></li>
+					<li aria-current="page" class="breadcrumb-item active">Create a Set or a Single</li>
+				</ol>
+			</nav>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-12 tex-center">
+			<h1 class="text-center">CREATE A SET OR A SINGLE PRODUCT</h1>
+		</div>
+	</div>
+	
+
+	<form action = "{% url 'set_single_data' %}" type = "GET" >
+		<div class="row mt-5">
+			<div class = "col-12">
+				CREATE: 
+			</div>
+			<div class = "col-12 mt-3">
+				<label class="radio-inline">
+				  <input type="radio" name="setsingle" value = "SET" checked onchange = "set_disp();"
+					id = "set-radio"> A SET
+				</label>
+				<label class="radio-inline">
+				  <input class = "ml-3" type="radio" name="setsingle" value = "SINGLE"  onchange = "set_disp();"
+					id = "single-radio"> A SINGLE
+				</label>
+			</div>
+			<div class = "col-12">
+				<hr>
+			</div>
+		</div>
+		<div class="row mt-5" id = "set-of-div">
+			<div class = "col-12 mt-3">
+				CREATE A SET OF:
+			</div>
+			<div class = "col-12 mt-3">
+				<label hidden class="radio-inline">
+				  <input type="radio" name="set_of" value = "1" id = "radio-1"> 1
+				</label>
+				<label class="radio-inline">
+				  <input type="radio" name="set_of" value = "2"  id = "radio-2" checked> 2
+				</label>
+				<label class="radio-inline">
+				  <input  class = "ml-3" type="radio" name="set_of"  value = "3" > 3
+				</label>			
+				<label class="radio-inline">
+				  <input  class = "ml-3" type="radio" name="set_of"  value = "4" > 4
+				</label>			
+			</div>
+			<div class = "col-12">
+				<hr>
+			</div>
+		</div>
+		<div class="row mt-5">
+			<div class = "col-12 mt-3 text-center">
+				<button id = "create" class="btn btn-primary" style = "width: 50%;" type = "submit">
+					PROCEED
+				</button>			
+			</div>
+		</div>
+	</form>			
+	{% include 'artevenue/message-modal_ok.html' %}		
+	{% include 'artevenue/modal_yesno.html' %}		
+</div>
+
+{% endblock sitecontent %}
+
+{% block jscripts %}
+	<script>
+		$( document ).ready(function() {
+		});	
+		
+		function set_disp(){
+			if ( $("#set-radio").prop('checked') ){
+				$("#set-of-div").show();
+				$("#radio-1").prop('checked', 'false');
+				$("#radio-2").prop('checked', 'true');
+			} else {
+				$("#set-of-div").hide();
+				$("#radio-1").prop('checked', 'true');
+			}
+			
+			if ( $("#single-radio").prop('checked') ){
+				$("#set-of-div").hide();
+				$("#radio-1").prop('checked', 'true');
+			} else {
+				$("#set-of-div").show();
+				$("#radio-1").prop('checked', 'false');
+				$("#radio-2").prop('checked', 'true');
+			}
+		}
+	</script>
+
+{% endblock jscripts %}
+	

@@ -8,7 +8,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from datetime import datetime
 import datetime
 import json
-#import imagehash
+
 import os
 
 from artevenue.models import Ecom_site, Stock_image, Stock_image_category
@@ -377,6 +377,23 @@ def search_products_by_keywords(request):
 		'width':width, 'height':height, 'page_range':page_range} )
 	
 def stock_image_detail(request, prod_id = '', iuser_width='', iuser_height=''):
+	imld_id = request.GET.get("frame_id", "")
+	isurface = request.GET.get("surface", "").upper()
+	imnt_id = request.GET.get("mount_id", "")
+	imnt_color = request.GET.get("mount_color", "")
+	imnt_size = request.GET.get("mount_size", "")
+	istr_id = request.GET.get("stretch_id", "")
+
+	if imnt_color != '' and imnt_id == '':
+		mnt = Mount.objects.filter(name__iexact = imnt_color).first()
+		imnt_id = mnt.mount_id
+		imnt_color = mnt.color
+	if imnt_color == '' and imnt_id != '':
+		mnt = Mount.objects.filter(mount_id = imnt_id).first()
+		imnt_color = mnt.color
+
+
+	
 	cart_item_id = request.GET.get("cart_item_id", "")
 	wishlist_item_id = request.GET.get("wishlist_item_id", "")
 	if not prod_id or prod_id == '' :
@@ -518,8 +535,7 @@ def stock_image_detail(request, prod_id = '', iuser_width='', iuser_height=''):
 	paper_mouldings_apply = mouldings['paper_mouldings_apply']
 	paper_mouldings_show = mouldings['paper_mouldings_show']
 	moulding_diagrams = mouldings['moulding_diagrams']
-	paper_mouldings_corner = mouldings['paper_mouldings_corner']
-	canvas_mouldings_corner = mouldings['canvas_mouldings_corner']
+	canvas_mouldings_show = mouldings['canvas_mouldings_show']
 	# get mounts
 	mounts = get_mounts(request)
 
@@ -580,19 +596,43 @@ def stock_image_detail(request, prod_id = '', iuser_width='', iuser_height=''):
 		if not orders:
 			v15off = True
 		
+
+	## if a creative for this products exists
+	'''
+	from pathlib import Path
+	import csv
+	creative_exists = False
+	creative_url = ''
+	ifile = ''
+	if env == 'DEV' or env == 'TESTING':
+		ifile = settings.BASE_DIR + "/artevenue" + settings.STATIC_URL + "img/creatives/creatives_singles.csv"
+	else:
+		ifile = settings.PROJECT_DIR + '/' + settings.STATIC_URL + "/img/creatives/creatives_singles.csv"
+	cfile = Path(ifile)
+	if cfile.is_file():
+		file = open(ifile)	
+		cr = csv.reader(file, delimiter=',')
 		
-		
+		for row in cr:
+			if row[0] == str(product.product_id):
+				creative_url = row[1]
+				creative_exists = True
+	'''
+	
 	return render(request, "artevenue/stock_image_detail_new.html", {'product':product,
 		'prod_categories':prod_categories, 'printmedium':printmedium, 'product_category':product_category,
-		'mouldings_apply':paper_mouldings_apply, 'mouldings_show':paper_mouldings_show, 'mounts':mounts,
+		'mouldings_apply':paper_mouldings_apply, 'paper_mouldings_show':paper_mouldings_show, 
+		'canvas_mouldings_show':canvas_mouldings_show, 'mounts':mounts,
 		'per_sqinch_paper':per_sqinch_paper, 'per_sqinch_canvas':per_sqinch_canvas, 'acrylics':acrylics,
 		'boards':boards,'stretches':stretches, 'env':settings.EXEC_ENV,
 		'cart_item':cart_item_view, 'iuser_width':iuser_width, 'iuser_height':iuser_height,
 		'prods':similar_products, 'price':price, 'wishlist_prods':wishlist_prods,
-		'paper_mouldings_corner':paper_mouldings_corner, 'canvas_mouldings_corner':canvas_mouldings_corner,
 		'ready_prod_data_paper':ready_prod_data_paper, 'ready_prod_data_canvas':ready_prod_data_canvas,
 		'wishlist_item':wishlist_item_view, 'wall_colors': wall_colors, 'v15off': v15off, 
-		'img_download_flg': img_download_flg} )
+		'img_download_flg': img_download_flg, 
+		#'creative_exists': creative_exists, 'creative_url': creative_url,
+		'imld_id': imld_id, 'isurface' : isurface, 'imnt_id': imnt_id, 'imnt_color': imnt_color, 
+		'istr_id': istr_id, 'imnt_size': imnt_size} )
 
 @csrf_exempt	
 def get_item_price (request):
@@ -1708,7 +1748,7 @@ def get_stock_images(request, cat_nm = None, page = None, curated_coll_id = None
 	#image_type_values = products.values('colors').distinct()
 	im_arr = ['Red', 'Orange',  'Yellow', 'Green', 'Blue', 'Purple', 'Pink', 'Brown', 'black', 'White']
 	prod_filter_values['COLORS'] = im_arr
-	
+	colors_list = ['Red', 'Orange',  'Yellow', 'Green', 'Blue', 'Purple', 'Pink', 'Brown', 'black', 'White']
 
 	####################################
 	####### Limiting the result set
@@ -1804,7 +1844,7 @@ def get_stock_images(request, cat_nm = None, page = None, curated_coll_id = None
 		'filt_orientation':filt_orientation, 'filt_image_type':filt_image_type,
 		'total_count':total_count, 'sliced_count':sliced_count, 'result_limit':result_limit,
 		'slab_0_50':slab_0_50, 'slab_50_100':slab_50_100, 'slab_100_150':slab_100_150, 
-		'slab_150_200':slab_150_200, 'slab_200_plus':slab_200_plus, 'env':env} )
+		'slab_150_200':slab_150_200, 'slab_200_plus':slab_200_plus, 'env':env, 'colors_list': colors_list} )
 
 '''
 @csrf_exempt		

@@ -1,0 +1,176 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+
+{% block page-title %} 
+<title>Arte'Venue | Generate Set Prices</title>
+{% endblock page-title %} 
+  
+{% block page-description %}
+<meta name="description" content="Arte'Venue | Staff Page - Restricted Access">
+{% endblock page-description %}
+  
+{% block page-keywords %}
+<meta name="keywords" content="artevenue, staff ">
+{% endblock page-keywords %}
+  
+{% block page-author %}
+<meta name="author" content="Arte'Venue">
+{% endblock page-author %}
+
+{% block coursel-stylesheet %}
+{% endblock coursel-stylesheet %}
+
+{% block jqueryui-script %}
+{% endblock jqueryui-script %}
+
+{% block coursel-script %}
+{% endblock coursel-script %}
+
+{% block front.js %}
+{% endblock front.js %}
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+{% block sitecontent %}
+	<div class="container">
+		<div class = "row">
+			<div class="col-lg-12">
+				<!-- breadcrumb-->
+				<nav aria-label="breadcrumb">
+					<ol class="breadcrumb">
+						<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+						<li class="breadcrumb-item"><a href="{% url 'staff_page' %}">Staff Page</a></li>
+						<li aria-current="page" class="breadcrumb-item active">generate_set_prices</li>						
+					</ol>
+				</nav>
+			</div>
+		</div>
+		<div class = "row mb-5">
+			<div class = "col-12 text-center">
+				<h1>GENERATE PRICES FOR SETS / SINGLE PRODUCTS </h1>
+			</div>
+			<div class = "col-12 text-center">
+				<h2>Use this to generate the prices that are displayed on the wall art sets page and best sellers page (category pages).
+					On the individual set or single product page the price is calculated.
+				</h2>
+			</div>
+			<div class = "col-12 text-center">
+				<div class="row mt-5">
+					<div class = "col-12">
+						GENERATE: 
+					</div>
+					<div class = "col-12 mt-3">
+						<label class="radio-inline">
+						  <input type="radio" name="generate_type" value = "SET" checked onchange = "set_disp();"
+							id = "all"> FOR ALL SETS AND SINGLE IMAGE PRODUCTS
+						</label>
+						<label class="radio-inline">
+						  <input class = "ml-3" type="radio" name="generate_type" value = "SINGLE"  onchange = "set_disp();"
+							id = "from"> FROM A SET/SINGLE IMAGE PRODUCT NUMBER ONWARDS
+						</label>
+					</div>
+					<div class = "col-12">
+						<hr>
+					</div>
+				</div>
+				<div class="row mt-5" id = "num-div" style = "display: none;">
+					<div class = "col-12 col-md-6">
+						<div class = "form-group">
+							<label>Enter the Set Number From:</label>
+							<INPUT id = "from_num" type = "number" min='1' max=1000 maxlength="4"
+							class = "form-control">
+						</div>
+					</div>
+				</div>
+				
+				<div class="row mt-5">
+					<div class = "col-12 mt-3 text-center">
+						<button id = "generate_btn" class="btn btn-primary" style = "width: 50%;" type = "button"
+							onclick = "generate();">
+							GENERATE PRICES
+						</button>			
+					</div>
+				</div>				
+			</div>
+
+			{% include 'artevenue/message-modal_ok.html' %}		
+				
+		</div>
+	</div>
+	{% endblock sitecontent %}
+
+
+	{% block jscripts %}
+	<script>
+		$(document).ready(function(){
+			$body = $("body");
+			$(document).on({
+				ajaxStart: function() { $body.addClass("loading"); },
+				ajaxStop: function() { $body.removeClass("loading"); }    
+			});
+		});
+	</script>
+	
+	<script>
+		function set_disp(){
+			if ( $("#all").prop('checked') ){
+				$("#num-div").hide();
+				$("#from_num").val('');
+			} else {
+				$("#num-div").show();
+			}
+			
+			if ( $("#from").prop('checked') ){
+				$("#num-div").show();				
+			} else {
+				$("#num-div").hide();
+				$("#from_num").val('');
+			}
+		}
+	</script>
+	
+	<script>
+		function generate(){
+			var all_sets = false;
+			var from_num = '';
+			var form_data = {};
+			if ($("#all").prop('checked')){
+				all_flag = true;
+				from_flag = false;
+			}
+			if ( $("#from").prop('checked') ) {
+				from_num = $("#from_num").val();
+				all_flag = false;
+				from_flag = true;
+			}
+		
+			if (from_flag) {
+				form_data = {'from_product_id': from_num};			
+			}
+	
+
+			$.ajax({
+					url: "{% url 'createInitialData' %}", 
+					data: form_data, 
+					dataType: 'text', 
+					type: 'GET',
+				success: function (data) {
+						data = JSON.parse(data);
+						if (data.err_cd != '00'){
+							$('#msg').html(msg);
+							$('#msg-modal').modal('show');
+						} else {
+							$("#generate_btn").prop('disabled', 'true');
+							$('#msg').html("PRICING GENERATION COMPLETED SUCCESSFULLY!");
+							$('#msg-modal').modal('show');
+						}
+					},
+				error: function(xhr){
+					alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+				}
+			});
+		
+		}
+	</script>
+	{% endblock jscripts %}

@@ -618,9 +618,14 @@ def original_art_detail(request, prod_id = ''):
 
 	
 	# Get image price on paper and canvas
-	per_sqinch_price = price_views.get_per_sqinch_price(prod_id, 'STOCK-IMAGE')
-	per_sqinch_paper = per_sqinch_price['per_sqin_paper']
-	per_sqinch_canvas = per_sqinch_price['per_sqin_canvas']
+	per_sqinch_price = 0
+	per_sqinch_paper = 0
+	per_sqinch_canvas = 0
+	if product.stock_image:	
+		if product.stock_image.is_published:
+			per_sqinch_price = price_views.get_per_sqinch_price(product.stock_image_id, 'STOCK-IMAGE')
+			per_sqinch_paper = per_sqinch_price['per_sqin_paper']
+			per_sqinch_canvas = per_sqinch_price['per_sqin_canvas']
 
 	# get mouldings
 	mouldings = frame_views.get_mouldings(request)

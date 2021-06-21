@@ -3,9 +3,6 @@ from .frame_views import *
 from artevenue.models import Stock_image, Publisher_price, Product_view, Moulding, Collage_stock_image
 
 from .tax_views import *
-
-from datetime import datetime
-import datetime
 from decimal import Decimal
 
 def get_prod_price(prod_id,**kwargs):
@@ -105,9 +102,12 @@ def get_prod_price(prod_id,**kwargs):
 			if moulding_id:
 				moulding_price = (image_width + image_height) * 2 * get_moulding_price_by_id(moulding_id)
 				item_price = Decimal(item_price + moulding_price)
-			
+
+				stretch_price = (image_width + image_height) * 2 * get_stretch_price_by_id(stretch_id)
+				item_price = Decimal(item_price + stretch_price)
+				
 			# Stretch price
-			if stretch_id:			
+			elif stretch_id:			
 				stretch_price = (image_width + image_height) * 2 * get_stretch_price_by_id(stretch_id)
 				item_price = Decimal(item_price + stretch_price)
 			
@@ -225,19 +225,13 @@ def get_prod_price(prod_id,**kwargs):
 				'disc_amt':disc_amt, 'disc_applied':disc_applied, 'promotion_id':promotion_id,
 				'item_price_without_disc':item_price_without_disc})		
 		
-def get_per_sqinch_price(prod_id, prod_type, eff_date=None):
-	if eff_date == None:
-		eff_date = datetime.date.today()
-		
+def get_per_sqinch_price(prod_id, prod_type):
 	per_sqin_paper = 0
 	per_sqin_canvas = 0
 	if prod_type == 'STOCK-IMAGE':
 
 		prod = Stock_image.objects.filter(product_id = prod_id).first()
 		publisher_price = Publisher_price.objects.filter(publisher_id = prod.publisher )
-		
-		publisher_price = publisher_price.filter(effective_from__lte = eff_date,
-			effective_to__gte = eff_date)
 		
 		for p in publisher_price:
 			if p.print_medium_id == "PAPER" :
@@ -281,6 +275,7 @@ def get_price_reduction_by_size(price, size):
 		reduced_price = price * size + (price * size * 20/100)
 	elif size <= 1299:
 		reduced_price = (price * size)  ## no reduction
+
 	# decrease price for larger sizes
 	elif size  > 1299 and size < 1800:	
 		reduction_factor = (size - 1300) * slab1_reduction
@@ -298,6 +293,12 @@ def get_price_reduction_by_size(price, size):
 	
 
 def get_price_for_6_prods(prod_id, aspect_ratio, prod_type='STOCK-IMAGE'):
+
+	try:
+		product = Stock_image.objects.get(product_id = prod_id)
+		
+	except Stock_image.DoesNotExists:
+		return ({'size_price_paper':0, 'size_price_canvas':0})
 	
 	##STANDARD_PROD_WIDTHS = [12, 18, 24, 30, 36, 42]
 	
@@ -307,16 +308,20 @@ def get_price_for_6_prods(prod_id, aspect_ratio, prod_type='STOCK-IMAGE'):
 		STANDARD_PROD_WIDTHS = [w, w+4 , w+8, w+14, w+20, w+26]
 	else:
 		STANDARD_PROD_WIDTHS = [10, 14, 18, 24, 30, 36]
+
+	if product.artist == 'Huynh, Duy':
+		if aspect_ratio > 1:
+			h = 16
+			w = round(h * aspect_ratio)
+			STANDARD_PROD_WIDTHS = [w, w+4 , w+8, w+14, w+20]
+		else:
+			STANDARD_PROD_WIDTHS = [16, 20, 24, 30, 36]
+	
 	# Get image price on paper and canvas
 	per_sqinch_price = get_per_sqinch_price(prod_id, prod_type)
 	per_sqinch_paper = per_sqinch_price['per_sqin_paper']
 	per_sqinch_canvas = per_sqinch_price['per_sqin_canvas']	
 
-	try:
-		product = Stock_image.objects.get(product_id = prod_id)
-		
-	except Stock_image.DoesNotExists:
-		return ({'size_price_paper':0, 'size_price_canvas':0})
 		
 	## Common pricing components
 	acrylic_id = 1

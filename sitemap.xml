@@ -3,13 +3,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="https://www.w3.org/1999/xhtml" >
 <url>
 <loc>https://artevenue.com/</loc>
-<lastmod>2020-06-08T08:03:57+00:00</lastmod>
+<lastmod>2021-06-11T08:03:57+00:00</lastmod>
 <priority>1.00</priority>
 </url>
 
 <url>
 <loc>https://www.artevenue.com/</loc>
-<lastmod>2020-06-08T08:03:57+00:00</lastmod>
+<lastmod>2021-06-11T08:03:57+00:00</lastmod>
 <priority>1.00</priority>
 </url>
 
@@ -22,12 +22,6 @@
 
 <url>
 <loc>https://artevenue.com/gallery-walls/</loc>
-<lastmod>2020-10-07T08:03:57+00:00</lastmod>
-<priority>1.00</priority>
-</url>
-
-<url>
-<loc>https://artevenue.com/original-art-by-category/</loc>
 <lastmod>2020-10-07T08:03:57+00:00</lastmod>
 <priority>1.00</priority>
 </url>
@@ -53,8 +47,51 @@
 
 
 <url>
-<loc>https://artevenue.com/wall-art-collage-sets/</loc>
-<lastmod>2020-06-08T08:03:57+00:00</lastmod>
+<loc>https://artevenue.com/wall-art-sets/</loc>
+<lastmod>2021-06-11T08:03:57+00:00</lastmod>
+<priority>1.00</priority>
+</url>
+
+<url>
+<loc>https://artevenue.com/framed-wall-art/</loc>
+<lastmod>2021-06-11T08:03:57+00:00</lastmod>
+<priority>1.00</priority>
+</url>
+
+
+<url>
+<loc>https://artevenue.com/wall-art-sets/canvas-wall-art-sets/</loc>
+<lastmod>2021-06-11T08:03:57+00:00</lastmod>
+<priority>1.00</priority>
+</url>
+
+<url>
+<loc>https://artevenue.com/wall-art-sets/paper-wall-art-sets/</loc>
+<lastmod>2021-06-11T08:03:57+00:00</lastmod>
+<priority>1.00</priority>
+</url>
+
+<url>
+<loc>https://artevenue.com/wall-art-sets/set-of-3-wall-art/</loc>
+<lastmod>2021-06-11T08:03:57+00:00</lastmod>
+<priority>1.00</priority>
+</url>
+
+<url>
+<loc>https://artevenue.com/wall-art-sets/set-of-2-wall-art/</loc>
+<lastmod>2021-06-11T08:03:57+00:00</lastmod>
+<priority>1.00</priority>
+</url>
+
+<url>
+<loc>https://artevenue.com/curated-art-prints/gold-paintings/</loc>
+<lastmod>2021-06-11T08:03:57+00:00</lastmod>
+<priority>1.00</priority>
+</url>
+
+<url>
+<loc>https://artevenue.com/curated-art-prints/botanical-paintings/</loc>
+<lastmod>2021-06-11T08:03:57+00:00</lastmod>
 <priority>1.00</priority>
 </url>
 
@@ -376,8 +413,6 @@
 </url>
 
 
-
-
 <url>
 <loc>https://artevenue.com/art-prints/abstract-art-paintings/</loc>
 <lastmod>2020-06-24T08:03:57+00:00</lastmod>
@@ -451,63 +486,11 @@
 <priority>0.9</priority>
 </url>
 
-
-
-<url>
-<loc>https://artevenue.com/art-print/198778/</loc>
-<lastmod>2020-06-24T08:03:57+00:00</lastmod>
-<priority>0.5</priority>
-</url>
-
-<url>
-<loc>https://artevenue.com/art-print/164403/</loc>
-<lastmod>2020-06-24T08:03:57+00:00</lastmod>
-<priority>0.5</priority>
-</url>
-
-<url>
-<loc>https://artevenue.com/art-print/155726/</loc>
-<lastmod>2020-06-24T08:03:57+00:00</lastmod>
-<priority>0.5</priority>
-</url>
-
-<url>
-<loc>https://artevenue.com/art-print/33249/</loc>
-<lastmod>2020-06-24T08:03:57+00:00</lastmod>
-<priority>0.5</priority>
-</url>
-
-<url>
-<loc>https://artevenue.com/art-print/23309/</loc>
-<lastmod>2020-06-24T08:03:57+00:00</lastmod>
-<priority>0.5</priority>
-</url>
-
-<url>
-<loc>https://artevenue.com/art-print/148993/</loc>
-<lastmod>2020-06-24T08:03:57+00:00</lastmod>
-<priority>0.5</priority>
-</url>
-<url>
-
-<loc>https://artevenue.com/art-print/220224/</loc>
-<lastmod>2020-06-24T08:03:57+00:00</lastmod>
-<priority>0.5</priority>
-</url>
-
 <url>
 <loc>https://artevenue.com/show-all-wall-art-categories/</loc>
 <lastmod>2020-06-08T08:03:57+00:00</lastmod>
 <priority>1.0</priority>
 </url>
-
-
-<url>
-<loc>https://artevenue.com/wall-art-collage-set/7/</loc>
-<lastmod>2020-06-24T08:03:57+00:00</lastmod>
-<priority>0.5</priority>
-</url>
-
 
 
 <url>

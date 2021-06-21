@@ -49,14 +49,7 @@
 										{% for i in userwishlistitems %}
 										<tr>											
 											<td>												
-												<img src = "{% if i.product_type == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product__image_to_frame}} {% else %} {% static i.product__thumbnail_url %} {% endif %}" style = "width:75px; height:75px; object-fit:contain;">
-												<!--
-												{% if i.product__publisher == '1001' %}
-													<img src = "{% if i.product_type == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product__image_to_frame}} {% else %} {% static i.product__thumbnail_url %} {% endif %}" style = "width:75px; height:75px; object-fit:contain;">
-												{% else %}
-													<img src = "{% if i.product_type == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product__image_to_frame}} {% else %} {{i.product__thumbnail_url}} {% endif %}" style = "width:75px; height:75px; object-fit:contain;">
-												{% endif %}
-												-->
+												<img src = "{% if i.product_type == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product__image_to_frame}} {% else %} {% if env == 'DEV' or env == 'TESTING' %} {% if i.product_type == 'ORIGINAL-ART' %} {% static i.product__thumbnail_url %} {% else %} {% static i.product__thumbnail_url %} {% endif %} {% else %} {% static i.product__thumbnail_url %} {% endif %} {% endif %}" style = "width:75px; height:75px; object-fit:contain;">
 												<br />
 												<div class = "pull-left">
 													<button style="padding-left:0px;" type ="button" class = "btn btn-link pull-left" onclick = "getFramedImg('{{i.product_id}}', '{{i.image_width}}', '{{i.moulding_id | default_if_none:0}}', '{{i.mount__color | default_if_none:0}}','{{i.mount_size | default_if_none:0}}', '{{i.product__product_image__url | default_if_none:""}}');">
@@ -65,6 +58,45 @@
 												</div>
 											</td>
 											<td>
+													{% with width=i.moulding__width_inner_inches|add_width_frame_mount:i.mount_size %}
+													<small>
+													{% if i.product_type == 'STOCK-COLLAGE' %}
+														EACH ITEM: <br/>
+													{% endif %}
+													{% if i.product_type == 'ORIGINAL-ART' %}
+														<li>Original Art: 
+															{% for k, v in medium_list %}
+															{% if i.product__art_medium == k %}{{v}}{% endif %}
+															{% endfor %} on 
+															{% for k, v in surface_list %}
+															{% if i.product__art_surface == k %}{{v}}{% endif %}
+															{% endfor %}
+															</li>
+													{% else %}													
+														<li>Art Print on {{i.print_medium_id|title}}</li>
+													{% endif %}
+													{% if i.moulding_id %}
+														<li>{% if i.product_type == 'ORIGINAL-ART' %} Art Size{% else %} Image Size {% endif %}: {{ i.image_width }}" X {{i.image_height }}"</li>
+														<li>Frame: {{i.moulding__name }} ({{i.moulding__width_inches}} inch, Polystyrene)</li>
+														{% if i.mount_id %}
+															<li>Mount: {{i.mount_size }}", Color: {{i.mount__name|title }} </li>
+														{% endif %}
+														<li>Total Size: 
+															{{ i.image_width|add_width:width|add_width:width }}" X {{i.image_height|add_width:width|add_width:width }}"</li>
+													{% else %}
+														<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+													{% endif %}
+													{% if i.acrylic_id and i.print_medium_id == 'PAPER' %}
+														<li>Acrylic covered</li>
+													{% endif %}
+													{% if i.stretch_id and not i.moulding_id %}
+														<li>Canvas Stretched</li>
+													{% endif %}
+													</small>
+													{% endwith %}
+
+
+												<!--
 												{% with width=i.moulding__width_inner_inches|add_width_frame_mount:i.mount_size %}
 												<small>
 												{% if i.product_type == 'ORIGINAL-ART' %}
@@ -104,48 +136,76 @@
 														</span>
 													{% endif %}
 												{% endif %}
+												-->
 											</td>
 											<td style = "text-align:right">{{i.item_total|floatformat}}</td>
 											<td>
 												<ul style="list-style-type:none; padding:0px;">
-												<li>
-												<a><i style = "cursor: pointer;" 
-													data-toggle="tooltip" title="Edit!" 
-													class="fa fa-edit"
-													onclick = "edit_item('{{i.wishlist_item_id}}', '{{i.product_id}}');">
-													<small>Edit</small>
-													</i>
-												</a>
-												</li>
-												<li>
-												<a>
-													<i class="fa fa-trash-o"
-														data-toggle="tooltip" title="Remove!" 
+													{% if i.product_type == 'STOCK-IMAGE'%}
+													<li>
+													<a>
+														<i style = "cursor: pointer; color:#007bff;" 
+															data-toggle="tooltip" title="Edit!" class="fa fa-edit"
+															onclick = "edit_item('{{i.wishlist_item_id}}', '{{i.product_id}}');">
+															<small> Edit</small>
+														</i>
+													</a>
+													</li>
+													<li>
+													{% endif %}
+													{% if i.product_type == 'STOCK-COLLAGE'%}
+													<li>
+													<a>
+														<i style = "cursor: pointer; color:#007bff;" 
+															data-toggle="tooltip" title="Edit!" class="fa fa-edit"
+															onclick = "edit_item_collage('{{i.wishlist_item_id}}', '{{i.product_id}}');">
+															<small> Edit</small>
+														</i>
+													</a>
+													</li>
+													<li>
+													{% endif %}
+													{% if i.product_type == 'ORIGINAL-ART'%}
+													<li>
+													<a>
+														<i style = "cursor: pointer; color:#007bff;" 
+															data-toggle="tooltip" title="Edit!" class="fa fa-edit"
+															onclick = "edit_item_original_art('{{i.wishlist_item_id}}', '{{i.product_id}}');">
+															<small> Edit</small>
+														</i>
+													</a>
+													</li>
+													{% endif %}
+													<li>
+													<a>
+														<i class="fa fa-trash-o"
+															data-toggle="tooltip" title="Remove!" 
+															style = "cursor: pointer;"
+															onclick="deleteItem('{{i.wishlist_item_id}}', '{{sub_total|floatformat}}', '{{total_tax|floatformat}}', '{{userwishlist.wishlist_total|floatformat}}', '{{i.item_total|floatformat}}');">
+															<small>Delete</small>
+														</i>
+													</a>
+													</li>
+													<li>
+													<a> 
+														<i data-toggle="tooltip" title="Move to Cart!" 
+														onclick ="moveitem({{i.wishlist_item_id}});" 
 														style = "cursor: pointer;"
-														onclick="deleteItem('{{i.wishlist_item_id}}', '{{sub_total|floatformat}}', '{{total_tax|floatformat}}', '{{userwishlist.wishlist_total|floatformat}}', '{{i.item_total|floatformat}}');">
-														<small>Delete</small>
-													</i>
-												</a>
-												</li>
-												<li>
-												<a> 
-													<i data-toggle="tooltip" title="Move to Cart!" 
-													onclick ="moveitem({{i.wishlist_item_id}});" 
-													style = "cursor: pointer;"
-													class= "fa fa-cart-plus">
-													<small>Move to Cart</small>
-													</i>
-												</a>
-												</li>
-												<li>
-												<!--<a>
-													<i data-toggle="tooltip" title="Move to a Collection!" onclick ="" 
-														style = "cursor: pointer;"
-														class= "fa fa-arrow-circle-o-right">
-														<small>Add to Collection</small>
-													</i>
-												</a>-->
-												</li>
+														class= "fa fa-cart-plus">
+														<small>Move to Cart</small>
+														</i>
+													</a>
+													</li>
+													<li>
+													<!--<a>
+														<i data-toggle="tooltip" title="Move to a Collection!" onclick ="" 
+															style = "cursor: pointer;"
+															class= "fa fa-arrow-circle-o-right">
+															<small>Add to Collection</small>
+														</i>
+													</a>-->
+													</li>
+												</ul>
 											</td>
 										</tr>
 										{% endfor userwishlistitems %}
@@ -242,6 +302,24 @@
 					<input hidden id="wishlist_item_id" name = "wishlist_item_id" value = ''>
 					<input hidden id="product_id" name = "product_id" value = ''>
 				</form>
+
+
+				<form id = "edit_form" hidden action = "{% url 'stock_image_detail' %}" method = 'GET'>
+					<input hidden id="wishlist_item_id" name = "wishlist_item_id" value = ''>
+					<input hidden id="product_id" name = "product_id" value = ''>
+					<input hidden id="product_type" name = "product_type" value = ''>
+				</form>
+				<form id = "edit_form_collage" hidden action = "{% url 'stock_collage_detail' %}" method = 'GET'>
+					<input hidden id="c_wishlist_item_id" name = "wishlist_item_id" value = ''>
+					<input hidden id="c_product_id" name = "product_id" value = ''>
+					<input hidden id="c_product_type" name = "product_type" value = ''>
+				</form>
+				<form id = "edit_form_original_art" hidden action = "{% url 'original_art_detail' %}" method = 'GET'>
+					<input hidden id="o_wishlist_item_id" name = "wishlist_item_id" value = ''>
+					<input hidden id="o_product_id" name = "product_id" value = ''>
+					<input hidden id="o_product_type" name = "product_type" value = ''>
+				</form>
+
 
 			</div>
 			<script>

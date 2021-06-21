@@ -1,0 +1,90 @@
+{% load static %}
+{% load utils %}
+
+						<div class = "row">					
+						<div class="col-12 mt-1">
+							<span class = "pull-left">Showing {{coll|length}} sets</span>
+							<span class = "pull-right">
+								Sort by Price
+								<select id = "priceSort">								
+									<option value="NONE"></option>
+									<option value="L2H">Low to High</option>
+									<option value="H2L">High to Low</option>							
+								</select>							
+							</span>
+						</div>
+						{% for c in coll %}
+							<div class="col-12 col-md-4 mt-3 mb-3">
+								<a id = "alink_{{c.product_id}}" href="{% url 'stock_collage_detail' c.product_id %}">
+									<img id = "coll_{{c.product_id}}" src="{% static c.stock_collage_specs.display_url %}" alt="Set of wall art painting,{{c.name}}"  class="img-fluid lazyload">
+								</a>
+								<div id = "">
+									<div class = "row">
+										<div class = "col-12">
+											<span>
+												Framed art on {{c.stock_collage_specs.print_medium_id|lower}} from 
+												<i class = "fa fa-inr"></i> 
+												<span  style = "color:#11b6bd;">
+													{{c.price|floatformat:'0'}}
+												</span>
+												<span class = "pull-right">
+													{% if c.product_id in wishlist_prods %}
+													<span id = "fav_{{c.product_id}}">
+														<i class = "fa fa-heart"  
+															onclick = "deleteItem('{{c.product_id}}')" 
+															style="color:red; padding-right:5px;cursor:alias;" data-toggle="tooltip" title="Added to Favorites!"></i>
+													</span>
+													{% else %}
+													<span  id = "fav_{{c.product_id}}">
+														<i class = "fa fa-heart-o"  
+															onclick = "addToFav({{c.product_id}}, {% if c.max_width > 16 %} 16 {%else%} {{c.max_width}} {%endif%}, {{c.aspect_ratio}}, 0, '', 0, 0, 0);"
+															style="color:red; padding-right:5px;cursor:alias;" data-toggle="tooltip" title="Add to Favourites!"></i>
+													</span>
+													{% endif %}
+												</span>												
+												<br />
+												<span class = "text-muted" style = "font-size:0.7rem;">
+													Multiple Sizes Available
+												</span>												
+											</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						{% endfor %}
+						</div>
+						<div class="box-cat info-bar">
+							<div class="row">
+								<div class="col-md-12 col-lg-12 text-cetner">
+									<ul class = "pagination justify-content-center"style="margin-bottom:0px !important">
+										{% if coll.has_previous %}
+										<li class="page-item">
+										  <button class="page-link" onclick="getAllFilters(page='1', sort='{{sortOrder}}', show='{{show}}', keywords='{{ikeywords}}');" aria-label="Previous">
+											<span aria-hidden="true">&laquo; First</span>
+											<span class="sr-only">begin</span>
+										  </button>
+										</li>   {% endif %}
+
+										{% for n in coll.paginator.page_range %}
+										  {% if coll.number == n %}
+											<li class="page-item active">
+											  <span class="page-link">{{ n }}<span class="sr-only">(current)</span></span>
+											</li>
+										  {% elif n > coll.number|add:'-5' and n < coll.number|add:'5' %}
+											<li class="page-item">
+											<button class="page-link" onclick="getAllFilters(page='{{n}}', sort='{{sortOrder}}', show='{{show}}', keywords='{{ikeywords}}');">{{ n }}</li>
+										  {% endif %}
+										{% endfor %}
+
+										{% if coll.has_next %}
+										  <li class="page-item">
+											<button class="page-link" onclick="getAllFilters(page='{{coll.paginator.num_pages}}', sort='{{sortOrder}}', show='{{show}}', keywords='{{ikeywords}}');" aria-label="Next">
+											  <span aria-hidden="true">Last &raquo;</span>
+											  <span class="sr-only">end</span>
+											</button>
+										  </li>
+										  {% endif %}   
+									</ul> 
+								</div>
+							</div>
+						</div>

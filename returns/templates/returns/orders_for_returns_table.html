@@ -39,17 +39,59 @@
 												{% endif %}
 											{% endif %}
 										</div>
-										<div class= "col-12 col-md-6">
+										{% if o.order_id in ret_order %}
+										<div class= "col-12 col-md-3 d-flex align-items-center">
+											<span class = "justify-content-center" style="color:red; font-weight:600;">
+											RETURN REQUEST EXISTS
+											</span>
+										</div>
+										<div class= "col-12 col-md-3">
 											<form action="{% url 'choose_products_for_return' %}"
 												method = "POST">
 												{% csrf_token %}
 												<input hidden value = '{{o.order_id}}' name = "order_id">
-												<button class = "pull-right btn btn-primary m-2">
+												<input hidden value = '{{o.order_id}}' name = "ret_initiated">
+												<button class = "pull-right btn btn-primary m-2"
+													{% if o.order_status == 'PR' or o.order_status == 'PC' or o.order_status == 'SH' %} disabled {% endif %}>
+													View/Modify
+												</button>
+											</form>
+											{% for r in ret_orderObjs %}
+												{% if r.order_id == o.order_id %}
+													{% if r.ret_status == 'X' or r.ret_status < '8' %}
+														<form action="{% url 'cancel_return_request' %}"
+															method = "POST">
+															{% csrf_token %}
+															<input hidden value = '{{o.order_id}}' name = "order_id">
+															<input hidden value = '{{o.order_id}}' name = "ret_initiated">
+															<button class = "pull-right btn btn-primary m-2"
+																{% if o.order_status == 'PR' or o.order_status == 'PC' or o.order_status == 'SH' %} disabled {% endif %}>
+																Cancel Req
+															</button>
+														</form>
+													{% endif %}
+												{% endif %}
+											{% endfor %}
+										{% else %}											
+											<form action="{% url 'choose_products_for_return' %}"
+												method = "POST">
+												{% csrf_token %}
+												<input hidden value = '{{o.order_id}}' name = "order_id">
+												<button class = "pull-right btn btn-primary m-2"
+													{% if o.order_status == 'PR' or o.order_status == 'PC' or o.order_status == 'SH' %} disabled {% endif %}>
 													Choose Products for Return
 												</button>
 											</form>
 										</div>
+										{% endif %}
 									</div>
+									{% if o.order_status == 'PR' or o.order_status == 'PC' or o.order_status == 'SH' %}
+									<div class = "row">
+										<div class = "col-12" style = "color:red;">
+											<strong>Return can't be processed. Order status: {{o.get_order_status_display}}.</strong>
+										</div>
+									</div>
+									{% endif %}
 									<div class = "row">
 										{% if o.order_shipping %}
 										<div class = "col-6 box">

@@ -196,6 +196,10 @@
 								</div>
 								<div class = "why-artevenue-text">
 									We ship in 1-3 days & courier takes about 4-7 days to deliver in all major cities in India.
+									Please Note: The orders
+									placed during the sale period it will take 4-5 more days to ship and 
+									due to Covid situation in the country delivery may be delayed more than usual
+									
 								</div>
 							</div>
 						</div>
@@ -262,7 +266,7 @@
 											Clear Acrylic: Added protection, durability and clear visibility. 
 										</td>
 									</tr>
-									<tr>													
+									<tr>											
 										<td class="accordian-subhead">STRETCHED CANVAS</td>
 										<td class = "comp-frame">
 											The canvas is stretched over a wooden frame. The frame is not visible from the front and sides.
@@ -293,7 +297,11 @@
 										<td class="accordian-subhead">SHIPPING TIME</td>
 										<td class = "comp-frame">
 											Ships by courier in 1-3 days. Usually deliveres in 3-10 days in most parts of India.
-											It ususally takes between 4-7 days to deliver in all metro and major cities.
+											It ususally takes between 4-7 days to deliver in all metro and major cities.<br />
+											Please Note: The orders
+											placed during the sale period it will take 4-5 more days to ship and 
+											due to Covid situation in the country delivery may be delayed more than usual
+											
 										</td>
 									</tr>
 								</tbody>
@@ -331,6 +339,17 @@
 		<div class = "row mt-2">
 			<hr>
 		</div>
+		{% if gal.gallery.set_of > 1 %}
+		<div class = "row mt-5">
+			<div class = "col-12">
+				<hr>
+			</div>		
+			<div class = "col-12 text-center">
+				<iframe width="360" height="240" src="https://youtube.com/embed/VC5qAHT2In4" frameborder="0" allowfullscreen>
+				</iframe>				
+			</div>
+		</div>
+		{% endif %}
 		
 		{% include 'artevenue/how_to_tips.html' %}
 

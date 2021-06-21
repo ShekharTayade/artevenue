@@ -1,0 +1,153 @@
+				{% load static %}
+				<div class = "col-12  mt-2 sticky-header" id="sticky-header">
+					<div class = "row" 
+							style = "padding: 5px; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; background-color:#f6f6f6;" >
+						<div class="col-3 d-flex align-items-center">
+							Filter By:
+						</div>
+						<div class="col-3 text-center">
+							<div class="dropdown">
+								<button class="btn btn-default dropdown-toggle" 
+								style = "color: #212529; background-color: #f6f6f6;"
+								type="button" id="dropdownMenuButton" 
+								data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									Shape
+								</button>
+								<div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style = "font-size: 0.75rem;">
+									<li class="dropdown-item" onclick="getSets('{{s}}', '', '', '')">
+										<img src = "{% static 'img/horizontal.png' %}" width = 25> Horizontal
+									</li>	
+									<li class="dropdown-item mt-2" onclick="getSets('{{s}}', '', '', '')">
+										<img src = "{% static 'img/vertical.png' %}" width = 25> Vertical
+									</li>	
+									<li class="dropdown-item mt-2" onclick="getSets('{{s}}', '', '', '')">
+										<img src = "{% static 'img/square.png' %}" width = 25> Square
+									</li>	
+									<li class="dropdown-item mt-2" onclick="getSets('{{s}}', '', '', '')">
+										<img src = "{% static 'img/slim_horizontal.png' %}" width = 25> Slim Horizontal
+									</li>	
+									<li class="dropdown-item mt-2" onclick="getSets('{{s}}', '', '', '')">
+										<img src = "{% static 'img/slim_vertical.png' %}" width = 25> Slim Vertical
+									</li>	
+									<li class="dropdown-item mt-2" onclick="showAll('SET');"
+										style = "text-decoration: underline; cursor:pointer;">
+										Show All
+									</li>
+								</div>
+							</div>
+						</div>
+						<div class="col-3 text-center">
+							<button class="btn btn-default dropdown-toggle" 
+							style = "color: #212529; background-color: #f6f6f6;"
+							type="button" id="dropdownMenuButton" 
+							data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+								Color
+							</button>
+							<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+								{% for c in colors_list %}
+									<div class= "text-center color-col mr-1" 
+										style = "display: inline-block; background-color:{{c}}; 
+											{% if c == 'White' %} border:1px solid gainsboro{% endif %}; 
+											border-radius:50%; width:30px; height:30px; 
+											margin:3px 3px; cursor:pointer;
+											color:{% if c == 'White' or c == 'Yellow'%} black {% else %} white {% endif %};"
+										onclick="getSets('', '{{c}}', '', '')">	
+									</div>
+								{% endfor %}
+								<span style = "text-decoration: underline; cursor:pointer;" 
+									onclick="showAll('COLOR');">Show All</span><br/>
+							</div>
+						</div>
+						<div class="col-3 text-center">
+							<div class="dropdown">
+								<button class="btn btn-default dropdown-toggle" 
+								style = "color: #212529; background-color: #f6f6f6;"
+								type="button" id="dropdownMenuButton" 
+								data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									Size
+								</button>
+								<div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+									{% for c in categories_list %}
+										<li class="dropdown-item" onclick="getSets('', '', '{{c}}', '')">{{c}}</li>
+									{% endfor %}
+										<li class="dropdown-item" onclick="showAll('THEME');"
+											style = "text-decoration: underline; cursor:pointer;">
+											Show All
+										</li>
+								</div>
+							</div>
+						</div>
+						<form hidden id="cat-form" action = "{% url 'stock_collage_products' %}">
+							<input hidden id = "id_page_num" name = "page">
+							<input hidden id = "id_sort" name = "sort">
+							<input hidden id = "id_keywords" name = "keywords">
+							<input hidden id = "id_color" name = "color">
+							<input hidden id = "id_size" name = "size">
+							<input hidden id = "id_category" name = "category">
+							<input hidden id = "id_shape" name = "shape">
+						</form>
+					</div>
+
+					{% if filt_applied %}								
+					<div id = "filter" class = "row mt-1 " >
+						{% if shape %}
+						<div class="col-4 col-md-2 mt-2">
+						<span  id = "s_shape" 
+							onclick = "removeFilter('SHAPE', '{{shape}}');" class = "chip">
+							{{shape|title}}&nbsp;&nbsp;
+							<i class = "fa fa-remove" 
+								style = " font-size: 0.75rem; color: #aaa;">
+							</i>
+						</span>
+						</div>
+						{% endif %}
+						{% if size %}
+						<div class="col-4 col-md-2 mt-2">
+						<span  id = "s_size"
+							onclick = "removeFilter('SHAPE''{{size}}');" class = "chip">
+							{{s}}&nbsp;&nbsp;
+							<i class = "fa fa-remove" 
+								style = " font-size: 0.75rem; color: #aaa;">
+							</i>
+						</span>
+						</div>
+						{% endif %}
+						{% for c in f_color %}
+						<div class="col-4 col-md-2 mt-2">
+						<span id = "color_{{c}}" 
+							onclick = "removeFilter('COLOR', '{{c}}')" class = "chip">
+						{{c}}&nbsp;&nbsp;
+						<i class = "fa fa-remove"  id = "colx_{{c}}" onclick = "removeFilter('COLOR', '{{c}}')"
+							style = " font-size: 0.75rem; color: #aaa;">
+						</i>
+						</span>
+						</div>
+						{% endfor %}
+						{% for c in f_category %}
+						<div class="col-4 col-md-2 mt-2">
+						<span id = "theme_{{s}}"
+							onclick = "removeFilter('THEME', '{{c}}')" class = "chip">
+							{{c}}&nbsp;&nbsp;
+							<i class = "fa fa-remove" 
+								style = " font-size: 0.75rem; color: #aaa;">
+							</i>
+						</span>
+						</div>
+						{% endfor %}
+						<div class="col-4 col-md-2 mt-2" style = "color: #11b6bd;">
+							<span onclick="getSetsAll();"
+								style = "text-decoration: underline; font-size: 0.75rem; cursor: pointer">
+								Clear All Filters
+							</span>
+						</div>
+					</div>
+														
+					<div class = "row mt-3" style = "border-bottom: 1px solid #ddd;">
+						<div class="col-12">
+						</div>
+					</div>
+					{% endif %}
+				</div>
+
+	
+	

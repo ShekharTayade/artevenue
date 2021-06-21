@@ -48,8 +48,9 @@
 							</div>
 							<div class = "col-12  col-md-6 text-center mt-1" style = "font-size:0.7rem;">
 								<a class = "btn btn-outline btn-sm" type = "button" 
-									href="{% url 'stock_image_detail' i.product_id i.image_width i.image_height %}">
-									<i class = "fa fa-rupee"> Buy Only This</i>
+									href = "{% url 'stock_image_detail' s.stock_image_id %}" target = "_blank"
+									style = "border: 1px solid #ddd;">
+									Buy This Artwork
 								</a>
 							</div>
 						</div>

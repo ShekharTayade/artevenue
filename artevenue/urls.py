@@ -60,7 +60,7 @@ urlpatterns = [
 	url(r'^ajax/get_carts/$', views.get_carts, name='get_carts'),	
 
 	#url(r'^homelane-products/$', views.homelane_products, name='homelane_products'),
-	#url(r'^amazon-products/$', views.amazon_products, name='amazon_products'),	
+	url(r'^amazon-products/$', views.amazon_products, name='amazon_products'),	
 	
 	
 	url(r'^sign-up/$', views.register, name='register'),
@@ -214,11 +214,27 @@ urlpatterns = [
 	path('my-client-order-report/<int:client_id>/', views.my_client_order_report, name='my_client_order_report'),
 
 	url(r'^wall-art-collage-sets/$', views.stock_collage_products, name='stock_collage_products'),
+	###########################################################
+	######################## WHEN SETS IS DONE
+	url(r'^wall-art-sets/$', views.wall_art_set_products, name='stock_collage_products'),
+	path('wall-art-sets/set-of-<str:set_of>-wall-art/', views.wall_art_set_products, name='stock_collage_products'),
+	path('wall-art-sets/<str:print_medium>-wall-art-sets/', views.wall_art_set_products, name='stock_collage_products'),
+	###########################################################
+	
+	url(r'^framed-wall-art/$', views.wall_art_set_products, name='framed_wall_art_collection'),
+	path('framed-wall-art/framed-<str:print_medium>-wall-art/', views.wall_art_set_products, name='framed_wall_art_by_surface'),
+	
 	url(r'^ajax/get-framed-collage/$', views.get_framed_collage, name='get_framed_collage'),
 	url(r'^ajax/get-collage-price/$', views.get_collage_price, name='get_collage_price'),
-	url(r'^wall-art-collage-set/$', views.stock_collage_detail, name='stock_collage_detail'),
-	path('wall-art-collage-set/<int:prod_id>/', views.stock_collage_detail, name='stock_collage_detail'),	
-	path('wall-art-collage-set/<int:prod_id>/<int:iuser_width>/<int:iuser_height>', views.stock_collage_detail, name='stock_collage_detail'),
+	#url(r'^wall-art-collage-set/$', views.stock_collage_detail, name='stock_collage_detail'),
+	#path('wall-art-collage-set/<int:prod_id>/', views.stock_collage_detail, name='stock_collage_detail'),	
+	url(r'^wall-art-collage-set/$', views.set_detail, name='stock_collage_detail'),
+	path('wall-art-collage-set/<int:prod_id>/', views.set_detail, name='stock_collage_detail'),	
+	#path('wall-art-collage-set/<int:prod_id>/<int:iuser_width>/<int:iuser_height>', views.stock_collage_detail, name='stock_collage_detail'),
+
+	path('framed-wall-art/<int:prod_id>/', views.set_detail, name='framed_wall_art'),	
+
+
 	url(r'^ajax/get-collage-catalog-card/$', views.get_collage_catalog_card, name='get_collage_catalog_card'),
 		 
 	url(r'^ajax/show-on-wall/$', views.show_on_wall, name='show_on_wall'),
@@ -253,6 +269,22 @@ urlpatterns = [
 	url(r'^coupon-management/', views.coupon_management, name='coupon_management'),	
 	url(r'^apply-coupon/', views.apply_coupon, name='apply_coupon'),	
 	url(r'^ajax/after-coupon-view/$', views.after_coupon_view, name='after_coupon_view'),
+	url(r'^ajax/apply-coupon-code/$', views.apply_coupon_code, name='apply_coupon_code'),
+
+	url(r'^invoice-report/', views.invoice_report, name='invoice_report'),	
+	url(r'^get-invoice-report/', views.get_invoice_report, name='get_invoice_report'),	
+
+	url(r'^print-pf-labels/$', views.pf_label_bulk, name = "pf_label_bulk"),
+	url(r'^print-bulk-pf-labels/$', views.print_bulk_pf_labels, name='print_bulk_pf_labels'),
+
+
+
+	url(r'^create-set-single/', views.create_set_single, name='create_set_single'),	
+	url(r'^set-single-data/', views.set_single_data, name='set_single_data'),	
+	url(r'^ajax/get-product/$', views.get_product, name='get_product'),
+	url(r'^ajax/save-new-set-single/$', views.save_new_set_single, name='save_new_set_single'),
+	url(r'^generate-set-prices/', views.generate_set_prices, name='generate_set_prices'),
+	url(r'^ajax/create_initial_data/$', views.createInitialData, name='createInitialData'),
 
 	
 	] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

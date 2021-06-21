@@ -1,0 +1,39 @@
+
+<div id="modal-yesno" tabindex="-1" role="dialog" aria-labelledby="Question Prompt" aria-hidden="true" class="modal fade">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h3 class="modal-title"><span id = "modal-hedline">Alert</span></h3>
+				<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-12">
+						<div class = "mb-4">
+							<h4><span id = "yesno-title"></span></h4>
+						</div>
+						<p>
+							<span id = "yesno-question"></span>							
+						</p>
+					</div>
+					<div class="col-6 pull-left">
+						<button class="btn btn-primary" 
+							onclick="answerNo();">
+							<i class="fa fa-times"></i>
+							NO
+						</button>
+					</div>					
+					<div class="col-6 pull-right">
+						<button class="btn btn-success" 
+							onclick="answerYes();">
+							<i class="fa fa-check"></i>
+							YES
+						</button>
+					</div>					
+				</div>
+
+			</div>
+		</div>
+	</div>
+</div>
+<!-- END: Message modal -->

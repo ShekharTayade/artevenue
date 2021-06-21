@@ -231,9 +231,13 @@ def register(request, email=None, signup_popup = 0):
 					
 				u_profile.save()
 				
-			# After successful sign up redirect to cuurent page
+			NEW_SIGNUP = 90
+			messages.add_message(request, NEW_SIGNUP, 'Thank you for signing up.')
+			
+			# After successful sign up redirect to current page
 			if signup_popup == 1:
 				next = request.POST['curr_pg']
+				## Set message for new sign up				
 				return redirect(next)
 			else:
 				return redirect('index')

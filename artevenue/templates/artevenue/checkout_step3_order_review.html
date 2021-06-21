@@ -173,9 +173,11 @@
 									<div class = "col-12">
 										<button type="submit" class="btn btn-primary pull-right" id = "online_btn"
 												form="order_confirm_form">
-											Make Payment<i class="fa fa-chevron-right"></i>
+											Pay Online<i class="fa fa-chevron-right"></i>
 										</button>
-										<button  type="submit" class="btn btn-primary pull-right" id = "cod_btn"
+									</div>
+									<div class = "col-12">
+										<button  type="submit" class="btn btn-primary pull-right mb-1" id = "cod_btn"
 												form="order_confirm_form">
 											Confirm COD Order<i class="fa fa-chevron-right"></i>
 										</button>
@@ -183,18 +185,35 @@
 									<div class = "col-12" id = "cod_ret">
 										<span style="font-size: 0.75rem; font-weight:700;" class = "pull-right"> 
 											<i class = "fa fa-exclamation-circle" style = "color: #FFC20F;"></i> 
-											COD order not eligible for return
-										</span>
-									</div>
-									<div class = "col-12 mt-1">
-										<span class = "pull-right" id = "cod_span">
-											<input  id = "cod_chk" name = "cod_chk" type = "checkbox" onclick="pay_cod();"> Cash on Delivery(COD)
-										</span>
-										<span   class = "pull-right" id = "online_span">
-											<input  id = "online_chk" name = "online_chk" type = "checkbox" onclick="pay_online();" checked> Pay Online
+											Cash on Delivery (COD) order not eligible for returns
 										</span>
 									</div>
 								</div>
+							</div>
+							<div class = "col-12 mt-1 text-center">
+								<span class = "pull-right" id = "cod_span">
+									<button type="button" class="btn btn-outline-secondary pull-right mb-1" id = "cod_chk" 
+										name = "cod_chk" type = "checkbox" onclick="pay_cod();"> 
+										Cash on Delivery<i class="fa fa-chevron-right"></i>
+									</button>
+									<input hidden id = "cod_val" name = "cod_val" type = "checkbox">
+								</span>
+							</div>									
+							<div class = "col-12 mt-1 text-center">
+								<span style="font-size: 0.75rem; font-weight:700;" class = "pull-right"  id = "cod_text">  
+									<i class = "fa fa-exclamation-circle" style = "color: #FFC20F;"></i> 
+									Cash on Delivery(COD) order not eligible for returns
+								</span>
+							</div>
+							<div class = "col-12 mt-1 text-center">
+								<!--<span style="font-weight:700; font-size:0.9rem; border: 1px solid #11b6bd; border-radius: 0.25rem;" 
+									class = "pull-right p-2" id = "online_span" onclick="pay_online();"> -->									
+									<button class = "btn btn-artevenue pull-right p-2" id = "online_chk" name = "online_chk" type = "button" 
+										onclick="pay_online();" style = "border-radius: 0.25rem;"> 
+										<i class = "fa fa-check-circle"></i> Online Payment (Eligible for returns)
+									</button>
+									<input hidden id = "online_val" name = "online_val" type = "checkbox">
+								<!--</span> -->
 							</div>
 						</div>
 						<div class="box-footer row">
@@ -232,100 +251,45 @@
             </div>
 			
 			<div class="col-12 col-md-3">
-					<div id="order-summary" class="box">
-						<div class="box-header">
-							<h3 class="mb-0">Order No. {{order.order_number}}</h3>
-						</div>
-						<div class="table-responsive">
-							<table class="table">
-								<tbody>
-									<tr>
-										<td>Order subtotal</td>
-										<th class="pull-right">{{order.sub_total|floatformat}}</th>
-									</tr>
-									<tr>
-										<td>Tax</td>
-										<th class="pull-right">{{order.tax|floatformat}}</th>
-									</tr>					
-									<tr>
-										<td>Shipping & handling</td>
-										<th><span class="pull-right">{{order.shipping_cost|floatformat}}</span></th>
-									</tr>
-									<tr class="total">
-										<td>Order Total</td>
-										<th class="pull-right"><i class = "fa fa-inr"> </i> <span id ="cart_total" >{{order.order_total|floatformat:"0"|default:"0"}}</span></th>
-									</tr>
-
-								</tbody>
-							</table>
-							<ul>
-							{% if order.order_discount_amt > 0 %} 
-								<strong>Your Savings:</strong> <span style = "color:green">{{order.order_discount_amt|floatformat}}</span>
-							{% endif %}
-							{% if order.voucher %} 
-								<div id "vouch_text" style ="color: #999; font-size: 0.6rem;">
-									You have used coupan "{{ order.voucher.voucher_code }}". 
-									Discount of <i class = "fa fa-inr"></i> {{order.voucher_disc_amount |floatformat }} is applied
-								</div>
-							{% endif %}
-							</ul>
-						</div>
-					</div>
-			
-			
-			
-			
-			
-				<!-- <div id="order-summary" class="box">
+				<div id="order-summary" class="box">
 					<div class="box-header">
 						<h3 class="mb-0">Order No. {{order.order_number}}</h3>
 					</div>
-					<div class = "row">
-						<div class = "col-sm-3">
-							<div class = "col-sm-12">		
-								<strong>Order subtotal</strong>
-							</div>
-							<div class = "col-sm-12">		
-								<span class = "ord-row">{{order.sub_total|floatformat}}</span>
-							</div>
-						</div>
-						<div class = "col-sm-2">
-							<div class = "col-sm-12">		
-								<strong>Tax</strong>
-							</div>
-							<div class = "col-sm-12">		
-								<span class = "ord-row">{{order.tax|floatformat}}</span>
-							</div>
-						</div>
-						<div class = "col-sm-3">
-							<div class = "col-sm-12">		
-								<strong>Shipping & handling</strong>
-							</div>
-							<div class = "col-sm-12">		
-								<span id ="s-h" class = "ord-row">{{order.shipping_cost|floatformat}}</span>
-							</div>
-						</div>
-						<div class = "col-sm-2">
-							<div class = "col-sm-12">		
-								<strong>Order Total</strong>
-							</div>
-							<div class = "col-sm-12">		
-								<span id ="ord-total" class = "ord-row"><strong>{{order.order_total|floatformat}}</strong></span>
-							</div>
-						</div>
-						{% if order.order_discount_amt %}
-						<div class = "col-sm-2">
-							<div class = "col-sm-12">		
-								<strong>Your Saving</strong>
-							</div>
-							<div class = "col-sm-12">		
-								<span style = "color:green">{{order.order_discount_amt|floatformat}}</span>
-							</div>
-						</div>
+					<div class="table-responsive">
+						<table class="table">
+							<tbody>
+								<tr>
+									<td>Order subtotal</td>
+									<th class="pull-right">{{order.sub_total|floatformat}}</th>
+								</tr>
+								<tr>
+									<td>Tax</td>
+									<th class="pull-right">{{order.tax|floatformat}}</th>
+								</tr>					
+								<tr>
+									<td>Shipping & handling</td>
+									<th><span class="pull-right">{{order.shipping_cost|floatformat}}</span></th>
+								</tr>
+								<tr class="total">
+									<td>Order Total</td>
+									<th class="pull-right"><i class = "fa fa-inr"> </i> <span id ="cart_total" >{{order.order_total|floatformat:"0"|default:"0"}}</span></th>
+								</tr>
+
+							</tbody>
+						</table>
+						<ul>
+						{% if order.order_discount_amt > 0 %} 
+							<strong>Your Savings:</strong> <span style = "color:green">{{order.order_discount_amt|floatformat}}</span>
 						{% endif %}
+						{% if order.voucher %} 
+							<div id "vouch_text" style ="color: #999; font-size: 0.6rem;">
+								You have used coupan "{{ order.voucher.voucher_code }}". 
+								Discount of <i class = "fa fa-inr"></i> {{order.voucher_disc_amount |floatformat }} is applied
+							</div>
+						{% endif %}
+						</ul>
 					</div>
-							
-				</div> -->
+				</div>
 			</div>
 
 			{% else %}
@@ -356,30 +320,51 @@
 		$("#online_btn").show();
 		$("#cod_btn").hide();
 		$("#cod_span").show();
+		$("#cod_text").show();
 		$("#online_span").hide();
+		$("#online_chk").hide();
 		$("#cod_ret").hide();
-		$('#online_chk').prop('checked', true);
-		$('#cod_chk').prop('checked', false);
+		//$('#online_chk').prop('checked', true);
+		//$('#cod_chk').prop('checked', false);
+		$('#cod_val').prop('checked', false);
+		$('#online_val').prop('checked', true);
 	</script>
 	<script>
 	function pay_cod(){
 		$("#online_btn").hide();
 		$("#cod_btn").show();
 		$("#cod_span").hide();
+		$("#cod_text").hide();
 		$("#online_span").show();
+		$("#online_chk").show();
 		$("#cod_ret").show();
-		$('#online_chk').prop('checked', false);
-		$('#cod_chk').prop('checked', true);
+		//$('#online_chk').prop('checked', false);
+		//$('#cod_chk').prop('checked', true);
+		$('#cod_val').prop('checked', true);
+		$('#online_val').prop('checked', false);
 	}
 	function pay_online(){
 		$("#online_btn").show();
 		$("#cod_btn").hide();
 		$("#cod_span").show();
+		$("#cod_text").show();
 		$("#online_span").hide();
+		$("#online_chk").hide();
 		$("#cod_ret").hide();
-		$('#online_chk').prop('checked', true);
-		$('#cod_chk').prop('checked', false);
+		//$('#online_chk').prop('checked', true);
+		//$('#cod_chk').prop('checked', false);
+		$('#cod_val').prop('checked', false);
+		$('#online_val').prop('checked', true);
 	}
 	</script>
 	
+	<script>
+	$(document).ready(function () {
+		$("#order_confirm_form").submit(function () {
+			$("#cod_btn").prop("disabled", true);
+			$("#online_btn").prop("disabled", true);
+			return true;
+		});
+	});	
+	</script>
 	{% endblock jscripts %}

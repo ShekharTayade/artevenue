@@ -57,6 +57,12 @@
 					<a style = "background-color: #000; color: #fff; padding:7px; width:100%; margin-bottom:20px;" href = "{{order.tracking_url}}">Track it here
 					</a>
 				</h5>
+
+				{% if order.payment_type == 'COD' %}
+				<h5>
+					Payment Type: {{order.get_payment_type_display}}
+				</h5>
+				{% endif %}
 				
 				<!--  Email content -->
 				<table style = "font-size: 10px; margin-top: 20px;">

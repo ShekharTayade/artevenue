@@ -1,0 +1,256 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load utils %}
+
+{% block page-title %} 
+<title>Arte'Venue | Store Orders</title>
+{% endblock page-title %} 
+  
+{% block page-description %}
+<meta name="description" content="Arte'Venue | Returns Requests">
+{% endblock page-description %}
+  
+{% block page-keywords %}
+<meta name="keywords" content="artevenue, returns">
+{% endblock page-keywords %}
+  
+{% block page-author %}
+<meta name="author" content="Arte'Venue">
+{% endblock page-author %}
+
+{% block coursel-stylesheet %}
+{% endblock coursel-stylesheet %}
+
+{% block jqueryui-script %}
+{% endblock jqueryui-script %}
+
+{% block coursel-script %}
+{% endblock coursel-script %}
+
+{% block front.js %}
+{% endblock front.js %}
+
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+	{% block sitecontent %}
+
+    <div id="all">
+		<div id="content">
+			<div class="container mb-5">
+				<div class = "row">
+					<div class="col-12">
+						<nav aria-label="breadcrumb">
+							<ol class="breadcrumb">
+								<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+								<li class="breadcrumb-item"><a href="{% url 'staff_page' %}">Staff Page</a></li>
+								<li aria-current="page" class="breadcrumb-item active">List of Active Return Requests</li>
+							</ol>
+						</nav>
+					</div>
+				</div>
+				<div class = "row">				
+					<div class = "col-12 text-center">
+						<h2 style = "font-weight:700;">ACTIVE RETURN REQUESTS</h2> 
+					</div>
+				</div>
+				<div class = "row">				
+					<div class = "col-12">
+						Total Active Returns: {{returns.count|floatformat|default_if_none:0}}
+					</div>
+				</div>						
+				<div class="row mt-2">
+					<div class = "col-12">
+						<table id = "ordTbl" class="table table-responsive table-striped">
+							<thead>
+								<tr>
+									<th width="20%">Customer Name</th>
+									<th width="10%" style = "text-align:right">Refund Amount Due</th>
+									<th width="10%" style="text-align:right">Ret Req No.</th>
+									<th width="10%" style="text-align:right">Ret Req Dt.</th>
+									<th width="15%">Status</th>
+									<th width="25%">Remarks</th>
+									<th width="10%"></th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for r in returns %}
+								<tr>
+									<td>
+										<div class = "pull-left">
+											{{r.order.order_billing.full_name}}
+										</div>
+									</td>
+									<td style = "text-align:right">
+										{{r.refund_amount|floatformat}}
+									</td>
+									<td style = "text-align:right">
+										{{r.ret_number}}
+									</td>
+									<td style = "text-align:right">
+										{{r.ret_request_date|date:'d-M-y'}}
+									</td>
+									<td>
+										{{r.get_ret_status_display}}
+									</td>
+									<td>
+										{{r.remarks}}
+									</td>
+									<td style = "text-align:right">
+										<a class="btn btn-link btn-sm btn-primary" href="{% url 'return_request_for_update' r.ret_id %}">
+											Update Status
+										</a>
+									</td>
+								</tr>
+								{% endfor %}
+								
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<hr>
+			</div>
+		</div>
+	</div>
+	{% endblock sitecontent %}
+
+	{% block jscripts %}
+	<script>
+		$("#id_req_date").change(function(){
+			$("#req_date").val( $(this).val() );
+		});
+		$("#id_remarks").change(function(){
+			$("#remarks").val( $("#remarks").val() + $(this).val() );
+		});
+	
+		$(".item-chk").change(function(){
+			$("#selected_items").val('');
+			{% for i in choose_order_items %}
+				if ($("#chk_{{i.order_item_id}}").prop("checked") == true) {
+					var v = $("#selected_items").val();
+					$("#selected_items").val(v + "{{i.order_item_id}},");
+				}
+			{% endfor %}
+		});
+	
+		$("#id_ret_reason").change(function(){
+			$("#ret_reason").val( $(this).val() );
+		});
+		
+	</script>
+	<script>
+		$( document ).ready(function() {
+			var today = new Date();
+			var to_dt = today.getDate();
+			var to_mn = today.getMonth();
+			var to_mn = to_mn + 1;
+			var to_yy = today.getFullYear();						
+			$("#id_req_date").val( parseInt(to_yy) + "-" + zeroPad(to_mn) + "-" + zeroPad(to_dt) );
+			$("#req_date").val( parseInt(to_yy) + "-" + zeroPad(to_mn) + "-" + zeroPad(to_dt)  );
+			$("#ret_reason").val( $("#id_ret_reason").val() );
+			
+			// Mark items already initiated for return
+			{% for i in ret_order_items %}
+				$("#chk_{{i.order_item_id}}").prop( "checked", true );
+				$("#selected_items").val($("#selected_items").val() + "{{i.order_item_id}},");
+				//Items previously selected for returns
+				$("#ini_items").val($("#ini_items").val() + "{{i.order_item_id}},");
+				$("#ret_reason").val( "{{i.return_order.ret_reason}}" );
+				$("#id_ret_reason").val( "{{i.return_order.ret_reason}}" );
+				$("#req_date").val( "{{i.return_order.ret_request_date|date:'Y-m-d'}}" ); 
+				$("#id_req_date").val( "{{i.return_order.ret_request_date|date:'Y-m-d'}}" ); 
+				$("#refund_amount").val("{{ret_order.refund_amount}}");
+				$("#id_remarks").val("{{ret_order.remarks}}");
+				calcRefund();
+			{% endfor %}
+			
+			{% if ret_order.ret_status > '2' %}
+				doNotModify();
+			{% endif %}
+		});
+
+		function zeroPad(val){
+			if(val < 10){
+				ret = "0" + String(val);
+			} else {
+				ret = String(val);
+			}
+			return ret;
+		}
+		
+		function doNotModify(){
+			$("#btn-submit").prop('disabled', true);
+			$("#check-all").prop('disabled', true);
+			{% for i in choose_order_items %}
+				$("#chk_{{i.order_item_id}}").prop('disabled', true);			
+			{% endfor %}
+			$("#id_ret_reason").prop('disabled', true);
+			$("#id_req_date").prop('disabled', true);		
+		}
+	</script>
+	
+	<script>
+		$('#check-all').change(function() {
+			$("#selected_items").val('');
+			if(this.checked) {			
+				{% for i in choose_order_items %}
+					$("#chk_{{i.order_item_id}}").prop('checked', true);
+					$("#selected_items").val($("#selected_items").val() + "{{i.order_item_id}},");
+				{% endfor %}
+			} else {
+				{% for i in choose_order_items %}
+					$("#chk_{{i.order_item_id}}").prop('checked', false);
+				{% endfor %}			
+				$("#selected_items").val("");
+			}			
+			calcRefund();
+		});
+		
+		$( ".item-chk" ).change(function() {
+		  calcRefund();
+		  
+		  if(this.checked == false) {
+				$('#check-all').prop('checked', false);
+			}
+		});		
+		
+		function calcRefund(){
+			var amt = 0;
+			var cnt = 0;
+			var itms = '';
+			{% for i in choose_order_items %}
+				if ($("#chk_{{i.order_item_id}}").prop("checked") == true) {
+					amt = amt + {{i.item_total}};
+					cnt = cnt + 1;
+					itms = itms + ", " + String({{i.order_item_id}});
+				}
+				$("#refund-due").html(amt);
+				$("#refund_amount").val(amt);
+				$("#sel-cnt").html(cnt);
+			{% endfor %}
+		}
+	</script>
+
+	<script>
+		function validateRet(){
+			var cnt = parseInt($("#sel-cnt").html());
+			if (isNaN(cnt)){
+				alert("Please selects products for return");
+				return false;
+			}
+			
+			if (cnt < 1){
+				alert("Please selects products for return");
+				return false;
+			}
+			
+			if (confirm('Are you sure you want to process this return?')) {
+			   return true;
+			} else {
+			   return false;
+		   }
+		}
+	</script>
+		
+	{% endblock jscripts %}

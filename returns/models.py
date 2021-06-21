@@ -3,9 +3,11 @@ from django.conf import settings
 from django.contrib.auth.models import User
 
 from artevenue.models import Order, Product_view, Promotion, Moulding, Print_medium, Mount
-from artevenue.models import Acrylic, Stretch, Board, Product_type
+from artevenue.models import Acrylic, Stretch, Board, Product_type, Order_items_view
 from artevenue.models import Shipping_method, Shipper, Shipping_status
 from artevenue.models import Stock_image, User_image, Stock_collage, Original_art
+from artevenue.models import Cart_item, Product_view, Promotion
+
 
 class Credit_note(models.Model):	
 	CRN_REASON = (
@@ -110,7 +112,6 @@ class Debit_note_detail(models.Model):
 	created_date = models.DateTimeField(auto_now_add=True, null=False)	
 	updated_date = models.DateTimeField(auto_now=True, null=False)	
 
-
 class Return_order(models.Model):	
 	RET_REASON = (
 		('UN', 'Not Specified'),
@@ -121,15 +122,22 @@ class Return_order(models.Model):
 		('L', 'Did not Like It'),
 	)    
 	RET_STATUS = (
-		('RQ', 'Return Request Raised'),
-		('IN', 'Return Request Being Processed'),
-		('SH', 'Return Shipment Booked'),
-		('PK', 'Return Shipment Picked Up'),
-		('RC', 'Return Shipment Received by ArteVenue'),
-		('QC', 'Quality Check In Process'),
-		('QF', 'Quality Check Failed'),
-		('QP', 'Quality Check Passed'),
-		('RI', 'Refund Issued'),
+		('X', 'Request Cancelled'),
+		('0', 'Request Raised'),
+		('1', 'Request Being Processed'),
+		('2', 'Shipment Booked'),
+		('3', 'Shipment Picked Up'),
+		('4', 'Shipment Received by ArteVenue'),
+		('5', 'Quality Check In Process'),
+		('6', 'Quality Check Failed'),
+		('7', 'Quality Check Passed'),
+		('8', 'Refund Issued'),
+		('9', 'Request Closed'),
+	)
+	CLOSURE_STATUS  = (
+		('0', 'Return Request Cancelled'),
+		('1', 'Quality Check Failed'),
+		('2', 'Refund Issued'),
 	)
 	ret_id = models.AutoField(primary_key=True)
 	ret_number = models.CharField(max_length = 15, blank = True, default = '')
@@ -141,13 +149,15 @@ class Return_order(models.Model):
 	total_deductions = models.DecimalField(max_digits=12, decimal_places=2,  null=False, default=0)
 	refund_amount = models.DecimalField(max_digits=12, decimal_places=2,  null=False, default=0)
 	refund_transaction_reference = models.CharField(max_length = 500, blank = True, default = '')
-	remarks = models.CharField(max_length = 500, blank = True, default = '')
+	remarks = models.CharField(max_length = 5000, blank = True, default = '')
 	ret_process_date = models.DateTimeField(null=True)
 	ret_shipping_method = models.ForeignKey(Shipping_method, models.PROTECT, null=True) #Null is allowed, in case it's a store pickup
 	ret_shipper = models.ForeignKey(Shipper, models.PROTECT, null=True) #Null is allowed, in case it's a store pickup	
 	ret_shipping_status = models.ForeignKey(Shipping_status, models.PROTECT, null=True) #Null is allowed, in case it's a store pickup
 	ret_status = models.CharField(max_length = 2, blank=True, 
-		choices=RET_STATUS, default='PP') 
+		choices=RET_STATUS, default='0') 
+	closure_status = models.CharField(max_length = 2, blank=True,
+		choices=CLOSURE_STATUS, default='') 
 	created_date = models.DateTimeField(auto_now_add=True, null=False)	
 	updated_date = models.DateTimeField(auto_now=True, null=False)	
 
@@ -158,17 +168,24 @@ class Return_order_item(models.Model):
 		('WR', 'Products Received Are Not As Per The Order')
 	)
 	ret_item_id = models.AutoField(primary_key=True)
-	return_order = models.ForeignKey(Return_order,on_delete=models.PROTECT, null=True)
+	return_order = models.ForeignKey(Return_order, on_delete=models.PROTECT, null=True)
+	order_item_id = models.IntegerField(null=False)   ## Referential relation to Order_items_view (programatically)
+
 	ret_item_quantity = models.IntegerField(null=False)
 	ret_item_unit_price = models.DecimalField(max_digits=12, decimal_places=2, null=False, default=0)
 	ret_item_sub_total = models.DecimalField(max_digits=12, decimal_places=2,  null=False, default=0)
 	ret_item_disc_amt  = models.DecimalField(max_digits=12, decimal_places=2,  null=False, default=0)
 	ret_item_tax  = models.DecimalField(max_digits=12, decimal_places=2,  null=False, default=0)
 	ret_item_total = models.DecimalField(max_digits=12, decimal_places=2,  null=False, default=0)
+
 	quality_check_date = models.DateTimeField(null=True)
 	quality_check_passed = models.BooleanField(null=True, default=False)
 	quality_check_failed_reason = models.CharField(max_length = 2, choices=QC_FAIL_REASON, blank = True, default = '')
 
+	def __str__(self):
+		return str(self.return_order_id) + str(self.ret_item_id)
+
+'''
 class Return_order_stock_image(Return_order_item):
 	stock_image = models.ForeignKey(Stock_image, models.CASCADE, null=False)
 
@@ -192,3 +209,4 @@ class Return_order_item_view(models.Model):
 	class Meta:
 		managed = False
 		db_table = 'return_order_item_view'	
+'''

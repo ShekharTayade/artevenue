@@ -43,6 +43,14 @@
 	
 	
 	{% block jscripts %}
+		<script>
+		$body = $("body");
+		
+		$(document).on({
+			ajaxStart: function() { $body.addClass("loading");},
+			ajaxStop: function() { $body.removeClass("loading");},
+		});
+		</script>
 	
 		<script>
 		
@@ -125,11 +133,26 @@
 		</script>
 		
 		<script>
-			function edit_item(wishlist_item_id, product_id){
+
+			function edit_item(wishlist_item_id, product_id, product_type='STOCK-IMAGE'){
 				$("#product_id").val(product_id);
+				$("#product_type").val(product_type);
 				$("#wishlist_item_id").val(wishlist_item_id);
 				$("#edit_form").submit();
 			}
+			function edit_item_collage(wishlist_item_id, product_id, product_type='STOCK-COLLAGE'){
+				$("#c_product_id").val(product_id);
+				$("#c_product_type").val(product_type);
+				$("#c_wishlist_item_id").val(wishlist_item_id);
+				$("#edit_form_collage").submit();
+			}
+			function edit_item_original_art(wishlist_item_id, product_id, product_type='ORIGINAL-ART'){
+				$("#o_product_id").val(product_id);
+				//$("#o_product_type").val(product_type);
+				//$("#o_cart_item_id").val(wishlist_item_id);
+				$("#edit_form_original_art").submit();
+			}
+			
 		</script>
 		
 		<script>

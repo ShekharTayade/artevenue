@@ -3,15 +3,23 @@
 
 <div class = "container-fluid mt-5">
 	<div class="row text-center">
-		<div class="col-12 col-md-12">
-			<div class="col-md-12 text-center" style = "background-color: #fafafa; padding:10px;">
-				<h2 class="text-center">CUSTOM PHOTO FRAMES
-				</h2>
-				<h4>Get your Photos, Artworks, Posters Framed and Delivered
+		<div class="col-12 col-12">
+			<a id = "" href="{% url 'user_image' %}">
+			<div class = "row d-flex justify-content-center align-items-center" style = "background-color: #fafafa; padding:10px; color:#212529;">
+				<div >
+					<h2 class="text-center">CUSTOM PHOTO FRAMES
+					</h2>
+					<h4>Upload your Photos, Artworks & Get Framed
+				</div>
+				<div style = "background-color: #fafafa; padding:10px;">
+						<i class = "fa fa-caret-right fa-3x" style = "color:#999999;" >
+						</i>
+				</div>			
 			</div>
+			</a>
 		</div>
 	</div>
-	<div class="row text-center">
+	<!--<div class="row text-center">
 		<div class = "col-12">
 		<a id = "" href="{% url 'user_image' %}">
 		<div class="curated-container">
@@ -23,7 +31,7 @@
 		</div>
 		</a>
 		</div>
-	</div>
+	</div>-->
 </div>
 
 {% endif %}

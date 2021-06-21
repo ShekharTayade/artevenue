@@ -1843,6 +1843,7 @@ def add_to_cart_new(request):
 		total_disc_amt = 0
 		disc_applied = False
 		promotion_id = None
+
 		#####################################
 		#    Get the item price for each
 		#####################################
@@ -1932,6 +1933,7 @@ def add_to_cart_new(request):
 	##################################################
 	# END:	if item price not found, don't add to cart
 	##################################################
+
 
 	##################################################
 	#	Get the product object
@@ -2284,9 +2286,7 @@ def add_to_cart_new(request):
 		usercartitems.updated_date =  today_dt
 
 		usercartitems.save()		
-	
-	
-	
+
 		###### Create and save art set image and thumbnail
 		if prod.product_type_id == 'STOCK-COLLAGE':
 			if env == 'DEV' or env == 'TESTING':				
@@ -2468,14 +2468,15 @@ def apply_voucher_py_new(request, cart_id, voucher_code, cart_total, car_sub_tot
 	#############################################
 	## Check if voucher applies to the user, 
 	## if it's already used and the expiry date
-	############################################	
+	############################################
+
 	voucher_user = Voucher_user.objects.filter(voucher = voucher, effective_from__lte = today, 
 			effective_to__gte = today).first()	
 	if not voucher.all_applicability:
 		if not voucher_user :
 			return JsonResponse({"status":"INVALID-CODE"})
-		if voucher_user.used_date != None :
-			return JsonResponse({"status":"USED"})		
+		#if voucher_user.used_date != None :
+		#	return JsonResponse({"status":"USED"})		
 		if voucher_user.user != user:
 			return JsonResponse({"status":"USER-MISMATCH"})
 		if voucher.effective_to < today:
@@ -2558,40 +2559,40 @@ def apply_voucher_py_new(request, cart_id, voucher_code, cart_total, car_sub_tot
 	## If it's not eGift, then it has to be an all appliable voucher.
 	## All applicable voucher is allowed only with disc type as PERCENTAGE
 	else:
-		if voucher.all_applicability:
-			# Check it it's alrady used
-			#if cart.voucher_disc_amount > 0 :
-			#	return JsonResponse({"status":"USED"})
+		#if voucher.all_applicability:
+		# Check it it's alrady used
+		#if cart.voucher_disc_amount > 0 :
+		#	return JsonResponse({"status":"USED"})
 
-			## Check one time use
-			if voucher_use_check:
-				used_voucher = Voucher_used.objects.filter( voucher = voucher,
-					user = user)
-				if used_voucher:
-					return JsonResponse({"status":"USED"})
-				
-			## For all "applicable vouchers" only allowed disc type is %
-			if disc_type == "PERCENTAGE":
-				##if there is any voucher already in cart, remove the amount
-				if cart.voucher_disc_amount > 0:
-					cart_sub_total = round(cart.cart_sub_total + cart.voucher_disc_amount, 2)
-				else:
-					cart_sub_total = cart.cart_sub_total
-				## Calculate discount amount and new cart total
-				disc_amount = round(cart_sub_total * voucher.discount_value/100, 2)
-				new_cart_sub_total = round(cart_sub_total - ( cart_sub_total * voucher.discount_value/100 ), 2)
-				total_disc_amount =  disc_amount
-				voucher_bal_amount =  0
-			elif disc_type == "CASH":
-				None
-				######new_cart_sub_total = cart.cart_sub_total 
-				######total_disc_amount =  disc_amount + applied_disc
-			if new_cart_sub_total < 0:
-				# Limit the discount to the total cart value
-				new_cart_sub_total = 0
+		## Check one time use
+		if voucher_use_check:
+			used_voucher = Voucher_used.objects.filter( voucher = voucher,
+				user = user)
+			if used_voucher:
+				return JsonResponse({"status":"USED"})
 			
-		else:
-			return JsonResponse({"status":"DOESNOT-APPLY"})
+		## For all "applicable vouchers" only allowed disc type is %
+		if disc_type == "PERCENTAGE":
+			##if there is any voucher already in cart, remove the amount
+			if cart.voucher_disc_amount > 0:
+				cart_sub_total = round(cart.cart_sub_total + cart.voucher_disc_amount, 2)
+			else:
+				cart_sub_total = cart.cart_sub_total
+			## Calculate discount amount and new cart total
+			disc_amount = round(cart_sub_total * voucher.discount_value/100, 2)
+			new_cart_sub_total = round(cart_sub_total - ( cart_sub_total * voucher.discount_value/100 ), 2)
+			total_disc_amount =  disc_amount
+			voucher_bal_amount =  0
+		elif disc_type == "CASH":
+			None
+			######new_cart_sub_total = cart.cart_sub_total 
+			######total_disc_amount =  disc_amount + applied_disc
+		if new_cart_sub_total < 0:
+			# Limit the discount to the total cart value
+			new_cart_sub_total = 0
+		
+		#else:
+		#	return JsonResponse({"status":"DOESNOT-APPLY"})
 
 		taxes = get_taxes()
 		####################################################

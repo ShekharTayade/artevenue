@@ -1,0 +1,315 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+
+{% block page-title %} 
+<title>Arte'Venue | Store Order Summary</title>
+{% endblock page-title %} 
+  
+{% block page-description %}
+<meta name="description" content="Arte'Venue | Store Order Summary - Restricted Access.">
+{% endblock page-description %}
+  
+{% block page-keywords %}
+<meta name="keywords" content="artevenue, store order summary">
+{% endblock page-keywords %}
+  
+{% block page-author %}
+<meta name="author" content="Arte'Venue">
+{% endblock page-author %}
+
+{% block coursel-stylesheet %}
+{% endblock coursel-stylesheet %}
+
+{% block jqueryui-script %}
+{% endblock jqueryui-script %}
+
+{% block coursel-script %}
+{% endblock coursel-script %}
+
+{% block front.js %}
+{% endblock front.js %}
+
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+{% block add_to_head %}	
+	<link rel="stylesheet" href="{% static  'vendor/DataTables/datatables.min.css' %}">
+	<script src="{% static 'vendor/DataTables/datatables.min.js' %}" async></script>
+{% endblock add_to_head %}
+
+{% load widget_tweaks %}
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+
+    <div id="all">
+		<div id="content">
+			<div class="container">
+				<div class = "row">
+					<div class="col-lg-12">
+						<!-- breadcrumb-->
+						<nav aria-label="breadcrumb">
+							<ol class="breadcrumb">
+								<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+								<li class="breadcrumb-item"><a href="{% url 'staff_page' %}">Staff Page</a></li>
+								<li aria-current="page" class="breadcrumb-item active">Invoice Report</li>
+							</ol>
+						</nav>
+					</div>
+				</div>
+				<div class = "row">
+					<div class = "col-sm-12">
+						<div class="box">
+							<h3>Invoice Report</h3>
+							<p>Invoices by date range</p>
+						</div>
+					</div>				
+					<div class = "col-sm-12">
+						<div class="box info-bar">
+							<div class = "row">
+								<div class = "col-sm-5 col-lg-3">
+									<div class="form-group">
+										<label>From:</label>
+										<input name = "fromdate" id = "fromdate" 
+											class = "form-control" type="date" onchange = "copy_date('FROMDATE');"/>
+									</div>
+								</div>
+								<div class = "col-sm-5 col-lg-3">
+									<div class="form-group">
+										<label>To:</label>
+										<input name = "todate" id = "todate" 
+											class = "form-control" type="date" onchange = "copy_date('TODATE');" />
+									</div>
+								</div>
+								<div class = "col-sm-2 col-lg-2">
+									<div class="form-group">
+										<label>&nbsp; </label><br />
+										<button type="button" id = "date-submit" 
+										class = "btn btn-primary"
+										onclick = "get_invoices('1', 'NO');">Submit</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class = "col-sm-12">
+						<div class = "box info-bar">
+							<div id = "invoice_report_table">
+								{% include 'artevenue/invoice_report_table.html' %}
+							</div>
+						</div>
+						<div hidden class="col-sm-12">
+							<form method = "POST" action = "{% url 'get_invoices'%}" id = "getpdf">
+								<input hidden name = "printpdf" value = "YES">
+								<input hidden name = "fromdate" id = "fromdate_pdf">
+								<input hidden name = "todate" id = "todate_pdf">
+								<input hidden name = "inv_fromdate" id = "inv_fromdate_pdf" >
+								<input hidden name = "inv_todate" id = "inv_todate_pdf">
+								<input hidden name = "ordtype" id = "ordtype" value = "A">
+								<input hidden name = "invoice_num" id = "invoice_num_pdf" type="text"/>
+								<input hidden name = "order_num" id = "order_num_pdf" type="text"/>
+								<div hidden class="form-group">
+									<button type="submit" id = "submit_pdf" 
+									class = "btn btn-primary" form = "getpdf">
+									Download PDF</button>
+								</div>	
+							</form>
+						</div>													
+					</div>
+				</div>
+			</div>
+					
+        </div>
+    </div>
+	{% include 'artevenue/message-modal_ok.html' %}
+	{% endblock sitecontent %}
+
+
+	{% block jscripts %}
+		<script>
+		/*
+		function getButtons(){
+			$('#ordTbl').dataTable();
+			// Get the export buttons
+			var entTable = $('#ordTbl').DataTable( {
+				autoWidth: true,
+				fixedHeader: true,
+				responsive: true,
+				select: false,
+				paging: true,
+				dom: '<"top"f>Brt<"bottom"ilp><"clear">',
+				buttons: [
+				   'copy', 'excel', 'pdf', 'print'
+				]
+			} );
+		}
+		*/
+		</script>
+	
+	<script>
+		$( document ).ready(function() {
+			var today = new Date();
+			var from_dt = new Date();
+			from_dt.setDate( 1 ) 
+			var fm_dt = from_dt.getDate();
+			var fm_mn = from_dt.getMonth();
+			var fm_mn = fm_mn + 1; //Javascript month start from 0
+			var fm_yy = from_dt.getFullYear();			
+			document.getElementById("fromdate").value = ( parseInt(fm_yy) + "-" + zeroPad(fm_mn) + "-" + zeroPad(fm_dt) );
+
+			var to_dt = today.getDate();
+			var to_mn = today.getMonth();
+			var to_mn = to_mn + 1;
+			var to_yy = today.getFullYear();			
+			
+			document.getElementById("todate").value = ( parseInt(to_yy) + "-" + zeroPad(to_mn) + "-" + zeroPad(to_dt) );
+		
+		
+			// Trigger the inital fetch of orders
+			document.getElementById("date-submit").click();
+
+		});
+	
+		function get_invoices(page, printpdf='NO'){
+		
+			var execute_ajax = false;
+			var query_data = {};
+			//Get the from, to dates
+			var fm_d = new Date(document.getElementById("fromdate").value);
+			if (fm_d > new Date()) {
+				$("#msg").html("From Date can't be greatrer than today");
+				$("#msg-modal").modal("show");
+				return;
+			}
+			var fm_dt = fm_d.getDate();
+			var fm_mn = fm_d.getMonth();
+			var fm_mn = fm_mn + 1; //Javascript month start from 0
+			var fm_yy = fm_d.getFullYear();			
+			var from_date = fm_yy + "-" + fm_mn + "-" + fm_dt;
+			  
+			var to_d = new Date(document.getElementById("todate").value);
+			var to_dt = to_d.getDate();
+			var to_mn = to_d.getMonth();
+			var to_mn = to_mn + 1; //Javascript month start from 0
+			var to_yy = to_d.getFullYear();			
+			var to_date = to_yy + "-" + to_mn + "-" + to_dt;
+			
+			if ( to_d < fm_d ) {
+				$("#msg").html("To Date can't be earlier than From Date");
+				$("#msg-modal").modal("show");
+				return;
+			}
+			query_data = {'fromdate':from_date, 'todate':to_date, 'page':page, 'printpdf':printpdf, 'ordtype':'A'}
+
+			$.ajax({
+				url: "{% url 'get_invoice_report' %}", 
+				dataType: 'text',
+				data: query_data,
+				type: 'POST',
+				success: function (data) {
+					if (printpdf == "NO") {
+						$("#invoice_report_table").html(data);
+						set_datatable();
+						/*getButtons();*/
+					}
+				},
+				error: function(xhr){
+					alert("An error occured: " + xhr.status + " " + xhr.statusText + " Apologies for the inconvenience!! Please let us know the details and we will be happy to help sort it out."); 
+					return;
+				}
+			});	
+		}
+		
+		
+		function zeroPad(val){
+			if(val < 10){
+				ret = "0" + String(val);
+			} else {
+				ret = String(val);
+			}
+			return ret;
+		}
+	</script>
+
+	
+	<script>
+	function copy_date(type){
+		if (type == "FROMDATE") {
+			var fm_d = new Date(document.getElementById("fromdate").value);
+			var fm_dt = fm_d.getDate();
+			var fm_mn = fm_d.getMonth();
+			var fm_mn = fm_mn + 1; //Javascript month start from 0
+			var fm_yy = fm_d.getFullYear();			
+			var from_date = fm_yy + "-" + fm_mn + "-" + fm_dt;
+			$('#fromdate_pdf').val(from_date);
+		} 
+		if (type == "TODATE") {
+			var to_d = new Date(document.getElementById("todate").value);
+			var to_dt = to_d.getDate();
+			var to_mn = to_d.getMonth();
+			var to_mn = to_mn + 1; //Javascript month start from 0
+			var to_yy = to_d.getFullYear();			
+			var to_date = to_yy + "-" + to_mn + "-" + to_dt;
+			$('#todate_pdf').val(to_date);
+		}
+	}
+	</script>
+	
+	<script>
+	function set_datatable(){ 
+		//Get the from, to dates
+		var fm_d = new Date(document.getElementById("fromdate").value);
+		if (fm_d > new Date()) {
+			$("#msg").html("From Date can't be greatrer than today");
+			$("#msg-modal").modal("show");
+			return;
+		}
+		var fm_dt = fm_d.getDate();
+		var fm_mn = fm_d.getMonth();
+		var fm_mn = fm_mn + 1; //Javascript month start from 0
+		var fm_yy = fm_d.getFullYear();			
+		var from_date = fm_yy + "-" + fm_mn + "-" + fm_dt;
+		  
+		var to_d = new Date(document.getElementById("todate").value);
+		var to_dt = to_d.getDate();
+		var to_mn = to_d.getMonth();
+		var to_mn = to_mn + 1; //Javascript month start from 0
+		var to_yy = to_d.getFullYear();			
+		var to_date = to_yy + "-" + to_mn + "-" + to_dt;
+
+        var table = $('#ordTbl').DataTable( {
+			retrieve: true,
+			paging: true,
+			header: true,
+            footer: true,
+			pagingType: "simple_numbers",
+			lengthMenu: [ [10, 25, 50, 100, -1], [10, 25, 50, 100, "All"] ],
+			dom: 'Bfrtip',
+			buttons: [
+				{
+					extend: 'excel', 
+					messageTop: 'Invoices from ' + from_date + ' to ' + to_date,
+					title : "Arte'Venue: Invoice Summary Report", 
+					footer: true
+				},
+				
+				{
+					extend: 'pdfHtml5',
+					messageTop: 'Invoices from ' + from_date + ' to ' + to_date,
+					title : "Arte'Venue: Invoice Summary Report",
+					orientation: 'landscape', 
+					footer: true
+				},
+				{
+					extend: 'print',
+					messageTop: 'Invoice from ' + from_date + ' to ' + to_date,
+					title : "Arte'Venue: Invoices Summary Report", 
+					footer: true
+				}
+			]
+        
+        } );
+	}
+	</script>
+	
+	{% endblock jscripts %}

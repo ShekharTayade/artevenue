@@ -1,210 +1,9 @@
 $(function () {
-
-    /*$('.shop-detail-carousel').owlCarousel({
-        items: 1,
-        thumbs: true,
-        nav: false,
-        dots: false,
-        loop: true,
-        autoplay: true,
-        thumbsPrerendered: true
-    });
-
-    $('#main-slider').owlCarousel({
-        items: 1,
-		responsiveClass:true,
-        nav: false,
-		//navText: ["",""],
-        //dots: true,
-		loop:true,
-        autoplay: true,
-        autoplayHoverPause: true,
-        //dotsSpeed: 400,
-		autoheight:true,
-		autowidth:true,
-		//width: 300
-		
-    });
-
-	$('#card-slider').owlCarousel({
-		loop:false,
-		nav:false,
-		pagination:false,
-		items: 1,
-		singleItem:true
-    });
-
-    $('#get-inspired').owlCarousel({
-        items: 1,
-        nav: false,
-        dots: true,
-        autoplay: true,
-        autoplayHoverPause: true,
-        dotsSpeed: 400
-    });
-
-
-    $('.product-slider').owlCarousel({
-        items: 3,
-        dots: true,
-        nav: false,
-		//navText: ["<i class='fa fa-chevron-left' aria-hidden='true'></i>","<i class='fa fa-chevron-right' aria-hidden='true'></i>"],
-		loop:true,
-        autoplay: true,
-		autoWidth: false,
-        responsive: {
-            480: {
-                items: 3
-            },
-            765: {
-                items: 4
-            },
-            991: {
-                items: 7
-            },
-            1200: {
-                items: 10
-            }
-        }
-    });
-
-    $('.frame-slider').owlCarousel({
-        items: 4,
-        dots: false,
-        nav: true,
-		navText: ["<i class='fa fa-chevron-left' aria-hidden='true'></i>","<i class='fa fa-chevron-right' aria-hidden='true'></i>"],
-		loop:true,
-        autoplay: false,
-		autoWidth: false,
-        responsive: {
-            480: {
-                items: 4
-            },
-            765: {
-                items: 4
-            },
-            991: {
-                items: 4
-            },
-            1200: {
-                items: 4
-            }
-        }
-    });
-
-	
-	$('.collection-slider').owlCarousel({
-        items: 1,
-        dots: false,
-        nav: true,
-		navText: ["<i class='fa fa-chevron-left' aria-hidden='true'></i>","<i class='fa fa-chevron-right' aria-hidden='true'></i>"],
-		loop:true,
-        autoplay: true,
-        responsive: {
-            480: {
-                items: 1
-            },
-            765: {
-                items: 3
-            },
-            991: {
-                items: 5
-            },
-            1200: {
-                items: 7
-            }
-        },
-
-    });
-	*/
-
-
     // productDetailGallery(4000);
     utils();
-
-    // ------------------------------------------------------ //
-    // For demo purposes, can be deleted
-    // ------------------------------------------------------ //
-
-    var stylesheet = $('link#theme-stylesheet');
-    $("<link id='new-stylesheet' rel='stylesheet'>").insertAfter(stylesheet);
-    var alternateColour = $('link#new-stylesheet');
-
-    if ($.cookie("theme_csspath")) {
-        alternateColour.attr("href", $.cookie("theme_csspath"));
-    }
-
-    $("#colour").change(function () {
-
-        if ($(this).val() !== '') {
-
-            var theme_csspath = 'css/style.' + $(this).val() + '.css';
-
-            alternateColour.attr("href", theme_csspath);
-
-            $.cookie("theme_csspath", theme_csspath, {
-                expires: 365,
-                path: document.URL.substr(0, document.URL.lastIndexOf('/'))
-            });
-
-        }
-
-        return false;
-    });
-
 });
-
-
-
-$(window).on('load', function () {
-    $(this).alignElementsSameHeight();
-});
-
-$(window).resize(function () {
-    setTimeout(function () {
-        $(this).alignElementsSameHeight();
-    }, 150);
-});
-
-
-/* product detail gallery */
-
-// function productDetailGallery(confDetailSwitch) {
-//     $('.thumb:first').addClass('active');
-//     timer = setInterval(autoSwitch, confDetailSwitch);
-//     $(".thumb").click(function(e) {
-//
-// 	switchImage($(this));
-// 	clearInterval(timer);
-// 	timer = setInterval(autoSwitch, confDetailSwitch);
-// 	e.preventDefault();
-//     }
-//     );
-//     $('#mainImage').hover(function() {
-// 	clearInterval(timer);
-//     }, function() {
-// 	timer = setInterval(autoSwitch, confDetailSwitch);
-//     });
-//
-//     function autoSwitch() {
-// 	var nextThumb = $('.thumb.active').closest('div').next('div').find('.thumb');
-// 	if (nextThumb.length == 0) {
-// 	    nextThumb = $('.thumb:first');
-// 	}
-// 	switchImage(nextThumb);
-//     }
-//
-//     function switchImage(thumb) {
-//
-// 	$('.thumb').removeClass('active');
-// 	var bigUrl = thumb.attr('href');
-// 	thumb.addClass('active');
-// 	$('#mainImage img').attr('src', bigUrl);
-//     }
-// }
 
 function utils() {
-
 
     /* click on the box activates the radio */
 
@@ -251,45 +50,6 @@ function utils() {
             scrollTop: target_top
         }, 1000);
     }
-}
-
-
-$.fn.alignElementsSameHeight = function () {
-    $('.same-height-row').each(function () {
-
-        var maxHeight = 0;
-
-        var children = $(this).find('.same-height');
-
-        children.height('auto');
-
-        if ($(document).width() > 768) {
-            children.each(function () {
-                if ($(this).innerHeight() > maxHeight) {
-                    maxHeight = $(this).innerHeight();
-                }
-            });
-
-            children.innerHeight(maxHeight);
-        }
-
-        maxHeight = 0;
-        children = $(this).find('.same-height-always');
-
-        children.height('auto');
-
-        children.each(function () {
-            if ($(this).innerHeight() > maxHeight) {
-                maxHeight = $(this).innerHeight();
-            }
-        });
-
-        children.innerHeight(maxHeight);
-
-    });
-
-
-
 }
 
 
@@ -358,7 +118,6 @@ function magnify(imgID, zoom) {
 	return {x : x, y : y};
   }
   
-
 }		
 
 /* Remove the magnifying glass over the image */
@@ -366,14 +125,3 @@ function removeGlass(){
 	var x = document.getElementsByClassName("img-magnifier-glass");
     x[0].parentNode.removeChild(x[0]);
 }	
-
-/* For the counter moving up */
-$(document).ready(function() {
-	// jQuery counterUp
-	if(jQuery().counterUp) {
-		$('[data-counter-up]').counterUp({
-			delay: 20,
-		});
-	}
-})
-

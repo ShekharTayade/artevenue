@@ -109,3 +109,24 @@ def is_artist(function):
 	wrap.__doc__ = function.__doc__
 	wrap.__name__ = function.__name__
 	return wrap
+	
+	
+def has_accounts_access(function):
+	def wrap(request, *args, **kwargs):
+		try:
+			userObj = User.objects.get(username = request.user)
+		except User.DoesNotExist:
+			userObj = None
+		if userObj:
+			try:
+				if userObj.employee.department == 5 or userObj.employee.is_manager:
+					return function(request, *args, **kwargs)
+				else:
+					raise PermissionDenied
+			except Employee.DoesNotExist:
+					raise PermissionDenied
+		else:
+			raise PermissionDenied
+	wrap.__doc__ = function.__doc__
+	wrap.__name__ = function.__name__
+	return wrap

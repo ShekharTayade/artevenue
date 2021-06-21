@@ -131,6 +131,11 @@
 						  Print Invoices
 						  </a>
 						</li>
+						<li class="nav-item">
+						  <a class="nav-link" href="{% url 'invoice_report' %}">
+						  Invoice Report
+						  </a>
+						</li>
 					</ul>
 				</div>
 			</div>
@@ -140,22 +145,23 @@
 					<ul class="nav flex-column">
 						<li class="nav-item">
 						  <a class="nav-link" href="{% url 'initiate_returns' %}">
-							Initiate Returns
+						  Returns - New Request, Modify, Cancel
 						  </a>
 						</li>
 						<li class="nav-item">
-						  <a class="nav-link" href="">
-							Pending Returns
+						  <a class="nav-link" href="{% url 'get_active_return_request' %}">
+						  Update Return Requests
 						  </a>
 						</li>
 						<li class="nav-item">
-						  <a class="nav-link" href="">
-							Update Returns
+						  <a class="nav-link" href="{% url 'returns_report' %}">
+						  Returns Summary Report
 						  </a>
 						</li>
 					</ul>
 				</div>
 			</div>
+
 			<div class = "col-12 col-md-6 text-center">
 				<div class="col-12 staffpg-card">
 					<h2 class = 'stitle'>B2B</h2>
@@ -190,6 +196,22 @@
 						  Coupon Management
 						  </a>
 						</li>
+					</ul>
+				</div>
+			</div>
+			<div class = "col-12 col-md-6 text-center">
+				<div class="col-12 staffpg-card">
+					<h2 class = 'stitle'>CREATE A SET/SINGLE</h2>
+					<ul class="nav flex-column">
+						<li class="nav-item">
+						  <a class="nav-link" href="{% url 'create_set_single' %}">
+						  Create A Set Or a Single Product
+						  </a>
+						</li>
+						<li class="nav-item">
+						  <a class="nav-link" href="{% url 'generate_set_prices' %}">
+						  Generate Prices for Sets/Singles
+						  </a>
 					</ul>
 				</div>
 			</div>

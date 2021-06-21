@@ -1,0 +1,73 @@
+{% load static %}
+{% load utils %}
+
+					{% if gal.gallery.set_of > 1 %}
+					<div class = "col-12 py-2" style ="color:#082a4c; background-color: #f6f6f6;">
+						<strong>ARTWORKS IN THE GALLERY WALL</strong>
+					</div>
+					{% else %}
+					<div class = "col-12 py-2" style ="color:#082a4c; background-color: #f6f6f6;">
+						<strong>ARTWORK SPECIFICATIONS</strong>
+					</div>
+					{% endif %}
+
+					{% for i in gallery_items %}
+					<div id = "item_{{i.product_id}}" class = "{% if gal.gallery.set_of > 1 %} col-6 {% else %} col-12 {% endif %} col-md-4 mt-4 gal_items">
+						<div class="img-container" style= "background-color: transparent; position: relative;">
+							<i id = "prod-select_{{i.product_id}}" style = "position: absolute; top:0; left:0; color: #11b6bd; z-index: 111" class = "fa fa-check-circle fa-2x"></i>
+							<img id = "img_{{i.product_id}}" src="" alt="Wall art:" class="img-fluid image-display lazyload" 
+									style = "display: block; margin-left: auto; margin-right: auto;">
+						</div>
+						<div class = "row">
+							<div id = "spec_{{i.id}}"class = "col-12 mt-2" style = "font-size:0.7rem;">
+								<ul style = "width: 80%; margin: auto;">
+								<li>Art Print On: <span id = "{{i.product_id}}_surface">{{i.print_medium_id|title}}</span></li>
+								<li>Print Size: <span id = "{{i.product_id}}_psize">{{i.image_width}} X {{i.image_height}} inch</span></li>
+								<li id = "{{i.product_id}}_frm">Frame: <span id = "{{i.product_id}}_frame">{{i.moulding.name}}</span></li>
+								<li id="{{i.product_id}}_f-mnt">Mount: <span id = "{{i.product_id}}_mount">{{i.mount.name|title}}, {{i.mount_size|floatformat}} inch</span></li>
+								<li id="{{i.product_id}}_g-wrap">Stretched Canvas: <span id = "{{i.product_id}}_str">{{i.stretched_id}}</span></li>
+								<li>Finished Size: <span id = "{{i.product_id}}_fsize"></span></li>
+								</ul>
+								
+							</div>
+
+							{% if gal.gallery.set_of > 1 %}
+							<div class = "col-12 text-center mt-3" style = "font-size:0.7rem;">
+								<button id = "remove-btn_{{i.product_id}}" class = "btn btn-outline btn-sm" type = "button"
+									onclick = "removeFromGallery('{{i.product_id}}')">
+									<i class = "fa fa-trash"> Remove from Gallery</i>
+								</button>
+								<button id = "add-btn_{{i.product_id}}" class = "btn btn-outline btn-sm" type = "button"
+									onclick = "addToGallery('{{i.product_id}}');">
+									<i class = "fa fa-plus"> Add To Gallery</i>
+								</button>
+							</div>
+							<div class = "col-12 text-center mt-3" style = "font-size:0.7rem;">
+								<form id = "f_{{i.item_id}}" action = "{% url 'stock_image_detail' i.product_id %}" method = "GET">
+									<input hidden name = "iuser_width" value = "{{i.image_width}}">
+									<input hidden name = "frame_id" value = "{{i.moulding_id}}">
+									<input hidden name = "surface" value = "{{i.print_medium_id}}">
+									<input hidden name = "mount_id" value = "{{i.mount_id}}">
+									<input hidden name = "mount_color" value = "{{i.mount_color}}">
+									<input hidden name = "stretched_id" value = "{{i.stretched_id}}">
+									<button class = "btn btn-outline btn-sm" type = "submit" form="f_{{i.item_id}}"
+										target = "_blank"
+										style = "border: 1px solid #ddd;">
+										Buy This Artwork
+									</button>
+								</form>
+							</div>
+							{% else %}
+							<div class = "col-12 text-center mt-3" style = "font-size:0.7rem;">
+								<a class = "btn btn-artevenue" type = "button" target="_blank" 
+									href="{% url 'stock_image_detail' i.product_id i.image_width i.image_height %}">
+									<i class = "fa fa-sliders"> CUSTOMIZE</i>
+								</a>
+							</div>
+							<div class = "col-12 text-center" style = "font-size:0.65rem;">
+								(Choose your own size, frame, print surface & more)
+							</div>
+							{% endif %}
+						</div>
+					</div>					
+					{% endfor %}

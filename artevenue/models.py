@@ -488,6 +488,7 @@ class Stock_image(models.Model):
 	max_width = models.DecimalField(max_digits = 6, decimal_places=2, null=True)
 	max_height = models.DecimalField(max_digits = 6, decimal_places=2, null=True)
 	min_width = models.DecimalField(max_digits = 6, decimal_places=2, null=True)
+	min_height = models.DecimalField(max_digits = 6, decimal_places=2, null=True)
 	publisher = models.CharField(max_length = 600, null=True)
 	artist = models.CharField(max_length = 600, null=True)
 	colors = models.CharField(max_length = 600, null=True)
@@ -602,6 +603,25 @@ class Stock_collage(models.Model):
 
 	def __str__(self):
 		return str( self.product_id ) + " " + self.name
+
+
+class Stock_collage_specs(models.Model):
+	stock_collage = models.OneToOneField(Stock_collage, models.PROTECT, null=False)
+	moulding = models.ForeignKey("Moulding",on_delete=models.PROTECT, null=True)
+	moulding_size = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	print_medium = models.ForeignKey("Print_medium", models.PROTECT, null=False, default='PAPER')
+	mount = models.ForeignKey("Mount", models.PROTECT, null=True)
+	mount_size = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+	board = models.ForeignKey("Board", models.PROTECT, null=True)
+	acrylic = models.ForeignKey("Acrylic", models.PROTECT, null=True)
+	stretch = models.ForeignKey("Stretch", models.PROTECT, null=True)
+	image_width = models.DecimalField(max_digits=3, decimal_places=0, blank=True, null=True)
+	image_height = models.DecimalField(max_digits=3, decimal_places=0, blank=True, null=True)	
+	display_url = models.CharField(max_length = 1000, blank=True, default='')
+	display_thumbnail_url = models.CharField(max_length = 1000, blank=True, default='')
+	created_date = models.DateTimeField(auto_now_add=True, null=False)	
+	updated_date = models.DateTimeField(auto_now=True, null=False)	
+
 	
 class Original_art(models.Model):
 	IMAGE_TYPE = (
@@ -1587,6 +1607,12 @@ class Generate_number_by_month(models.Model):
 class Generate_number(models.Model):
 	type = models.CharField(max_length = 50, null=False, primary_key = True)
 	description = models.CharField(max_length = 1000, null=True)
+	current_number = models.IntegerField(null=False)	
+
+class Generate_number_by_year(models.Model):
+	type = models.CharField(max_length = 50, null=False, primary_key = True)
+	description = models.CharField(max_length = 1000, null=True)
+	year = models.CharField(max_length = 4, null=False)
 	current_number = models.IntegerField(null=False)	
 
 

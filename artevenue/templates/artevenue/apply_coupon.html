@@ -61,33 +61,7 @@
 				<div class="row">
 					<input name="order_id" id = "order_id" value = "{{order.order_id}}" 
 						class = "form-control" hidden>
-					<div class="col-12 col-md-6">
-						<h3 class = "text-center"> <strong>ORDER</strong></h3>
-						<div class = "row">
-							<div class = "col-12 col-md-4">
-								<div class="form-group">
-									<label>Order Number:</label>
-									<input name="order_number" id = "order_number" value = "{{order.order_number}}" 
-										class = "form-control" readonly>
-								</div>
-							</div>
-							<div class = "col-12 col-md-4">
-								<div class="form-group">
-									<label>Order Date:</label>
-									<input name="order_date" id = "order_date" value = "{{order.order_date|date:'d M y'}}" 
-										class = "form-control" readonly>
-								</div>
-							</div>						
-							<div class = "col-12 col-md-4">
-								<div class="form-group">
-									<label>Status:</label>
-									<input name="order_status" id = "order_status" value = "{{order.get_order_status_display}}" 
-										class = "form-control" readonly>
-								</div>
-							</div>						
-						</div>
-					</div>
-					<div class="col-12 col-md-6">
+					<div class="col-12">
 						<h3 class = "text-center"> <strong>CART</strong></h3>
 						<div class = "row">
 							<div class = "col-12 col-md-4">
@@ -111,9 +85,35 @@
 										class = "form-control" readonly>
 								</div>
 							</div>
+							{% if cart.user %}
+							{% if cart.user.first_name %}
+							<div class = "col-12 col-md-4">
+								<div class="form-group">
+									<label>Name:</label>
+									<input name="updated_date" id = "updated_date" value = "{{cart.user.first_name}} {{cart.user.last_name}}" 
+										class = "form-control" readonly>
+								</div>
+							</div>
+							{% endif %}
+							<div class = "col-12 col-md-4">
+								<div class="form-group">
+									<label>Email:</label>
+									<input name="updated_date" id = "updated_date" value = "{{cart.user.email}}" 
+										class = "form-control" readonly>
+								</div>
+							</div>
+							<div class = "col-12 col-md-4">
+								<div class="form-group">
+									<label>User Name:</label>
+									<input name="updated_date" id = "updated_date" value = "{{cart.user.username}}" 
+										class = "form-control" readonly>
+								</div>
+							</div>
+							{% endif %}
 						</div>
 					</div>
 				</div>
+				{% if order %}
 				<div class="row">
 					<div class="col-12 col-md-6">
 						<strong>Shipping Address:</strong><br />
@@ -166,71 +166,16 @@
 						Ph: {{order.order_billing.phone_number}} Email: {{order.order_billing.email_id}}
 					</div>
 				</div>
-				
+				{% endif %}
 				
 				<div class = "row mt-3">
-					<div class = "col-6 text-center" style = "display: table-cell; font-weight:700; border-bottom: 1px solid #cfcfcf;">
-						ORDER ITEMS				
-					</div>		
-					<div class = "col-6 text-center" style = "display: table-cell; font-weight:700; border-bottom: 1px solid #cfcfcf;">
+					<div class = "col-12 text-center" style = "display: table-cell; font-weight:700; border-bottom: 1px solid #cfcfcf;">
 						CART ITEMS
 					</div>	
 				</div>
 				<div class = "row mt-2" style = "border-bottom: 2px solid #cfcfcf;">
-					<div class = "col-6" >
-						{% for oi in orderitems %}
-							<span style = "font-weight:700;" >
-							{% if oi.product.product_type_id|cut:' ' == 'USER-IMAGE' %}  
-								Customer Image; Prod Id: {{oi.product.product_id}}
-							{% elif oi.product.product_type_id|cut:' ' == 'STOCK-COLLAGE' %}
-								SET; Prod Id: {{oi.product.product_id}}
-							{% else %}
-								{{oi.product.name}};  
-								Image Code: {{oi.product.part_number}} / Prod Id: {{oi.product.product_id}}
-							{% endif %}													
-							</span>		
-							<br />
-							<img src = "{% if oi.product_type_id|cut:' ' == 'USER-IMAGE' %} https://artevenue.com{{MEDIA_URL}}{{oi.product.image_to_frame_thumbnail}} {% else %} {% if env == 'DEV' or env == 'TESTING' %} {{ oi.product.thumbnail_url }} {% else %} {% static oi.product.thumbnail_url %} {% endif %} {% endif %}" style = "width:75px; height:75px; object-fit:contain; float: left;">
-							{% with width=oi.moulding.width_inner_inches|add_width_frame_mount:oi.mount_size %}
-							<small>
-							{% if oi.product_type_id == 'STOCK-COLLAGE' %}
-								EACH ITEM: <br/>
-							{% endif %}
-							{% if oi.product_type_id == 'ORIGINAL-ART' %}
-								<li>{{oi.product.description}}</li>
-							{% else %}													
-								<li>Print on {{oi.print_medium_id|title}}</li>
-							{% endif %}
-							{% if oi.moulding_id %}
-								<li>Image Size : {{ oi.image_width }}" X {{oi.image_height }}"</li>
-								<li>Frame: {{oi.moulding.name }} ({{oi.moulding.width_inches}} inch, Polystyrene)</li>
-								{% if oi.mount_id %}
-									<li>Mount: {{oi.mount_size }}", Color: {{oi.mount.name|title }} </li>
-								{% endif %}
-								<li>Total Size: 
-									{{ oi.image_width|add_width:width|add_width:width }}" X {{oi.image_height|add_width:width|add_width:width }}"</li>
-							{% else %}
-								<li>Image Size : {{ oi.image_width }}" X {{oi.image_height }}"</li>
-							{% endif %}
-							{% if oi.acrylic_id and oi.print_medium_id == 'PAPER' %}
-								<li>Acrylic covered</li>
-							{% endif %}
-							{% if oi.stretch_id and not oi.moulding_id %}
-								<li>Canvas Stretched</li>
-							{% endif %}
-							</small>
-							{% endwith %}
-							<br />
-							<small>Qty: {{oi.quantity}}; </small>
-							<small>Unit: {{oi.item_unit_price}}; </small>
-							<small>Disc: {{oi.item_disc_amt|floatformat}}; </small>
-							<small>Sub: {{oi.item_sub_total|floatformat}}; </small>
-							<small>Tax: {{oi.item_tax|floatformat}}; </small>
-							Total: {{oi.item_total|floatformat}};
-						{% endfor %}
-					</div>
-					<div class = "col-6" style = "display: table-cell">
-						{% for i in cartitems %}
+					{% for i in cartitems %}
+					<div class = "col-12 col-md-4" style = "display: table-cell">
 							<span style = "font-weight:700;" >
 							{% if i.product.product_type_id|cut:' ' == 'USER-IMAGE' %}  
 								Customer Image; Prod Id: {{i.product.product_id}}
@@ -279,27 +224,22 @@
 							<small>Sub: {{i.item_sub_total|floatformat}}; </small>
 							<small>Tax: {{i.item_tax|floatformat}}; </small>
 							Total: {{i.item_total|floatformat}};
-						{% endfor %}
 					</div>
+					{% endfor %}
 				</div>
 				<div class = "row mt-3 box">
-					<div class = "col-6">
-						<strong>ORDER TOTAL:</strong> {{order.order_total}}
+					<div class = "col-12">
+						<strong>CART TOTAL:</strong> {{cart.cart_total}}
 					</div>
-					<div class = "col-6">
-						<strong>CART TOTAL:</strong> {{order.cart.cart_total}}
-					</div>
-				</div>	
-				<div class = "row mt-3 box">
-					<div class = "col-6">
-						{% if order.voucher %}
-						<strong>COUPON APPLIED:</strong> {{order.voucher.voucher_code}} | {{discount_value|floatformat}} {{discount_type|title}}
+					<div class = "col-12 mt-3 text-center">
+						{% if cart.voucher %}
+						<strong>CART HAS COUPON APPLIED:</strong> {{cart.voucher.voucher_code}} | {{cart.voucher.discount_value|floatformat}} {{cart.voucher.discount_type|title}}
 						{% else %}
-						<strong>NO COUPON APPLIED</strong>
+						<strong>NO COUPON IS APPLIED TO CART</strong>
 						{% endif %}
 					</div>
 				</div>
-				<div class = "row mt-3" style = "border-radius: 5px; border: 1px solid #11b5bd; padding: 15px 15px 0px 15px;">
+				<div class = "row mt-3 mb-5" style = "border-radius: 5px; border: 1px solid #cfcfcf; background-color:#FFFACD;">
 					<div class = "col-12 text-center">
 						<strong>APPLY COUPON</strong>
 						<p style = "margin-bottom: 0px;">The Cart and order will get applied with coupon discount.</p>
@@ -313,64 +253,186 @@
 						</select>
 					</div>
 					<div class = "col-12 col-md-6 mt-3 text-center">
-						<a class = "btn btn-primary" onclick = "apply_coupon();">
-							APPLY
-						</a>
+						<strong>Check Discount & then Apply</strong><br />
+						<button id = "id_check" type = "button" class = "btn btn-primary" 
+							onclick = "check_discount();">
+							Check Discount
+						</button>
+						<button disabled id = "id_apply" type = "button" class = "btn btn-primary" 
+							onclick="$('#coupon-confirm').modal('show');">
+							Apply Coupon
+						</button>
 					</div>
-					<div class = "col-12 text-center" style = "border-radius: 5px;">
+					<div class = "col-12 text-center mb-3" style = "border-radius: 5px; font-weight:700;">
 						<span id = "voucher-msg"></span>
 					</div>
 				</div>
+				{% if order %}
+				<div class = "row mt-3 mb-5" style = "background-color:#cfcfcf;">
+					<div class="col-12 mt-3 ">
+						<h3 class = "text-center"> <strong>ORDER</strong></h3>
+						<div class = "row">
+							<div class = "col-12 col-md-4">
+								<div class="form-group">
+									<label>Order Number:</label>
+									<input name="order_number" id = "order_number" value = "{{order.order_number}}" 
+										class = "form-control" readonly>
+								</div>
+							</div>
+							<div class = "col-12 col-md-4">
+								<div class="form-group">
+									<label>Order Date:</label>
+									<input name="order_date" id = "order_date" value = "{{order.order_date|date:'d M y'}}" 
+										class = "form-control" readonly>
+								</div>
+							</div>						
+							<div class = "col-12 col-md-4">
+								<div class="form-group">
+									<label>Status:</label>
+									<input name="order_status" id = "order_status" value = "{{order.get_order_status_display}}" 
+										class = "form-control" readonly>
+								</div>
+							</div>						
+						</div>
+					</div>
+					{% if orderitems %}
+					<div class = "col-12 mt-3 text-center" style = "display: table-cell; font-weight:700; border-bottom: 1px solid #cfcfcf;">
+						ORDER ITEMS				
+					</div>		
+					{% for oi in orderitems %}
+					<div class = "col-12 col-md-4">
+							<span style = "font-weight:700;" >
+							{% if oi.product.product_type_id|cut:' ' == 'USER-IMAGE' %}  
+								Customer Image; Prod Id: {{oi.product.product_id}}
+							{% elif oi.product.product_type_id|cut:' ' == 'STOCK-COLLAGE' %}
+								SET; Prod Id: {{oi.product.product_id}}
+							{% else %}
+								{{oi.product.name}};  
+								Image Code: {{oi.product.part_number}} / Prod Id: {{oi.product.product_id}}
+							{% endif %}													
+							</span>		
+							<br />
+							<img src = "{% if oi.product_type_id|cut:' ' == 'USER-IMAGE' %} https://artevenue.com{{MEDIA_URL}}{{oi.product.image_to_frame_thumbnail}} {% else %} {% if env == 'DEV' or env == 'TESTING' %} {{ oi.product.thumbnail_url }} {% else %} {% static oi.product.thumbnail_url %} {% endif %} {% endif %}" style = "width:75px; height:75px; object-fit:contain; float: left;">
+							{% with width=oi.moulding.width_inner_inches|add_width_frame_mount:oi.mount_size %}
+							<small>
+							{% if oi.product_type_id == 'STOCK-COLLAGE' %}
+								EACH ITEM: <br/>
+							{% endif %}
+							{% if oi.product_type_id == 'ORIGINAL-ART' %}
+								<li>{{oi.product.description}}</li>
+							{% else %}													
+								<li>Print on {{oi.print_medium_id|title}}</li>
+							{% endif %}
+							{% if oi.moulding_id %}
+								<li>Image Size : {{ oi.image_width }}" X {{oi.image_height }}"</li>
+								<li>Frame: {{oi.moulding.name }} ({{oi.moulding.width_inches}} inch, Polystyrene)</li>
+								{% if oi.mount_id %}
+									<li>Mount: {{oi.mount_size }}", Color: {{oi.mount.name|title }} </li>
+								{% endif %}
+								<li>Total Size: 
+									{{ oi.image_width|add_width:width|add_width:width }}" X {{oi.image_height|add_width:width|add_width:width }}"</li>
+							{% else %}
+								<li>Image Size : {{ oi.image_width }}" X {{oi.image_height }}"</li>
+							{% endif %}
+							{% if oi.acrylic_id and oi.print_medium_id == 'PAPER' %}
+								<li>Acrylic covered</li>
+							{% endif %}
+							{% if oi.stretch_id and not oi.moulding_id %}
+								<li>Canvas Stretched</li>
+							{% endif %}
+							</small>
+							{% endwith %}
+							<br />
+							<small>Qty: {{oi.quantity}}; </small>
+							<small>Unit: {{oi.item_unit_price}}; </small>
+							<small>Disc: {{oi.item_disc_amt|floatformat}}; </small>
+							<small>Sub: {{oi.item_sub_total|floatformat}}; </small>
+							<small>Tax: {{oi.item_tax|floatformat}}; </small>
+							Total: {{oi.item_total|floatformat}};
+					</div>
+					{% endfor %}
+					<div class = "col-12 mt-3 mb-3 text-center">
+						<strong>ORDER TOTAL:</strong> {{order.order_total}}
+					</div>
+					{% endif %}
+				</div>
+				{% endif %}
 			</form>
 		</div>
 		{% include 'artevenue/message-modal_ok.html' %}		
+
+		<!-- Coupon cofirm Modal -->
+		<div id="coupon-confirm" tabindex="-1" role="dialog" aria-labelledby="Apply Coupon Confirm" aria-hidden="true" class="modal fade">
+			<div class="modal-dialog modal-sm">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h3 class="modal-title"><span id = "modal-hedline">Alert</span></h3>
+						<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
+					</div>
+					<div class="modal-body">
+						<div class="row">
+							<div class="col-12">
+								<div class = "mb-4">
+									<h4><span id = "msg">ARE YOU SURE YOU WANT TO APPLY THE SELECTED COUPON TO THIS CART?</span></h4>
+								</div>
+							</div>
+							<div class="col-12 text-center">
+								<button class="btn btn-success" 
+									onclick="apply_coupon();">
+									<i class="fa fa-check-circle"></i>
+									YES, APPLY COUPON
+								</button>
+							</div>					
+							<div class="col-12 text-center mt-3">
+								<button class="btn btn-primary" 
+									onclick="$('#coupon-confirm').modal('hide');">
+									<i class="fa fa-remove"></i>
+									CANCEL
+								</button>
+							</div>					
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- END: Message modal -->		
+
 
 	{% endblock sitecontent %}
 	
 	{% block jscripts %}	
 	<script>
 		$( document ).ready(function() {
+			{% if not cart.user %}
+				$("#coupon_select").prop('disabled', true);
+				$("#id_check").prop('disabled', true);
+				$("#id_apply").prop('disabled', true);
+				$("#voucher-msg").html("Customer has not logged in while creating this cart. Coupon can't be applied.");
+				$("#voucher-msg").css({"color" : "red"});
+				$('#msg').html("Customer has not logged in while creating this cart. Coupon can't be applied.");
+				$('#msg-modal').modal('show');
+			{% endif %}			
+			
+			{% if cart.cart_status != 'AC' %}
+				$("#coupon_select").prop('disabled', true);
+				$("#id_check").prop('disabled', true);
+				$("#id_apply").prop('disabled', true);
+				$("#voucher-msg").html("This cart is not active. Either it has been checked out or abandoned.");
+				$("#voucher-msg").css({"color" : "red"});
+				$('#msg').html("This cart is not active. Either it has been checked out or abandoned.");
+				$('#msg-modal').modal('show');
+			{% endif %}
+			
 		});	
 	</script>
 	<script>
-		$('#order_manage_form').submit(function() {
-			var val = document.activeElement.getAttribute('value');
-			
-			
-			switch(val) {
-				case 'PROCESS PAYMENT':
-					{% if order.order_status != 'PP' %}
-						$('#msg').html("Payment for this order is not pending. Please check the order status.");
-						$('#msg-modal').modal('show');					
-						return false;
-					{% endif %}
-					if (confirm('Are you sure you want to mark this order as payment received?') == false) {
-						return false;
-					}				
-					break;
-				case 'CANCEL ORDER':
-					{% if order.order_status == 'CN' %}
-						$('#msg').html("This order has already been cancelled. Please check the order status.");
-						$('#msg-modal').modal('show');					
-						return false;
-					{% endif %}
-					if (confirm('Are you sure you want to cancel this order?') == false) {
-						return false;
-					}				
-					break;
-			}			
-			
-			return true;
-		});
-	</script>
-	
-	<script>
-		function apply_coupon(){
+		function check_discount(){
 
-			var cart_id = {{order.cart_id}};
+			var cart_id = {{cart.cart_id}};
 			var voucher_code = $('#coupon_select').val();
 			
-			query_data = {'cart_id':cart_id, 'voucher_code':voucher_code, 'voucher_use_check':'TRUE'}
+			var query_data = {'cart_id':cart_id, 'voucher_code':voucher_code, 'voucher_use_check':'TRUE'}
 
 			$.ajax({
 				url: "{% url 'after_coupon_view' %}", 
@@ -382,15 +444,18 @@
 					switch(response.status) {
 					  case "SUCCESS":
 							$("#voucher-msg").html(response.disc_amount + " discount will be applied.");
+							$("#voucher-msg").css({"color" : "green"});
 							
-							$('#msg').html( response.disc_amount + " discount will be pplied.");
+							$('#msg').html( response.disc_amount + " discount will be applied.");
 							$('#msg-modal').modal('show');
 							setTimeout(function() {
 								$('#msg-modal').modal('hide');
 							}, 2500);
+							$("#id_apply").prop('disabled', false);
 							break;
 					  case "INVALID-CODE":
 							$("#voucher-msg").html("Entered Code is invalid (Customer needs to be logged in and use correct code)");
+							$("#voucher-msg").css({"color" : "red"});
 							$('#msg').html("Entered Code is invalid (Cusomer needs to be logged in and use correct code)");
 							$('#msg-modal').modal('show');
 							setTimeout(function() {
@@ -399,6 +464,7 @@
 							break;
 					  case "NO-USER":
 							$("#voucher-msg").html("Customer needs to be logged in to use coupon/voucher.");
+							$("#voucher-msg").css({"color" : "red"});
 							$('#msg').html("Customer need to be logged in to use coupon/voucher.");
 							$('#msg-modal').modal('show');
 							setTimeout(function() {
@@ -407,6 +473,7 @@
 							break;
 					  case "USER-MISMATCH":
 							$("#voucher-msg").html("Entered Code is not valid for the Customer.");
+							$("#voucher-msg").css({"color" : "red"});
 							$('#msg').html("Entered Code is not valid for the Customer.");
 							$('#msg-modal').modal('show');
 							setTimeout(function() {
@@ -415,6 +482,7 @@
 							break;
 					  case "USED":
 							$("#voucher-msg").html("Customer has already used this code.");
+							$("#voucher-msg").css({"color" : "red"});
 							$('#msg').html("Customer has already used this code.");
 							$('#msg-modal').modal('show');
 							setTimeout(function() {
@@ -423,6 +491,7 @@
 							break;
 					  case "ONLY-ONE":
 							$("#voucher-msg").html("Customer can use only one coupon per order.");
+							$("#voucher-msg").css({"color" : "red"});
 							$('#msg').html("Customer can use only one coupon per order.");
 							$('#msg-modal').modal('show');
 							setTimeout(function() {
@@ -437,6 +506,7 @@
 								$("#voucher-msg").html(response.disc_amount + " discount will be applied." );
 								ms = response.disc_amount + " discount will be applied."
 							}
+							$("#voucher-msg").css({"color" : "green"});
 							$('#msg').html(ms);
 							$('#msg-modal').modal('show');
 							setTimeout(function() {
@@ -454,6 +524,7 @@
 							
 					   case	'NO-MORE':
 							$("#voucher-msg").html("No more discount is applicable.");
+							$("#voucher-msg").css({"color" : "red"});
 							$('#msg').html("No more discount is applicable.");
 							$('#msg-modal').modal('show');
 							setTimeout(function() {
@@ -462,8 +533,9 @@
 							break;
 					   
 					   case 'DOESNOT-APPLY':
-							$("#voucher-msg").html("This coupon doesn't apply to the Customer. Please ensure Customer is logged in as the eligible user or check the code you have entered.");
-							$('#msg').html("This coupon doesn't apply to the Customer. Please ensure Customer have logged in as the eligible user or check the code you have entered.");
+							$("#voucher-msg").html("This coupon doesn't apply to the Customer. Please ensure Customer has logged in as the eligible user or check the code you have selected.");
+							$("#voucher-msg").css({"color" : "red"});
+							$('#msg').html("This coupon doesn't apply to the Customer. Please ensure Customer has logged in as the eligible user or check the code you have selected.");
 							$('#msg-modal').modal('show');
 							setTimeout(function() {
 								$('#msg-modal').modal('hide');
@@ -479,6 +551,7 @@
 							break;
 					  default:
 							$("#voucher-msg").html("Encountered an error in applying this code.");
+							$("#voucher-msg").css({"color" : "red"});
 							$('#msg').html("Encounter an error in applying this code.");
 							$('#msg-modal').modal('show');
 							setTimeout(function() {
@@ -492,8 +565,53 @@
 					return;
 				}
 			});	
+		}		
+	</script>
+	
+	<script>
+		function apply_coupon(){
+			var cart_id = {{cart.cart_id}};
+			var voucher_code = $('#coupon_select').val();
+			
+			var query_data = {'cart_id':cart_id, 'voucher_code':voucher_code, 'voucher_use_check':'TRUE'}
+
+			$.ajax({
+				url: "{% url 'apply_coupon_code' %}", 
+				dataType: 'text',
+				data: query_data,
+				type: 'POST',
+				success: function (data) {
+					response = JSON.parse(data);
+					if (response.status == 'SUCCESS'){
+						coupon_applied();
+					} else {
+						$('#coupon-confirm').modal('hide');
+						$('#msg').html(response.status);
+						$('#msg-modal').modal('show');			
+						$("#voucher-msg").html(response.status);
+						$("#voucher-msg").css({"color" : "red"});
+					}
+				},
+				error: function(xhr){
+					$('#coupon-confirm').modal('hide');
+					alert("An error occured: " + xhr.status + " " + xhr.statusText + " Apologies for the inconvenience!! Please let us know the details and we will be happy to help sort it out."); 
+					return;
+				}
+			});
+		}	
+	</script>
+	<script>
+		function coupon_applied(){
+			$("#coupon_select").prop('disabled', true);
+			$("#id_check").prop('disabled', true);
+			$("#id_apply").prop('disabled', true);
+			$('#coupon-confirm').modal('hide');
+			$("#voucher-msg").html("Discount Coupon is applied!! Refresh page to see updated cart.");
+			$("#voucher-msg").css({"color" : "green"});
+			$('#msg').html("Discount Coupon is applied!! Refresh page to see updated cart.");
+			$('#msg-modal').modal('show');
 		}
 	</script>
 	{% endblock jscripts %}
-			
+	
 	

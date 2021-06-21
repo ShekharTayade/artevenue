@@ -1,0 +1,934 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load utils %}
+{% block page-title %} 
+{% load customer_review from customer_review %}
+	<title>Gallery Wall - {{gal.gallery.title}}, Set of {{gal.gallery.set_of}}, Customization Available</title>
+{% endblock page-title %} 
+{% block page-description %}
+	<meta name="description" content="Designer curated gallery wall. pucture wall, collage set for your home and office decor.">
+{% endblock page-description %}
+{% block page-keywords %}
+	<meta name="keywords" content="gallery wall, set of paintings, set of 2 paintings, set of 3 paintings, picture wall, collage frames">
+{% endblock page-keywords %}
+
+{% block page-author %}
+	<meta name="author" content="Arte'Venue">
+{% endblock page-author %}
+
+{% block jqueryui-stylesheet %}
+{% endblock jqueryui-stylesheet %}
+
+{% block jqueryui-script %}
+{% endblock jqueryui-script %}
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+{% block popper-script %}
+	<script src="{% static 'vendor/popper.js/umd/popper.min.js' %}"> </script>
+{% endblock popper-script %}
+
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+	<div class="container mt-4">
+		<div class="row">
+			<!-- breadcrumb-->
+			<div class="col-xs-12 col-lg-12">
+				<nav aria-label="breadcrumb">
+					<ol class="breadcrumb">
+						<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+						<li class="breadcrumb-item"><a href="{% url 'get_gallery_walls' %}">Gallery Walls</a></li>
+						<li aria-current="page" class="breadcrumb-item active">{{gal.gallery.title}}</li>
+					</ol>
+				</nav>
+			</div>
+		</div>
+		<div class="row">
+			<div class = "col-12 text-center">
+				{% if gal.gallery.set_of > 1 %}					
+				<h2>
+					Gallery Wall 
+				</h2>
+				<h1 style = "font-size: 1.3rem; font-weight:700;">{{gal.gallery.title}}
+				</h1>
+				{% else %}
+				<h2>
+					Art Print 
+				</h2> 
+				<h1 style = "font-size: 1.3rem; font-weight:700;">
+					{{gal.gallery.title}}
+				</h1>
+				{% endif %}
+				<span style = "font-size: 0.7rem;">	
+					{{gal.gallery.description}}
+				</span>
+				<span class="id" hidden>{{gal.gallery.gallery_id}}</span>
+			</div>
+			<div class="col-12 col-md-6 mt-3">		
+				<img src="{% static  gal.gallery.room_view_url %}" alt="Gallery: {{gal.gallery.name}}" class="img-fluid lazyload">
+			</div>
+			<div id ="frame-sec" class="col-12 col-md-6 mt-3">
+				<div class = "row">
+					<div class = "col-4">
+						<h1 style = "font-size:1.4rem; color:#11b6bd; font-weight:600;" class = "mb-0 pb-0">
+							<i class = "fa fa-inr">
+								<span id="price"><span>
+							</i>
+						</h1>
+						<small>(Incl taxes, before disc)</small>
+					</div>		
+					{% if gal.gallery.set_of > 1 %}
+					<div class = "col-8 text-center" style = "font-size:0.7rem;">
+						(Covers approximately <span id="g-width">{{gal.wall_area_width|floatformat}}</span>" 
+							X 
+							<span id="g-height">{{gal.wall_area_height|floatformat}}</span>"
+							inch on the wall with all the artworks selected. Includes space in-between.)
+					</div>
+					{% else %}
+					<div class = "col-8 text-center" style = "font-size:0.7rem;">
+						(Product Size: <span id="g-width">{{gal.wall_area_width|floatformat}}</span>" 
+							X 
+							<span id="g-height">{{gal.wall_area_height|floatformat}}</span>"
+							inch)
+					</div>
+					{% endif %}
+					{% if gallery_variations %}	
+					
+					{% if gal.gallery.set_of > 1 %}
+					<div class = "col-12 text-center mt-5">
+						WALL AREA (in inches)
+					</div>
+					{% else %}
+					<div class = "col-12 text-center mt-5">
+						CHOOSE SIZE (inches)
+					</div>
+					
+					{% endif %}
+					
+					<div class = "col-12 text-center">
+						<div class = "row">
+							{% for v in gallery_variations %}
+							<div class = "col-4 col-lg-3 mt-3">
+								<span id="print-surface" title='Choose print surface'
+									data-placement="right">
+										<span id= "s-{{v.id}}" class = "p_size"
+											onclick = "get_variation('{{v.id}}');">
+											{{v.wall_area_width|floatformat}}" X {{v.wall_area_height|floatformat}}"
+										</span><br />
+										{% for p in prices %}
+											{% if p == v.id %}
+											<span>
+											<i class = "fa fa-inr" style = "font-size: 0.8rem;">
+												<span id = "vprice-{{v.id}}">{{prices|get_dict_item:p}}</span>
+											</i>										
+											</span>
+											{% endif %}
+										{% endfor %}
+								</span>
+							</div>
+							{% endfor %}
+						</div>
+					</div>
+					{% endif %}
+					<div class = "col-12 mt-4 text-center">
+						<button class="btn btn-artevenue"
+							onclick="addGalleryToCart()" style = "width:100%;">
+							<i class="fa fa-shopping-cart"></i>
+							<strong>Add To Cart</strong>
+						</button>						
+						<br /><span style="font-size: 0.75rem;" class = "pull-right" {% if gal.gallery.set_of == 1 %} hidden {% endif %}>Selected <span id = "no_of_prod"></span> artworks</span>
+					</div>
+					<div class = "col-12">
+						<hr>
+					</div>		
+					{% if not user.is_authenticated %}
+					<div class = "col-12 mt-3 px-3 py-1 text-center">
+						<button id = "signupsave" class = "btn " style = "border: 1px solid #11b6bd; background-color: transparent; width: 100%;">
+							<img src="{% static 'img/signup_callout.png' %}" alt="Sign and save 15% on Wall art painting" width=40 onclick = "$('#signup_popup-modal').modal('show');" align="left" style = "margin:auto;">
+							<ul style = "list-style: none; margin-left: 15px; margin-top: 0px; margin-bottom:0px;">
+								<li class = "align-top" style = "font-size:0.9rem; cursor: pointer; color:#11b6bd;"
+									onclick = "$('#signup_popup-modal').modal('show');">
+								Tap to Sign Up & Save 15%<br/>
+								on total cart value
+								</li>
+							</ul>
+						</button>
+					</div>
+					<div class = "col-12 text-center py-2">
+						<div style = "font-size:0.6rem; line-height: 1;"> Discount coupon gets automatically applied 
+							in your cart. Price shown here is before discount.
+						</div>
+					</div>	
+					{% else %}
+						{% if v15off %}
+						<div class = "col-12 mt-3 py-1 text-center">
+							<button class = "btn" style = "border: 1px solid #11b6bd; background-color: transparent; width: 100%;">
+								<img src="{% static 'img/signup_callout.png' %}" alt="Save 15% on Gallery Wall" width=40 align="left" style = "margin:auto;">
+								<div style = "font-size:0.9rem; color:#11b6bd;">
+									You are eligible to get 15% off <br />on total cart value.
+								</div>
+							</button>
+						</div>
+						<div class = "col-12 text-center py-2">
+							<div style = "font-size:0.6rem; line-height: 1;"> Discount coupon gets automatically applied 
+								in your cart. Price shown here is before discount.
+							</div>
+						</div>	
+						{% endif %}							
+					{% endif %}
+				</div>
+				<div class = "row mt-3" style = "font-size: 0.8rem;">
+					<div class = "col-12 py-2 mb-2" style ="color:#082a4c; background-color: #f6f6f6;">
+						<span  style = "font-weight:600;" >PRODUCT BENEFITS</span>
+					</div>
+					<div class = "col-6">
+						<ul style = "list-style-position: outside;">
+							<li><span style = "font-weight:600;">Licensed Art Prints</span></li>
+						</ul>
+					</div>
+					<div class = "col-6">
+						<ul style = "list-style-position: outside;">
+							<li><span style = "font-weight:600;">Premium Quality</span></li>
+						</ul>
+					</div>
+					<div class = "col-6">
+						<ul style = "list-style-position: outside;">
+							<li><span style = "font-weight:600;">Free Shipping In India</span></li>
+						</ul>
+					</div>
+					<div class = "col-6">
+						<ul style = "list-style-position: outside;">
+							<li><span style = "font-weight:600;">Eligible for Returns</span></li>
+						</ul>
+					</div>
+
+				</div>
+			</div>			
+		</div>
+		<div class="row">
+			<div class = "col-12">
+				<hr>
+			</div>		
+			<div class = "col-12">
+				<div id = "item-details" class = "row">
+					{% include 'gallerywalls/gallery_wall_detail_items_new.html' %}
+				</div>
+			</div>
+
+
+			<div class = "col-12 mt-5 text-center">
+					<a class = "btn btn-light" style = "color: #212529;"
+						onclick = "$('#how-to-customize-gallery').modal('show');">
+					How to Customize? <i class = "fa fa-question-circle fa-lg"></i>
+					</a>
+			</div>
+			<!--
+			<div class = "col-12 mt-5 text-center">
+					<a class = "btn btn-light" href = "#customize" data-toggle="collapse" style = "color: #212529;">
+					How to Customize? <i class = "fa fa-question-circle fa-lg"></i>
+					</a>
+			</div>
+			
+			<span id = "customize" class="collapse">				
+				<div class = "col-12 mt-2">
+					<ul>
+						<li>Choose the size and click on "Add to Cart" button above on this page</li>
+						<li>On the shopping cart page, click on the Edit link against the artwork </li>
+						<li>On the next page, click on the CUSTOMIZE tab and choose your own size, frame, and more </li>
+						<li>When done, click on the "Add to Cart" button </li>
+						<li>The artwork gets updated with the customization your perform </li>
+						<li>On the shopping cart page, repeat above steps for each artwork your wish to customize </li>
+					</ul>
+				</div>
+			</span>
+			-->
+		</div>
+		<div class = "row mt-5">
+			<div class = "col-12">
+				<hr>
+			</div>	
+			<div class = "col-12 py-2" style ="color:#082a4c; background-color: #f6f6f6;">
+				<span style = "font-weight:600; ">PRODUCT DESCRIPTION</span>			
+			</div>
+			<div class = "col-12 mt-3">
+				<strong>Art Print</strong>
+			</div>
+			<div class = "col-12">
+				The best quality giclee' prints produced at a very high resolution with full saturation 
+				which are fade resistant. We use large format inkjet printers and archival inks to ensure 
+				consistent quality. Each artwork has an associated copyright and is licensed from the artist.
+			</div>				
+				
+			<div class = "col-12 mt-3">
+				<strong>Print Surface</strong>
+			</div>
+			{% if 'PAPER' in mediums %}
+			<div class = "col-12">
+				Paper: 
+				Coated premium matte paper 230(MCP 230). Bright white, smooth finish matte, top-coated with an 
+				ink-receptive layer.
+			</div>
+			{% endif %}
+			{% if 'CANVAS' in mediums %}
+			<div class = "col-12">
+				Canvas: 
+				Artistic matte cotton canvas 410 GSM. Matte finished, crack-resistant, water-resistant, 
+				top-coated with an ink-receptive layer. 
+			</div>
+			{% endif %}
+			
+			{% if frames %}
+			<div class = "col-12 mt-3">
+				<strong>Frame</strong>
+			</div>
+			<div class = "col-12">
+				Frames are made of high density polystyrene which is moisture resistant. Premium finish, 
+				durable and light weight.
+			</div>			
+			{% endif %}
+
+			{% if stretched_canv %}
+			<div class = "col-12 mt-3">
+				<strong>Stretched Canvas</strong>
+			</div>
+			<div class = "col-12">
+				The canvas is stretched over stretcher bars(wooden frame) at the back. The strecher bars 
+				is not visible from the front and sides. It comes with hooks and ready for hanging on the wall.
+				<div class="">
+					<img src = "{% static 'img/canvas_stretched.jpg' %}" 
+						alt = "What is Stretched Canvas"
+						style = "display:block; width:100px;">
+				</div>
+			</div>
+			{% endif %}			
+			
+			{% if 'PAPER' in mediums and frames %}
+			<div class = "col-12 mt-3">
+				<strong>Acrylic</strong>
+			</div>
+			<div class = "col-12">
+				Acrylic is a cover on top of paper art prints. Premium quality, clear and shatterproof acrylic 
+				cover is added on top of framed paper artworks. 
+			</div>
+			<div class = "col-12 mt-3">
+				<strong>Mount Board</strong>
+			</div>
+			<div class = "col-12">
+				Mat boards add a decorative element within the frame. 
+				They are acid free, buffered to resist aging and are matt finished.
+			</div>
+			<div class = "col-12 mt-3">
+				<strong>Back Board</strong>
+			</div>
+			<div class = "col-12">
+				Medium density fibreboards are used to cover paper art prints at the back. 
+			</div>
+			<div class = "col-12 mt-2">
+				Note:  Acrylic cover, mount board and back board is used only for framed paper art prints and not canvas art prints.
+			</div>
+			{% endif %}
+			<span id = "d-hanging">
+				<div class = "col-12 mt-3">
+					<strong>Hanging Hardware</strong>
+				</div>
+				<div class = "col-12">				
+					All pieces are ready to hang and come with necessary hardware.
+				</div>
+			</span>
+			<span id = "d-pcking">
+				<div class = "col-12 mt-3">
+					<strong>Packaging</strong>
+				</div>
+				<div class = "col-12">				
+					All our products are manufactured, assembled and packaged in Bangalore, India.
+					The artworks are secured with a three layer packaging that is shrink wrapped, 
+					followed by thermocol and corrugated sheet. The package is brand labelled.
+				</div>
+			</span>
+			
+			{% if 'CANVAS' in mediums and frames %}
+			<div class = "col-12 mt-2 text-center">
+				<a class = "btn btn-light" style = "color: #212529;"
+					href = "#dd-faq" data-toggle="collapse">General FAQ</a>
+			</div>
+			<div class = "col-12">
+				<span id = "dd-faq" class="collapse">
+					<ol>
+						<li> Why is canvas not covered with acrylic? </li>
+							Canvas is a cloth medium and is not as delicate as paper. 
+							Canvas needs to breathe and covering it with acrylic or glass could eventually reduce 
+							its life.
+						<li> Why is mount board not included in canvas artworks? </li>
+							Mount board is secured between an acrylic cover and the art print. 
+							Canvas is not covered and hence a mount board cannot be added.
+						<li> What is the difference between framed canvas, stretched canvas and rolled canvas?</li>
+						<ul>
+							<li>Framed Canvas: Canvas is first stretched on wooden bars and then framed.</li>
+							<li>Stretched Canvas: The canvas is stretched over stretcher bars 
+								(wooden frame) at the back. It comes ready for hanging.
+								The stretcher bars are not visible from the front and sides. 
+								It comes with hooks and is ready for hanging.</li>
+							<li>Rolled Canvas: These come in a roll and cannot be hung on a wall.</li>
+						</ul>
+					</ol>
+				</span>
+			</div>
+			{% endif %}
+		</div>
+		<div class = "row mt-5">
+			<div class = "col-12">
+				<hr>
+			</div>	
+			<div class = "col-12 py-2" style ="color:#082a4c; background-color: #f6f6f6;">
+				<span style = "font-weight:600;">SHIPPING, GUARANTEE & RETURNS </span>
+			</div>
+			<div class = "col-12 mt-3">
+				<div style="float:left;">
+					<img src = "{% static 'img/why_artevenue/truck.png' %}" width=30px>			
+					<strong>Shipping & Delivery</strong>
+				</div>
+			</div>
+			<div class = "col-12">
+				<ul>
+					<li>
+						Free shipping across India. 
+					</li>
+					<li>
+						We ship in 1-3 days via reputed courier companies such as FedEx, Xpressbees.
+					</li>
+					<li>Courier takes about 4-7 days to deliver in 
+						major cities in India. In some places, it may take up to 10-12 days. 
+					</li>
+					<a id = "shipping" href = "#more-shipping" data-toggle="collapse">See more...</a>
+					<span id = "more-shipping" class="collapse">
+					<li>
+						The orders placed during the sale period will take 4-5 days more to 
+						ship due to high volume.
+					</li>
+					<li>
+						Owing to the pandamic situation in the country, delivery may be delayed.
+					</li>
+					<li>
+						International shipping cost is charged extra, at actual.
+					</li>
+					</span>
+				</ul>
+			</div>
+			<div class = "col-12 mt-3">
+				<div style="float:left;">
+					<img src = "{% static 'img/why_artevenue/returns.png' %}" width=30px>			
+					<strong>Eligible for Returns</strong>
+				</div>
+			</div>
+			<div class = "col-12">
+				<ul>
+					<li>
+						Dont like it? return it to us and get 100% refund. 
+					</li>
+					<a id = "returns" href = "#more-returns" data-toggle="collapse">See more...</a>
+					<span id = "more-returns" class="collapse">
+					<li>
+						Inform us within 5 days of delivery and ship it back to us.
+					</li>
+					<li>
+						Cash on Delivery (COD) orders are not eligible for returns.
+					</li>
+					<li>
+						For complete return process and 
+						details please see section 5 of <a href="{% url 'terms_conditions' %}">our terms of use</a>.
+					</li>
+					</span>
+				</ul>
+			</div>
+			<div class = "col-12 mt-3">
+				<div style="float:left;">
+					<img src = "{% static 'img/why_artevenue/guarantee.png' %}" width=30px>
+					<strong>100% Statisfaction Guarantee</strong>
+				</div>
+			</div>
+			<div class = "col-12">
+				<ul>
+					<li>
+						In case artworks delivered are not as per your order, damaged or wrong
+						artworks are delivered, we replace it at our cost.
+					</li>
+					<li>
+						If you are not happy with the quality, you can return it.
+					</li>
+				</ul>
+			</div>
+		</div>
+		<div class = "row mt-5">
+			<div class = "col-12">
+				<hr>
+			</div>	
+			<div class = "col-12 py-2" style ="color:#082a4c; background-color: #f6f6f6;">
+				<span style = "font-weight:600;">PRICE, PAYMENT MODES, COUPONS</span>
+			</div>
+			<div class = "col-12 mt-2">
+				<ul>
+					<li>
+						The price you see in your shopping cart is the final price you pay. 						
+					</li>
+					<li>
+						Pay online using credit/debit cards, netbanking, UPI, Wallets. <a href = "{% url 'contact_us' %}">Contact us</a>
+						for other payment modes.
+					</li>
+					<a id = "more-info" href = "#more-addln" data-toggle="collapse">See more...</a>
+					<span id = "more-addln" class="collapse">
+					<li>
+						Apply the coupon/eGift code in your shopping cart page, in "Apply Discount Coupon or eGift code:" box.
+						Prices listed on this page are before coupon/eGift discounts.
+					</li>
+					</span>
+				</ul>
+			</div>
+		</div>
+		{% if gal.gallery.set_of > 1 %}
+		<div class = "row mt-5">
+			<div class = "col-12">
+				<hr>
+			</div>	
+			<div class = "col-12 col-md-6">
+				<div class = "row mt-5">
+					<div class = "col-12 py-2 text-center" style ="color:#082a4c; background-color: #f6f6f6;">
+						<span style = "font-weight:600; ">BUY ART HASSLE FREE</span>
+					</div>
+					<div class = "col-12 text-center mt-3">
+						<iframe width="360" height="240" src="https://youtube.com/embed/6vRss_YY48I" frameborder="0" allowfullscreen>
+						</iframe>				
+					</div>
+				</div>
+			</div>
+			<div class = "col-12 col-md-6">
+				<div class = "row mt-5">
+					<div class = "col-12 py-2 text-center" style ="color:#082a4c; background-color: #f6f6f6;">
+						<span style = "font-weight:600; ">THE MAKING OF GALLERY WALLS</span>
+					</div>
+					<div class = "col-12 text-center mt-3">
+						<iframe width="360" height="240" src="https://youtube.com/embed/VC5qAHT2In4" frameborder="0" allowfullscreen>
+						</iframe>				
+					</div>
+				</div>
+			</div>
+		</div>
+		{% else %}
+		<div class = "row mt-5">
+			<div class = "col-12">
+				<hr>
+			</div>	
+			<div class = "col-12 py-2" style ="color:#082a4c; background-color: #f6f6f6;">
+				<span style = "font-weight:600; ">PREMIUM ONLINE ART GALLERY</span>
+			</div>
+			<div class = "col-12 text-center mt-3">
+				<iframe width="360" height="240" src="https://youtube.com/embed/6vRss_YY48I" frameborder="0" allowfullscreen>
+				</iframe>				
+			</div>
+		</div>
+		
+		{% endif %}
+
+
+		<div class = "row mt-5">
+			<div class = "col-12">
+				<hr>
+			</div>	
+			<div class = "col-12 py-2" style ="color:#082a4c; background-color: #f6f6f6;">
+				<span style = "font-weight:600;">CUSTOMER REVIEWS</span>
+			</div>
+			<div class = "col-12 col-md-12">
+				{% customer_review product.product_id cart_item.cart_item_id wishlist_item.wishlist_item_id iuser_width iuser_height %}
+			</div>
+		</div>
+		<div class = "row mt-2">
+			<hr>
+		</div>
+
+		{% include 'artevenue/how_to_tips.html' %}
+
+
+		{% include 'artevenue/cart-add-message.html' %}
+		{% include 'artevenue/message-modal_ok.html' %}
+		{% include 'artevenue/signup_modal.html' %}	
+		{% include 'gallerywalls/how_to_customize_gallerywall_modal.html' %}		
+		
+		<div id="stretched-modal" tabindex="-1" role="dialog" aria-labelledby="What is Stretcher" aria-hidden="true" class="modal fade">
+			<div class="modal-dialog modal-sm">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h3 class="modal-title">Stretched Canvas Print</h3>
+						<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
+					</div>
+					<div class="modal-body">
+						<div class="">
+							<img src = "{% static 'img/canvas_stretched.jpg' %}" 
+								alt = "What is Stretched Canvas"
+								style = "display:block; margin-left:auto; margin-right:auto; width:200px;">
+							<ul class = "mt-3" style = "font-size:0.75rem;">
+								<li>Please check the "Streched" checkbox to get the art 
+									printed on canvas and streched on a wooden frame as 
+								shown above. </li>
+								<li>If not checked, we print art on canvas, roll it and 
+								deliver it in a tube.</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<div id="framed-product-modal" tabindex="-1" role="dialog" aria-labelledby="Strecher" aria-hidden="true" class="modal fade">
+			<div class="modal-dialog modal-sm">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h3 class="modal-title">Framed Product</h3>
+						<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
+					</div>
+					<div class="modal-body">
+						<div class="">
+							<img src = "{% static 'img/framed_product.png' %}" 
+							alt = "Framed Wall Art Painting"
+							style = "display:block; margin-left:auto; margin-right:auto; width:200px;">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<div id="added-to-cart-modal" tabindex="-1" role="dialog" aria-labelledby="Added To Cart" aria-hidden="true" class="modal fade">
+			<div class="modal-dialog modal-sm">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h3 class="modal-title">Added to Your Cart</h3>
+						<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
+					</div>
+					<div class="modal-body">
+						<div class="row">
+							<div class="col-12">
+							<p>This gallery wall has been added to your cart.</p>
+							</div>
+						</div>
+						<div class="row ">
+							<div class="col-12 text-center">
+							<button class = "btn btn-primary"
+								onclick="$('#added-to-cart-modal').modal('hide');">
+								OK
+							</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	{% endblock sitecontent %}
+	
+	{% block footer-text %}
+		<div class = "text-center">
+			Our designers have specially curated the gallery wall collage sets for you. These are sure to set your home decor apart.
+		</div>
+	{% endblock footer-text %}
+	
+	{% block jscripts %}
+	<script>
+		$(document).ready(function(){			
+			{% for i in gallery_items %}
+				getFramedImg ('{{i.product_id}}', '{{i.moulding_id}}', '{{i.mount.color}}', '{{i.mount_size}}', '{{i.image_width}}');
+				$('#add-btn_{{i.product_id}}').hide();
+			{% endfor %}
+
+			{% for v in gallery_variations %}
+				{% if v.is_parent %}
+					$("#sizes").val('{{v.id}}');
+					get_variation('{{v.id}}');
+				{% endif %}				
+			{% endfor %}			
+
+			$('#more-info').click( function () {
+				  var text=$('#more-info').text();
+				  if(text === "See more..."){
+					$(this).html('Less...');
+				  } else{
+					$(this).text('See more...');
+				 }
+			});
+			$('#returns').click( function () {
+				  var text=$('#returns').text();
+				  if(text === "See more..."){
+					$(this).html('Less...');
+				  } else{
+					$(this).text('See more...');
+				 }
+			});
+			$('#shipping').click( function () {
+				  var text=$('#shipping').text();
+				  if(text === "See more..."){
+					$(this).html('Less...');
+				  } else{
+					$(this).text('See more...');
+				 }
+			});
+			
+		});
+	</script>
+
+	<script>
+		var gallery_price = 0;
+		
+	</script>
+
+	<script>
+		function getFramedImg (product_id, moulding_id, mount_color, mount_size,img_width) {
+
+			if (!moulding_id || moulding_id == 'None'){
+				moulding_id = '0';
+			}
+			if (!mount_color || mount_color == 'None'){
+				mount_color = '';
+			}
+			if (!mount_size || mount_size == 'None'){
+				mount_size = '0';
+			}
+			
+			// Get the framed image
+			$.ajax({
+					url: "{% url 'get_framed_image' %}", 
+					data: {'prod_id':product_id, 'moulding_id': moulding_id,
+								'mount_color':mount_color, 'mount_size':mount_size, 'image_width':img_width
+						}, 
+					dataType: 'text', 
+				success: function (data) {
+					document.getElementById("img_"+product_id).src = "data:image/png;base64," + data;
+					},
+				error: function(xhr){
+					alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+				}
+			});
+		}
+	</script>
+
+	
+	<script>
+		function changeWallSize(obj){
+			var gallery_variation_id = obj.value; 
+			get_variation(gallery_variation_id);
+		}
+		
+		function get_variation(gallery_variation_id){
+			if (gallery_variation_id == '' || !gallery_variation_id) {
+				{% for v in gallery_variations %}
+					if ( $("#s-{{v.id}}").hasClass('p_clicked') ){
+						gallery_variation_id = '{{v.id}}';
+					}
+				{% endfor %}
+			}
+			var gallery_id = {{gal.gallery_id}};
+			
+			var excl = [];
+			var cnt = {{gal.gallery.set_of}};
+			{% for i in gallery_items %}
+				var unselected = $("#prod-select_{{i.product_id}}").hasClass("fa-ban");
+				if (unselected) {
+					excl.push("{{i.product_id}}");
+					cnt = cnt - 1;
+				}
+			{% endfor %}
+			$("#no_of_prod").html(cnt);			
+			
+			$.ajax({
+					url: "{% url 'get_gallery_variation_and_price' %}", 
+					data: {'gallery_variation_id': gallery_variation_id,
+							'gallery_id':gallery_id, 'exclude_items': excl
+						}, 
+					dataType: 'text',
+					type: 'POST',
+					success: function (data) {
+						gal_items = JSON.parse(data);
+						set_size(gallery_variation_id);
+						items = gal_items['gallery_items'];
+						$("#price").html(parseInt(gal_items['gallery_variation_price']).toLocaleString('en-IN', {minimumFractionDigits : 0}));
+						for (i = 0; i < items.length; i++) {
+							var is_moulding = true;
+							var is_mount = true;
+							
+							var ptext = items[i].print_medium_id;
+							
+							$("#" + items[i].product_id + "_surface").html(ptext);
+							$("#" + items[i].product_id + "_psize").html(items[i].image_width + " X " + items[i].image_height + " inch" );
+							if (items[i].moulding__name == '' || !items[i].moulding__name || items[i].moulding__name == 'None'){
+								$("#" + items[i].product_id + "_frame").html('-');
+								is_moulding = false;
+								$("#" + items[i].product_id + "_frm").hide();
+							} else {
+								$("#" + items[i].product_id + "_frame").html(items[i].moulding__name + " (" + items[i].moulding__width_inner_inches + " inch)");
+								is_moulding = true;
+								$("#" + items[i].product_id + "_frm").show();
+							}
+							if (items[i].mount__name == '' || !items[i].mount__name || items[i].mount__name == 'None'){
+								$("#" + items[i].product_id + "_mount").html('-');
+								 is_mount = false;
+								$("#" + items[i].product_id + "_f-mnt").hide();
+							} else {
+								$("#" + items[i].product_id + "_mount").html(items[i].mount__name + ", " + items[i].mount_size + " inch");
+								 is_mount = true;
+								$("#" + items[i].product_id + "_f-mnt").show();
+							}
+
+							if ((items[i].stretch_id == '1') && (items[i].moulding__name == '' || !items[i].moulding__name || items[i].moulding__name == 'None')){
+								$("#" + items[i].product_id + "_str").html('Canvas wrapped over wooden frame at the back');
+								$("#" + items[i].product_id + "_g-wrap").show();
+							} else {
+								$("#" + items[i].product_id + "_str").html('-');
+								$("#" + items[i].product_id + "_g-wrap").hide();
+							}
+							
+							w = parseFloat(items[i].image_width)
+							h = parseFloat(items[i].image_height)
+							if (is_moulding){
+								w = w + parseFloat(items[i].moulding__width_inner_inches)*2;
+								h = h + parseFloat(items[i].moulding__width_inner_inches)*2;
+								
+								if (is_mount){
+									w = w + parseFloat(items[i].mount_size)*2;
+									h = h + parseFloat(items[i].mount_size)*2;
+								}
+							}
+							
+							$("#" + items[i].product_id + "_fsize").html( String(w) + '" X ' + String(h) + '" inch');
+							
+							getFramedImg (items[i].product_id, items[i].moulding_id, items[i].mount__color, items[i].mount_size, items[i].image_width);	
+						}
+					},
+				error: function(xhr){
+					alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+				}
+			});
+		}			
+	</script>
+	
+	<script>	
+		function removeFromGallery(id){			
+			$('#prod-select_'+id).removeClass("fa fa-check-circle fa-2x");
+			$('#prod-select_'+id).addClass("fa fa-ban fa-2x");
+			$('#prod-select_'+id).css('color', 'red');
+			
+			$('#remove-btn_'+id).hide();
+			$('#add-btn_'+id).show();			
+			get_variation('');
+		}
+		function addToGallery(id){
+			$('#prod-select_'+id).removeClass("fa fa-ban fa-2x");
+			$('#prod-select_'+id).addClass("fa fa-check-circle fa-2x");
+			$('#prod-select_'+id).css('color', '#11b6bd');
+			
+			$('#remove-btn_'+id).show();
+			$('#add-btn_'+id).hide();
+			get_variation('');
+		}
+	</script>
+	
+	<script>
+		function set_size(gallery_variation_id){
+			{% for g in gallery_variations %}
+				if ({{g.id}} == gallery_variation_id) {
+					$("#s-"+gallery_variation_id).addClass('p_clicked');
+					$("#g-width").html('{{g.wall_area_width}}');
+					$("#g-height").html('{{g.wall_area_height}}');
+				} else {
+					$("#s-{{g.id}}").removeClass('p_clicked');
+				}
+			{% endfor %}
+		}
+	</script>
+		
+	<script>
+	function addGalleryToCart(){
+		var gallery_variation_id = '';
+		{% for v in gallery_variations %}
+			if ( $("#s-{{v.id}}").hasClass('p_clicked') ){
+				gallery_variation_id = '{{v.id}}';
+			}
+		{% endfor %}
+		var gallery_id = {{gal.gallery_id}};
+		
+		var excl = [];
+		{% for i in gallery_items %}
+			var unselected = $("#prod-select_{{i.product_id}}").hasClass("fa-ban");
+			if (unselected) {
+				excl.push("{{i.product_id}}");
+			}
+		{% endfor %}
+		
+		if (parseInt( $("#no_of_prod").html() ) == 0){
+			$("#msg").html("No artworks from these gallery selected. Nothing to add to the cart!");
+			$("#msg-modal").modal('show');
+			return;
+		}
+		
+		$.ajax({
+			url: "{% url 'add_gallery_wall_to_cart' %}",
+			data: {'gallery_variation_id': gallery_variation_id,
+				   'gallery_id':gallery_id, 'exclude_items': excl},
+				dataType: 'text',
+				type: 'POST',
+				success: function (data) {					
+					data = JSON.parse(data);
+					if (data.msg.toUpperCase() == 'SUCCESS'){
+						cart_qty = data.cart_qty;
+						//Update items in cart
+						$("#itemsincart").html(cart_qty); 
+						$("#itemsincart_m").html(cart_qty); 
+						$('#cart-msg-modal').modal('show');
+					} else {
+						alert("Alert, Sorry we seems to encountered a system error! Please let us know using the contact us link in the footer and we will be happy to sort it out.");
+					}
+				},
+			error: function(xhr){
+				alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+			}
+		});
+	}
+	
+	</script>
+	<script>
+		function show_modal(param){
+			switch(param) {
+		  case 'FREE_SHIPPING':
+			$("#modal-hedline").html('FREE DELIVERY ANYWHERE IN INDIA');
+			$("#msg").html('<p>We produce the artwork and ship it within 1-3 days on receipt of an order.</p><p> Ususally courier delivers to most parts of India in 3-10 days.</p><p>It ususally takes between 4-7 days to deliver in all metro and major cities.</p>');
+			break;
+		  case 'CUSTOMIZATION':
+			$("#modal-hedline").html('CUSTOMIZE THE ARTWORK AS YOU LIKE');
+			$("#msg").html("<p><strong>A FIRST IN INDIA:</strong> Customize every artwork the way you would like it. You are not bound by those 'standard sizes' & frames, create it exactly as your space needs.</p> <p>Click on the 'CUSTOMIZE' tab and you can choose print size from minimum 8 inch wide to maximum allowed by the artist. Choose the frame and also choose the mount color, size.</p> <p>Before you finalize, see how it looks.</p>");
+			break;
+		  case 'GUARANTEE':
+			$("#modal-hedline").html('YOUR SATISFACTION IS GUARANTEED');	  
+			$("#msg").html("<p><strong>RETURNS</strong>: If you are not satisfied with the quality, we accept the returns, no questions asked. You need to ship the products to our address. Returns apply only to art prints. Custom photo framing items, where you upload pictures and we print & frame, and framed original artworks are not eligible for returns.</p> <p><strong>REPLACEMENT:</strong> If you receive the artwork with damages, or having quality issues, we will replace it without any additional cost to you.</p><p><small>You may go through our returns, refund policy in footer of this webpage.</small></p>");
+			break;
+		  case 'LICENSED':
+			$("#modal-hedline").html('LICENSED ARTWORKS');			  
+			$("#msg").html("<p><strong>All our artworks are licensed from  artists.</strong></p> <p>We don't use unauthorized images. So quality of print is assured.</p> <p>No copyright issues and you can enjoy the art to the fullest.</p>");
+			break;
+		  case 'SECURED':
+			$("#modal-hedline").html('SECURED CHECKOUT PROCESS');
+			$("#msg").html("The checkout process and payments are completely secured. We will not save your payment details. You will receive all the details on your order and payment.");
+			break;				
+		  case 'QUALITY':
+			$("#modal-hedline").html('HIGH QUALITY AT AFFORDABLE PRICES');
+			$("#msg").html("<p><strong>QUALITY:</strong> You won't be disapponted. We use professional printer, high quality frames with classy finish and materials used for fine art reproductions. We craft each artwork carefully and with state-of-the-art machines.</p> <p><strong>PRICE:</strong> Our prices are highly competitive for the quality we provide. If you don't like the price you paid, we accept returns without any questions.</p>");
+			break;				
+		  case 'LARGEST':
+			$("#modal-hedline").html('LARGEST COLLECTION');
+			$("#msg").html("<p><strong>DID YOU KNOW THAT WE HAVE THE LARGEST COLLECTION OF LICENSED ARTWORKS IN INDIA?</strong></p> <p>Over 2.7 lakh artworks licensed from over 4500 artists across the world.</p> <p>Arte'Venue saves you the pain of looking around for that exact piece of art you want for your home or office interiors.");
+			break;
+			}
+			$('#msg-modal').modal('show');
+		}
+		
+	</script>
+		
+	{% endblock jscripts %}
+	

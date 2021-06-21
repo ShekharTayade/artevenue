@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block page-title %} 
-<title>Arte'Venue | Store Orders</title>
+<title>Arte'Venue | Store Returns</title>
 {% endblock page-title %} 
   
 {% block page-description %}
@@ -47,14 +47,14 @@
 							<ol class="breadcrumb">
 								<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
 								<li class="breadcrumb-item"><a href="{% url 'staff_page' %}">Staff Page</a></li>
-								<li aria-current="page" class="breadcrumb-item active">Returns</li>
+								<li aria-current="page" class="breadcrumb-item active">Return Request</li>
 							</ol>
 						</nav>
 					</div>
 				</div>
 				<div class = "row">				
 					<div class = "col-12 text-center">
-						<h1 style = "font-weight:700;">INITIATE RETURN</h1>
+						<h1 style = "font-weight:700;">RETURN REQUEST</h1>
 					</div>				
 					<div class = "col-12 mt-3">
 						<h2>Get Orders for Return:</h2>
@@ -130,10 +130,14 @@
 	{% block jscripts %}	
 	<script>
 		$( document ).ready(function() {
- 		});
+ 			$body = $("body");
+			$(document).on({
+				ajaxStart: function() { $body.addClass("loading");    },
+				ajaxStop: function() { $body.removeClass("loading"); }    
+			});		
+		});
 		function get_orders(page, printpdf='NO'){
 		
-			var execute_ajax = false;
 			var query_data = {};
 			//Get the from, to dates
 			var fm_d = new Date(document.getElementById("fromdate").value);

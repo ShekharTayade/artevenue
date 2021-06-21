@@ -250,10 +250,10 @@ def get_addr_pin_city_state(request):
 
 @csrf_exempt
 def validate_address(request):
-	ipin_code = request.POST.get('pin_code', None)
-	icity = request.POST.get('city', None)
-	icstate = request.POST.get('cstate', None)
-	icountry = request.POST.get('country', None)
+	ipin_code = request.POST.get('pin_code', None).strip()
+	icity = request.POST.get('city', None).strip()
+	icstate = request.POST.get('cstate', None).strip()
+	icountry = request.POST.get('country', None).strip()
 
 	msg = []
 	err_flag = False
@@ -286,8 +286,37 @@ def validate_address(request):
 		q = q.filter(country = cnt)
 	
 	if q is None or q.count() == 0:
-		msg.append("Entered Pin code, City, State is invalid. Please correct and then proceed.")
-		err_flag = True
+		# if the combination is not found, create it.
+		pin = Pin_code.objects.filter(pin_code = ipin_code).first()
+		if not pin:
+			try:
+				pin = Pin_code(pin_code = ipin_code)
+				pin.save()
+			except Error as e:
+				msg.append("Entered Pin Code is invalid.")
+				err_flag = True				
+				
+		city = City.objects.filter(city = icity, state_id = icstate)
+		if not city:
+			try:
+				city = City(city = icity, state_id = icstate)
+				city.save()
+			except Error as e:
+				msg.append("Entered City is invalid.")
+				err_flag = True
+		q = Pin_city_state_country.objects.filter(pin_code_id = ipin_code, city_id = icity, state_id = icstate, country = cnt)
+		if not q:
+			try:
+				q = Pin_city_state_country(
+					pin_code = pin,
+					taluk =  None,
+					city_id = icity,
+					state_id = icstate,
+					country = cnt)
+				q.save()
+			except Error as e:
+				msg.append("Entered Pin code, City, State is invalid. Please correct and then proceed.")
+				err_flag = True
 
 	if not err_flag:
 		msg.append("SUCCESS")
@@ -1604,3 +1633,67 @@ def order_modify_items(request, order_id = None):
 def staff_page(request):
 	return render(request, "artevenue/staff_page.html")
 	
+
+@staff_member_required
+def pf_label_bulk(request):
+	return render(request, 'artevenue/print_pf_labels_bulk.html')	
+
+@staff_member_required	
+@csrf_exempt	
+def print_bulk_pf_labels (request):
+	from django.template.loader import render_to_string
+	from weasyprint import HTML, CSS
+	from django.core.files.storage import FileSystemStorage
+	from artevenue.models import Publisher
+
+	startDt = ''
+	endDt = ''	
+
+	order_number = request.POST.get('order_num','')
+	
+	from_date = request.POST.get("fromdate", '')
+	if from_date != '' :
+		startDt = datetime.datetime.strptime(from_date, "%Y-%m-%d")	
+		
+	to_date = request.POST.get("todate", '')
+	if to_date != '' :
+		endDt = datetime.datetime.strptime(to_date, "%Y-%m-%d")
+	
+	order = Order.objects.all()
+	if order_number:
+		order = order.filter(order_number = order_number)
+	if startDt:
+		order = order.filter(order_date__gte = startDt)
+	if endDt:
+		order = order.filter(order_date__lte = endDt)
+	
+	if order_number == None and startDt == None and endDt == None:
+		order = None
+		
+	for o in order:
+		orderitems = Order_items_view.objects.select_related('product').filter(order = o,
+					product__product_type_id = F('product_type_id'), quantity__gt = 0 ).order_by('product_id')
+		
+		c_ids = orderitems.values('product_id')
+		collage = Collage_stock_image.objects.filter(stock_collage_id__in = c_ids).order_by('stock_collage_id')
+
+		publ = Publisher.objects.all()
+
+		html_string = render_to_string('artevenue/printing_framing_label.html', {
+			'order': o, 'orderitems': orderitems, 'collage': collage, 'MEDIA_URL':settings.MEDIA_URL,
+			'ecom_site':ecom, 'publ': publ, 'env': env})
+
+		html = HTML(string=html_string, base_url=request.build_absolute_uri())
+		html.write_pdf(target= settings.TMP_FILES + o.order_number + '_printing_framing_label.pdf',
+						presentational_hints=True);
+		
+		fs = FileSystemStorage(settings.TMP_FILES)
+		with fs.open(o.order_number + '_printing_framing_label.pdf') as pdf:
+			response = HttpResponse(pdf, content_type='application/pdf')
+			response['Content-Disposition'] = 'attachment; filename="' + o.order_number + '_printing_framing_label.pdf"'
+			return response
+
+		return response		
+
+
+			

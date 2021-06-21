@@ -133,11 +133,13 @@ function show_wall_tool(){
 	}
 	
 	// Get the image string
-	var img_str = document.getElementById('prod-img-card').src
+	/*
+	var img_str = document.getElementById('prod-img-card-no-tilt').src
 	if (img_str == 'undefined') {
 		var img_str = document.getElementById('prod-img').src;
 	}
-
+	*/
+	
 	if (Number.isInteger(artwidth) && Number.isInteger(artheight) ){
 		if ( artwidth < 4 || artheight < 4){
 			$("#modal-hedline").html('Invalid Size');
@@ -185,7 +187,7 @@ function show_wall_tool(){
 	
 	$.ajax({
 			url: url, 
-			data: {'img_str':img_str, 'color': color,
+			data: {'color': color,
 					'image_width': artwidth, 'moulding_id': m_id,
 					'mount_size': mnt_size, 'prod_id': prod_id,
 					'mount_color': mnt_color

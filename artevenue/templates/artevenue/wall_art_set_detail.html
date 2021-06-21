@@ -1,0 +1,1812 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load utils %}
+{% load customer_review from customer_review %}
+{% load indian_numbers_tags %}
+
+{% block page-title %} 
+	<title>{% if product.set_of > 1 %} {{product.stock_image_category.name|title}} Wall Art Set of {{ product.set_of }} {% if product.name %} |  {{product.name}} {% endif %} {% else %} Buy Framed Wall Art | {{product.name}} | Print on {{print_medium_id}}{% endif %}
+	</title>
+{% endblock page-title %} 
+
+
+{% block page-description %}
+{% if product.set_of > 1 %}
+<meta name="description" content="Buy set of {{ product.set_of }} {{product.stock_image_category.name|title}} wall art paintings. Premium Quality. Size options and customization available.">
+{% else %}
+<meta name="description" content="Buy framed wall art painting | {{product.name}} | Artwork on {{print_medium_id}}, Size options available.">
+{% endif %}	
+{% endblock page-description %}
+  
+{% block page-keywords %}
+{% if product.set_of > 1 %}
+<meta name="keywords" content="set of {{ product.set_of }} paintings, set of {{ product.set_of }} wall art, {{ product.set_of }} piece framed wall art, {{ product.set_of }} piece painting, {{ product.set_of }} piece wall art,{{product.stock_image_category.name|title}} set of paintings, {{product.stock_image_category.name|title}} wall art set, {{product.stock_image_category.name|title}} painting set, {{product.stock_image_category.name|title}} wall art set">
+{% else %}
+<meta name="keywords" content="buy framed wall art, painting,{{product.name}}, framed painting, {{product.stock_image_category.name|title}} painting set, {{product.stock_image_category.name|title}} wall art set">
+{% endif %}
+{% endblock page-keywords %}
+  
+{% block page-author %}
+<meta name="author" content="Arte'venue">
+{% endblock page-author %}
+
+{% block coursel-stylesheet %}
+{% endblock coursel-stylesheet %}
+
+{% block coursel-script %}
+{% endblock coursel-script %}
+
+{% block front.js %}
+{% endblock front.js %}
+
+{% block lazysizes %}
+<script src="{% static '/vendor/lazysizes/lazysizes.min.js' %}" async=""></script>
+{% endblock lazysizes %}
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+{% block popper-script %}
+
+{% endblock popper-script %}
+
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+
+        <div id="" class = "container-fluid">
+			<div class="row">
+				<div class="col-12">
+					<!-- breadcrumb-->
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+							<li class="breadcrumb-item"><a href="{% url 'stock_collage_products' %}">Art Print Sets</a></li>
+							<li class="breadcrumb-item active">{{ product.product_id }}</li>
+						</ol>
+					</nav>
+				</div>
+				<div class="col-12 text-center">
+					{% if product.set_of > 1 %}
+						<h1  style = "font-weight: 600; font-size: 1.0rem;">WALL ART SET OF {{product.set_of}} </h1>
+					{% else %}
+						<h1  style = "font-weight: 600; font-size: 1.0rem;">FRAMED WALL ART </h1>
+					{% endif %}
+				</div>
+				<div class="col-12" style = "padding:30px;">
+					<button onclick="topFunction();" id="scrollBtn" title="Go to top">
+						<i class = "fa fa-chevron-up fa-lg"></i>
+					</button>				
+					<div id="productMain" class="row">
+						<div class = "d-none d-md-block col-12 col-md-2 img-thumbs">
+							<div class = "col-2">
+								<img src = "{% static product.stock_collage_specs.display_url %}" 
+									alt ="Set of wall art paintings full view" 
+									class = "card-thumb" id = "card0">
+							</div>
+							{% for s in stock_images %}
+							<div class = "col-2">
+								<img alt ="Wall Art 1" class = "card-thumb" id = "card_{{s.stock_image_id}}">
+							</div>
+							{% endfor %}
+							
+							<div hidden class="col-2">
+								<img id= "prod-img-card" src="" alt="Wall Art Collage" class = "card-thumb">
+							</div>
+							
+						</div>
+						<div class = "d-none d-md-block col-12 col-md-5 img-div">
+							<div class = "show_on_large_only mt-5">
+								&nbsp;
+							</div>
+							<div class="item img-magnifier-container" 
+									id = "image-div">
+								<img id = "prod-img" src="{% static product.stock_collage_specs.display_url %}" 
+										alt="A set of wall art painting: {{product.product_id}}"  data-action = "zoom" class="img-fluid"
+										style = "max-width: 100%; max-height:500px; margin:0px;"/>
+							</div>
+							<div class = "pull-right">
+								<button data-target='tooltip' title = "Add to favourites" 
+										class="btn btn-sm" style = "background-color:#fff;"
+										onclick="addProdToWishlist({{product.product_id}},1)">
+									<i class="fa fa-heart-o fa-lg" ></i>
+								</button>
+							</div>
+							<!--
+							<div class = "mt-4 d-flex flex-column align-items-center">
+								<button class = "btn btn-primary"
+									onclick = "show_size_color_tool();">
+									Size Guide Wall Color & Tool
+								</button>
+								<div class = "row">
+									<span class = "ml-2" style="font-size:0.7rem;">(How it looks on different wall colors)</span>
+								</div>
+							</div>
+							-->
+						</div>
+						<div class = "d-block d-md-none" style = "width: 100%;">
+							<div id="card-slider" class="slider" style= "max-height: 300px;">
+								<div class="item card-img">
+									<img id = "prod-img-m" src="{% static product.stock_collage_specs.display_url %}" 
+										alt="A set of wall art paintings" style= "max-height: 300px;">
+								</div>
+								{% for s in stock_images %}
+								<div class="item card-img">
+									<img id= "prod-card_{{s.stock_image_id}}" src="" alt="Wall Art 1">
+								</div>
+								{% endfor %}
+								
+								<div hidden class="item card-img">
+									<img id= "prod-img-card-m" src="" alt="Wall Art Collage">
+								</div>
+								
+							</div>
+							<div class = "pull-right">
+								<button data-target='tooltip' title = "Add to favourites" 
+										class="btn btn-sm" style = "background-color:#fff;"
+										onclick="addProdToWishlist({{product.product_id}},1)">
+									<i class="fa fa-heart-o fa-lg" ></i>
+								</button>
+							</div>
+							<!--
+							<div class = "mt-4 d-flex flex-column align-items-center">
+								<button class = "btn btn-primary"
+									onclick = "show_size_color_tool();">
+									Size Guide Wall Color & Tool
+								</button>
+								<div class = "row">
+									<span class = "ml-2" style="font-size:0.7rem;">(How it looks on different wall colors)</span>
+								</div>
+							</div>
+							-->
+						</div>
+						<div class="col-12 col-md-5">
+							<div class = "row">
+								<div class = "col-12">
+									<div class = "show_on_small_only">
+										<div class = " mt-2 row">
+										&nbsp;
+										</div>
+									</div>								
+									<div class= "pull-left">
+										{% if product.name != ' ' %}
+										<h2 id = "prod-name" style = "font-weight:600; margin-bottom:0px;">{{product.name}}</h2>
+										{% else %}
+										<h3 id = "artist">Category: {{product.stock_image_category.name}}</h3>										
+										{% endif %}										
+										<h3 style = "font-size: 0.8rem;">
+											{% if product.set_of > 1 %}
+											Set of {{ product.set_of }}
+											{% endif %}
+										</h3>
+									</div>
+									<div class="price pull-right">
+										<div id = "promo-display" style = "display:none">
+											<!--<small><i class="fa fa-inr" aria-hidden="true">&nbsp;</i></small>-->
+											<small id = "item_unit_price" style = "color:red; text-decoration: line-through;">{{product.price|floatformat:"0"}}</small>
+											<i class="fa fa-inr" aria-hidden="true">&nbsp;</i><span id = "item_total_price" style = "text-decoration: underline;">{{product.price|floatformat:"0"}}</span>
+											<br /><span id = "disc" style = "font-size:0.75rem;" class = "pull-right text-muted"></span>
+										</div>	
+										<div id = "no-disc">
+											<i class="fa fa-inr" aria-hidden="true">&nbsp;</i><span id="prod-price">{{product.price|floatformat:"0"}}</span>
+										</div>
+										<div id = "item_unit_price_nv" style = "display:none;"></div>
+										<div id = "promotion_id_nv" style = "display:none;"></div>
+										<div id = "disc_amt_nv" style = "display:none;"></div>
+										<div id = "item_total_price_nv" style = "display:none;"></div>
+									</div>
+								</div>								
+							</div>
+							<hr>
+							<div class = "row mt-3">
+								<div class = "col-6">
+									<div class = "row">
+										<div class = "col-12" style = "">
+											<div id = "print-med" class = "size-title">PRINT SURFACE:</div>
+										</div>
+										<div class = "col-12">
+											<span id="print-surface" title='Choose print surface'
+												data-placement="right">
+											{% for m in printmedium %}
+												{% if m.medium_id != 'NA' %}
+													<span id= "m-{{m.medium_id}}" class = "p_size pull-left"
+														onclick = "print_medium_change('{{m.medium_id}}'); ">
+														{{ m.medium_id|upper }}
+													</span>
+												{% endif %}
+											{% endfor printmedium %}
+											</span>
+										</div>
+									</div>									
+								</div>								
+								<div class = "col-6" hidden>
+									<div class = "row">
+										<div class = "row" id ="stretched" style = "padding-right: 15px;">
+											<div class = "col-12 mt-3" style = "font-size:0.6rem;" class = "checkbox row">
+												<label class="checkbox-inline  pull-right">
+													<input id="in_stretched" name="in_stretched"
+														onchange = "stretch_changed();"
+														type = "checkbox"> <strong>Stretched Canvas</strong>
+												</label>
+											</div>
+											<div class = "col-12" style = "margin-bottom:15px;">
+												<span class = "pull-right">
+													<i class = "fa fa-question-circle" 
+														data-toggle="tooltip" title="Click to know more!"
+														id="strt" 
+														onclick="$('#stretched-modal').modal('show');">
+														<span style = "color:#11b6bd; font-size:0.7rem; text-decoration:underline;">
+															What is 'Stretched Canvas'?
+														</span>
+													</i>
+												</span>
+											</div>
+										</div>										
+									</div>
+								</div>
+							</div>
+							<div class="row mt-1">
+								<div class = "col-12">
+									<div id = "surface_change_msg" 
+										style = "font-size: 0.75rem; font-weight: 700; display: none; 
+											background-color: #f6f6f6; padding:5px;">
+										<i class="fa fa-exclamation-circle"></i>
+										{% if product.set_of > 1 %}
+										We recommend {{product.stock_collage_specs.print_medium_id}} print surface for this set. 
+										You may choose 
+										{% if product.stock_collage_specs.print_medium_id == 'CANVAS' %}
+										PAPER
+										{% else %} 
+										CANVAS 
+										{% endif %}
+										, however, it will
+										not look exactly as shown in the room view. Individual artworks shown below on this page 
+										is how it will look like.
+										{% else %}
+										We recommend {{product.stock_collage_specs.print_medium_id}}
+										print surface for this artwork. You may choose 
+										{% if product.stock_collage_specs.print_medium_id == 'CANVAS' %}
+										PAPER
+										{% else %} 
+										CANVAS 
+										{% endif %}
+										, however, it will
+										not look exactly as shown in the room view. The artwork shown below on this page is how
+										it will look like.											
+										{% endif %}
+									</div>
+								</div>
+							</div>
+							<div class="row mt-4">
+								<div class = "col-12 mb-3" style = "">
+									<div id = "print-med" class = "size-title">
+										{% if product.set_of > 1 %} EACH {% endif %} ARTWORK SIZE (in inch):
+									</div>
+									{% if product.set_of > 1 %}
+									Price is for the set of {{ product.set_of }}
+									{% endif %}
+								</div>
+								<div class = "col-12 mb-3" style = "">
+									<div id = "mouldings_include_paper">
+										{% include 'artevenue/sets_ready_sizes_paper.html' %}
+									</div>
+									<div id = "mouldings_include_canvas" style="display:none;">
+										{% include 'artevenue/sets_ready_sizes_canvas.html' %}
+									</div>
+								</div>
+							</div>
+							<div class = "row mt-3">
+								<div class = "col-12">
+									<hr>
+								</div>
+							</div>
+							<div class = "row mt-1" style = "font-size: 0.8rem;">
+								<div class = "col-6">
+									<ul style = "list-style-position: outside;">
+										<li>Licensed Art Print</li>
+									</ul>
+								</div>
+								<div class = "col-6">
+									<ul style = "list-style-position: outside;">
+										<li>Premium Quality</li>
+									</ul>
+								</div>
+								<div class = "col-6">
+									<ul style = "list-style-position: outside;">
+										<li>Free Shipping Across India</li>
+									</ul>
+								</div>
+								<div class = "col-6">
+									<ul style = "list-style-position: outside;">
+										<li>Returns Accepted</li>
+									</ul>
+								</div>
+							</div>
+							{% if not user.is_authenticated %}
+							<div class = "row mt-3 d-flex px-3">
+								<div id = "signupsave" class = "col-12 text-center d-flex py-1" style = "border: 1px solid #11b6bd; cursor:pointer;">
+									<img src="{% static 'img/signup_callout.png' %}" alt="Sign and save 15% on Wall art painting" width=40 onclick = "$('#signup_popup-modal').modal('show');" align="left" style = "margin:auto;">
+									<ul style = "list-style: none; margin: auto;">
+									<li class = "align-middle" style = "font-size:0.9rem; cursor: pointer; color:#11b6bd;"
+										onclick = "$('#signup_popup-modal').modal('show');">
+										Tap to Sign Up & Save 15%.
+									</li>
+									</ul>
+								</div>
+								<div class = "col-12 text-center py-2">
+									<div style = "font-size:0.6rem; line-height: 1;"> Discount coupon gets automatically applied 
+										in your cart. Price shown here is before discount.
+									</div>
+								</div>	
+							</div>
+							{% else %}
+								{% if v15off %}
+								<div class = "row mt-3 d-flex px-3">
+									<div class = "col-12 text-center d-flex py-1" style = "border: 1px solid #11b6bd;">
+										<img src="{% static 'img/signup_callout.png' %}" alt="Save 15% on Wall art painting" width=40 align="left" style = "margin:auto;">
+										<ul style = "list-style: none; margin-left: 15px; margin-top: 0px; margin-bottom:0px;">
+										<li class = "align-top" style = "font-size:0.9rem; cursor: pointer; color:#11b6bd;">
+											You are eligible to get 15% off on total cart value.
+										</li>
+										</ul>
+									</div>
+									<div class = "col-12 text-center py-2">
+										<div style = "font-size:0.6rem; line-height: 1;"> Discount coupon gets automatically applied 
+											in your cart. Price shown here is before discount.
+										</div>
+									</div>	
+								</div>
+								{% endif %}							
+							{% endif %}
+							<div class = "row">
+								<div class = "col-12">
+									<hr>
+								</div>
+							</div>
+							<div class = "col-12 sticky d-flex justify-content-around">
+								<div class = "" style = "color:#11b6bd; font-size:1.2rem; font-weight:600;">
+									<i class="fa fa-inr" aria-hidden="true"></i><span id="prod-price-cart">{{product.price|floatformat:"0"}}</span>
+								</div>
+								
+								<div id = "selected_med"  class = "" style="font-size:0.65rem;">
+									<span id="prod-desc">
+										Set of {{product.set_of}} Artworks <br />
+										FREE SHIPPING
+									</span>
+								</div>							
+								
+								<div class = "">
+									<button class="btn btn-artevenue" 
+										onclick="addProdToCart({{product.product_id}}, 1)">
+										<i class="fa fa-shopping-cart"></i>
+										<strong>ADD TO CART</strong>
+									</button>
+								</div>
+							</div>
+							<div class = "col-12 d-flex justify-content-around">
+								<i class = "fa fa-exclamation-circle">  
+								Due to Covid situation in the country shipping & delivery may be delayed more than usual. 
+								</i> 
+							</div>
+						</div>
+					</div>
+					<div id = "specs" class = "row">
+						<div class = "col-12">
+							<hr>
+						</div>	
+						<div class = "col-12 mt-3 py-2"
+								 style ="color:#082a4c; background-color: #f6f6f6;">
+							<span style = "font-weight: 600; ">ARTWORK SPECIFICATIONS</span>
+						</div>
+						<div class = "col-12 mt-1" >
+							{% if product.set_of > 1 %}
+							EACH ARTWORK IN THIS SET:
+							{% endif %}
+						</div>
+						<div id = "specs" class = "col-12 mt-1">
+							<ul style = "">
+								<li>Art Print On: <span id = "surface"></span></li>
+								<li>Print Size: <span id = "print_size"></span></li>
+								<li id = "frm">Frame: <span id = "frame_spec"></span></li>
+								<li id="f-mnt">Mount: <span id = "f_mount">{{i.mount.name|title}}, {{i.mount_size|floatformat}} inch</span></li>
+								<li id="acr_cover" style = "display: none;">Art print covered on top with acrylic</li>
+								<li id="g-wrap">Stretched Canvas: <span id = "g_wrap">{{i.stretched_id}}</span></li>
+								<li>Finished Size: <span id = "fsize"></span></li>
+								<li id="rolled">The print is carefully rolled and dispatched in a tube</li>
+							</ul>						
+						</div>
+						
+						<div class = "col-12">
+							<div class = "row">
+								{% for s in stock_images %}
+								<div class = "col-6 col-md-4 mt-3 text-center">
+									<div class = "img-container" style= "background-color: transparent; position: relative;">
+										<img alt ="Wall Art 1" id = "s_card_{{s.stock_image_id}}" class="image-display lazyload" >
+									</div>
+									<p>{{s.stock_image.name}}</p>
+									<p>
+																		
+									<form id = "f_{{s.stock_image_id}}" action = "{% url 'stock_image_detail' s.stock_image_id %}" method = "GET">
+										<input hidden name = "iuser_width" id = "iuser_width_{{s.stock_image_id}}" value = "{{product.stock_collage_specs.image_width|default_if_none:''}}">
+										<input hidden name = "frame_id" value = "{{product.stock_collage_specs.moulding_id|default_if_none:''}}">
+										<input hidden name = "surface" id = "surface_{{s.stock_image_id}}" value = "{{product.stock_collage_specs.print_medium_id|default_if_none:''}}">
+										<input hidden name = "mount_id" value = "{{product.stock_collage_specs.mount_id|default_if_none:''}}">
+										<input hidden name = "mount_color" value = "{{product.stock_collage_specs.mount_color|default_if_none:''}}">
+										<input hidden name = "mount_size" value = "{{product.stock_collage_specs.mount_size|default_if_none:''}}">
+										<input hidden name = "stretched_id" value = "{{product.stock_collage_specs.stretched_id|default_if_none:''}}">
+										<button class = "btn btn-outline btn-sm" type = "submit" form="f_{{s.stock_image_id}}"
+											style = "border: 1px solid #ddd;">
+											{% if product.set_of > 1 %}
+												Buy This Artwork
+											{% else %}
+												CUSTOMIZE
+											{% endif %}
+										</button>
+									</form>
+									<!--
+									<a class = "btn btn-light" href = "{% url 'stock_image_detail' s.stock_image_id %}" target = "_blank"
+										style = "border: 1px solid #ddd;">
+										{% if product.set_of > 1 %}
+										Buy This Artwork
+										{% else %}
+										CUSTOMIZE
+										{% endif %}
+									</a>-->
+									<span class = "text-center" style = "font-size: 0.65rem;">(Choose your own, size, frame, & more)</span>
+									</p>
+								</div>
+								{% endfor %}
+							</div>
+						</div>
+					</div>
+					{% include 'artevenue/artprint_product_desc_include.html' %}
+					{% include 'artevenue/artevenue_more_info_include.html' %}
+					
+					<div class = "row mt-5">
+						<div class = "col-12">
+							<hr>
+						</div>	
+						<div class = "col-12 py-2" style ="color:#082a4c; background-color: #f6f6f6;">
+							<span style = "font-weight:600;">CUSTOMER REVIEWS</span>
+						</div>
+						<div class = "col-12">
+							{% customer_review product.product_id cart_item.cart_item_id wishlist_item.wishlist_item_id iuser_width iuser_height %}
+						</div>
+					</div>
+					<div class = "row mt-2">
+						<hr>
+					</div>
+					{% include 'artevenue/how_to_tips.html' %}
+					
+				</div>
+			</div>
+			
+			
+			<!--{% include 'artevenue/wall_color_tool_for_sets.html' %}-->
+			{% include 'artevenue/cart-add-message.html' %}
+			{% include 'artevenue/wishlist-add-message.html' %}
+			{% include 'artevenue/loader-message.html' %}
+			{% include 'artevenue/message-modal_ok.html' %}
+			{% include 'artevenue/signup_ask_modal.html' %}
+			{% include 'artevenue/signup_modal.html' %}
+
+			<div id="stretched-modal" tabindex="-1" role="dialog" aria-labelledby="What is Stretcher" aria-hidden="true" class="modal fade">
+				<div class="modal-dialog modal-sm">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h3 class="modal-title">Stretched Canvas Print</h3>
+							<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
+						</div>
+						<div class="modal-body">
+							<div class="">
+								<img src = "{% static 'img/canvas_stretched.jpg' %}" 
+									alt = "What is Stretched Canvas"
+									style = "display:block; margin-left:auto; margin-right:auto; width:200px;">
+								<ul class = "mt-3" style = "font-size:0.75rem;">
+									<li>Please check the "Streched" checkbox to get the art 
+										printed on canvas and streched on a wooden frame as 
+									shown above. </li>
+									<li>If not checked, we print art on canvas, roll it and 
+									deliver it in a tube.</li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+	{% endblock sitecontent %}
+	
+	
+	{% block jscripts %}
+	
+	<script>
+		// Global variables to store IDs of pricing components
+		var product_id = '{{product.product_id}}';		
+		var print_medium_id = '{{print_medium_id}}';		
+		var image_width = 10;
+		var ratio = {{product.aspect_ratio}};
+		var image_height = Math.round(image_width / ratio) ;
+
+		var moulding_id = '0';
+		var mount_id = '0';
+		var mount_color = '0';
+		var mount_size = 0;
+		var mount_w_left, mount_w_right, mount_w_top, mount_w_bottom = '0';
+		var board_id = '0';
+		var acrylic_id = '0';
+		var stretch_id = '0'; 
+
+		defaults_from_set();
+			
+		var def_mount_id = '3';				 
+
+		var minsize = 8;
+		var maxsize = 0;
+
+		if ("{{product.aspect_ratio}}" != "NA"){
+			ratio = parseFloat("{{product.aspect_ratio}}");
+		}
+
+		function defaults_from_set(){
+			{% if moulding_id %}
+				moulding_id = '{{moulding_id}}';
+			{% else %}
+				moulding_id = '0';
+			{% endif %}
+			
+			{% if mount_id %}
+				mount_id = '{{mount_id}}';
+			{% else %}
+				mount_id = '0';
+			{% endif %}
+			
+			{% if mount_color %}
+				mount_color = '{{mount_color}}';
+			{% else %}
+				mount_color = '0';
+			{% endif %}
+			
+			{% if mount_size %}
+				mount_size = {{mount_size}};
+			{% else %}
+				mount_size= 0;
+			{% endif %}
+			
+			
+			{% if board_id %}
+				board_id = '{{board_id}}';
+			{% else %}
+				board_id = '0';
+			{% endif %}
+			
+			{% if acrylic_id %}
+				acrylic_id = '{{acrylic_id}}';
+			{% else %}
+				acrylic_id = '0';
+			{% endif %}
+			
+			{% if stretch_id %}
+				stretch_id = '{{stretch_id}}'; 
+			{% else %}
+				stretch_id = '0';
+			{% endif %}
+
+			if ( get_print_medium_id() == 'PAPER') {				
+				if (get_image_width() <= 18) {
+					set_mount_size(1);
+					//set_moulding_id('18');
+				} else if (get_image_width() <= 26) {
+					set_mount_size(2);
+					//set_moulding_id('24');
+				} else if (get_image_width() <= 34) {
+					set_mount_size(3);
+					//set_moulding_id('24');
+				} else {
+					set_mount_size(4);
+					//set_moulding_id('24');
+				}
+			}
+		
+		}
+				
+		/*************************/
+		/* Getter setter methods */
+		/*************************/		
+		// Product_id
+		function set_product_id (prd_id) {
+			product_id = prd_id;
+		}
+		
+		function get_product_id () {
+			return product_id
+		}
+		
+		// print_medium_id
+		function set_print_medium_id (prt_med) {
+			print_medium_id = prt_med;
+		}
+		function get_print_medium_id () {
+			return print_medium_id;
+		}
+		
+		// Image width, height
+		function set_image_width(wdt) {
+			image_width = wdt;
+		}
+		function get_image_width () {
+			return image_width;
+		}
+		function set_image_height(hgt) {
+			image_height = hgt;
+		}
+		function get_image_height () {
+			return image_height;
+		}
+
+		//moulding_id
+		function set_moulding_id(m_id) {
+			moulding_id = m_id;
+		}
+		function get_moulding_id() {
+			return moulding_id;
+		}
+
+		//mount_id
+		function set_mount_id(mnt_id) {
+			mount_id = mnt_id;
+		}
+		function get_mount_id() {
+			return mount_id;
+		}
+
+		//mount_color
+		function set_mount_color(mnt_color) {
+			mount_color = mnt_color;
+		}
+		function get_mount_color() {
+			return mount_color;
+		}
+		
+		//mount_size
+		function set_mount_size(mnt_size) {
+			mount_size = mnt_size;
+		}
+		function get_mount_size() {
+			return mount_size;
+		}
+		
+		//acrylic_id
+		function set_acrylic_id(acr_id) {
+			acrylic_id = acr_id;
+		}
+		function get_acrylic_id() {
+			return acrylic_id;
+		}
+
+		//board_id
+		function set_board_id(brd_id) {
+			board_id = brd_id;
+		}
+		function get_board_id() {
+			return board_id;
+		}
+		
+		//stretch_id
+		function set_stretch_id(strt_id) {
+			stretch_id = strt_id;
+		}
+		function get_stretch_id() {
+			return stretch_id;
+		}		
+
+		function set_paper_default_frame_mount(){
+			var print_size = get_image_width();
+			if ( get_print_medium_id() == 'PAPER') {				
+				if (print_size <= 18) {
+					set_mount_size(1);
+					set_moulding_id('18');
+				} else if (print_size <= 26) {
+					set_mount_size(2);
+					set_moulding_id('24');
+				} else if (print_size <= 34) {
+					set_mount_size(3);
+					set_moulding_id('24');
+				} else {
+					set_mount_size(4);
+					set_moulding_id('24');
+				}
+				set_mount_color('#fffff0');
+				set_mount_id('3');
+				set_board_id('1');
+				set_acrylic_id('1');
+				set_stretch_id('0');
+			}
+
+		}
+		
+
+		
+		// Set print display size
+		function print_size_display(wth, hgt){
+			if (wth < 8){
+				return;
+			}
+			if (print_medium_id == '{{print_medium_id}}') {
+				defaults_from_set();
+			}
+			$("#surface").html(print_medium_id);
+			$("#print-size-display").html(wth.toString() + '" X ' + hgt.toString() + '"');
+			{% for s in stock_images %}
+				$("#iuser_width_{{s.stock_image_id}}").val(image_width);
+				$("#surface_{{s.stock_image_id}}").val(print_medium_id);
+			{% endfor %}
+			$("#print_size").html(wth.toString() + ' X ' + hgt.toString() + ' inch');
+			$("#g-wrap").hide();
+			var f_size = 0;
+			var mnt_size = 0;
+			var frame_width = image_width;
+			var frame_height = image_height;
+			if (moulding_id != '0' && moulding_id != ''){
+				$("#frm").show();
+				$("#d-frame").show();
+				{% if moulding %}
+					f_size = {{moulding.width_inner_inches}};
+				{% else %}
+					f_size = 0;
+				{% endif %}
+			
+				if  (moulding_id == '{{moulding.moulding_id}}') {
+					$("#frame_spec").html('{{moulding.name}}' + ' ({{moulding.width_inner_inches}}" inch)');
+				} else {
+					{% for m in all_mouldings %}
+						if (moulding_id == '{{m.moulding_id}}') {
+							$("#frame_spec").html('{{m.name}}' + ' ({{m.width_inner_inches}}" inch)');
+						}
+					{% endfor %}
+				}
+				
+				var mnt_nm = '{{mount.name|title}}';
+				if (mount_id != '{{mount_id}}'){
+					{% for m in all_mounts %}
+						if (mount_id == '{{m.mount_id}}') {
+							mnt_nm = '{{m.name|title}}';
+						}
+					{% endfor %}
+				}
+				
+				
+				frame_width = frame_width + f_size*2;
+				frame_height = frame_height + f_size*2;
+				
+				if (print_medium_id == 'PAPER'){
+					var mnt_color = '';
+					if (mount_id != '0' && mount_id != '') {
+						mount_size = parseFloat(mount_size);
+						frame_width = frame_width + mount_size*2;
+						frame_height = frame_height + mount_size*2;
+						$("#f_mount").html(mount_size + '" inch, Color: ' + mnt_nm);
+						$("#f-mnt").show();						
+					} else {
+						$("#f-mnt").hide();
+					}
+					$("#d-acrylic").show();
+					$("#acr_cover").show();
+				} else {
+					$("#d-acrylic").hide();
+					$("#d-mount").hide();
+					$("#f-mnt").hide();
+					$("#acr_cover").hide();
+				}
+			} else  {
+				$("#frm").hide();
+				$("#d-frame").hide();
+				$("#frame_spec").html('');
+				$("#d-acrylic").hide();
+				$("#f-mnt").hide();
+				$("#acr_cover").hide();
+				if (get_stretch_id() == '1'){
+					$("#g-wrap").show();
+					$("#g_wrap").html("Canvas wrapped over wooden frame at the back");
+					$("d-stretch").show();
+				} else {
+					$("#g-wrap").hide();
+					$("#d-stretch").hide();
+				}
+			}
+			
+			frame_width = Math.round(frame_width)
+			frame_height = Math.round(frame_height)
+
+			$("#fsize").html(frame_width.toString() + '" X ' + frame_height.toString() + '" inch');
+			
+			if ( (get_moulding_id() == '' || get_moulding_id() == '0') && (get_stretch_id() == '0' || get_stretch_id() == '') ){
+				$("#rolled").show();
+			} else {
+				$("#rolled").hide();
+			}
+		}
+		
+		/******************/
+		/* Events         */
+		/******************/
+		function print_medium_change(prt_med, fetch_img=true){
+			set_print_medium_id(prt_med);
+			if (prt_med == '{{print_medium_id}}') {
+				defaults_from_set();
+			}
+			{% for s in stock_images %}
+				$("#surface_{{s.stock_image_id}}").val(prt_med);
+			{% endfor %}
+			var mld_id = get_moulding_id();
+			var mnt_color = '';
+			var mnt_size = '0';
+			if (prt_med == 'PAPER') {
+				{% if product.stock_collage_specs.print_medium_id == 'CANVAS' and not product.stock_collage_specs.moulding_id %}
+					set_paper_default_frame_mount();
+				{% endif %}
+				{% if product.stock_collage_specs.print_medium_id == 'CANVAS' and product.stock_collage_specs.stretch_id and not product.stock_collage_specs.moulding_id %}
+					$("#surface_change_msg").show();
+				{% else %}
+					$("#surface_change_msg").hide();
+				{% endif %}
+				$('#mouldings_include_paper').show();
+				$('#mouldings_include_canvas').hide();
+				mld_id = get_moulding_id();
+				mnt_color = get_mount_color();
+				mnt_size = get_mount_size();
+				//$("#stretched").hide();
+				$("#d-paper").show();
+				$("#d-canvas").hide();
+				$("#d-stretch").hide();				
+				set_stretch_id('0');
+				$("#m-PAPER").addClass("p_clicked");
+				$("#m-CANVAS").removeClass("p_clicked");
+				$("#mount-show").show();
+				if (mld_id != '' && mld_id !== '0'){
+					set_acrylic_id('1');
+					set_board_id('1');
+				}
+				
+				$("#paper-frames").show();
+				$("#canvas-frames").hide();
+				set_ready_product('PAPER', image_width, image_width, false);
+				
+			} else if (prt_med == 'CANVAS') {
+					{% if product.stock_collage_specs.print_medium_id == 'PAPER' and product.stock_collage_specs.mount_id %}
+						$("#surface_change_msg").show();
+					{% else %}
+						$("#surface_change_msg").hide();
+					{% endif %}
+					$('#mouldings_include_paper').hide();
+					$('#mouldings_include_canvas').show();
+					mnt_color = '';
+					mnt_size = '0';
+					set_mount_id('0');
+					mld_id = get_moulding_id();
+					$("#m-CANVAS").addClass("p_clicked");
+					$("#m-PAPER").removeClass("p_clicked");
+					$("#mount-show").hide();
+					$("#d-paper").hide();
+					$("#d-canvas").show();
+					$("#f-mnt").hide();
+					if (mld_id != '' && mld_id != '0'){
+						//$("#stretched").hide();
+						$("#in_stretched").prop("disabled", true);
+						$("#in_stretched").prop("checked", true);
+						set_stretch_id('1');
+					} else {
+						//$("#stretched").show();
+						$("#in_stretched").prop("checked", true);
+						$("#in_stretched").prop("disabled", false);
+						set_stretch_id('1');
+					}					
+					if (document.getElementById('in_stretched').checked) {				
+						//set_stretch_id('{{stretch.stretch_id}}');
+						if (mld_id == '' && mld_id == '0'){
+							$("#d-stretch").show();
+						}
+					} else {
+						set_stretch_id('0');
+						$("#d-stretch").hide();
+					}
+					$("#paper-frames").hide();
+					$("#canvas-frames").show();
+					set_ready_product('CANVAS', image_width, image_width, false);
+				} else {
+						return;
+			}
+			
+			print_size_display(image_width, image_height);
+
+			if (fetch_img == true){
+				var mnt_color = '0';
+				var mnt_size = '0';
+				var strt = 'NO';
+				{% if product.stock_collage_specs.stretch_id %}
+					strt = "YES";
+				{% endif %}
+				
+				if (get_print_medium_id() == 'PAPER') {
+					mnt_color = get_mount_color();
+					mnt_size = get_mount_size()
+				} else {
+					mnt_color = '';
+					mnt_size = '0'			
+				}
+				
+				getFramedImg (product_id, moulding_id, mnt_color, mnt_size);
+			
+			}
+		}
+			
+
+		function moulding_change(m_id, fetch_img = true){
+			if (m_id == '' || m_id == '0'){
+				$("#d-frame").hide();
+				return;
+			}
+			$("#d-frame").show();
+			set_moulding_id(m_id);
+			var mnt_color = '';
+			var mnt_size = '0';
+			
+			// Add acrylic and board, or stretcher when a moulding is selected
+			if (print_medium_id == 'PAPER') {
+				if (m_id == '20' || m_id == '8' || m_id == '6' ) {
+					set_mount_id('1');
+					set_mount_color('#ffffff');
+				} else {
+					mnt_color = get_mount_color();
+				}
+				mnt_size = get_mount_size();
+				set_acrylic_id("{{acrylics.acrylic_id}}");
+				set_board_id('{{boards.board_id}}');
+			} else if (print_medium_id == 'CANVAS'){
+					// Set the stretch by default if moulding selected on Canvas
+					mnt_color = '';
+					mnt_size = '0';
+					set_stretch_id("{{stretches.stretch_id}}"); 
+					$("#in_stretched").prop("checked", true);
+					$("#in_stretched").prop("disabled", true);
+					set_stretch_id('1');
+					if (get_moulding_id() == '' || get_moulding_id() == '0') {
+						$("#d-stretch").show();
+					} else {
+						$("#d-stretch").hide();
+					}
+			}
+			if (fetch_img == true){
+				getFramedImg (product_id, moulding_id, mnt_color, mnt_size);
+			}
+			
+			print_size_display(image_width, image_height);
+		}
+			
+		
+		function mount_id_change(mnt_id, fetch_img = true ) {
+			if (mnt_id == '' || mnt_id == '0'){
+				return;
+			}
+			set_mount_id(mnt_id);
+			if (print_medium_id == 'PAPER') {
+				if (fetch_img == true){				
+					getFramedImg (product_id, moulding_id, mount_color, mount_size);
+				}
+				print_size_display(image_width, image_height);
+			}
+		}
+		
+		function mount_size_change(mnt_size, fetch_img = true ){
+			if (mnt_size == '' || mnt_size == '0'){
+				return;
+			}
+			set_mount_size(mnt_size);
+			if (mnt_size >= '5' || mnt_size == '' || mnt_size == '0') {
+				alert("Mount size should be between 1 and 5 inch");
+				return;
+			}
+			if (print_medium_id == 'PAPER') {
+				print_size_display(image_width, image_height);
+				if (fetch_img == true){
+					getFramedImg (product_id, moulding_id, mount_color, mount_size);
+				}
+			}				
+		}
+		function mount_size_change(mnt_size, mnt_w_left, mnt_w_right, mnt_w_top, mnt_w_bottom, fetch_img = true){
+			if (mnt_size == '' || mnt_size == '0'){
+				return;
+			}
+			mount_w_left = mnt_w_left;
+			mount_w_right = mnt_w_right
+			mount_w_top = mnt_w_top;
+			mount_w_bottom = mnt_w_bottom;
+			set_mount_size(mnt_size);
+			if (print_medium_id == 'PAPER') {
+				print_size_display(image_width, image_height);
+				if (fetch_img == true){				
+					getFramedImg (product_id, moulding_id, mount_color, mount_size);
+				}
+			}				
+		}
+
+		function stretch_changed(fetch_img = true){
+			if ($("#in_stretched").prop('checked')){
+				set_stretch_id('1');
+				if (get_moulding_id() == '' || get_moulding_id() == '0') {
+					$("#d-stretch").show();
+				} else {
+					$("#d-stretch").hide();
+				}
+			} else {
+				set_stretch_id('0');
+				$("#d-stretch").hide();
+			}
+			if (fetch_img == true){
+				getFramedImg (product_id, moulding_id, mount_color, mount_size);
+			}
+			print_size_display(image_width, image_height);
+		}
+		
+	</script>
+
+			
+	<script>
+		$('#nav-tab a').on('shown.bs.tab', function(event){
+			$('.frames-slider').slick('setPosition');
+		});		
+
+		$( "#card0" ).on( "click", function() {
+			var src = document.getElementById("card0").src;
+			document.getElementById("prod-img").src = src;
+		});
+		$( "#prod-img-card" ).on( "click", function() {
+			var src = document.getElementById("prod-img-card").src;
+			document.getElementById("prod-img").src = src;
+		});
+
+		{% for s in stock_images %}
+			$( "#card_{{s.stock_image_id}}" ).on( "click", function() {
+				var src = document.getElementById("card_{{s.stock_image_id}}").src;
+				document.getElementById("prod-img").src = src;
+			});
+		{% endfor %}
+	</script>
+
+	<script>
+		jQuery(document).ready(function(){
+			$body = $("body");
+			$(document).on({
+				ajaxStart: function() { $body.addClass("loading");},
+				ajaxStop: function() { $body.removeClass("loading");},
+				//ajaxStart: function() { $("#wall-color-tool").addClass("loading");},
+				//ajaxStop: function() { $("#wall-color-tool").removeClass("loading");}
+			});
+
+
+			$("#d-paper").hide();
+			$("#d-canvas").hide();
+			$("#d-frame").hide();
+			$("#d-stretch").hide();
+			$("#d-acrylic").hide();
+
+			$("#card-slider").slick({
+				dots: true,
+				arrows: false,
+				infinite: false,
+				mobileFirst: true,
+				rows: 1,
+				slidesToShow: 1,
+				slidesToScroll: 1,
+			});
+
+			{% if collage %}
+				set_product_id("{{product.product_id}}");
+			{% endif %}	
+
+			{% if cart_item or wishlist_item %}
+				set_for_cart_wishlist_item();
+			{% else %}
+				{% if iuser_width %}
+					if ({{iuser_width}} > 0) {
+						print_medium_change(print_medium_id, false);
+						//$( "#size-slider" ).slider( "option", "value", {{iuser_width}});
+						$("#paper-size-10").addClass("p_clicked");
+						$("#canvas-size-10").addClass("p_clicked");
+						set_ready_product(print_medium_id, {{iuser_width}}, {{iuser_width}}, true);
+						
+					} else {
+						if ({{product.max_width}} < 10 ){
+							print_medium_change(print_medium_id, false);
+							//$( "#size-slider" ).slider( "option", "value", {{product.max_width}});
+							$("#paper-size-10").addClass("p_clicked");
+							$("#canvas-size-10").addClass("p_clicked");
+							set_ready_product(print_medium_id, 10, 10, true);
+						} else {
+							print_medium_change(print_medium_id, false);
+							//$( "#size-slider" ).slider( "option", "value", 10);
+							$("#paper-size-10").addClass("p_clicked");
+							$("#canvas-size-10").addClass("p_clicked");
+							set_ready_product(print_medium_id, 10, 10, true);
+						}
+					}
+				{% else %}
+					print_medium_change(print_medium_id, false);
+					$("#paper-size-10").addClass("p_clicked");
+					$("#canvas-size-10").addClass("p_clicked");
+					set_ready_product(print_medium_id, 10, 10, true);
+				{% endif %}
+			{% endif %}
+		});
+
+	</script>
+	
+	<script>
+		function set_for_cart_wishlist_item(){
+			{% if cart_item %}
+				set_image_width({{cart_item.image_width}});
+				set_image_height({{cart_item.image_height}});
+				{% if cart_item.print_medium_id %}
+					set_print_medium_id("{{cart_item.print_medium_id}}");
+				{% endif %}
+				{% if cart_item.moulding_id %}
+					set_moulding_id("{{cart_item.moulding_id}}");
+				{% endif %}
+				{% if cart_item.mount_id %}
+					set_mount_id("{{cart_item.mount_id}}");
+					{% for m in mounts %}
+						if ('{{m.mount_id}}' == '{{cart_item.mount_id}}'){
+							set_mount_color("{{cart_item.mount.color}}");
+						}
+					{% endfor %}
+				{% endif %}
+				{% if cart_item.mount_size %}
+					set_mount_size({{cart_item.mount_size}});
+				{% endif %}
+				{% if cart_item.acrylic_id %}
+					set_acrylic_id("{{cart_item.acrylic_id}}");
+				{% endif %}
+				{% if cart_item.board_id %}
+					set_board_id("{{cart_item.board_id}}");
+				{% endif %}
+				{% if cart_item.stretch_id %}
+					set_stretch_id("{{cart_item.stretch_id}}");
+				{% endif %}
+
+				{% if cart_item.print_medium_id %}
+					print_medium_change("{{cart_item.print_medium_id}}", false);
+					{% if cart_item.print_medium_id == 'PAPER' %}
+						$("#paper-size-{{cart_item.image_width}}").addClass("p_clicked");
+					{% else %}				
+						$("#canvas-size-{{cart_item.image_width}}").addClass("p_clicked");
+					{% endif %}
+				{% endif %}
+
+				{% if cart_item.moulding_id %}
+					moulding_change("{{cart_item.moulding_id}}", false);
+				{% endif %}
+
+				{% if cart_item.mount_id %}
+					mount_id_change("{{cart_item.mount_id}}", false);
+				{% endif %}
+
+				{% if cart_item.mount_size %}
+					mount_size_change("{{cart_item.mount_size}}", false);
+				{% endif %}
+
+			{% endif %}
+
+			{% if wishlist_item %}
+				set_image_width({{wishlist_item.image_width}});
+				set_image_height({{wishlist_item.image_height}});
+				{% if wishlist_item.print_medium_id %}
+					set_print_medium_id("{{wishlist_item.print_medium_id}}", false);
+				{% endif %}
+				{% if wishlist_item.moulding_id %}
+					set_moulding_id("{{wishlist_item.moulding_id}}");
+				{% endif %}
+				{% if wishlist_item.mount_id %}
+					set_mount_id("{{wishlist_item.mount_id}}");
+					{% for m in mounts %}
+						if ('{{m.mount_id}}' == '{{wishlist_item.mount_id}}'){
+							set_mount_color("{{wishlist_item.mount.color}}");
+						}
+					{% endfor %}
+				{% endif %}
+				{% if wishlist_item.mount_size %}
+					set_mount_size({{wishlist_item.mount_size}});
+				{% endif %}
+				{% if wishlist_item.acrylic_id %}
+					set_acrylic_id("{{wishlist_item.acrylic_id}}");
+				{% endif %}
+				{% if wishlist_item.board_id %}
+					set_board_id("{{wishlist_item.board_id}}");
+				{% endif %}
+				{% if wishlist_item.stretch %}
+					set_stretch_id("{{wishlist_item.stretch_id}}");
+				{% endif %}
+				
+				{% if wishlist_item.print_medium_id %}
+					print_medium_change("{{wishlist_item.print_medium_id}}", false);
+				{% endif %}
+				
+				{% if wishlist_item.moulding_id %}
+					moulding_change("{{wishlist_item.moulding_id}}", false);
+				{% endif %}
+
+				{% if wishlist_item.mount_id %}
+					mount_id_change("{{wishlist_item.mount_id}}", false);
+				{% endif %}
+
+				{% if wishlist_item.mount_size %}
+					mount_size_change("{{wishlist_item.mount_size}}", false);
+				{% endif %}
+
+			{% endif %}
+			
+			getFramedImg (product_id, moulding_id, mount_color, mount_size);
+		}
+			
+	</script>
+	
+	
+	<script>	
+		function getFramedImg (prod_id, m_id, m_color, mount_size) {
+			var mnt_color = '';
+			var mnt_size = 0;
+			var strt = 'NO';
+			if (get_stretch_id() == '1'){
+				strt = "YES";
+			}
+			
+			if (get_print_medium_id() == 'PAPER') {
+				mnt_color = get_mount_color();
+				mnt_size = get_mount_size()
+			} else {
+				mnt_color = '';
+				mnt_size = 0;
+			}
+			
+			{% for s in stock_images %}
+				{% if product.set_of > 1 %}
+				// Get the framed image
+				$.ajax({
+					url: "{% url 'get_framed_image' %}", 
+					data: {'prod_id':'{{s.stock_image_id}}', 'moulding_id': moulding_id,
+							'mount_color':mnt_color, 'mount_size':mnt_size, 'image_width': image_width,
+							'stretched_canvas': strt, 'imgtilt': 'YES'
+						},
+					dataType: 'text', 
+					type: 'GET',
+					success: function (data) {
+						document.getElementById("prod-card_{{s.stock_image_id}}").src = "data:image/png;base64," + data;
+						document.getElementById("card_{{s.stock_image_id}}").src = "data:image/png;base64," + data;
+						document.getElementById("s_card_{{s.stock_image_id}}").src = "data:image/png;base64," + data;
+						//document.body.scrollTop = 0; // For Safari
+						//document.documentElement.scrollTop = 0;
+						},
+					error: function(xhr){
+						alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+					}
+				});				
+				{% elif product.set_of == 1 %}
+					$.ajax({
+						url: "{% url 'get_framed_image' %}", 
+						data: {'prod_id':'{{s.stock_image_id}}', 'moulding_id': moulding_id,
+								'mount_color':mnt_color, 'mount_size':mnt_size, 'image_width': image_width,
+								'stretched_canvas': strt, 'imgtilt': 'YES'
+							},
+						dataType: 'text', 
+						type: 'GET',
+						success: function (data) {
+							document.getElementById("prod-card_{{s.stock_image_id}}").src = "data:image/png;base64," + data;
+							document.getElementById("card_{{s.stock_image_id}}").src = "data:image/png;base64," + data;
+							document.getElementById("s_card_{{s.stock_image_id}}").src = "data:image/png;base64," + data;
+							//document.body.scrollTop = 0; // For Safari
+							//document.documentElement.scrollTop = 0;
+							},
+						error: function(xhr){
+							alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+						}
+					});
+			{% endif %}
+
+			{% endfor %}
+			
+			// Get the framed image
+			
+			{% if product.set_of > 1 %}
+
+				$.ajax({
+						url: "{% url 'get_framed_collage' %}", 
+						data: {'coll_id':prod_id, 'moulding_id': moulding_id,
+								'mount_color':mnt_color, 'mount_size':mnt_size, 'image_width':image_width
+							}, 
+						dataType: 'text', 
+						type: 'POST',
+					success: function (data) {
+						document.getElementById("prod-img-card").src = "data:image/png;base64," + data;
+						document.getElementById("prod-img-card-m").src = "data:image/png;base64," + data;
+						//document.body.scrollTop = 0; // For Safari
+						//document.documentElement.scrollTop = 0;
+						},
+					error: function(xhr){
+						alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+					}
+				});
+				{% elif product.set_of == 1 %}
+					{% for s in stock_images %}
+						$.ajax({
+							url: "{% url 'get_framed_image' %}", 
+							data: {'prod_id':'{{s.stock_image_id}}', 'moulding_id': moulding_id,
+									'mount_color':mnt_color, 'mount_size':mnt_size, 'image_width': image_width,
+									'stretched_canvas': strt, 'imgtilt': 'NO'
+								},
+							dataType: 'text', 
+							type: 'GET',
+							success: function (data) {
+								document.getElementById("prod-img-card").src = "data:image/png;base64," + data;
+								document.getElementById("prod-img-card-m").src = "data:image/png;base64," + data;
+								//document.body.scrollTop = 0; // For Safari
+								//document.documentElement.scrollTop = 0;
+								},
+							error: function(xhr){
+								alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+							}
+						});
+					{% endfor %}
+			{% endif %}
+		}
+	
+	</script>
+	
+	
+	<script>
+		function addProdToCart(prod_id, qty) {
+			var cart_qty;
+			var total_price = $("#item_total_price_nv").html();	
+			if (total_price == '0'){
+				alert("Sorry, this product is not available.");
+				return;
+			}			
+			var discount = $("#disc").html();
+			var promotion_id = $("#promotion_id_nv").html();
+			var disc_amt = $("#disc_amt_nv").html();
+			var item_unit_price = $("#item_unit_price_nv").html();
+
+			var currwidth = image_width;
+			var currheight = image_height
+			var sqin = currwidth * currheight;
+			
+			print_medium_id = get_print_medium_id();
+			print_medium_size = sqin;
+			moulding_size = (currwidth + currheight) * 2;
+			//mount_size = (currwidth + currheight) * 2;  // Taken from the mout_size set earlier (not sqin)
+			acrylic_size = currwidth * currheight;
+			board_size = currwidth * currheight;
+			stretch_size = (currwidth + currheight) * 2;
+			
+			var acr_id = '';
+			var brd_id = '';
+			var str_id = '';
+			if (print_medium_id == 'CANVAS') {
+				var str_id = get_stretch_id();
+				if (moulding_id != '' && moulding_id != '0') {
+					str_id = '1';
+				}
+				mnt_id = '0'
+			} else {
+				if (moulding_id != '' && moulding_id != '0') {
+					var acr_id = get_acrylic_id();
+					var brd_id = get_board_id();
+					var mnt_id = get_mount_id;
+				} else {
+					var acr_id = '';
+					var brd_id = '';
+				}
+				var str_id = '';
+			}
+			
+			//
+			var cart_item_flag = 'FALSE';
+			{% if cart_item %}
+				cart_item_flag = 'TRUE';
+			{% endif %}
+
+			mount_w_left, mount_w_right, mount_w_top, mount_w_bottom = '0';
+			{% if product.set_of > 1 %}
+				// Update the cart
+				$.ajax({
+					url: "{% url 'add_to_cart' %}", 
+					data: {'prod_id':prod_id, 'qty':qty, 'moulding_id': moulding_id,
+							'width':currwidth, 'height':currheight,
+							'moulding_size' : moulding_size,
+							'print_medium_id':print_medium_id, 'print_medium_size':print_medium_size, 
+							'mount_id':mnt_id, 'mount_size':mount_size,
+							'mount_w_left' : mount_w_left, 'mount_w_right':mount_w_right, 
+							'mount_w_top':mount_w_top, 'mount_w_bottom' : mount_w_bottom, 
+							'acrylic_id':acr_id, 'acrylic_size':acrylic_size,
+							'board_id':brd_id, 'board_size':board_size, 'stretch_id':str_id,
+							'stretch_size':stretch_size, 
+							'total_price':total_price, 'image_width':currwidth, 'image_height':currheight,
+							'discount':discount, 'promotion_id':promotion_id, 'disc_amt':disc_amt,
+							'item_unit_price':item_unit_price, 'prod_type':'STOCK-COLLAGE',
+							'cart_item_flag':cart_item_flag, 'image': document.getElementById("prod-img-card").src }, 
+					dataType: 'text', 
+						type: 'POST',
+					success: function (data) {
+						data = JSON.parse(data);
+						if (data.msg.toUpperCase() != 'SUCCESS'){
+								alert(data.msg);
+						} else {					
+								
+							cart_qty = data.cart_qty;
+							//Update items in cart
+							$("#itemsincart").html(cart_qty); 
+							$('#cart-msg-modal').modal('show');
+							
+						}
+					},
+					error: function(xhr){
+						alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+					}
+				});
+			{% else %}
+				{% for s in stock_images %}
+					$.ajax({
+						url: "{% url 'add_to_cart' %}", 
+						data: {'prod_id':'{{s.stock_image_id}}', 'qty':qty, 'moulding_id': moulding_id,
+								'width':currwidth, 'height':currheight,
+								'moulding_size' : moulding_size,
+								'print_medium_id':print_medium_id, 'print_medium_size':print_medium_size, 
+								'mount_id':mnt_id, 'mount_size':mount_size,
+								'mount_w_left' : mount_w_left, 'mount_w_right':mount_w_right, 
+								'mount_w_top':mount_w_top, 'mount_w_bottom' : mount_w_bottom, 
+								'acrylic_id':acr_id, 'acrylic_size':acrylic_size,
+								'board_id':brd_id, 'board_size':board_size, 'stretch_id':str_id,
+								'stretch_size':stretch_size, 
+								'total_price':total_price, 'image_width':currwidth, 'image_height':currheight,
+								'discount':discount, 'promotion_id':promotion_id, 'disc_amt':disc_amt,
+								'item_unit_price':item_unit_price, 'prod_type':'STOCK-IMAGE',
+								'cart_item_flag':cart_item_flag}, 
+						dataType: 'text', 
+							type: 'POST',
+						success: function (data) {
+							data = JSON.parse(data);
+							if (data.msg.toUpperCase() != 'SUCCESS'){
+									alert(data.msg);
+							} else {					
+									
+								cart_qty = data.cart_qty;
+								//Update items in cart
+								$("#itemsincart").html(cart_qty); 
+								$('#cart-msg-modal').modal('show');
+								
+							}
+						},
+						error: function(xhr){
+							alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+						}
+					});
+				{% endfor %}
+			{% endif %}
+		}
+		
+	
+		// ---- Add Product to Cart ----//
+		function addProdToWishlist(prod_id, qty) {
+			var cart_qty;
+			var total_price = $("#item_total_price_nv").html();
+			if (total_price == '0'){
+				alert("Sorry, this product is not available.");
+				return;
+			}
+			var discount = $("#disc").html();
+			var promotion_id = $("#promotion_id_nv").html();
+			var disc_amt = $("#disc_amt_nv").html();
+			var item_unit_price = $("#item_unit_price_nv").html();
+	
+			var currwidth = image_width;
+			var currheight = image_height
+			var sqin = currwidth * currheight;
+			
+			print_medium_size = sqin;
+			moulding_size = (currwidth + currheight) * 2;
+			acrylic_size = currwidth * currheight;
+			board_size = currwidth * currheight;
+			stretch_size = (currwidth + currheight) * 2;
+			
+			var acr_id = '';
+			var brd_id = '';
+			var str_id = '';
+			if (print_medium_id == 'CANVAS') {
+				var str_id = get_stretch_id();
+				if (moulding_id != '' && moulding_id != '0') {
+					str_id = '1';
+				}
+				mnt_id = '0'
+			} else {
+				if (moulding_id != '' && moulding_id != '0') {
+					var acr_id = get_acrylic_id();
+					var brd_id = get_board_id();
+					var mnt_id = get_mount_id;
+				} else {
+					var acr_id = '';
+					var brd_id = '';
+				}
+				var str_id = '';
+			}
+
+			//
+			var wishlist_item_flag = 'FALSE';
+			{% if wishlist_item %}
+				wishlist_item_flag = 'TRUE';
+			{% endif %}
+			
+			{% if product.set_of > 1 %}
+				// Update the cart
+				$.ajax({
+					url: "{% url 'add_to_wishlist' %}", 
+					data: { 'prod_id':prod_id,'qty':qty, 
+							'width':currwidth, 'height':currheight, 'moulding_id': moulding_id,
+							'moulding_size' : moulding_size,
+							'print_medium_id':print_medium_id, 'print_medium_size':print_medium_size, 
+							'mount_id':mount_id, 'mount_size':mount_size,
+							'mount_w_left' : mount_w_left, 'mount_w_right':mount_w_right, 
+							'mount_w_top':mount_w_top, 'mount_w_bottom' : mount_w_bottom, 
+							'acrylic_id':acr_id, 'acrylic_size':acrylic_size,
+							'board_id':brd_id, 'board_size':board_size, 'stretch_id':str_id,
+							'stretch_size':stretch_size, 
+							'total_price':total_price, 'image_width':currwidth, 'image_height':currheight,
+							'discount':discount, 'promotion_id':promotion_id, 'disc_amt':disc_amt,
+							'item_unit_price':item_unit_price,  'prod_type':'STOCK-COLLAGE',
+							'wishlist_item_flag':wishlist_item_flag}, 
+					dataType: 'text', 
+						type: 'POST',
+					success: function (data) {
+						data = JSON.parse(data);
+						cart_qty = data.cart_qty;
+						//Update items in cart
+						$('#msg-wishlist-modal').modal('show');
+					},
+					error: function(xhr){
+						alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+					}
+				});
+			{% else %}
+				{% for s in stock_images %}
+					$.ajax({
+						url: "{% url 'add_to_wishlist' %}", 
+						data: { 'prod_id':'{{s.stock_image_id}}','qty':qty, 
+								'width':currwidth, 'height':currheight, 'moulding_id': moulding_id,
+								'moulding_size' : moulding_size,
+								'print_medium_id':print_medium_id, 'print_medium_size':print_medium_size, 
+								'mount_id':mount_id, 'mount_size':mount_size,
+								'mount_w_left' : mount_w_left, 'mount_w_right':mount_w_right, 
+								'mount_w_top':mount_w_top, 'mount_w_bottom' : mount_w_bottom, 
+								'acrylic_id':acr_id, 'acrylic_size':acrylic_size,
+								'board_id':brd_id, 'board_size':board_size, 'stretch_id':str_id,
+								'stretch_size':stretch_size, 
+								'total_price':total_price, 'image_width':currwidth, 'image_height':currheight,
+								'discount':discount, 'promotion_id':promotion_id, 'disc_amt':disc_amt,
+								'item_unit_price':item_unit_price,  'prod_type':'STOCK-IMAGE',
+								'wishlist_item_flag':wishlist_item_flag}, 
+						dataType: 'text', 
+							type: 'POST',
+						success: function (data) {
+							data = JSON.parse(data);
+							cart_qty = data.cart_qty;
+							//Update items in cart
+							$('#msg-wishlist-modal').modal('show');
+						},
+						error: function(xhr){
+							alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+						}
+					});
+				{% endfor %}
+			{% endif %}
+		}				
+	
+	</script>
+	
+	<script>
+		function addToFav(prod_id, currwidth, aspect_ratio, total_price,
+				discount, promotion_id, disc_amt, item_unit_price){
+			var currheight = Math.round(currwidth / aspect_ratio);
+			var qty = 1; var mld_id = 0; var moulding_size = 0; 
+			var print_med = 'PAPER'; var print_medium_size = currheight * currwidth;
+			var mnt_id = 0; var mnt_size = 0; var mnt_w_left =0; var mnt_w_right = 0;
+			var mnt_w_top =0; var mnt_w_bottom = 0; var acr_id = 1;
+			var acrylic_size = currheight * currwidth; var brd_id = 0; var board_size = 0;
+			var strch_id = 0; var stretch_size = 0; var discount = 0;
+		
+			$.ajax({
+				url: "{% url 'add_to_wishlist' %}", 
+				data: { 'prod_id':prod_id,'qty':qty, 
+						'width':currwidth, 'height':currheight, 'moulding_id': mld_id,
+						'moulding_size' : moulding_size,
+						'print_medium_id':print_med, 'print_medium_size':print_medium_size, 
+						'mount_id':mnt_id, 'mount_size':mnt_size,
+						'mount_w_left' : mnt_w_left, 'mount_w_right':mnt_w_right, 
+						'mount_w_top':mnt_w_top, 'mount_w_bottom' : mnt_w_bottom, 
+						'acrylic_id':acr_id, 'acrylic_size':acrylic_size,
+						'board_id':brd_id, 'board_size':board_size, 'stretch_id':strch_id,
+						'stretch_size':stretch_size, 
+						'total_price':total_price, 'image_width':currwidth, 'image_height':currheight,
+						'discount':discount, 'promotion_id':promotion_id, 'disc_amt':disc_amt,
+						'item_unit_price':item_unit_price,  'prod_type':'STOCK-COLLAGE'}, 
+				dataType: 'text', 
+					type: 'POST',
+				success: function (data) {
+					data = JSON.parse(data);
+					cart_qty = data.cart_qty;
+					$('#fav_'+prod_id).html('<i class = "fa fa-heart" onclick = "deleteItem(' + prod_id + ')"style="color:red; padding-right:5px;" data-toggle="tooltip" title="Added to Favorites!"></i>');
+					/* $('#msg-wishlist-modal').modal('show');
+					setTimeout(function() {
+						$('#msg-wishlist-modal').modal('hide');
+						}, 1000);
+					*/
+				},
+				error: function(xhr){
+					alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+				}
+			});	
+		}
+	</script>
+
+
+	<script>
+		function show_streched_img(){
+			$("#show_streched_img").modal('show');	
+		}
+	</script>	
+	
+	<script>
+		function set_ready_product(print_med, p_width, unframed_width, fetch_img=true){
+
+			var prod_id = get_product_id();
+			image_width = p_width;
+			image_height = Math.round(p_width / ratio);
+
+			if ( print_med == 'PAPER') {				
+				if (p_width <= 18) {
+					set_mount_size(1);
+					//set_moulding_id('18');
+				} else if (p_width <= 26) {
+					set_mount_size(2);
+					//set_moulding_id('24');
+				} else if (p_width <= 34) {
+					set_mount_size(3);
+					//set_moulding_id('24');
+				} else {
+					set_mount_size(4);
+					//set_moulding_id('24');
+				}
+			}
+
+			{% for s in stock_images %}
+				$("#iuser_width_{{s.stock_image_id}}").val(p_width);
+				$("#surface_{{s.stock_image_id}}").val(print_med);
+			{% endfor %}
+			if (print_med == 'PAPER') {
+			var p_id = "paper-size-"+ p_width.toString();
+				{% for key, value in ready_prod_data_paper.items %}
+					if ("paper-size-{{value.PAPER_WIDTH_UNFRAMED}}" == p_id) {
+						$('#paper-size-{{value.PAPER_WIDTH_UNFRAMED}}').addClass("p_clicked");
+						$('#prod-price').html("{{value.PAPER_PRICE|floatformat|intcomma_indian}}");
+						set_image_width( {{value.PAPER_WIDTH_UNFRAMED}} );
+						$("#prod-price-cart").html("{{value.PAPER_PRICE|floatformat|intcomma_indian}}");
+					} else {
+						$('#paper-size-{{value.PAPER_WIDTH_UNFRAMED}}').removeClass("p_clicked");				
+					}
+				{% endfor %}
+			} else {
+				var c_id = "canvas-size-"+ p_width.toString();								
+				{% for key, value in ready_prod_data_canvas.items %}
+					if ("canvas-size-{{value.CANVAS_WIDTH_UNFRAMED}}" == c_id) {
+						$('#canvas-size-{{value.CANVAS_WIDTH_UNFRAMED}}').addClass("p_clicked");
+						$('#prod-price').html("{{value.CANVAS_PRICE|floatformat|intcomma_indian}}");
+						set_image_width( {{value.CANVAS_WIDTH_UNFRAMED}} );
+						$("#prod-price-cart").html("{{value.CANVAS_PRICE|floatformat|intcomma_indian}}");
+					} else {
+						$('#canvas-size-{{value.CANVAS_WIDTH_UNFRAMED}}').removeClass("p_clicked");				
+					}				
+				{% endfor %}
+			}
+						
+			print_size_display(image_width, image_height);
+			
+			if (fetch_img == true){
+				var mnt_color = '0';
+				var mnt_size = '0';
+				var strt = 'NO';
+				{% if product.stock_collage_specs.stretch_id %}
+					strt = "YES";
+				{% endif %}
+				
+				if (get_print_medium_id() == 'PAPER') {
+					mnt_color = get_mount_color();
+					mnt_size = get_mount_size()
+				} else {
+					mnt_color = '';
+					mnt_size = '0'			
+				}
+				
+				getFramedImg (product_id, moulding_id, mnt_color, mnt_size);
+			
+			}
+			
+			
+		}
+		
+	</script>	
+	
+	<script>
+	function show_size_color_tool(){
+		var frame_width = image_width;
+		var frame_height = image_height;
+		if (moulding_id != '0' && moulding_id != ''){
+			{% if moulding %} 
+				f_size = {{moulding.width_inner_inches}};;
+			{% endif %}
+			
+			frame_width = frame_width + f_size*2;
+			frame_height = frame_height + f_size*2;
+			
+			if (print_medium_id == 'PAPER'){
+				var mnt_color = '';
+				if (mount_id != '0' && mount_id != '') {
+					mnt_size = parseFloat(mount_size);
+					frame_width = frame_width + mnt_size*2;
+					frame_height = frame_height + mnt_size*2;					
+				}
+			}
+		}
+		$('#a_width').val(Math.round(frame_width));
+		$('#a_height').val(Math.round(frame_height));
+		//$('#wall-color-tool').modal('show');
+		//show_wall_tool(document.getElementById('prod-img-card').src, '{{wall_colors.0}}', 'TRUE');
+	}
+	</script>
+
+	<script>
+		$( "#card0" ).hover(function() {
+			var src = document.getElementById("card0").src;
+			document.getElementById("prod-img").src = src;
+		});
+		$( "#prod-img-card" ).hover(function() {
+			var src = document.getElementById("prod-img-card").src;
+			document.getElementById("prod-img").src = src;
+		});
+		
+		{% for s in stock_images %}
+			$( "#card_{{s.stock_image_id}}" ).hover(function() {
+				var src = document.getElementById("card_{{s.stock_image_id}}").src;
+				document.getElementById("prod-img").src = src;
+			});
+		{% endfor %}
+	</script>
+
+	<script>
+	window.onscroll = function() {scrollFunction()};
+
+	var scrbutton = document.getElementById("scrollBtn");
+
+	function scrollFunction() {
+	  if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+		scrbutton.style.display = "block";
+	  } else {
+		scrbutton.style.display = "none";
+	  }
+	}
+
+	// When the user clicks on the button, scroll to the top of the document
+	function topFunction() {
+	  document.body.scrollTop = 0;
+	  document.documentElement.scrollTop = 0;
+	}
+	</script>
+	{% endblock jscripts %}	
+
+	{% block tawkto %}
+	{% endblock tawkto %}

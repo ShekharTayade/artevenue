@@ -37,12 +37,21 @@
 {% block front.js %}
 {% endblock front.js %}
 
-{% block imagemap-resize-script %}
-{% endblock imagemap-resize-script %}
-
 {% block lazysizes %}
 <script src="{% static '/vendor/lazysizes/lazysizes.min.js' %}" async=""></script>
 {% endblock lazysizes %}
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+{% block gmap-script %}
+{% endblock gmap-script %}
+
+
+{% block popper-script %}
+	<script src="{% static 'vendor/popper.js/umd/popper.min.js' %}"> </script>
+{% endblock popper-script %}
+
 
 {% block JSON-LD %}
 	<script type="application/ld+json">
@@ -102,7 +111,7 @@
 			<div class="row">
 
 				<!-- breadcrumb-->
-				<div class="col-sm-12 col-lg-12">
+				<div class="col-12">
 					<nav aria-label="breadcrumb">
 						<ol class="breadcrumb">
 							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
@@ -112,23 +121,21 @@
 					</nav>
 				</div>
 
-				<div class="col-sm-12 col-lg-3">
+				<div class="col-12">
+				{% include 'artevenue/art_by_category_filter.html' %}
+				</div>
 
+				<div class="col-12">
+
+					<!--
 					<button type="button" data-toggle="collapse" data-target="#cat_navigation" class="btn btn-outline-secondary navbar-toggler full-width-btn" style="width:100% !important;">
 						<span class="sr-only">Toggle navigation</span>
 						<i class="fa fa-align-justify"></i>Categories
 					</button>
 
 				
-					 <!--
-					 *** CATEGORIES AND FILTERS ***
-					_________________________________________________________
-					-->
 					<div id = "cat_navigation" class="collapse show navbar-collapse">
 						<div class="card sidebar-menu mb-4">
-							<!--<div class="card-header">
-								<h3 class="h4 card-title">Categories</h3>
-							</div>-->
 							<div class="card-body">
 								<ul class="nav navbar-collapse nav-pills flex-column category-menu pull-left">
 									<li><span class="badge badge-secondary">{{prod_cat_count}}</span>
@@ -152,16 +159,15 @@
 							</div>
 						</div>
 					</div>
+					-->
 					<!-- Display the filters -->
+					<!--
 					<button type="button" data-toggle="collapse" data-target="#filter_navigation" class="btn btn-outline-secondary navbar-toggler full-width-btn" style="width:100% !important;">
 						<span class="sr-only">Toggle navigation</span>
 						<i class="fa fa-align-justify"></i>Filter
 					</button>
 					<div id = "filter_navigation" class="collapse show navbar-collapse">
 						<div class="card sidebar-menu mb-4">
-							<!--<div class="card-header">
-								<h3 class="h4 card-title">Filter</h3>
-							</div>-->
 							{% for pf in prod_filters %}
 							{% if pf == 'ARTIST' or pf == 'SIZE' %}
 							<div class="card-body" style = "max-height:175px; width:auto; overflow:auto; margin-bottom:10px;">
@@ -284,8 +290,6 @@
 												<input id="size_width" type = "number" min="4" max="60" class = "form-control" onchange="setUserWidth(this);">
 											</div>
 										</div>
-										<!--<div style="display:flex; flex-direction: row; justify-content: center; align-items: center"> 
-											</div>-->
 										<div class = "row">
 											<div class = "col-5">
 												<label for = "size_height">Height:</label>
@@ -303,13 +307,14 @@
 							</div>									
 						</div>
 					</div>
+					-->
 					<!-- *** CATEGORIES AND FILTERS END ***-->
 				</div>
 				<!-- /.col-md-3-->
 	
 
 
-				<div class="col-sm-12 col-lg-9">
+				<div class="col-12">
 					<div class="box-cat">
 						{% autoescape off %}
 						{% if ikeywords %}

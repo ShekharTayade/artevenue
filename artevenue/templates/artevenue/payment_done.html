@@ -62,6 +62,14 @@
 		  'currency': 'INR',
 		  'transaction_id': '{{order.order_number}}'
 	  });
+
+	  gtag('event', 'conversion', {
+		  'send_to': 'AW-766463166/n9HDCNOUyPsBEL6Zve0C',
+		  'value': {{order.order_total}},
+		  'currency': 'INR',
+		  'transaction_id': '{{order.order_number}}'
+	  });
+	  
 	</script>
 	
 {% endblock add_to_head %}

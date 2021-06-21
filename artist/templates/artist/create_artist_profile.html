@@ -19,8 +19,8 @@
 {% endblock page-author %}  
 
 {% block add_to_head %}
-   <script src="//cdn.tinymce.com/4/tinymce.min.js"></script>
-   <script>tinymce.init({ selector:'textarea'});</script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/4.5.6/tinymce.min.js"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/tinymce/4.5.6/jquery.tinymce.min.js"></script>
 {% endblock add_to_head %}
 
 	<!-- Only Override the site content block -->
@@ -137,7 +137,8 @@
 		</div>
 		<div class="row mt-3">
 			<div class="col-12">
-				<textarea max-width= "2000" id = "about-me" name = "profile" placeholder = "Enter your profile here. You have 2000 characters limit.">
+				<textarea max-width= "2000" id = "about-me" name = "profile" style = "width: 100%;"
+				placeholder = "Enter your profile here. You have 2000 characters limit.">
 				{{artist.artist_profile}}
 				</textarea>
 			</div>
@@ -246,6 +247,23 @@
 
 	
 	{% block jscripts %}
+	<script>
+		$(document).ready(function() {
+		  tinymce.init({
+			selector: 'textarea',
+			height: 500,
+			menubar: false,
+			plugins: [
+			  'advlist autolink lists link image charmap print preview anchor',
+			  'searchreplace visualblocks code fullscreen',
+			  'insertdatetime media table contextmenu paste code'
+			],
+			toolbar: 'undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify |  bullist numlist outdent indent | link image',
+			content_css: '//www.tinymce.com/css/codepen.min.css'
+		  });
+		});	
+	</script>
+	
 	<script>
 		// Returns text statistics for the specified editor by id
 		function getStats(id) {

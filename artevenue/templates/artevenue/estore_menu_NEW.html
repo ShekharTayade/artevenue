@@ -248,7 +248,7 @@
 				<li class= "mt-2 mb-2 mt-md-0 mb-md-0">
 					<a href="{% url 'stock_collage_products' %}"
 							style = "text-decoration:underline;">
-						Sets
+						Wall Art Sets
 					</a>
 				</li>
 
@@ -499,6 +499,7 @@
 							  <img src="{% static 'img/fb_login.png' %}" alt="Facebook Login" style="height:auto; border:0; width:150px; ">
 							</a>
 						</div>
+						<!--
 						<div class="col-12 text-center"
 								style = "padding:10px;">
 							<a class="btn auth-provider-button" href="{% provider_login_url 'instagram' %}"
@@ -506,6 +507,7 @@
 							  <img src="{% static 'img/instagram_login.png' %}" alt="Instagram Login" style="height:auto; border:0; width:150px; ">
 							</a>
 						</div>
+						-->
 						<div class="col-12 text-center"
 								style = "padding:10px;">
 							<a class="btn auth-provider-button" href="{% provider_login_url 'google' %}"
@@ -538,7 +540,7 @@
 						</h3>
 					</div>
 					<div class="panel-body">
-						<form method="post" novalidate action = "{% url 'password_change' %}">
+						<form method="post" novalidate action = "{% url 'password_change' %}" id = "f_pwd">
 							{% csrf_token %}
 							{% include 'includes/form.html' %}
 							<input class="btn btn-lg btn-primary btn-block" type="submit" value="Change">

@@ -11,6 +11,8 @@ import datetime
 from decimal import Decimal
 import json
 
+import base64
+
 from artevenue.models import Stock_image_category
 from artevenue.models import Promotion, Stock_image, Product_view
 from artevenue.models import Wishlist, Wishlist_item, Wishlist_stock_image, User_image 
@@ -122,27 +124,99 @@ def add_to_wishlist(request):
 	#####################################
 	#         Get the item price
 	#####################################
-	price = get_prod_price(prod_id, 
-			prod_type=prod_type,
-			image_width=image_width, image_height=image_height,
-			print_medium_id = print_medium_id,
-			acrylic_id = acrylic_id,
-			moulding_id = moulding_id,
-			mount_size = mount_size,
-			mount_id = mount_id,
-			board_id = board_id,
-			stretch_id = stretch_id)
-	total_price = price['item_price']
-	msg = price['msg']
-	cash_disc = price['cash_disc']
-	percent_disc = price['percent_disc']
-	item_unit_price = price['item_unit_price']
-	disc_amt = price['disc_amt']
-	disc_applied = price['disc_applied']
-	promotion_id = price['promotion_id']
-	#####################################
-	# END::::    Get the item price
-	#####################################	
+	if prod_type == "STOCK-COLLAGE":	
+
+		collages = Collage_stock_image.objects.filter(stock_collage_id = prod_id)
+		total_price = 0
+		total_cash_disc = 0
+		total_percent_disc = 0
+		total_item_unit_price = 0
+		total_item_price_withoutdisc = 0
+		total_disc_amt = 0
+		disc_applied = False
+		promotion_id = None
+		#####################################
+		#    Get the item price for each
+		#####################################
+		for c in collages:
+			price = get_prod_price(c.stock_image_id, 
+					prod_type='STOCK-IMAGE',
+					image_width=image_width, 
+					image_height=image_height,
+					print_medium_id = print_medium_id,
+					acrylic_id = acrylic_id,
+					moulding_id = moulding_id,
+					mount_size = mount_size,
+					mount_id = mount_id,
+					board_id = board_id,
+					stretch_id = stretch_id)					
+
+			item_price = price['item_price']
+			msg = price['msg']
+			cash_disc = price['cash_disc']
+			percent_disc = price['percent_disc']
+			item_unit_price = price['item_unit_price']
+			item_price_withoutdisc = price['item_price_without_disc']
+			disc_amt = price['disc_amt']
+			disc_applied = price['disc_applied']
+			promotion_id = price['promotion_id']
+			
+			total_price = total_price + item_price
+			total_cash_disc = total_cash_disc + cash_disc
+			total_percent_disc = statistics.mean([total_percent_disc, percent_disc])
+			total_item_unit_price = item_unit_price + item_unit_price
+			total_item_price_withoutdisc = total_item_price_withoutdisc + item_price_withoutdisc
+			total_disc_amt = total_disc_amt + disc_amt
+
+		item_price = total_price
+		cash_disc = total_cash_disc
+		percent_disc = total_percent_disc
+		item_unit_price = total_item_unit_price
+		item_disc_amt = total_disc_amt
+		disc_applied = price['disc_applied']
+		promotion_id = price['promotion_id']
+
+
+	else:
+		#####################################
+		#         Get the item price
+		#####################################
+		if prod_id:
+			price = get_prod_price(prod_id, 
+					prod_type=prod_type,
+					image_width=image_width,
+					image_height=image_height,
+					print_medium_id = print_medium_id,
+					acrylic_id = acrylic_id,
+					moulding_id = moulding_id,
+					mount_size = mount_size,
+					mount_id = mount_id,
+					board_id = board_id,
+					stretch_id = stretch_id)
+			item_price = price['item_price']
+			msg = price['msg']
+			cash_disc = price['cash_disc']
+			percent_disc = price['percent_disc']
+			item_unit_price = price['item_unit_price']
+			item_disc_amt = price['disc_amt']
+			disc_applied = price['disc_applied']
+			promotion_id = price['promotion_id']
+			
+			total_price = item_price
+			
+		else:
+			item_price = 0
+			msg = 'Product not given'
+			cash_disc = 0
+			percent_disc = 0
+			item_unit_price = 0
+			item_disc_amt = 0
+			disc_applied = False
+			promotion_id = None
+			
+		#####################################
+		# END::::    Get the item price
+		#####################################	
 	
 	if item_unit_price == 0 or item_unit_price is None:
 		return( JsonResponse({'msg':'Price not avaiable for this image', 'cart_qty':qty}, safe=False) )
@@ -509,7 +583,7 @@ def add_to_wishlist(request):
 							user_image_id = prod.product_id
 						)
 					elif prod.product_type_id == 'STOCK-COLLAGE':
-						userwishlistitems = Wishist_stock_collage(
+						userwishlistitems = Wishlist_stock_collage(
 							wishlist = userwishlist,
 							promotion = promotion,
 							quantity = qty,
@@ -660,7 +734,7 @@ def add_to_wishlist(request):
 						user_image_id = prod.product_id
 					)
 				elif prod.product_type_id == 'STOCK-COLLAGE':
-					userwishlistitems = Wishist_stock_collage(
+					userwishlistitems = Wishlist_stock_collage(
 						wishlist = newuserwishlist,
 						promotion = promotion,
 						quantity = qty,
@@ -776,9 +850,9 @@ def show_wishlist(request):
 
 		userwishlistitems = Wishlist_item_view.objects.select_related('product', 'promotion').filter(
 				wishlist = userwishlist.wishlist_id, product__product_type_id = F('product_type_id')).values(
-			'wishlist_item_id', 'product_id', 'quantity', 'item_total', 'moulding_id',
+			'wishlist_item_id', 'product_id', 'quantity', 'item_total', 'moulding_id', 'stretch_id',
 			'moulding__name', 'moulding__width_inches', 'print_medium_id', 'mount_id', 'mount__name',
-			'acrylic_id', 'mount_size', 'product__name', 'image_width', 'image_height',
+			'acrylic_id', 'mount_size', 'product__name', 'image_width', 'image_height', 'moulding__width_inner_inches',
 			'product__thumbnail_url', 'wishlist_id', 'promotion__discount_value', 'promotion__discount_type', 'mount__color',
 			'item_unit_price', 'item_sub_total', 'item_disc_amt', 'item_tax', 'item_total', 'product_type',
 			'product__image_to_frame', 'product__publisher', 'product__art_width', 'product__art_height', 'product__art_medium',
@@ -805,7 +879,8 @@ def show_wishlist(request):
 	return render(request, template, {'userwishlist':userwishlist, 
 		'userwishlistitems': userwishlistitems, 'total_bare':total_bare,
 		'user_image':user_image, 'cart_quantity':cart_quantity, 
-		'user_collection':user_collection, 'user_space':user_space})
+		'user_collection':user_collection, 'user_space':user_space,
+		'env': env, 'MEDIA_ROOT':settings.MEDIA_ROOT, 'MEDIA_URL':settings.MEDIA_URL})
 
 @csrf_exempt	
 def delete_wishlist_item(request):
@@ -891,7 +966,7 @@ def move_all_items_to_cart(request, wishlist_id):
 	
 	wishlistitems = Wishlist_item_view.objects.get(wishlist_id = wishlist_id)
 
-	for w in wishlist:
+	for w in wishlistitems:
 		move_item_to_cart(request, w.wishlist_item_id)
 
 	
@@ -905,8 +980,10 @@ def move_item_to_cart(request, wishlist_item_id = None):
 		return 'Invalid request'
 		
 	items_count = 0
+
 	try:
-		wishlistitem = Wishlist_item_view.objects.get(wishlist_item_id = wishlist_item_id)
+		wishlistitem = Wishlist_item_view.objects.select_related('product').get(
+			wishlist_item_id = wishlist_item_id, product__product_type_id = F('product_type_id'))		
 		wishlist = Wishlist.objects.get(wishlist_id = wishlistitem.wishlist_id)
 	except Wishlist_item_view.DoesNotExist:
 		wishlistitem = None
@@ -924,12 +1001,13 @@ def move_item_to_cart(request, wishlist_item_id = None):
 	request.POST['image_width'] = wishlistitem.image_width	
 	request.POST['image_height'] = wishlistitem.image_height
 	request.POST['moulding_id'] = wishlistitem.moulding_id or ''
+	request.POST['mount_id'] = wishlistitem.mount_id or None
 	request.POST['print_medium_id'] = wishlistitem.print_medium_id or ''
 	request.POST['mount_size'] = wishlistitem.mount_size or ''
-	request.POST['mount_w_left'] = ''
-	request.POST['mount_w_right'] = ''
-	request.POST['mount_w_top'] = ''
-	request.POST['mount_w_bottom'] = ''
+	request.POST['mount_w_left'] = 0
+	request.POST['mount_w_right'] = 0
+	request.POST['mount_w_top'] = 0
+	request.POST['mount_w_bottom'] = 0
 	request.POST['acrylic_id'] = wishlistitem.acrylic_id or ''
 	request.POST['board_id'] = wishlistitem.board_id or ''
 	request.POST['stretch_id'] = wishlistitem.stretch_id or ''
@@ -939,6 +1017,17 @@ def move_item_to_cart(request, wishlist_item_id = None):
 	request.POST['disc_amt'] = wishlistitem.item_disc_amt or ''
 	request.POST['discount'] = ''
 	request.POST['promotion_id'] = wishlistitem.promotion_id or ''
+	
+	## if it's collage, then Get the image file 
+	if wishlistitem.product_type_id == 'STOCK-COLLAGE':
+		if env == 'DEV' or env == 'TESTING':				
+			img_file = settings.BASE_DIR + "/artevenue" + settings.STATIC_URL  + wishlistitem.product.url
+		else:
+			img_file = settings.PROJECT_DIR + '/' + settings.STATIC_URL  + wishlistitem.product.url
+
+		with open(img_file, "rb") as image_file:
+			encoded_string = base64.b64encode(image_file.read())
+			request.POST['image'] = encoded_string
 	
 	err_flg = False
 	res = json.loads( add_to_cart_new(request).content )
@@ -979,12 +1068,14 @@ def move_all_to_cart(request, wishlist_items = None):
 	if wishlist_items == []:
 		return 'Invalid request'
 		
-	items_count = 0
 	try:
-		wishlistitems = Wishlist_item_view.objects.filter(wishlist_item_id__in = wishlist_items)
-		wishlist_ids = list(Wishlist_item_view.objects.filter(wishlist_item_id__in = wishlist_items).values_list('wishlist_id', flat=True))
-		wishlist = Wishlist.objects.filter(wishlist_id__in = wishlist_ids)
-		items_count = Wishlist_item_view.objects.filter(wishlist_id__in = wishlist_ids).count()
+		wishlistitems = Wishlist_item_view.objects.select_related('product').filter(wishlist_item_id__in = wishlist_items, 
+						product_type_id = 'STOCK-COLLAGE',
+						product__product_type_id = F('product_type_id') )
+						
+		wishlist_ids = list(wishlistitems.values_list('wishlist_id', flat=True))
+		
+		wishlist = Wishlist.objects.filter(wishlist_id__in = wishlist_ids)		
 	except Wishlist_item_view.DoesNotExist:
 		wishlistitems = None
 		
@@ -1016,6 +1107,18 @@ def move_all_to_cart(request, wishlist_items = None):
 		request.POST['discount'] = ''
 		request.POST['promotion_id'] = wi.promotion_id or ''
 	
+		## if it's collage, then Get the image file 
+		if wi.product_type_id == 'STOCK-COLLAGE':
+			if env == 'DEV' or env == 'TESTING':				
+				img_file = settings.BASE_DIR + "/artevenue" + settings.STATIC_URL  + wi.product.url
+			else:
+				img_file = settings.PROJECT_DIR + '/' + settings.STATIC_URL  + wi.product.url
+
+			with open(img_file, "rb") as image_file:
+				encoded_string = base64.b64encode(image_file.read())
+				request.POST['image'] = encoded_string
+		
+
 		err_flg = False
 		res = json.loads( add_to_cart_new(request).content )
 	

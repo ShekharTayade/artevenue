@@ -13,7 +13,7 @@ import json
 from decimal import Decimal
 
 from gallerywalls.models import Gallery, Gallery_variation, Room, Placement, Gallery_item
-from artevenue.models import Business_profile, Order, UserProfile
+from artevenue.models import Business_profile, Order, UserProfile, Moulding
 
 from artevenue.views import price_views, cart_views
 
@@ -32,10 +32,10 @@ def get_gallery_walls(request, gallery_id=None, category_id = None, page = None,
 	if page is None or page == 0:
 		page = 1 # default
 
-	gallery_parent = Gallery_variation.objects.filter(is_parent = True, gallery__is_published = True)
+	gallery_parent = Gallery_variation.objects.filter(is_parent = True, gallery__is_published = True, gallery__set_of__gte = 2)
 	total_galleries = gallery_parent.count()	
 
-	gallery_variation = Gallery_variation.objects.filter(is_parent = False, gallery__is_published = True)
+	gallery_variation = Gallery_variation.objects.filter(is_parent = False, gallery__is_published = True, gallery__set_of__gte = 2).order_by('-gallery_id')
 
 	filt_msg = ''
 	if gallery_id:
@@ -65,7 +65,7 @@ def get_gallery_walls(request, gallery_id=None, category_id = None, page = None,
 
 	gallery_parent = gallery_parent.filter( t_f )
 
-	gallery_parent = gallery_parent.order_by('gallery__category_disp_priority', 'gallery_id')		
+	gallery_parent = gallery_parent.order_by('gallery__category_disp_priority', '-gallery_id')		
 	gallery_filters = ['ROOM', 'PLACEMENT', 'COLORS', 'KEY_WORDS' ]
 
 	rooms = Room.objects.all().values('name').distinct()	
@@ -139,6 +139,22 @@ def gallery_wall_detail(request, gallery_id):
 
 		prices[v.id] = v_price
 
+	
+	## Get frames in the gallerywall
+	mouldings = []
+	mediums = []
+	stretched_canv = False
+	for i in gallery_items_all:
+		if i.moulding_id:
+			mouldings.append(i.moulding_id)
+		if i.print_medium_id:
+			mediums.append(i.print_medium_id)	
+		if i.stretch_id and not i.moulding_id:
+			stretched_canv = True
+	
+	frames = Moulding.objects.filter(moulding_id__in = mouldings)
+
+
 	livuser = False
 	bus_user = False
 	user = None
@@ -167,14 +183,17 @@ def gallery_wall_detail(request, gallery_id):
 			v15off = True
 	
 	if g:
-		template = "gallerywalls/gallery_wall_detail.html"
+		#if g.set_of > 1:
+		#	template = "gallerywalls/gallery_wall_detail.html"
+		#else:
+		template = "gallerywalls/gallery_wall_detail_new.html"
 	else:
 		template = "gallerywalls/gallery_not_published.html"
 		
 	return render(request, template, {
 		'gal':gallery_parent, 'gallery_variations': gallery_variations,
 		'gallery_items': gallery_items, 'prices': prices, 'v15off': v15off,
-		'env':settings.EXEC_ENV})
+		'env':settings.EXEC_ENV, 'frames': frames, 'mediums': mediums, 'stretched_canv': stretched_canv})
 
 @csrf_exempt
 def gallery_wall_detail_items(request):
@@ -182,8 +201,13 @@ def gallery_wall_detail_items(request):
 	gallery_variation_id = request.GET.get('gallery_variation_id', '')
 	gallery_items = Gallery_item.objects.filter(gallery_id = gallery_id, gallery_variation_id = gallery_variation_id)
 
+	g = gallery_items.first()
+	if g.set_of > 1:
+		template = "gallerywalls/gallery_wall_detail.html"
+	else:
+		template = "gallerywalls/gallery_wall_detail_new.html"
 	
-	return render(request, "gallerywalls/gallery_wall_detail_items.html", {'gallery_items': gallery_items})
+	return render(request, template, {'gallery_items': gallery_items})
 
 @csrf_exempt	
 def get_gallery_variation_and_price(request):
@@ -322,10 +346,13 @@ def add_gallery_wall_to_cart(request):
 	return JsonResponse({'status': status, 'msg': msg, 'cart_qty': total_cart_qty})
 	
 	
-def update_gallery_prices():
+def update_gallery_prices(g_id=None):
 
 	gallery_variation = Gallery_variation.objects.filter(
 		gallery__is_published = True).order_by('gallery_id')
+	
+	if g_id:
+		gallery_variation = gallery_variation.filter(gallery_id__gte = g_id)
 	
 	for g in gallery_variation:
 		gallery_items = Gallery_item.objects.filter(gallery_id = g.gallery_id, gallery_variation = g)

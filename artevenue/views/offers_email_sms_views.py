@@ -336,7 +336,7 @@ def apply_99_off_offer(cart_ids=None):
 				print(rep)
 				
 			## Apply 20% off voucher "U2slzt"
-			vou = apply_voucher_py_new(request, cart.cart_id, 'ADYtAB5yh', 0, 0)
+			vou = apply_voucher_py_new(request, cart.cart_id, 'U2slzt', 0, 0)
 			rep_v = json.loads(vou.content.decode('utf-8'))
 			if rep_v['status'] == 'FAILURE':
 				print("Error occured while applying this voucher " + cart.cart_id + " not found")

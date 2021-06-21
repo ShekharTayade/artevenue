@@ -19,6 +19,7 @@
 									on {{o.delivery_date | date:'d-M-Y'}}
 								{% endif %}
 							{% endif %}
+							</h4>
 							{% if o.order_status == 'IN' %} 
 								{% if o.tracking_number %} 
 									<h4> Order Tracking:<br />
@@ -32,7 +33,17 @@
 									</h4>
 								{% endif %}
 							{% endif %}
-						
+							<h3>Payment Type: {{o.get_payment_type_display}}</h3>
+							{% if o.payment_type == 'COD' %}
+								<h3>
+									Cash On Delivery (COD) Order. This order is not eligible for returns.
+								</h3>
+								{% if o.order_status == 'PC' or o.order_status == 'PR'  or o.order_status == 'SH' or o.order_status == 'IN' %}
+								<h3>
+									Payment to be made on delivery. 
+								</h3>
+								{% endif %}	
+							{% endif %}
 							<div class = "row">
 								{% if o.order_shipping %}
 								<div class = "col-6 box">

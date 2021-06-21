@@ -73,7 +73,7 @@
 										{% for i in usercartitems %}
 										<tr>
 											<td>
-												<img src = "{% if i.product_type == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product__image_to_frame}} {% else %} {% if env == 'DEV' or env == 'TESTING' %} {% if i.product_type == 'ORIGINAL-ART' %} {% static i.product__thumbnail_url %} {% else %} {{i.product__thumbnail_url}} {% endif %} {% else %} {% static i.product__thumbnail_url %} {% endif %} {% endif %}" style = "width:50px; height:50px; object-fit:contain;">
+												<img src = "{% if i.product_type == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product__image_to_frame}} {% else %} {% if env == 'DEV' or env == 'TESTING' %} {% if i.product_type == 'ORIGINAL-ART' %} {% static i.product__thumbnail_url %} {% else %} {% static i.product__thumbnail_url %} {% endif %} {% else %} {% static i.product__thumbnail_url %} {% endif %} {% endif %}" style = "width:50px; height:50px; object-fit:contain;">
 												<br />
 
 												<div class = "pull-left">

@@ -232,3 +232,50 @@ def create_cat_filenm(val=None, disp=None):
 def get_art_price_without_tax(val=None):
 	unit_price = round( float(val)/ (1 + (12/100)), 2 )
 	return Decimal(unit_price)
+	
+	
+	
+#@register.filter(is_safe=True)
+#@register.simple_tag
+@register.inclusion_tag('artevenue/price_render.html')
+def get_price_on_category_page(min_width, min_height, aspect_ratio, sqin_price, user_width):
+
+	## 8 the min width and height we allow, but
+	## Set min width, height to 10 for display purpose on category pages
+	## Our product pages also start with default width of 10
+	if min_width == 0 or min_width == 8:
+		min_width = 10
+	if min_height == 0 or min_height == 8:
+		min_height = 10
+
+	if user_width > 0:
+		if aspect_ratio < 1:
+			width = 10
+			height = round(width / aspect_ratio)
+		else:
+			height = 10
+			width = round(height * aspect_ratio)
+	else:
+		if aspect_ratio < 1:
+			width = min_width
+			height = round(width / aspect_ratio)
+		else:
+			height = min_height
+			width = round(height * aspect_ratio)
+
+	size = width * height
+	sqin_price = round(size * sqin_price)
+	# Small size prices increased by 20%  -- 26 Sep 2020
+	
+	if size <= 100:
+		sqin_price = round(sqin_price + (sqin_price * 20/100))
+	elif size <= 256:
+		sqin_price = round(sqin_price + (sqin_price * 15/100))
+	elif size <= 500:
+		sqin_price = round(sqin_price + (sqin_price * 10/100))
+	
+	ret = { 'sqin_price': sqin_price, 'width': width, 'height': height }
+	
+	#'<span class="price">' + str(sqin_price) + '</span> <span style="color:#888;">(for '+ str(width) + '"' + str(height) + '" ")</span>'
+	
+	return ret

@@ -1,60 +1,104 @@
 {% load static %}
 
 {% if ecom_site.show_promotion_section %}		
-<div class="">
-	<div class="col-12">
-		<div class="d-none d-md-block">			
+<div>
+	<div class="col-12 pb-3 mt-2">
+		<div class="d-none d-md-block" style = "font-size: 0.75rem;" >	
 			{% if livuser %}
 			<img src="{% static 'img/main-image/livspace_banner.jpg' %}" alt="Buy beautiful paintings online and save 15%" class="img-fluid" style="min-height: 506px;">
 			{% else %}
-			<img src="{% static 'img/main-image/wall_art_15_off.jpg' %}" alt="Buy beautiful paintings online and save 15%" class="img-fluid" usemap="#bannermap" style="min-height: 506px;">
+			<img src="{% static 'img/main-image/wall_art_d.jpg' %}" alt="Buy beautiful paintings online and save 15%" class="img-fluid" 
+				usemap="#bannermap" style = "height: calc(100vw / 2.47);">
 			{% endif %}
 			<map name="bannermap">
-
-			  <area shape="rect" coords="0,0,481,878" data-toggle="modal" data-target="#signup_popup-modal" style = "cursor:pointer;">
-
-			<!--
-			  <area shape="rect" coords="870,40,1485,355" href="{% url 'stock_image_detail' 148993  %}">
-			  <area shape="rect" coords="530,575,725,870" href="{% url 'stock_image_detail' 220224 %}">
-			  <area shape="rect" coords="755,575,965,870" href="{% url 'stock_image_detail' 23309 %}">
-			  <area shape="rect" coords="980,575,1200,870" href="{% url 'stock_image_detail' 33249 %}">
-			  <area shape="rect" coords="1225,575,1425,870" href="{% url 'stock_image_detail' 155726 %}">
-			  <area shape="rect" coords="1440,575,1670,870" href="{% url 'stock_image_detail' 164403 %}">
-			  <area shape="rect" coords="1685,575,1885,870" href="{% url 'stock_image_detail' 198778 %}">
-			</map>
-			-->
+			  <area shape="rect" coords="1185,275,1405,480" data-toggle="modal" data-target="#pop-image" alt="Floral Wall Art" onclick="setImg('15339');">
+			  <area shape="rect" coords="103,250,240,380" data-toggle="modal" data-target="#pop-image" alt="Pots Wall Art" onclick="setImg('164426');">
+			  <area shape="rect" coords="370,117,605,350" data-toggle="modal" data-target="#pop-image" alt="Abstract Wall Art" onclick="setImg('280889');">
+			  <area shape="rect" coords="1105,38,1235,158" data-toggle="modal" data-target="#pop-image" alt="Buddha Wall Art" onclick="setImg('249469');">
+			  <area shape="rect" coords="1455,140,1635,325" data-toggle="modal" data-target="#pop-image" alt="Car Wall Art" onclick="setImg('204738');">
+			  <area shape="rect" coords="853,140,1085,350" data-toggle="modal" data-target="#pop-image" alt="Nature Wall Art" onclick="setImg('261146');">
+			  <area shape="rect" coords="923,460,1161,685" data-toggle="modal" data-target="#pop-image" alt="Marylene Wall Art" onclick="setImg('210252');">
+			  <area shape="rect" coords="168,465,450,725" data-toggle="modal" data-target="#pop-image" alt="Master Wall Art" onclick="setImg('44017');">
+			  <area shape="rect" coords="635,630,790,780" data-toggle="modal" data-target="#pop-image" alt="Landscape Wall Art" onclick="setImg('190581');">
+			  <area shape="rect" coords="1690,340,1840,485" data-toggle="modal" data-target="#pop-image" alt="Scooters Wall Art" onclick="setImg('42771');">
+			  <area shape="rect" coords="610,375,810,560" data-toggle="modal" data-target="#pop-image" alt="Ocean Wall Art" onclick="setImg('240274');">
+			  <area shape="rect" coords="1460,481,1680,703" data-toggle="modal" data-target="#pop-image" alt="Cityscape Wall Art" onclick="setImg('354205');">
+			</map>		
 		</div>
 		<div class="d-block d-md-none">
 			{% if livuser  %}
 			<img src="{% static 'img/main-image/livspace_banner_m.jpg' %}" alt="Buy beautiful paintings online and save 15%" class="img-fluid" style="min-height: 506px;">
 			{% else %}
-			<img src="{% static 'img/main-image/wall_art_15_off_m.jpg' %}" alt="Main Banner on Mobile" class="img-fluid" usemap="#bannermap_m"  style="min-height: 377px;">
+			<img src="{% static 'img/main-image/wall_art_m.jpg' %}" alt="Buy beautiful paintings online and save 15%" class="img-fluid" 
+				usemap="#bannermap_m"  style = "height: calc(100vw / 1.1714);">
 			{% endif %}
 			<map name="bannermap_m">
-
-			  <area shape="rect" coords="348,0,475,293" data-toggle="modal" data-target="#signup_popup-modal" alt="Sign Up">
-			  
-			<!--
-			  <area shape="rect" coords="44,49,248,153" href="{% url 'stock_image_detail' 148993  %}" alt="Sign Up">
-			  <area shape="rect" coords="7,357,75,459" href="{% url 'stock_image_detail' 220224 %}">
-			  <area shape="rect" coords="83,357,155,459" href="{% url 'stock_image_detail' 23309 %}">
-			  <area shape="rect" coords="160,357,238,459" href="{% url 'stock_image_detail' 33249 %}">
-			  <area shape="rect" coords="242,357,312,459" href="{% url 'stock_image_detail' 155726 %}">
-			  <area shape="rect" coords="317,357,395,459" href="{% url 'stock_image_detail' 155726 %}">
-			  <area shape="rect" coords="400,357,470,459" href="{% url 'stock_image_detail' 198778 %}">
-			 -->
-
-
-
-			  <!--<area shape="rect" coords="11,577,119,741" href="{% url 'stock_image_detail' 220224 %}" alt="Show Product">
-			  <area shape="rect" coords="134,577,250,741" href="{% url 'stock_image_detail' 23309 %}" alt="Show Product">
-			  <area shape="rect" coords="259,577,380,741" href="{% url 'stock_image_detail' 33249 %}" alt="Show Product">
-			  <area shape="rect" coords="393,577,504,741" href="{% url 'stock_image_detail' 155726 %}" alt="Show Product">
-			  <area shape="rect" coords="514,577,639,741" href="{% url 'stock_image_detail' 164403 %}" alt="Show Product">
-			  <area shape="rect" coords="648,577,758,741" href="{% url 'stock_image_detail' 198778 %}" alt="Show Product">-->
+			  <area shape="rect" coords="164,42,262,136" data-toggle="modal" data-target="#pop-image" alt="Floral Wall Art" onclick="setImg('15339');">
+			  <area shape="rect" coords="18,233,86,300" data-toggle="modal" data-target="#pop-image" alt="Pots Wall Art" onclick="setImg('164426');">
+			  <area shape="rect" coords="117,179,209,271" data-toggle="modal" data-target="#pop-image" alt="Abstract Wall Art" onclick="setImg('280889');">
+			  <area shape="rect" coords="276,171,337,232" data-toggle="modal" data-target="#pop-image" alt="Buddha Wall Art" onclick="setImg('249469');">
+			  <area shape="rect" coords="360,83,445,166" data-toggle="modal" data-target="#pop-image" alt="Car Wall Art" onclick="setImg('204738');">
+			  <area shape="rect" coords="335,215,461,315" data-toggle="modal" data-target="#pop-image" alt="Nature Wall Art" onclick="setImg('261146');">
+			  <area shape="rect" coords="211,293,336,412" data-toggle="modal" data-target="#pop-image" alt="Marylene Wall Art" onclick="setImg('210252');">
+			  <area shape="rect" coords="49,357,171,477" data-toggle="modal" data-target="#pop-image" alt="Master Wall Art" onclick="setImg('44017');">
+			  <area shape="rect" coords="244,449,322,516" data-toggle="modal" data-target="#pop-image" alt="Landscape Wall Art" onclick="setImg('190581');">
+			  <area shape="rect" coords="500,150,563,211" data-toggle="modal" data-target="#pop-image" alt="Scooters Wall Art" onclick="setImg('42771');">
+			  <area shape="rect" coords="388,381,472,465" data-toggle="modal" data-target="#pop-image" alt="Ocean Wall Art" onclick="setImg('240274');">
+			  <area shape="rect" coords="498,302,580,381" data-toggle="modal" data-target="#pop-image" alt="Cityscape Wall Art" onclick="setImg('354205');">
 
 			</map>		
 		</div>
 	</div>
+
+	<div id="pop-image" tabindex="-1" role="dialog" aria-labelledby="Image pop up" aria-hidden="true" class="modal fade">
+		<div class="modal-dialog modal-dialog-centered modal-md">
+			<div class="modal-content"  style = "background: transparent !important;">
+				<div class="modal-body">
+					<div class = "row text-center">
+						<div class="col-12">
+							<img id = "pop-img-id" src = "" 
+								alt = "Wall Art Image" class = "img-resposive"
+								style = "display:block; margin-left:auto; margin-right:auto; width: 100%; height: auto;">
+						</div>
+						<div class="col-12 mt-3">
+							<div class = "row">
+								<div class="col-6">
+									<a class = "btn btn-outline"
+										style ="background: transparent; color: #fff; font-size: 1.2rem; font-weight:700;"
+										onclick = "$('#pop-image').modal('hide');"> 
+										Close 
+										<i class = "fa fa-times fa-lg"></i>
+									</a>
+								</div>
+								<div class="col-6">
+									<a class = "btn btn-outline" id = "img-link"
+										style ="background: transparent; color: #fff;  font-size: 1.2rem; font-weight:700;"
+										href = "{% url 'stock_image_detail' 15339 %}">
+										Frame It! 
+										<i class = "fa fa-chevron-right fa-lg"></i>
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<script>
+		$( "#banner" ).ready(function() {
+			imageMapResize();
+		});
+		$( "#banner_m" ).ready(function() {
+			imageMapResize();
+		});
+		
+		function setImg(product_code){
+			$("#pop-img-id").prop("src", "/static/img/creatives/" + product_code + "_img.jpg");
+			$("#img-link").prop("href", "https://artevenue.com/art-print/" + product_code);
+		}
+	</script>
+	
 </div>
 {% endif %}

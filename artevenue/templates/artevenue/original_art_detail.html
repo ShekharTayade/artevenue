@@ -205,7 +205,20 @@
 									</div>
 									<div class= "pull-left">
 										<span id = "prod-name">{{ product.name }}</span><br />
-										<span id = "artist"> {% if product.artist %} By {{product.artist}} {% endif %} </span>
+										<span id = "artist">
+										By 
+										{% if orig_art.artist %}
+											{% if orig_art.artist.url_name %}
+												<a href = "https://artevenue.com/artist/{{orig_art.artist.url_name}}">
+													{{orig_art.artist.profile_name}}
+												</a>
+											{% else %}
+												{{orig_art.artist.profile_name}}
+											{% endif %}
+										{% else %}
+											{{orig_art.artist.profile_name}}
+										{% endif %} 
+										</span>
 									</div>
 									<div class="price pull-right">
 										<div id = "promo-display" style = "display:none">
@@ -1541,7 +1554,7 @@
 								$("#disc").html("(" + data.percent_disc + "% off)");
 							}
 							
-							$("#item_unit_price_nv").html(parseInt(data.item_unit_price).toLocaleString('en-IN', {minimumFractionDigits : 0}));
+							$("#item_unit_price_nv").html(pasrseInt(data.item_unit_price).toLocaleString('en-IN', {minimumFractionDigits : 0}));
 							$("#promotion_id_nv").html(data.promotion_id);
 							$("#disc_amt_nv").html(data.disc_amt);
 							$("#item_total_price_nv").html(data.item_price);
@@ -1884,7 +1897,8 @@
 	<script>
 	function get_cards(){
 		// Get the card
-		var prod_id = get_product_id();
+		//var prod_id = get_product_id();
+		var prod_id = {{product.stock_image_id}}
 		var currwidth = {{product.art_width}};
 		var m_id = get_moulding_id();
 		var mnt_color = '';
@@ -1900,7 +1914,7 @@
 				url: "{% url 'get_catalog_card' %}", 
 				data: {'card_no': '1', 'prod_id':prod_id, 'moulding_id': m_id,
 						'mount_color':mnt_color, 'mount_size':mnt_size, 
-						'image_width':currwidth, 'prod_type':'ORIGINAL-ART'
+						'image_width':currwidth, 'prod_type':'STOCK-IMAGE'
 					}, 
 				dataType: 'text', 
 			success: function (data) {
@@ -1916,7 +1930,7 @@
 				url: "{% url 'get_catalog_card' %}", 
 				data: {'card_no': '2', 'prod_id':prod_id, 'moulding_id': m_id,
 						'mount_color':mnt_color, 'mount_size':mnt_size, 
-						'image_width':currwidth, 'prod_type':'ORIGINAL-ART'
+						'image_width':currwidth, 'prod_type':'STOCK-IMAGE'
 					}, 
 				dataType: 'text', 
 			success: function (data) {
@@ -1931,7 +1945,7 @@
 				url: "{% url 'get_catalog_card' %}", 
 				data: {'card_no': '3', 'prod_id':prod_id, 'moulding_id': m_id,
 						'mount_color':mnt_color, 'mount_size':mnt_size, 
-						'image_width':currwidth, 'prod_type':'ORIGINAL-ART'
+						'image_width':currwidth, 'prod_type':'STOCK-IMAGE'
 					}, 
 				dataType: 'text', 
 			success: function (data) {

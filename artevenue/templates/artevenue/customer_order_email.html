@@ -58,7 +58,13 @@
 					<span  style = "color:#11b6bd">{{order.order_number}}</span>
 					, <small>Dated : {{order.order_date}}</small>
 				</h5>
-					
+				
+				{% if order.payment_type == 'COD' %}
+				<h5>
+					Payment Type: {{order.get_payment_type_display}}
+				</h5>
+				{% endif %}
+				
 				<hr>
 
 				<table>

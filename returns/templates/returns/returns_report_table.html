@@ -1,0 +1,77 @@
+{% load static %}
+{% load utils %}
+
+	<div class = "row mb-3">
+		<div class = "col-6 col-md-4">
+			<strong>Number of Return Requests: {{ ret_orders.count | floatformat}}</strong>
+		</div>
+		<div class = "col-6 col-md-4">
+			{% if totals.order_total__sum %}
+			<strong>Total Refund Amount: {{totals.order_total__sum|default_if_none:'0'|floatformat|indian_number_format}}</strong>
+			{% endif %}
+		</div>
+		<div class = "col-6 col-md-4">
+			{% if totals.order_total__avg %}
+			<strong>Avg Refund Amount: {{ totals.order_total__avg|default_if_none:'0'|floatformat|indian_number_format}}</strong>
+			{% endif %}		
+		</div>
+	</div>
+	
+	<div class="table table-responsive">
+		<table id = "ordTbl" class="table table-responsive table-striped">
+			<thead>
+				<tr>
+					<th width="9%">Return No.</th>
+					<th width="9%">Return Dt.</th>
+					<th width="13%">Status</th>
+					<th width="13%">Reason</th>
+					<th width="9%">Ord No.</th>
+					<th width="9%">Ord Dt.</th>
+					<th width="11%">Cust Name</th>
+					<th width="9%">City</th>
+					<th width="9%">State</th>
+					<th width="9%" style="text-align:right">Ref Amount</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for ro in ret_orders %}
+				<tr>
+					<td>
+						{{ro.ret_number }}
+					</td>																						
+					<td>
+						{{ro.ret_request_date|date:'d/m/y'}}
+					</td>																						
+					<td>
+						{{ro.get_ret_status_display}}
+					</td>																						
+					<td>
+						{{ro.get_ret_reason_display}}
+					</td>																						
+					<td>
+						{{ro.order.order_number}}
+					</td>
+					<td>
+						{{ro.order.order_date | date:'d/m/y'}}
+					</td>
+					<td>
+						{{ro.order.order_billing.full_name }}
+					</td>																						
+					<td>
+						{{ro.order.order_billing.city}}
+					</td>
+					<td>
+						{{ro.order.order_billing.state_id}}
+					</td>
+					<td style = "text-align:right">{{ro.refund_amount|floatformat}}</td>
+
+				</tr>
+				{% endfor %}
+			</tbody>
+			<tfoot>
+			</tfoot>
+		</table>
+	</div>
+	<div class = "mb-5" style="padding-bottom:2px; background-color:#11b6bd;" >
+	</div>							
+	

@@ -1,32 +1,14 @@
 {% load static %}
-<!--<div class="col-12 text-center" style = " font-family: Georgia, serif; font-weight: 700; color: #000 !important; background-image: linear-gradient(#f66703, #fff, #37b139);">
-	<a style = "text-decoration: none;" href = "{% url 'offers' %}">
-	<span style = "text-shadow: 1px 1px 1px black; color:white; ">MEGA REPUBLIC DAY SALE!!</span><br />
-	<strong style = "text-shadow: 1px 1px 2px white; color:black;">HURRY UP! LAST DAY TODAY | 25% Discount</strong> <br/>
-	<span style = "color:black; font-weight: 500;">Use coupon code <strong style=" font-weight: 700; color:white; text-shadow: 1px 1px 2px black; ">JAN26</strong> in your cart, 25th to 1st Feb</span>
+
+<!--<div class="col-12 announcement" style = "font-size:0.9rem; padding:5px;">
+	<a data-toggle="modal" data-target="#announcement" style = "cursor:pointer; font-size:0.9rem; text-decoration:none !important;">
+		<i class="fa fa-exclamation-circle fa-lg" style="color: #FFEA00;"></i> Orders delayed due to lockdown
+		<i class = "fa fa-chevron-circle-right fa-lg"></i>
 	</a>
-</div>-->
-<div class="col-12 annoucement text-center" style = "color: #fff; background-color:#000; font-weight: 700; padding:5px;">
-	{% if not request.user.is_authenticated %}
-		<i class = "fa fa-gift fa-lg"></i> 
-		Flat 15% Off on 1st Order. 
-		To save please
-		<a data-toggle="modal" data-target="#signup_popup-modal" 
-			style = "text-decoration: underline;!important;
-				font-weight: 700;">
-		Sign Up Now.
-		</a> 
-	{% else %}
-		<div class = "d-none d-md-block">
-			<strong>PREMIUM QUALITY | LARGEST COLLECTION | FREE SHIPPING</strong>
-		</div>
-		<div class = "d-block d-md-none">
-			<strong>PREMIUM QUALITY | FREE SHIPPING</strong>
-		</div>	
-	{% endif %}
 </div>
-<div class="announcement col-12 text-center">
-	<a style = "color: #fff; font-weight: 700; font-size:0.85rem; " 
+-->
+<div class="col-12 text-center" style = "background-color: #000;">
+	<a style = "color: #fff; font-weight: 700; font-size:0.8rem;" 
 		target = '_blank' 
 		href = "https://startup.siliconindia.com/vendor/home-decor-startups-2020-artevenue-cid-14000.html">
 		Arte'Venue in SiliconIndia's 10 Best Home Decor Startups
@@ -35,3 +17,29 @@
 	</a>
 </div>
 
+<!--
+<div id="announcement" tabindex="-1" role="dialog" aria-labelledby="Announcement" aria-hidden="true" class="modal fade">
+	<div class="modal-dialog modal-md">
+		<div class="modal-content">
+			<div class="modal-header">
+				IMPORTANT INFORMATION!!
+				<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
+			</div>
+			<div class="modal-body">
+				<div class = "row">
+					<div class = "col-12">
+					<p>
+						Team Arte'Venue
+						<br />
+						<img src = "https://artevenue.com/static/img/artevenue_logo_new.png" alt="Arte'Venue Logo"  height="25" width="110"> <br />
+						<a href = "https://www.artevenue.com">www.artevenue.com</a>
+					</p>
+					</div>
+				</div>
+
+			</div>
+
+		</div>
+	</div>
+</div>
+-->

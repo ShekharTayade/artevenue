@@ -5,41 +5,44 @@
 		<hr>
 	</div>
 	{% if reviews %}
-	<div class = "col-12 customer-rating-summary">
-		<div class = "col-6 customer-rating">
-			<div class= "">Overall Rating: </div>
-			<div class = "rating">{{overall_rating}}</div> 
-		</div>
-		<div class = "col-6">
-			<div class = "pull-right">
-				<div >
-					{% if overall_rating == 0 %}
-						<img src = "{% static 'img/customer_reviews/0.png'%}" class = "rating-stars">
-					{% elif overall_rating > 0 and  overall_rating <= 0.5 %}
-						<img src = "{% static 'img/customer_reviews/0point5.png'%}" class = "rating-stars">
-					{% elif overall_rating > 0.5 and overall_rating <= 1 %}
-						<img src = "{% static 'img/customer_reviews/1.png'%}" class = "rating-stars">
-					{% elif overall_rating > 1 and overall_rating <= 1.5 %}
-						<img src = "{% static 'img/customer_reviews/1point5.png'%}" class = "rating-stars">
-					{% elif overall_rating > 1.5 and overall_rating <= 2 %}
-						<img src = "{% static 'img/customer_reviews/2.png'%}" class = "rating-stars">
-					{% elif overall_rating > 2 and overall_rating <= 2.5 %}
-						<img src = "{% static 'img/customer_reviews/2point5.png'%}" class = "rating-stars">
-					{% elif overall_rating > 2.5 and overall_rating <= 3 %}
-						<img src = "{% static 'img/customer_reviews/3.png'%}" class = "rating-stars">
-					{% elif overall_rating > 3 and overall_rating <= 3.5 %}
-						<img src = "{% static 'img/customer_reviews/3point5.png'%}" class = "rating-stars">
-					{% elif overall_rating > 3.5 and overall_rating <= 4 %}
-						<img src = "{% static 'img/customer_reviews/4.png'%}" class = "rating-stars">
-					{% elif overall_rating > 4 and overall_rating <= 4.5 %}
-						<img src = "{% static 'img/customer_reviews/4point5.png'%}" class = "rating-stars">
-					{% elif overall_rating > 4.5 %}
-						<img src = "{% static 'img/customer_reviews/5.png'%}">
-					{% endif %}					
-				</div>
-				<div class = "text-muted" style = "margin-left: 15px; font-size:0.65rem;">{%  if total_reviews > 0 %} ({{total_reviews}} reviews) {% endif %}</div>
+	<div class = "col-12 customer-rating">
+		<div style = "font-size: 1.1rem;">Overall Rating: </div>
+	</div>
+	<div class = "col-6">
+		<div class = "rating">{{overall_rating}}</div> 
+	</div>
+	<div class = "col-6">
+		<span class = "float-right">
+			<div>
+				{% if overall_rating == 0 %}
+					<img src = "{% static 'img/customer_reviews/0.png'%}" class = "rating-stars">
+				{% elif overall_rating > 0 and  overall_rating <= 0.5 %}
+					<img src = "{% static 'img/customer_reviews/0point5.png'%}" class = "rating-stars">
+				{% elif overall_rating > 0.5 and overall_rating <= 1 %}
+					<img src = "{% static 'img/customer_reviews/1.png'%}" class = "rating-stars">
+				{% elif overall_rating > 1 and overall_rating <= 1.5 %}
+					<img src = "{% static 'img/customer_reviews/1point5.png'%}" class = "rating-stars">
+				{% elif overall_rating > 1.5 and overall_rating <= 2 %}
+					<img src = "{% static 'img/customer_reviews/2.png'%}" class = "rating-stars">
+				{% elif overall_rating > 2 and overall_rating <= 2.5 %}
+					<img src = "{% static 'img/customer_reviews/2point5.png'%}" class = "rating-stars">
+				{% elif overall_rating > 2.5 and overall_rating <= 3 %}
+					<img src = "{% static 'img/customer_reviews/3.png'%}" class = "rating-stars">
+				{% elif overall_rating > 3 and overall_rating <= 3.5 %}
+					<img src = "{% static 'img/customer_reviews/3point5.png'%}" class = "rating-stars">
+				{% elif overall_rating > 3.5 and overall_rating <= 4 %}
+					<img src = "{% static 'img/customer_reviews/4.png'%}" class = "rating-stars">
+				{% elif overall_rating > 4 and overall_rating <= 4.5 %}
+					<img src = "{% static 'img/customer_reviews/4point5.png'%}" class = "rating-stars">
+				{% elif overall_rating > 4.5 %}
+					<img src = "{% static 'img/customer_reviews/5.png'%}">
+				{% endif %}					
 			</div>
-		</div>
+			<div class = "text-muted" style = "margin-left: 15px; font-size:0.65rem;">{%  if total_reviews > 0 %} ({{total_reviews}} reviews) {% endif %}</div>
+		</span>
+	</div>
+	<div class = "col-12">
+		<hr>
 	</div>
 	{% for r in reviews %}
 	<div class = "col-12 mt-3 customer-review">
