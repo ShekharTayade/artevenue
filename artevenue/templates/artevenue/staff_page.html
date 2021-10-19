@@ -73,8 +73,8 @@
 						  </a>
 						</li>
 						<li class="nav-item">
-						  <a class="nav-link" href="{% url 'store_order_summary' %}">
-						  Order Summary
+						  <a class="nav-link" href="{% url 'store_orders_by_payment_type' %}">
+						  Order Summary (By Payment Type)
 						  </a>
 						</li>
 						<li class="nav-item">
@@ -117,6 +117,11 @@
 						<li class="nav-item">
 						  <a class="nav-link" href="{% url 'order_delivery' %}">
 						  Order Delivery Update
+						  </a>
+						</li>
+						<li class="nav-item">
+						  <a class="nav-link" href="{% url 'generate_print_data_csv' %}">
+						  Generate Print Data Excel File
 						  </a>
 						</li>
 					</ul>
@@ -201,8 +206,13 @@
 			</div>
 			<div class = "col-12 col-md-6 text-center">
 				<div class="col-12 staffpg-card">
-					<h2 class = 'stitle'>CREATE A SET/SINGLE</h2>
+					<h2 class = 'stitle'>CREATE GALERY WALL/SET/SINGLE</h2>
 					<ul class="nav flex-column">
+						<li class="nav-item">
+						  <a class="nav-link" href="{% url 'create_gallery_wall' %}">
+						  Create A Gallery Wall
+						  </a>
+						</li>
 						<li class="nav-item">
 						  <a class="nav-link" href="{% url 'create_set_single' %}">
 						  Create A Set Or a Single Product
@@ -215,6 +225,19 @@
 					</ul>
 				</div>
 			</div>
+			<div class = "col-12 col-md-6 text-center">
+				<div class="col-12 staffpg-card">
+					<h2 class = 'stitle'>IMAGE SEARCH</h2>
+					<ul class="nav flex-column">
+						<li class="nav-item">
+						  <a class="nav-link" href="{% url 'staff_image_search' %}">
+						  Image Search
+						  </a>
+						</li>
+					</ul>
+				</div>
+			</div>
+			
 		</div>
 	</div>
 	{% endblock sitecontent %}

@@ -1,27 +1,19 @@
 {% extends 'artevenue/estore_base.html' %}
 {% load static %}
 {% load utils %}
+{% load how_to_tips from estore_base %}
 {% block page-title %} 
 	<title>
-		{% if product_category.page_title %} 
-			{{product_category.page_title}} 
-		{% else %}
-			Beautiful 
-			{% if product_category.url_suffix|endswith:'paintings' or product_category.url_suffix|endswith:'painting'  or product_category.url_suffix|startswith:'paintings' or product_category.url_suffix|startswith:'painting'%}
-				Wall Art Prints of 													 
-				{{ product_category.url_suffix|replace_dash|title }},
-			{% else %}
-				Art Prints from 
-				{{ product_category.url_suffix|replace_dash|title }} Category,
-			{% endif %} 15% Off | Top Quality | Licensed
+		{% if product_category.page_title %}{{product_category.page_title}} 
+		{% else %}Beautiful{% if product_category.url_suffix|endswith:'paintings' or product_category.url_suffix|endswith:'painting'  or product_category.url_suffix|startswith:'paintings' or product_category.url_suffix|startswith:'painting'%}Framed Wall Art Prints from{{ product_category.url_suffix|replace_dash|title }} Theme{% else %}Premium Quality Framed Wall Art | Curated Collection from {{ product_category.url_suffix|replace_dash|title }} Category{% endif %}
 		{% endif %}
 	</title>
 	{% if product_category.page_description %} 
 	<meta name="description" content="{{product_category.page_description}}">
 	{% else %}
-	<meta name="description" content="Largest collection | {% if product_category.url_suffix|endswith:'paintings' or product_category.url_suffix|endswith:'painting'  or product_category.url_suffix|startswith:'paintings' or product_category.url_suffix|startswith:'painting'%} art prints of {{ product_category.url_suffix|replace_dash|title }}{% else %}{{ product_category.url_suffix|title }}{% endif %} for home walls and decor. Wall art from across the world.">
+	<meta name="description" content="Framed wall art from {% if product_category.url_suffix|endswith:'paintings' or product_category.url_suffix|endswith:'painting'  or product_category.url_suffix|startswith:'paintings' or product_category.url_suffix|startswith:'painting'%} {{ product_category.url_suffix|replace_dash|title }}{% else %}{{ product_category.url_suffix|title }}{% endif %} theme. Art Prints on Canvas or Paper| Premium Quality | Licensed | Fully Customizable">
 	{% endif %}
-	<meta name="keywords" content="{{product_category.url_suffix|replace_dash}}, {{product_category.keywords}},paintings for home walls, home decor">	
+	<meta name="keywords" content="framed paintings, wall art, art prints on canvas, paper, {{product_category.url_suffix|replace_dash}} paintings, {{product_category.keywords}},paintings for home walls, home decor">
 {% endblock page-title %} 
 {% block page-description %}
 {% endblock page-description %}
@@ -40,6 +32,10 @@
 {% block lazysizes %}
 <script src="{% static '/vendor/lazysizes/lazysizes.min.js' %}" async=""></script>
 {% endblock lazysizes %}
+
+{% block slick-slider %}
+{% endblock slick-slider %}
+
 
 {% block imagemap-resize-script %}
 {% endblock imagemap-resize-script %}
@@ -107,7 +103,7 @@
 
 	<!-- Only Override the site content block -->
 	{% block sitecontent %}
-        <div class="container-fluid">
+        <div class="container">
 			<div class="row">
 
 				<!-- breadcrumb-->
@@ -119,203 +115,10 @@
 							<li aria-current="page" class="breadcrumb-item active">{{product_category.name}}</li>
 						</ol>
 					</nav>
-				</div>
+				</div>	
 
 				<div class="col-12">
-				{% include 'artevenue/art_by_category_filter.html' %}
-				</div>
-
-				<div class="col-12">
-
-					<!--
-					<button type="button" data-toggle="collapse" data-target="#cat_navigation" class="btn btn-outline-secondary navbar-toggler full-width-btn" style="width:100% !important;">
-						<span class="sr-only">Toggle navigation</span>
-						<i class="fa fa-align-justify"></i>Categories
-					</button>
-
-				
-					<div id = "cat_navigation" class="collapse show navbar-collapse">
-						<div class="card sidebar-menu mb-4">
-							<div class="card-body">
-								<ul class="nav navbar-collapse nav-pills flex-column category-menu pull-left">
-									<li><span class="badge badge-secondary">{{prod_cat_count}}</span>
-									{% for p in prod_categories %}
-										<ul class="list-unstyled">
-											{% if p.category_id %}
-												{% if p.url_suffix %}												
-													<li><a href="{% url 'art_by_category' cat_nm=p.url_suffix %}" class="nav-link">{{p.name|title}}</a></li>
-												{% else %}
-													<li><a href="{% url 'art_by_category' cat_nm=p.name %}" class="nav-link">{{p.name|title}}</a></li>
-												{% endif %}
-												
-											{% else %}
-												<li><a href="{% url 'art_by_category' %}" class="nav-link">{{p.name|title}}</a></li>
-											{% endif %}
-										</ul>
-									{% endfor prod_categories %}
-										<a href="{% url 'show_all_categories' %}" style="color: #555; font-size: 0.65rem; text-decoration: underline;">See All...</a>
-									</li>
-								</ul>
-							</div>
-						</div>
-					</div>
-					-->
-					<!-- Display the filters -->
-					<!--
-					<button type="button" data-toggle="collapse" data-target="#filter_navigation" class="btn btn-outline-secondary navbar-toggler full-width-btn" style="width:100% !important;">
-						<span class="sr-only">Toggle navigation</span>
-						<i class="fa fa-align-justify"></i>Filter
-					</button>
-					<div id = "filter_navigation" class="collapse show navbar-collapse">
-						<div class="card sidebar-menu mb-4">
-							{% for pf in prod_filters %}
-							{% if pf == 'ARTIST' or pf == 'SIZE' %}
-							<div class="card-body" style = "max-height:175px; width:auto; overflow:auto; margin-bottom:10px;">
-							{% else %}
-							<div class="card-body" style = "width:auto; overflow:auto; margin-bottom:10px;">
-							{% endif  %}
-								<div> <h3 class="card-title">{{ pf|title }}</h3></div>
-								<form id= "f_{{pf}}" role="form">
-									<div class="form-group" style="margin-bottom:0.25em !important;">
-										<div class="checkbox filter-class {{pf}}">
-											{% for key, value in prod_filter_values.items %}
-											
-												{% if key == pf %}
-													{% if pf == 'COLORS' %}
-														<div id = "colors-div" class = "row" style = "padding:10px;">
-														{% for val in value %}
-															<div class = "col-sm-1 text-center color-col" 
-																style = "background-color:{{val}}; 
-																	{% if val == 'White' %} border:1px solid gainsboro{% endif %}; 
-																	border-radius:50%; width:20px; height:30px; 
-																	margin:3px 3px;
-																	color:{% if val == 'White' or val == 'Yellow'%} black {% else %} white {% endif %};"
-																onclick = "select_color(this);"
-																>
-															</div>
-														{% endfor %}
-														</div>
-														
-													{% else %}
-														{% if pf == 'ARTIST' %}
-															<div class = "mb-2">
-																<input id="artist_search" name="artist-search" class = "form-control" type="search" placeholder="Search...">
-															</div>
-														{% endif %}
-														<div id = "{{d_pf}}">
-														<ul style = "list-style: none; padding-inline-start:0px;">
-														{% for val in value %}
-															<li class = "mt-2">
-															<input class = "i_{{pf}}" type="checkbox" />
-																{% if pf == 'IMAGE-TYPE' %}
-																	<label id = "l_{{val}}" style="display:none">{{val}}</label>{% if val == '1' %} Photo {% elif val == '0' %} Fine Art {% endif %}
-																{% else %}
-																	<label {% if pf == 'COLORS' %} style = "background-color:{{val}}; border:1px solid gainsboro; border-radius:50%; width:25px; height:25px" {% endif %}>{% if pf == 'COLORS' %} &nbsp; {% else %} {{val}}{% endif %}</label>
-																{% endif %}
-															</li>
-														{% endfor %}
-														</ul>
-														</div>
-													{% endif %}
-												{% endif %}
-											{% endfor prod_filter_values %}
-										</div>
-									</div>
-								</form>
-							</div>
-							<div class = "sticky">
-								<button type = "button" class="btn btn-secondary btn-sm pull-left" onclick = "getAllFilters('1', '{{sortOrder}}', '{{show}}', '{{ikeywords}}')"><i class="fa fa-pencil"></i> Apply</button>
-								<button type = "button" class="btn btn-sm btn-outline-secondary pull-right" onclick = "clearFilter('{{pf}}')"><i class="fa fa-times-circle"></i> Clear</button>
-							</div>
-							<hr style = "margin-top: 10px; margin-bottom: 10px;">
-							{% endfor prod_filters %}
-							<div class="card-body" style = "max-height:300px; width:auto; overflow:auto; margin-bottom:10px;">
-								<h3 class="card-title">Size</h3>
-								<form id= "f_size" role="form">
-									<div class="form-group" style="margin-bottom:0.25em !important;">
-										<div class="checkbox filter-class mb-2">
-											<select id ="size_select" class = "form-control" name = "size" />
-												<option selected value = "any">Any</option>
-												<option disabled value= "-">PORTRAIT:</option>
-												<option value= "8_12"> 8" X 12"</option>
-												<option value= "9_11"> 9" X 11" </option>
-												<option value= "12_16"> 12" X 16" </option>
-												<option value = "16_20"> 16" X 20"</option>
-												<option value = "18_24"> 18" X 24"</option>
-												<option value = "20_24"> 20" X 24"</option>
-												<option value = "20_30"> 20" X 30"</option>
-												<option value = "24_30"> 24" X 30"</option>
-												<option value = "24_36"> 24" X 36"</option>
-												<option value = "30_36"> 30" X 36"</option>
-												<option value = "30_40"> 30" X 40"</option>
-												<option value = "36_48"> 36" X 48"</option>
-												<option value = "40_60"> 40" X 60"</option>
-												<option value = "48_60"> 48" X 60"</option>
-												<option value = "48_72"> 48" X 72"</option>
-												<option disabled value = "24__">------------</option>
-												<option disabled value= "-">LANDSCAPE:</option>
-												<option value= "12_8"> 12" X 8"</option>
-												<option value= "11_9"> 11" X 9" </option>
-												<option value= "16_12"> 16" X 12" </option>
-												<option value = "20_16"> 20" X 16"</option>
-												<option value = "24_18"> 24" X 18"</option>
-												<option value = "24_20"> 24" X 20"</option>
-												<option value = "30_20"> 30" X 20"</option>
-												<option value = "30_24"> 30" X 24"</option>
-												<option value = "36_24"> 36" X 24"</option>
-												<option value = "36_30"> 36" X 30"</option>
-												<option value = "40_30"> 40" X 30"</option>
-												<option value = "48_36"> 48" X 36"</option>
-												<option value = "60_40"> 60" X 40"</option>
-												<option value = "60_48"> 60" X 48"</option>
-												<option value = "72_48"> 72" X 48"</option>
-												<option disabled value = "24__">------------</option>
-												<option disabled value= "-">SQAURE:</option>
-												<option value= "12_12"> 12" X 12"</option>
-												<option value= "18_18"> 18" X 18" </option>
-												<option value = "24_24"> 24" X 24"</option>
-												<option value = "30_30"> 30" X 30"</option>
-												<option value = "36_36"> 36" X 36"</option>
-												<option value = "40_40"> 40" X 40"</option>
-												<option value = "48_48"> 48" X 48"</option>
-												<option value = "54_54"> 54" X 54"</option>
-												<option value = "60_60"> 60" X 60"</option>
-											</select>	
-										</div>
-										<div class = "row">
-											<div class = "col-5">
-												<label for = "size_width">Width:</label>
-											</div>
-											<div class = "col-7">
-												<input id="size_width" type = "number" min="4" max="60" class = "form-control" onchange="setUserWidth(this);">
-											</div>
-										</div>
-										<div class = "row">
-											<div class = "col-5">
-												<label for = "size_height">Height:</label>
-											</div>
-											<div class = "col-7">
-												<input id="size_height" type = "number" min="4" max="60" class = "form-control" onchange="setUserHeight(this);">
-											</div>
-										</div>
-									</div>
-									<div class = "sticky">
-										<button type = "button" class="btn btn-secondary btn-sm pull-left" onclick = "getAllFilters('1', '{{sortOrder}}', '{{show}}', '{{keywords}}');"><i class="fa fa-pencil"></i> Apply</button>
-										<button type = "button" class="btn btn-sm btn-outline-secondary pull-right" onclick = "clearFilter('SIZE')"><i class="fa fa-times-circle"></i> Clear</button>
-									</div>
-								</form>
-							</div>									
-						</div>
-					</div>
-					-->
-					<!-- *** CATEGORIES AND FILTERS END ***-->
-				</div>
-				<!-- /.col-md-3-->
-	
-
-
-				<div class="col-12">
-					<div class="box-cat">
+					<div class="mt-3 text-center">
 						{% autoescape off %}
 						{% if ikeywords %}
 							<h1>Art Prints for Your Search "{{ikeywords}}"</h1>
@@ -331,10 +134,9 @@
 									{{product_category.header}}
 								{% else %}
 									{% if product_category.url_suffix|endswith:'paintings' or product_category.url_suffix|endswith:'painting'  or product_category.url_suffix|startswith:'paintings' or product_category.url_suffix|startswith:'painting'%}
-										ART PRINTS OF 
-										{{ product_category.url_suffix|replace_dash|upper }}
+										FRAMED WALL ART PRINTS | {{ product_category.url_suffix|replace_dash|upper }}
 									{% else %}
-										ART PRINTS FROM {{ product_category.url_suffix|replace_dash|upper }} CATEGORY
+										{{ product_category.url_suffix|replace_dash|upper }} THEME FRAMED WALL ART PRINTS
 									{% endif %}
 								{% endif %}
 							{% endif %}
@@ -344,30 +146,63 @@
 								{{product_category.description}}
 							{% else %}
 								Largest and beautiful collection of wall art of from across the world 
-								for home decor, office and interiors. Get it as paper or canvas
-								print and customize size and frame to suit your interiors.
-								Go ahead and pick a wall art to give your home walls a classy look.
+								for home decor, office and interiors. Framed canvas or
+								paper prints.
 							{% endif %}
 							</h3>
 							<h3>
-							{% if product_category.second_description %} 
+							{% if product_category.second_description %} 								
 								{{product_category.second_description}}
-							{% endif %}
+							{% else %}
+								Licensed | Premium Quality | Fully Customizable
+							{% endif %}							
 							</h3>
 						{% endif %}
 						{% endautoescape %}
 					</div>
-					 
-
-					<div id = "img-display">
-						{% include 'artevenue/prod_display_include.html' %}
-					</div> <!-- END:  img-display -->
 				</div>
+				<button onclick="topFunction();" id="scrollBtn" title="Go to top">
+					<i class = "fa fa-chevron-up fa-lg"></i>
+				</button>
+								
+				<div class="col-12 mt-3">
+				{% include 'artevenue/art_by_category_filter.html' %}
+				</div>
+				
+				<div class = "sticky-content" style = "width:100%;">
+					<div class="col-12 ">
+						<div id = "img-display mt-5">
+						{% include 'artevenue/prod_display_include.html' %}
+						</div>
+					</div>
+				</div>
+
+				<div class="col-12">
+					<hr>
+				</div>
+				{% if cat_id == 5 %}
+				<div class="col-12">
+					{% include 'artevenue/category_abstract_include.html' %}
+				</div>
+				{% endif %}
+				{% if cat_id == 2 %}
+				<div class="col-12">
+					{% include 'artevenue/category_floral_include.html' %}
+				</div>
+				{% endif %}
+				{% if cat_id == 3 %}
+				<div class="col-12">
+					{% include 'artevenue/category_landscape_include.html' %}
+				</div>
+				{% endif %}
+				
+				{% how_to_tips request %}
+
 				<!-- /.col-lg-9-->
 				{% include 'artevenue/wishlist-add-message.html' %}
 				{% include 'artevenue/message-modal_ok.html' %}
 				{% if product_category.category_id %}
-					<form  hidden id="cat-form" action = "{% url 'art_by_category' cat_nm=product_category.url_suffix %}">
+					<form hidden id="cat-form" action = "{% url 'art_by_category' cat_nm=product_category.url_suffix %}">
 						<input id = "id_page_num" name = "page_num">
 						<input id = "id_sort" name = "sort">
 						<input id = "id_show" name = "show">
@@ -382,22 +217,39 @@
 						<input id = "id_f_image_type" name = "filt_image_type">
 						<input id = "id_tf" name = "t_f">
 						
+						<!--<input id = "id_page_num" name = "page_num">
+						<input id = "id_keywords" name = "keywords">
+						<input id = "id_sort" name = "sort"> -->
+						<input id = "id_color" name = "color">
+						<input id = "id_size" name = "size">
+						<input id = "id_category" name = "category">
+						<input id = "id_shape" name = "shape">
+						<input id = "id_art_type" name = "art_type"> 
+						
+						
 					</form>
 				{% else %}
-					<form  hidden id="cat-form" action = "{% url 'art_by_category' %}">
+					<form hidden id="cat-form" action = "{% url 'art_by_category' %}">
 						<input id = "id_page_num" name = "page_num">
 						<input id = "id_sort" name = "sort">
 						<input id = "id_show" name = "show">
 						<input id = "id_keywords" name = "keywords">
 						<input id = "id_result_limit" name = "result_limit">
-						<input id = "id_f_colors" name = "filt_colors">
-						<input id = "id_f_size" name = "filt_size">
-						<input id = "id_f_width" name = "filt_width">
-						<input id = "id_f_height" name = "filt_height">
-						<input id = "id_f_artist" name = "filt_artist">
-						<input id = "id_f_orientation" name = "filt_orientation">
-						<input id = "id_f_image_type" name = "filt_image_type">
+						<!--
+							<input id = "id_f_colors" name = "filt_colors">
+							<input id = "id_f_size" name = "filt_size">
+							<input id = "id_f_width" name = "filt_width">
+							<input id = "id_f_height" name = "filt_height">
+							<input id = "id_f_artist" name = "filt_artist">
+							<input id = "id_f_orientation" name = "filt_orientation">
+							<input id = "id_f_image_type" name = "filt_image_type">
+						-->
 						<input id = "id_tf" name = "t_f">
+						<input id = "id_color" name = "color">
+						<input id = "id_size" name = "size">
+						<input id = "id_category" name = "category">
+						<input id = "id_shape" name = "shape">
+						<input id = "id_art_type" name = "art_type"> 
 					</form>
 				{% endif %}
 			</div>
@@ -406,55 +258,23 @@
 	
 	{% block footer-text %}
 		{% if product_category.url_suffix|endswith:'paintings' or product_category.url_suffix|endswith:'painting'  or product_category.url_suffix|startswith:'paintings' or product_category.url_suffix|startswith:'painting'%}
-			We have the largest collection of art prints of  
-			{{ product_category.url_suffix|replace_dash }}.
+			We have the largest collection of licesed art from  
+			{{ product_category.url_suffix|replace_dash }} them.
 		{% else %}
-			We have the largest collection of art prints from {{ product_category.url_suffix|replace_dash }} category.
+			We have the largest collection of art prints from {{ product_category.url_suffix|replace_dash }} theme.
 		{% endif %}
-		We offer complete satisfaction gurantee, free returns and free delivery. So look no further.
+		Buy the best quality framed wall art with confidence. We offer complete satisfaction gurantee, free returns and free delivery. So look no further.
 	{% endblock footer-text %}
 
 
 	{% block jscripts %}
 
-	<script>
-		// Clear the filers
-		function clearFilter(ele_chx){
-			/*$(":checkbox").each( function() {
-				$(this).prop('checked', false);
-			});*/
-			$("#id_f_colors").val('');
-			$("#id_f_size").val('');
-			$("#id_f_artist").val('');
-			$("#id_f_orientation").val('');
-			$("#id_f_image_type").val('');
-			
-			switch (ele_chx) {
-			  case 'COLORS':
-				eles = document.getElementsByClassName("color-col");
-				for (i = 0; i < eles.length; ++i) {
-					eles[i].innerHTML = "";
-				}
-				break;
-			  case 'SIZE':
-				$('#size_select').val('any');
-				$('#size_width').val('');				
-				$('#size_height').val('');
-				break;
-			  default:
-				$("div." + ele_chx + " input[type=checkbox]").each( function() {
-					$(this).prop('checked', false);
-				});
-			}
-			
-		}
-		
-		function getAllFilters(page, sort, show, keywords, result_limit=''){ 
-			$("#id_f_colors").val('');
-			$("#id_f_size").val('');
-			$("#id_f_artist").val('');
-			$("#id_f_orientation").val('');
-			$("#id_f_image_type").val('');
+	<script>		
+		function page_perpage_change(page, sort, show, keywords, result_limit=''){ 
+			$('#id_sort').val(sort);
+			$('#id_show').val(show);
+			$('#id_keywords').val(keywords);
+			$('#id_result_limit').val(result_limit);
 			
 			if (isNaN(page) == false) {
 				page_num = parseInt(page);
@@ -462,128 +282,8 @@
 				page_num = 1;  // default
 			}
 			$("#id_page_num").val(page_num);
-			
-			var filter = '{';
-			var fcnt = 0;
-			{% for pf in prod_filters %}
-				{% if pf != "COLORS" %}
-					if (fcnt == 0) {
-						filter = filter + '"{{pf}}": { ';
-					} else {
-						filter = filter + ', "{{pf}}": { ';
-					}
-					valcnt = 0;
-					rec = ''
-					$(".i_{{pf}}").each(function () {
-						var val = $(this).next('label').text();
-						var sts = $(this).is(":checked");
-						if (sts) {
-							if (valcnt == 0){
-								rec = rec + '"' + val.trim() + '": ' + ' " ' + sts + '"';
-							} else {
-								rec = rec + ', "' + val.trim() + '": ' + ' " ' + sts + '"';
-							}
-							valcnt = valcnt + 1;
-							
-							filt = "{{pf}}";
-							
-							switch (filt) {
-							  case 'ORIENTATION':
-								var o = $("#id_f_orientation").val();
-								$("#id_f_orientation").val( o + "|" + val.trim());
-								break;
-							  case "ARTIST":
-								var a = $("#id_f_artist").val();
-								$("#id_f_artist").val( a + "|" + val.trim());
-								break;
-							  case "IMAGE-TYPE":
-								var i = $("#id_f_image_type").val();
-								$("#id_f_image_type").val( i + "|" + val.trim());
-								break;
-							}
-						}
 						
-					});
-				filter = filter + rec + ' }';
-				fcnt = fcnt + 1;
-				{% endif %}
-			{% endfor prod_filters %}
-			
-			var size_val = $("#size_select").val();
-			var w = $("#size_width").val();
-			var h = $("#size_height").val();
-			if ( (w) && (h) ) {
-				if (w < 4 || h < 4) {
-					$("#msg").html ("We can print images with Width and Height between 4 and 60 inches");
-					$("#msg-modal").modal("show");
-					return
-				}
-			}
-			var size_input = w + "_" + h;
-			if ( ( parseInt(w) >= 4) && ( parseInt(h) >= 4) ){
-				size_val = size_input;
-				$("#id_f_size").val( size_input );
-			}
-
-			if (size_val != "any") {
-				rec = ', "SIZE": {"' + size_val + '" : ' + ' "true"';
-				filter = filter + rec + ' }';
-				$("#id_f_size").val( size_val );
-			}
-
-			if (w != "") {
-				$("#id_f_width").val(w);
-			} else {
-				$("#id_f_width").val("");
-			}
-			if (h != "") {
-				$("#id_f_height").val(h);
-			} else {
-				$("#id_f_height").val("");
-			}
-			
-			var chl = document.getElementById("colors-div").childNodes;
-			var len = chl.length;
-			var rec = ', "COLORS": {' ;
-			var valcnt = 0;
-			for (i=0; i < len; i++){
-				var ele = chl[i];
-				if (ele.innerHTML == "<i class=\"fa fa-check\"></i>") {
-					if (valcnt == 0) {
-						rec = rec + '"' + ele.style.backgroundColor + '"  : ' + ' "true"';
-					} else {
-						rec = rec + ', "' + ele.style.backgroundColor + '"  : ' + ' "true"';					
-					}
-					valcnt = valcnt + 1;
-					col = $("#id_f_colors").val();
-					$("#id_f_colors").val(col + "|" + ele.style.backgroundColor );
-				}
-			}
-			
-			if (len > 0){
-				filter = filter + rec + ' }';
-			}
-			
-			if (page_num >= 0 ){
-				rec = ', "PAGE": {"page": ' + page_num + '}';
-				filter = filter + rec;
-			}						
-			if (result_limit != '' ){
-				rec = ', "RESULT-LIMIT": {"result_limit": "' + result_limit + '"}';
-				filter = filter + rec;
-				$("#id_result_limit").val(result_limit);
-			}						
-			if (sort != '' && sort != 'None' ){
-				rec = ', "SORT": {"sort":"' + sort + '"}';
-				filter = filter + rec
-				$("#id_sort").val(sort);
-			}
-			if (keywords != '' && keywords !== 'None'){
-				rec = ', "KEY-WORDS": {"keywords":"{{ikeywords}}"}';
-				filter = filter + rec
-				$("#id_keywords").val("{{ikeywords}}");
-			}
-			
+						
 			if (isNaN(show) == false) {
 				show_num = show;
 			} else {
@@ -594,13 +294,9 @@
 				}
 			}
 			if (show_num != '' ){
-				rec = ', "SHOW": {"show":"' + show_num + '"}';
-				filter = filter + rec
 				$("#id_show").val(show_num);
 			}
 			
-			filter = filter + '}';		
-
 			document.body.scrollTop = 0; // For Safari
 			document.documentElement.scrollTop = 0; 
 			
@@ -609,77 +305,38 @@
 	</script>
 	
 	<script>
-		var isBreakpoint = function(viewport_size){
-		  //return $('.device-' + viewport_size).is(':visible');
-		  if (viewport_size == 'xs'){
-			return window.innerWidth < 768;
-		  }
-		  if (viewport_size == 'sm'){
-			return window.innerWidth < 991;
-		  }
-		  if (viewport_size == 'md'){
-			return window.innerWidth < 1199;
-		  }
-		  if (viewport_size == 'lg'){
-			return window.innerWidth > 1199;
-		  }
-		}	
-	
-	
-		jQuery(document).ready(function(){
-
-			if (isBreakpoint('xs')){
-				$('#cat_navigation').removeClass('show');
-				$('#filter_navigation').removeClass('show');
-			} else {
-				$('#cat_navigation').addClass('show');
-				$('#filter_navigation').addClass('show');
-			}	
-
-			setFilterDisplay();
+		$(document).on({
+			ajaxStart: function() { $body.addClass("loading");},
+			ajaxStop: function() { $body.removeClass("loading");},								
 		});
-	</script>
-	
-	<script>
-		//document.addEventListener('contextmenu', event => event.preventDefault());
-	</script>
-	
-	<script>
-		function select_color(ele){
-			if (ele.innerHTML == "<i class=\"fa fa-check\"></i>"){
-				ele.innerHTML = "";
-			} else {
-				ele.innerHTML = "<i class ='fa fa-check'></i>";
-			}
-		}
-	</script>
-	
-	<script>
-	   $(document).on("input", "#artist_search", function(){
-			input = $("#artist_search");
-			filter = input.val().toUpperCase();				  
-			elem = document.getElementsByClassName("i_ARTIST");		
-			
-			$(".i_ARTIST").each(function () {
-				var label = $(this).next('label');
-				var val = $(this).next('label').text();
-				var sts = $(this).is(":checked");
-				if (val.toUpperCase().indexOf(filter) > -1) {
-				   $(this).show();
-				   label.show();
-				   $(this).prop("checked", sts);
-				   $(this).closest("li").show();
-				} else {
-				   $(this).hide();
-				   label.hide();;
-				   $(this).prop("checked", false);
-				   $(this).closest("li").hide();
-				}				
-			});
+		
+		{% for c in f_category %}
+			$('#id_category').val($('#id_category').val() + "," + "{{c}}");
+		{% endfor %}
+		{% for s in f_shape %}
+			$('#id_shape').val($('#id_shape').val() + "," + "{{s}}");
+		{% endfor %}
+		{% for c in f_color %}
+			$('#id_color').val($('#id_color').val() + "," + "{{c}}");
+		{% endfor %}
+		{% for c in f_size %}
+			$('#id_size').val($('#id_size').val() + "," + "{{c}}");
+		{% endfor %}
+		{% if f_art_type %}
+			$('#id_art_type').val("{{f_art_type}}");
+		{% endif %}
+		{% if ikeywords %}
+			$('#id_keywords').val("{{ikeywords}}");
+		{% endif %}
 
-		});
+
+		$("#id_page_num").val('{{page}}');			
+		$("#id_sort").val('{{sortOrder}}');
+		$("#id_show").val('{{show}}');
+		
+		wigzo('track', 'categoryview', "https://artevenue.com/art-prints/{{product_category.url_suffix}}/");
 	</script>
-	
+
 	<script>
 		function addToFav(prod_id, currwidth, aspect_ratio, total_price,
 				discount, promotion_id, disc_amt, item_unit_price){
@@ -773,96 +430,6 @@
 		}
 	</script>
 	
-	<script>
-	function setUserWidth(ele){
-		var value = ele.value;
-		if( value ) {
-			$(".iuser_width").val(value);
-		} else {
-			value = 0;
-			$(".iuser_width").val(value);
-		}	
-				
-	}
-	function setUserHeight(ele){
-		var value = ele.value;
-		if( value ) {
-			$(".iuser_height").val(value);
-		} else {
-			value = 0;
-			$(".iuser_height").val(value);
-		}		
-	}
-	</script>
-	
-	<script>
-		function setFilterDisplay(){
-			$("#id_f_colors").val('{{filt_colors}}');
-			$("#id_f_size").val('{{filt_size}}');
-			$("#id_f_artist").val('{{filt_artist}}');
-			$("#id_f_orientation").val('{{filt_orientation}}');
-			$("#id_f_image_type").val('{{filt_image_type}}');
-			$("#size_width").val("{{filt_width}}");
-			$("#size_height").val("{{filt_height}}");
-			
-			if ("{{filt_colors}}" != '' ) {
-				var chld = document.getElementById("colors-div").childNodes;
-				var leng = chld.length;
-				for (i=0; i < leng; i++){
-					var e = chld[i];
-					if ( e.tagName == 'DIV' ){
-						var color = e.style.backgroundColor;
-						var col = color.toUpperCase();
-						var f = "{{filt_colors}}".toUpperCase();
-						var n = f.search(col);
-						if (n >= 0){
-							e.innerHTML = "<i class=\"fa fa-check\"></i>";
-						} else {
-							e.innerHTML = "";
-						}
-					}
-					
-				}
-			}
-			
-			if ("{{filt_orientation}}" != '') {
-				$(".i_ORIENTATION").each(function () {
-					var val = $(this).next('label').text().toUpperCase().trim();
-					var filt = "{{filt_orientation}}".toUpperCase().trim();
-					var n = filt.indexOf(val);
-					if (n >= 0) {
-						$(this).prop('checked', true);
-					} else {
-						$(this).prop('checked', false);					
-					}
-				});
-			}
-			if ("{{filt_artist}}" != '') {
-				$(".i_ARTIST").each(function () {
-					var val = $(this).next('label').text().toUpperCase().trim();
-					var filt = "{{filt_artist}}".toUpperCase().trim();
-					var n = filt.indexOf(val);
-					if (n >= 0) {
-						$(this).prop('checked', true);
-					} else {
-						$(this).prop('checked', false);					
-					}
-				});
-			}
-			if ("{{filt_image_type}}" != '') {
-				$(".i_IMAGE-TYPE").each(function () {
-					var val = $(this).next('label').text().toUpperCase().trim();
-					var filt = "{{filt_image_type}}".toUpperCase().trim();
-					var n = filt.indexOf(val);
-					if (n >= 0) {
-						$(this).prop('checked', true);
-					} else {
-						$(this).prop('checked', false);					
-					}
-				});
-			}
-		}
-	</script>
 	{% endblock jscripts %}
 	{% block tawkto %}
 	{% endblock tawkto %}

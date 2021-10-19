@@ -1,129 +1,128 @@
 {% load static %}		
-	<div class="row text-center" id = "sub-cate-include">
-		<div class = "col-4 col-md-4 col-lg-2 mt-3">
-			<h4 class = "curatedHeading1"  style = "font-size:0.65rem;">
-				ABSTRACT EXPRESSIONISM
-			</h4>
-			<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='abstract-expressionist' %}">
-			<div class="curated-container">
-				<picture>
-					<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/abstract/expressionist.jpg' %}">
-					<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/abstract/expressionist.jpg' %}">
-					<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/abstract/expressionist.jpg' %}" alt="Abstract Expressionist Paintings">
-				</picture>
-			</div>
-			</a>
+	<div class="row">
+		<div class = "col-12 mt-3">
+			<h2>Abstract Collection By Themes</h2>
 		</div>
-		<div class = "col-4 col-md-4 col-lg-2 mt-3">
-			<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
-				ABSTRACT LINE ART<span class = "d-none d-md-block">&nbsp;</span>
-			</h4>
-			<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='abstract-line-art' %}">
-			<div class="curated-container">
-				<picture>
-					<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/abstract/abstract_line_art.jpg' %}">
-					<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/abstract/abstract_line_art.jpg' %}">
-					<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/abstract/abstract_line_art.jpg' %}" alt="Abstract Line Art">
-				</picture>
+	</div>
+	<div class="row text-center mb-3">
+		<div class = "col-12 col-md-6 mt-2">
+			<div class="row">
+				<div class = "col-3 col-md-3">
+					<h4 class = "curatedHeading1"  style = "font-size:0.65rem;">
+						EXPRESSIONISM
+					</h4>
+					<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='abstract-expressionist' %}">
+					<div class="curated-container">
+						<picture>
+							<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/abstract/expressionist.jpg' %}">
+							<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/abstract/expressionist.jpg' %}">
+							<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/abstract/expressionist.jpg' %}" alt="Abstract Expressionist Paintings">
+						</picture>
+					</div>
+					</a>
+				</div>
+				<div class = "col-3 col-md-3">
+					<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
+						LINE ART
+					</h4>
+					<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='abstract-line-art' %}">
+					<div class="curated-container">
+						<picture>
+							<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/abstract/abstract_line_art.jpg' %}">
+							<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/abstract/abstract_line_art.jpg' %}">
+							<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/abstract/abstract_line_art.jpg' %}" alt="Abstract Line Art">
+						</picture>
+					</div>
+					</a>
+				</div>
+				<div class = "col-3 col-md-3">
+					<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
+						GEOMETRIC
+					</h4>
+					<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='abstract-geometric-art' %}">
+					<div class="curated-container">
+						<picture>
+							<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/abstract/geometric.jpg' %}">
+							<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/abstract/geometric.jpg' %}">
+							<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/abstract/geometric.jpg' %}" alt="Abstract Geometric Paintings">
+						</picture>
+					</div>
+					</a>
+				</div>
+				<div class = "col-3 col-md-3">
+					<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
+						FLORAL
+					</h4>
+					<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='abstract-flower-paintings' %}">
+					<div class="curated-container">
+						<picture>
+							<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/abstract/abstract_flower.jpg' %}">
+							<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/abstract/abstract_flower.jpg' %}">
+							<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/abstract/abstract_flower.jpg' %}" alt="Abstract Flowers Paintings">
+						</picture>
+					</div>
+					</a>
+				</div>
 			</div>
-			</a>
 		</div>
-		<div class = "col-4 col-md-4 col-lg-2 mt-3">
-			<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
-				GEOMETRIC ABSTRACT
-			</h4>
-			<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='abstract-geometric-art' %}">
-			<div class="curated-container">
-				<picture>
-					<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/abstract/geometric.jpg' %}">
-					<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/abstract/geometric.jpg' %}">
-					<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/abstract/geometric.jpg' %}" alt="Abstract Geometric Paintings">
-				</picture>
+		<div class = "col-12 col-md-6 mt-2">
+			<div class="row">
+				<div class = "col-3 col-md-3">
+					<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
+						LANDSCAPE
+					</h4>
+					<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='abstract-landscape-paintings' %}">
+					<div class="curated-container">
+						<picture>
+							<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/abstract/abstract_landscape.jpg' %}">
+							<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/abstract/abstract_landscape.jpg' %}">
+							<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/abstract/abstract_landscape.jpg' %}" alt="Abstract Landscape Paintings">
+						</picture>
+					</div>
+					</a>
+				</div>
+				<div class = "col-3 col-md-3">
+					<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
+						BLACK & WHITE
+					</h4>
+					<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='black-and-white-abstract-art' %}">
+					<div class="curated-container">
+						<picture>
+							<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/abstract/abstract_b_w.jpg' %}">
+							<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/abstract/abstract_b_w.jpg' %}">
+							<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/abstract/abstract_b_w.jpg' %}" alt="Black & White Abstract Paintings">
+						</picture>
+					</div>
+					</a>
+				</div>
+				<div class = "col-3 col-md-3">
+					<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
+						MANDALA
+					</h4>
+					<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='abstract-mandala-art' %}">
+					<div class="curated-container">
+						<picture>
+							<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/abstract/abstract_mandala.jpg' %}">
+							<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/abstract/abstract_mandala.jpg' %}">
+							<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/abstract/abstract_mandala.jpg' %}" alt="Abstract Mandala Art">
+						</picture>
+					</div>
+					</a>
+				</div>
+				<div class = "col-3 col-md-3">
+					<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
+						FIGURATIVE
+					</h4>
+					<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='abstract-figurative-painting' %}">
+					<div class="curated-container">
+						<picture>
+							<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/abstract/abstract_figurative.jpg' %}">
+							<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/abstract/abstract_figurative.jpg' %}">
+							<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/abstract/abstract_figurative.jpg' %}" alt="Abstract Figurative Art">
+						</picture>
+					</div>
+					</a>
+				</div>
 			</div>
-			</a>
-		</div>
-		<div class = "col-4 col-md-4 col-lg-2 mt-3">
-			<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
-				ABTRACT FLOWERS<span class = "d-none d-md-block">&nbsp;</span>
-			</h4>
-			<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='abstract-flower-paintings' %}">
-			<div class="curated-container">
-				<picture>
-					<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/abstract/abstract_flower.jpg' %}">
-					<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/abstract/abstract_flower.jpg' %}">
-					<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/abstract/abstract_flower.jpg' %}" alt="Abstract Flowers Paintings">
-				</picture>
-			</div>
-			</a>
-		</div>
-		<div class = "col-4 col-md-4 col-lg-2 mt-3">
-			<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
-				ABSTRACT LANDSCAPE
-			</h4>
-			<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='abstract-landscape-paintings' %}">
-			<div class="curated-container">
-				<picture>
-					<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/abstract/abstract_landscape.jpg' %}">
-					<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/abstract/abstract_landscape.jpg' %}">
-					<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/abstract/abstract_landscape.jpg' %}" alt="Abstract Landscape Paintings">
-				</picture>
-			</div>
-			</a>
-		</div>
-		<div class = "col-4 d-md-none mt-3">
-			<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
-				B & W ABSTRACT
-			</h4>
-			<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='black-and-white-abstract-art' %}">
-			<div class="curated-container">
-				<picture>
-					<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/abstract/abstract_b_w.jpg' %}">
-					<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/abstract/abstract_b_w.jpg' %}">
-					<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/abstract/abstract_b_w.jpg' %}" alt="Black & White Abstract Paintings">
-				</picture>
-			</div>
-			</a>
-		</div>
-		<div class = "d-none d-md-block col-md-4 col-lg-2 mt-3">
-			<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
-				BLACK & WHITE ABSTRACT
-			</h4>
-			<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='black-and-white-abstract-art' %}">
-			<div class="curated-container">
-				<picture>
-					<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/abstract/abstract_b_w.jpg' %}">
-					<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/abstract/abstract_b_w.jpg' %}">
-					<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/abstract/abstract_b_w.jpg' %}" alt="Black & White Abstract Paintings">
-				</picture>
-			</div>
-			</a>
-		</div>
-		<div class = "col-4 col-md-4 col-lg-2 mt-3">
-			<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
-				ABSTRACT MANDALA
-			</h4>
-			<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='abstract-mandala-art' %}">
-			<div class="curated-container">
-				<picture>
-					<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/abstract/abstract_mandala.jpg' %}">
-					<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/abstract/abstract_mandala.jpg' %}">
-					<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/abstract/abstract_mandala.jpg' %}" alt="Abstract Mandala Art">
-				</picture>
-			</div>
-			</a>
-		</div>
-		<div class = "col-4 col-md-4 col-lg-2 mt-3">
-			<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
-				ABSTRACT FIGURATIVE
-			</h4>
-			<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='abstract-figurative-painting' %}">
-			<div class="curated-container">
-				<picture>
-					<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/abstract/abstract_figurative.jpg' %}">
-					<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/abstract/abstract_figurative.jpg' %}">
-					<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/abstract/abstract_figurative.jpg' %}" alt="Abstract Figurative Art">
-				</picture>
-			</div>
-			</a>
 		</div>
 	</div>

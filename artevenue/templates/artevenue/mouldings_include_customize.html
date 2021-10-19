@@ -8,7 +8,7 @@
 					<a onclick = "moulding_change('{{f.moulding_id}}');" class = "mb-3"
 						style = "cursor: pointer;"> 
 						{% with 'img/'|add:f.url as image_static %}
-						<img src="{% static image_static %}" class="">
+						<img data-src="{% static image_static %}" class="lazyload">
 						{% endwith %}
 						<span class="text text-center" onclick = "moulding_change('{{f.moulding_id}}')">
 							<div class = "mt-1" style = "font-size:0.6rem; color:#000 !important; line-height: 1;">
@@ -31,7 +31,7 @@
 					<a onclick = "moulding_change('{{f.moulding_id}}');" class = "mb-3"
 						style = "cursor: pointer;"> 
 						{% with 'img/'|add:f.url as image_static %}
-						<img src="{% static image_static %}" class="">
+						<img data-src="{% static image_static %}" class="lazyload">
 						{% endwith %}
 						<span class="text text-center" onclick = "moulding_change('{{f.moulding_id}}')">
 							<div class = "mt-1" style = "font-size:0.6rem; color:#000 !important; line-height: 1;">

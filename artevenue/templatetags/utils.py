@@ -36,6 +36,11 @@ def multiply(a,b):
 	return a * b
 
 @register.filter
+def covert_inch_to_cm (a):
+	return float(a) * 2.54
+
+
+@register.filter
 def divide(a,b):
 	return a / b
 

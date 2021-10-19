@@ -1,22 +1,28 @@
 from django.shortcuts import render, get_object_or_404
 from django.conf import settings
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-from django.views.decorators.csrf import csrf_protect, csrf_exempt
+from artevenue.decorators import is_manager
+from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Count, Q, F, When, Case
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import JsonResponse
 from django.contrib.auth.models import User
+from django.db import IntegrityError, DatabaseError, Error
 
 from datetime import datetime
 import datetime
 import json
 from decimal import Decimal
+from PIL import Image
+import random
+import string
 
 from gallerywalls.models import Gallery, Gallery_variation, Room, Placement, Gallery_item
 from artevenue.models import Business_profile, Order, UserProfile, Moulding
+from artevenue.views import price_views, cart_views, Ecom_site
 
-from artevenue.views import price_views, cart_views
-
+env = settings.EXEC_ENV
+ecom_site = get_object_or_404 (Ecom_site, store_id=settings.STORE_ID )
 def get_gallery_walls(request, gallery_id=None, category_id = None, page = None, room_name=None, f_placement_name=None, f_color=None):
 	
 	sortOrder = request.GET.get("sort")
@@ -70,7 +76,7 @@ def get_gallery_walls(request, gallery_id=None, category_id = None, page = None,
 
 	rooms = Room.objects.all().values('name').distinct()	
 	placements = Placement.objects.all().values('name').distinct()
-	set_of = Gallery.objects.all().values('set_of').distinct()
+	set_of = Gallery.objects.all().values('set_of').distinct().order_by('set_of')
 	
 	colors = ['Red', 'Orange',  'Yellow', 'Green', 'LightBlue', 'MediumPurple', 'Pink', 'Brown', 'black', 'White']
 	key_words = Gallery.objects.all().values('colors').distinct()
@@ -373,4 +379,211 @@ def update_gallery_prices(g_id=None):
 			gallery_id = g.gallery_id, id = g.id
 			).update(price = gallery_variation_price)
 			
+
+@csrf_exempt
+@is_manager	
+def create_gallery_wall(request):
+	rooms = Room.objects.all().distinct()	
+	placements = Placement.objects.all().distinct()
+
+	return render(request, "gallerywalls/create_gallery_wall.html", {'rooms': rooms, 'placements': placements})	
 	
+@csrf_exempt
+@is_manager	
+def create_gw_data(request):
+	from artevenue.models import Print_medium, Publisher_price, Moulding, Mount, Acrylic, Board, Stretch
+	from artevenue.views import frame_views
+	
+	title = request.GET.get("title", '')
+	desc = request.GET.get("description", '')
+	set_of = request.GET.get("set_of", '')
+	room_id = request.GET.get("room", '')
+	placement_id = request.GET.get("placement", '')
+	colors = request.GET.get("colors", '')
+	key_words = request.GET.get("key_words", '')
+	
+	
+	room = Room.objects.filter(room_id = room_id).first()
+	placement = Placement.objects.filter(placement_id = placement_id).first()
+	
+	printmedium = Print_medium.objects.all()
+	price = Publisher_price.objects.filter(print_medium_id = 'PAPER') 
+
+	# get mouldings
+	mouldings = Moulding.objects.filter(is_published = True)
+	
+	# get mounts
+	mounts = Mount.objects.all()
+
+	# get arylics
+	acrylics = Acrylic.objects.all()
+	
+	# get boards
+	boards = Board.objects.all()
+
+	# get Stretches
+	stretches = Stretch.objects.all()
+	
+	
+	# get mouldings
+	mouldings_d = frame_views.get_mouldings(request)
+	# defaul we send is for PAPER
+	paper_mouldings_apply = mouldings_d['paper_mouldings_apply']
+	paper_mouldings_show = mouldings_d['paper_mouldings_show']
+	moulding_diagrams = mouldings_d['moulding_diagrams']
+	canvas_mouldings_show = mouldings_d['canvas_mouldings_show']
+	
+	
+	return render(request, "gallerywalls/create_gw_data.html", {
+		'title': title, 'desc': title, 'set_of':set_of, 'set_range': range(int(set_of)),
+		'room': room, 'placement': placement, 'colors': colors, 'key_words': key_words,
+		'mouldings_apply':paper_mouldings_apply, 'paper_mouldings_show':paper_mouldings_show, 
+		'canvas_mouldings_show':canvas_mouldings_show, 
+		'printmedium':printmedium, 'mouldings': mouldings, 'mounts':mounts, 
+		'acrylics':acrylics, 'boards':boards,'stretches':stretches, 'env':settings.EXEC_ENV})
+
+@csrf_exempt
+@is_manager	
+def save_gw(request):
+	err_cd = '00'
+	msg = ''
+
+	room_id = request.POST.get("room_id", '')
+	placement_id = request.POST.get("placement_id", '')
+	placement_id
+	set_of = int(request.POST.get('set_of', '0'))
+	title = request.POST.get('title', '')
+	desc = request.POST.get('desc', '')
+	colors = request.POST.get('colors', '')
+	key_words = request.POST.get('key_words', '')
+	num_of_variations = int(request.POST.get('num_of_variations', '0'))
+	duplicate_image = request.POST.get('duplicate_image', 'NO')
+	
+	try:
+		existing_gal = Gallery.objects.filter(title = title).first()
+		if existing_gal:
+			err_cd = '99'
+			msg = "A Gallery Wall with this title has already been created. Cannot proceed."
+			return JsonResponse({"err_cd":err_cd, 'msg': msg})		
+
+		try:
+			im = request.FILES.get('file1', None)
+			if im:
+				img = Image.open(im)
+				img = img.resize( (1000, 1000) )
+				img_thumb = img.resize( (350, 350) )
+				r = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
+				file_nm =  r + '.jpg'
+				file_nm_thumb =  r + '_thumb.jpg'
+				env = settings.EXEC_ENV
+				if env == 'DEV' or env == 'TESTING':
+					img_loc = settings.BASE_DIR + "/artevenue" + settings.STATIC_URL + 'img/creatives/' + file_nm
+					thumb_img_loc = settings.BASE_DIR + "/artevenue" + settings.STATIC_URL + 'img/creatives/' + file_nm_thumb
+					
+				else:
+					img_loc = settings.PROJECT_DIR + '/' + settings.STATIC_URL  + 'img/creatives/' + file_nm
+					thumb_img_loc = settings.PROJECT_DIR + '/' + settings.STATIC_URL  + 'img/creatives/' + file_nm_thumb
+				
+				img.save(img_loc)
+				img_thumb.save(thumb_img_loc)
+				
+		except Error as e:
+			err_cd = "99"
+			msg = "System error has occured while saving roomview file. Can't proceed."
+			return( JsonResponse({'err_cd': err_cd, 'msg': msg }, safe=False) )					
+					
+		url = 'img/creatives/' + file_nm
+		thumbnail_url = 'img/creatives/' + file_nm_thumb
+	
+		## Create Gallery Wall Main Record
+		gal = Gallery(
+			title = title,
+			description = desc,
+			room_id = room_id,
+			placement_id = placement_id,
+			room_view_url = url,
+			room_view_thumbnail_url = thumbnail_url,
+			set_of = set_of,
+			stock_image_category = None,
+			category_disp_priority = None,
+			is_published = False,
+			colors = colors,
+			key_words = key_words
+		)
+		gal.save()
+		
+		for n in range(num_of_variations):
+			wall_area_width = int(request.POST.get('wall_area_width_'+str(n+1), '0'))
+			wall_area_height = int(request.POST.get('wall_area_height_'+str(n+1), '0'))
+			
+			## Create Variation
+			gal_variation = Gallery_variation(
+				gallery = gal,
+				price = 0,
+				is_parent = True if n==0 else False,
+				wall_area_width = wall_area_width,
+				wall_area_height = wall_area_height
+			)
+			gal_variation.save()
+			for i in range(set_of):
+				product_id = int(request.POST.get('product_id_' +str(i), '0'))
+				print_medium_id = request.POST.get('print_medium_id_' +str(i), '')
+				moulding_id = int(request.POST.get('moulding_id_' +str(i), '0'))
+				if moulding_id == 0:
+					mould_id = None
+				mount_id = int(request.POST.get('mount_id_' +str(i), '0'))
+				if mount_id == 0:
+					mount_id = None
+				mount_color = request.POST.get('mount_color_' +str(i), '')
+				mount_size = int(request.POST.get('mount_size_' +str(i), '0'))
+				stretch_id = int(request.POST.get('stretch_id_' +str(i), '0')) if print_medium_id == 'CANVAS' else None
+				if stretch_id == 0:
+					stretch_id = None
+				board_id = 1 if print_medium_id == 'PAPER' else None
+				if board_id == 0:
+					board_id = None
+				acrylic_id = 1 if print_medium_id == 'PAPER' else None
+				if acrylic_id == 0:
+					acrylic_id = None
+
+				image_width = int(request.POST.get('image_width_' +str(n+1) + "_" +str(i), '0'))
+				image_height = int(request.POST.get('image_height_'+str(n+1) + "_" +str(i), '0'))
+
+				## Create products under the variation
+				gal_items = Gallery_item(
+					gallery = gal,
+					gallery_variation = gal_variation,
+					product_id = product_id,
+					product_name = '',
+					product_type_id = 'STOCK-IMAGE',
+					moulding_id = moulding_id,
+					moulding_size = None,
+					print_medium_id = print_medium_id,
+					mount_id = mount_id,
+					mount_size = mount_size,
+					board_id = board_id,
+					acrylic_id = acrylic_id,
+					stretch_id = stretch_id,
+					image_width = image_width,
+					image_height = image_height
+				)
+				gal_items.save()
+		
+	except DatabaseError as e:
+		err_cd = '99', 
+		msg = 'System Error while creating the gallery wall'
+		return JsonResponse({"err_cd":err_cd, 'msg': msg})
+
+	## Publish the Gallery Wall
+	g = Gallery.objects.filter(gallery_id = gal.gallery_id).update(
+		is_published = True)
+	
+	## Update price
+	try:
+		update_gallery_prices(gal.gallery_id)
+	except DatabaseError as e:
+		err_cd = '99', 
+		msg = 'System Error while updating the gallery prices'
+		return JsonResponse({"err_cd":err_cd, 'msg': msg})		
+		
+	return JsonResponse({"err_cd":err_cd, 'msg': msg})		

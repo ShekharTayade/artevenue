@@ -609,3 +609,95 @@ def get_orders_for_shipping_template(request, order_number=None, printpdf=''):
 	else:
 		return render(request, 'artevenue/shipping_template_table.html', { 
 			'order_list': order_list, 'startDt':startDt, 'endDt':endDt, 'MEDIA_URL':settings.MEDIA_URL})		
+
+
+@csrf_exempt
+@staff_member_required
+def store_orders_by_payment_type(request):
+	return render(request, 'artevenue/store_orders_by_payment_type.html')
+
+@csrf_exempt
+@staff_member_required
+def get_orders_by_payment_type(request):
+	startDt = ''
+	endDt = ''	
+	page = request.POST.get('page', 1)
+	printpdf = request.POST.get('printpdf', 'NO')
+	payment_type = request.POST.get('payment_type', '')	
+	from_date = request.POST.get("fromdate", '')
+	if from_date != '' :
+		startDt = datetime.datetime.strptime(from_date, "%Y-%m-%d")	
+		
+	to_date = request.POST.get("todate", '')
+	if to_date != '' :
+		endDt = datetime.datetime.strptime(to_date, "%Y-%m-%d")
+
+	order_list = Order.objects.exclude(order_status = 'CN').order_by('order_date')
+	if payment_type :
+		order_list = order_list.filter(payment_type = payment_type)
+	
+	order_items_list = {}
+	if startDt:
+		order_list = order_list.filter(order_date__gte = startDt)
+	if endDt:
+		order_list = order_list.filter(order_date__lte = endDt)
+		
+	#order_items_list = Order_items_view.objects.filter(
+	#	order__in = order_list, product__product_type_id = F('product_type_id')).select_related('product', 'promotion')
+
+	## Totals
+	totals = order_list.aggregate(Sum('unit_price'), Sum('quantity'), Sum('order_discount_amt'), 
+		Sum('shipping_cost'), Sum('sub_total'), Sum('tax'), Sum('order_total'), Avg('order_total'))
+
+	ord_cnt = order_list.count()
+
+
+	igst = order_list.exclude(order_billing__state__state_name__iexact=ecom_site.store_state).aggregate(igst=Sum('tax'))
+	if igst:
+		if igst['igst']:
+			total_igst = igst['igst']
+		else:
+			total_igst = 0.0
+	else:
+		total_igst = 0.0
+
+	cgst = order_list.filter(order_billing__state__state_name__iexact=ecom_site.store_state).aggregate(cgst=Sum('tax'))
+	if cgst :
+		if cgst['cgst']:
+			total_cgst = cgst['cgst'] / 2
+		else:
+			total_cgst = 0.0
+	else:
+		total_cgst = 0.0
+		
+	total_sgst = total_cgst
+	
+	if printpdf == "YES":
+		html_string = render_to_string('artevenue/order_summary_by_pay_type_print.html', {
+			'orders': order_list, 'totals':totals, 'startDt':startDt, 'endDt':endDt,
+			'ecom_site':ecom_site, 'total_cgst':total_cgst, 'total_sgst':total_sgst,
+			'total_igst':total_igst, 'ord_cnt': ord_cnt})
+
+		html = HTML(string=html_string, base_url=request.build_absolute_uri('/'))
+		
+		html.write_pdf(target= settings.TMP_FILES + str(request.user) + '_ord_pdf.pdf',
+			stylesheets=[
+						CSS(settings.CSS_FILES +  'style.default.css'), 
+						CSS(settings.CSS_FILES +  'custom.css'),
+						CSS(settings.VENDOR_FILES + 'bootstrap/css/bootstrap.min.css') 
+						],
+						presentational_hints=True);
+		
+		fs = FileSystemStorage(settings.TMP_FILES)
+		with fs.open(str(request.user) + '_ord_sum_pdf.pdf') as pdf:
+			response = HttpResponse(pdf, content_type='application/pdf')
+			response['Content-Disposition'] = 'attachment; filename="' + str(request.user) + '_ord_pdf.pdf"'
+			return response
+
+		return response		
+	else:
+		return render(request, 'artevenue/order_summary_table.html', { 
+			'orders': order_list, 'totals':totals, 'startDt':startDt, 'endDt':endDt,
+			'ecom_site':ecom_site, 'total_cgst':total_cgst, 'total_sgst':total_sgst,
+			'total_igst':total_igst, 'ord_cnt': ord_cnt})
+

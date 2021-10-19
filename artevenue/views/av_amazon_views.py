@@ -3420,6 +3420,7 @@ def refresh_images():
 					################################
 					### FRAME
 					################################					
+					'''
 					if h.moulding_id:						
 						f_name = ""
 						for k, v in frame_names.items():
@@ -3428,6 +3429,8 @@ def refresh_images():
 								break
 						
 						card2_url = 'https://www.artevenue.com/static/img/prod_desc/' + v
+					'''
+					card2_url =  ''
 					
 					## Save in urls table
 					hf = Amazon_data.objects.filter(amazon_key = h.amazon_key).update(	
@@ -3448,14 +3451,13 @@ def refresh_images():
 
 
 
-def amzFile_by_sku(file_loc=None):
+def amzFile_by_sku(amz_sku_file=None):
 
-	if not file_loc:
+	if not amz_sku_file:
 		if env == 'PROD':
 			amz_sku_file = '/home/artevenue/website/estore/static/feeds/amazon/single_prod_creative_sku_file.csv'
 		else:
 			amz_sku_file = 'C:/artevenue/AMAZON/ARTEVENUE_Mar201/UPLOADS/single_prod_creative_sku_file.csv'	
-	
 
 	skus = []
 	with open(amz_sku_file) as nfile:
@@ -3573,31 +3575,31 @@ def amzFile_by_sku(file_loc=None):
 			cat = h.category_name.title()
 
 			prod_details = cat + " Painting with frame," + " Title: " + h.product_name + ", Artist: " + h.artist + ".\nPrinted on: " + h.print_medium_id.title() + "; Framed Art Print. "
-			prod_details = prod_details + "Image Size: " + str(formatNumber(h.image_width)) + " X " + str(formatNumber(h.image_height)) + "; \n"
+			prod_details = prod_details + "Print Size: " + str(formatNumber(h.image_width)) + " X " + str(formatNumber(h.image_height)) + "; \n"
 			incl_components = "One piece " + cat + " art with frame, printed on " + h.print_medium_id.title() + "; "
-			incl_components = incl_components + "Image Print Size: " + str(formatNumber(h.image_width)) + " X " + str(formatNumber(h.image_height)) + "; "
+			incl_components = incl_components + "Print Size: " + str(formatNumber(h.image_width)) + " X " + str(formatNumber(h.image_height)) + "; "
 			if h.print_medium_id == 'PAPER':
 				if h.moulding_id:
-					bullet1 = 'Printed on ' + h.print_medium_id.title() + ', size: ' + str(formatNumber(h.image_width + (h.moulding.width_inner_inches *2) + (h.mount_size *2) )) + " X " + str(formatNumber(h.image_height + (h.moulding.width_inner_inches * 2) + ( h.mount_size * 2) )) + " inch. "
+					bullet1 = 'Licensed art print on ' + h.print_medium_id.title() + ', size: ' + str(formatNumber(h.image_width + (h.moulding.width_inner_inches *2) + (h.mount_size *2) )) + " X " + str(formatNumber(h.image_height + (h.moulding.width_inner_inches * 2) + ( h.mount_size * 2) )) + " inch. "
 				else:
-					bullet1 = "Printed on " + h.print_medium_id.title() + ", size: " + str(formatNumber(h.image_width)) + " X " + str(formatNumber(h.image_height)) + " inch. "
+					bullet1 = "Licensed art print on " + h.print_medium_id.title() + ", size: " + str(formatNumber(h.image_width)) + " X " + str(formatNumber(h.image_height)) + " inch. "
 				prod_details = prod_details + "Paper: NovaJet Matte Coated Premium Paper 230 (MCP 230). It is a heavy weight, bright white, smooth finish matte paper, top-coated with an ink-receptive layer. Ideally suitable for printing high quality fine art reproduction. The artwork is covered with clear acrylic for added protection, durability and clear visibility. \n"
 			else:
 				if h.moulding_id:
-					bullet1 = 'Printed on ' + h.print_medium_id.title() + ', size: ' + str(formatNumber(h.image_width + (h.moulding.width_inner_inches *2) )) + " X " + str(formatNumber(h.image_height + (h.moulding.width_inner_inches * 2) )) + " inch. "
+					bullet1 = 'Licensed art print on ' + h.print_medium_id.title() + ', size: ' + str(formatNumber(h.image_width + (h.moulding.width_inner_inches *2) )) + " X " + str(formatNumber(h.image_height + (h.moulding.width_inner_inches * 2) )) + " inch. "
 				else:
-					bullet1 = "Printed on " + h.print_medium_id.title() + ", size: " + str(formatNumber(h.image_width)) + " X " + str(formatNumber(h.image_height)) + " inch. "
+					bullet1 = "Licensed art print on " + h.print_medium_id.title() + ", size: " + str(formatNumber(h.image_width)) + " X " + str(formatNumber(h.image_height)) + " inch. "
 				prod_details = prod_details + "Canvas: NovaJet Artistic Matte Canvas 410 (AMC 410). It is a water-resistant canvas, top-coated with an ink-receptive layer. Ideally suitable for fine art reproductions. \n"
 			bullet2 = ''
 			t_size = ''
 			if h.moulding_id:
-				prod_details = prod_details + "Frame: " + h.moulding.name + " (" + str(formatNumber(h.moulding.width_inches)) + " inch). Frame is made of polystyrene, which is light weight, long lasting and has very good finish. \n"
+				prod_details = prod_details + "Frame: " + h.moulding.name + " (" + str(formatNumber(h.moulding.width_inches)) + " inch). Frame is made of polystyrene, which is light weight, water resistant, durable and has premium finish. \n"
 				incl_components = incl_components + "Frame: " + h.moulding.name + " (" + str(formatNumber(h.moulding.width_inches)) + " inch, Polystyrene). "
-				bullet2 = "Frame: " + h.moulding.name + " (" + str(formatNumber(h.moulding.width_inches)) + " inch). It's a high quality frame made of Polystyrene, which is light weight, long lasting and has very good finish. \n" 
+				bullet2 = "Frame: " + h.moulding.name + " (" + str(formatNumber(h.moulding.width_inches)) + " inch). It's a high quality frame made of Polystyrene, which is light weight, water resistant, durable and has premium finish. \n" 
 			if h.mount_id:
 				prod_details = prod_details + "Mount: " + str(formatNumber(h.mount_size)) + " inch, Color: " + h.mount.name.lower() + ", it enhances the look of this artwork. \n"
 				incl_components =  incl_components + "Mount: " + str(formatNumber(h.mount_size)) + " inch, Color: " + h.mount.name.lower() + ". "
-				bullet2 = bullet2 + ", " +str(formatNumber(h.mount_size)) + " inch " + h.mount.name.lower() + " mount adds classy look to this art. "
+				bullet2 = bullet2 + ", " +str(formatNumber(h.mount_size)) + " inch " + h.mount.name.lower() + " mount enhances the look of this art. "
 			## Total Size
 			t_size_width = h.image_width
 			t_size_height = h.image_height
@@ -3616,7 +3618,7 @@ def amzFile_by_sku(file_loc=None):
 			bullet3 = ''
 			if h.print_medium_name == "PAPER":
 				if h.acrylic_id:
-					prod_details = prod_details + "\nThe artwork is covered with clear acrylic for added protection, durability and clear visibility. Acrylic is light weight and durable."
+					prod_details = prod_details + "\nThe artwork is covered with clear acrylic for added protection, durability and clear visibility."
 					incl_components = incl_components + "Acrylic covered; "
 				bullet3 = "Paper: NovaJet Matte Coated Premium Paper 230 (MCP 230). It is a heavy weight, bright white, smooth finish matte paper, top-coated with an ink-receptive layer. Ideally suitable for printing high quality fine art reproduction. The artwork is covered with clear acrylic for added protection, durability and clear visibility."
 			else:
@@ -3708,7 +3710,7 @@ def amzFile_by_sku(file_loc=None):
 				item_total if item_total > 0 else 0.01, 
 				
 				##Images
-				h.card1_url, h.card2_url, h.card3_url, h.card4_url, h.card5_url,
+				h.card1_url, h.card2_url, h.card3_url, '', '',
 				'', '', '', '',
 				
 				## Variation
@@ -3721,7 +3723,7 @@ def amzFile_by_sku(file_loc=None):
 				## Discovery
 				bullet1, bullet2, bullet3, 
 				'Comes with hooks and is ready to be hung on the wall.', 
-				'This is a licensed artwork. We produce museum quality art prints of this painting, frame it and deliver. Top quality, classy finish and best suited for home, office decor. Prints on canvas are as close to the original painting as it can get. Your satisfaction is guaranteed.', 
+				'This is a licensed artwork. We produce high quality art prints of painting from original artwork image, frame it and deliver. Top quality, classy finish and best suited for home, office decor. Prints on canvas are as close to the original painting as it can get. Your satisfaction is guaranteed.', 
 				frame_type, search_terms, color_name, packer_contact_information,
 				'Wall Art', theme, p_size, col_map, 'Polystyrene', '', '', 
 				h.print_medium_id.title(), 

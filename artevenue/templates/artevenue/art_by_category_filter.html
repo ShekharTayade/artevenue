@@ -1,44 +1,45 @@
 				{% load static %}
-				<div class = "col-12  mt-2 sticky-header" id="sticky-header">
-					<div class = "row" 
-							style = "padding: 5px; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; background-color:#f6f6f6;" >
-						<div class="col-3 d-flex align-items-center">
+				<!--<div class = "col-12  mt-2 mb-3 sticky-header" id="sticky-header">-->
+				<div class = "mt-2 mb-3 sticky-header" id="sticky-header">
+					<div class = "row d-flex flex-direction-column justify-content-between" 
+							style = "border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; background-color:#f6f6f6;" >
+						<div class="d-flex align-items-center">
 							Filter By:
 						</div>
-						<div class="col-3 text-center">
+						<div class="ml-2 text-center">
 							<div class="dropdown">
 								<button class="btn btn-default dropdown-toggle" 
-								style = "color: #212529; background-color: #f6f6f6;"
+								style = "color: #212529; background-color: #f6f6f6; padding:2px;"
 								type="button" id="dropdownMenuButton" 
 								data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 									Shape
 								</button>
 								<div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style = "font-size: 0.75rem;">
-									<li class="dropdown-item" onclick="getSets('{{s}}', '', '', '')">
+									<li class="dropdown-item" onclick="getByShape('horizontal');">
 										<img src = "{% static 'img/horizontal.png' %}" width = 25> Horizontal
 									</li>	
-									<li class="dropdown-item mt-2" onclick="getSets('{{s}}', '', '', '')">
+									<li class="dropdown-item mt-2" onclick="getByShape('vertical');">
 										<img src = "{% static 'img/vertical.png' %}" width = 25> Vertical
 									</li>	
-									<li class="dropdown-item mt-2" onclick="getSets('{{s}}', '', '', '')">
+									<li class="dropdown-item mt-2" onclick="getByShape('square');">
 										<img src = "{% static 'img/square.png' %}" width = 25> Square
 									</li>	
-									<li class="dropdown-item mt-2" onclick="getSets('{{s}}', '', '', '')">
+									<li class="dropdown-item mt-2" onclick="getByShape('slim horizontal');">
 										<img src = "{% static 'img/slim_horizontal.png' %}" width = 25> Slim Horizontal
 									</li>	
-									<li class="dropdown-item mt-2" onclick="getSets('{{s}}', '', '', '')">
+									<li class="dropdown-item mt-2" onclick="getByShape('slim vertical');">
 										<img src = "{% static 'img/slim_vertical.png' %}" width = 25> Slim Vertical
 									</li>	
-									<li class="dropdown-item mt-2" onclick="showAll('SET');"
+									<li class="dropdown-item mt-2" onclick="getByShape('show_all');"
 										style = "text-decoration: underline; cursor:pointer;">
-										Show All
+										Any Shape
 									</li>
 								</div>
 							</div>
 						</div>
-						<div class="col-3 text-center">
+						<div class="ml-2 text-center">
 							<button class="btn btn-default dropdown-toggle" 
-							style = "color: #212529; background-color: #f6f6f6;"
+							style = "color: #212529; background-color: #f6f6f6; padding:2px;"
 							type="button" id="dropdownMenuButton" 
 							data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 								Color
@@ -51,93 +52,145 @@
 											border-radius:50%; width:30px; height:30px; 
 											margin:3px 3px; cursor:pointer;
 											color:{% if c == 'White' or c == 'Yellow'%} black {% else %} white {% endif %};"
-										onclick="getSets('', '{{c}}', '', '')">	
+										onclick="getByColor('{{c}}');">	
 									</div>
 								{% endfor %}
 								<span style = "text-decoration: underline; cursor:pointer;" 
-									onclick="showAll('COLOR');">Show All</span><br/>
+									onclick="getByColor('show_all');">Any Color</span><br/>
 							</div>
 						</div>
-						<div class="col-3 text-center">
+						<div class="ml-2 text-center">
 							<div class="dropdown">
 								<button class="btn btn-default dropdown-toggle" 
-								style = "color: #212529; background-color: #f6f6f6;"
+								style = "color: #212529; background-color: #f6f6f6; padding:2px;"
 								type="button" id="dropdownMenuButton" 
 								data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 									Size
 								</button>
-								<div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-									{% for c in categories_list %}
-										<li class="dropdown-item" onclick="getSets('', '', '{{c}}', '')">{{c}}</li>
-									{% endfor %}
-										<li class="dropdown-item" onclick="showAll('THEME');"
-											style = "text-decoration: underline; cursor:pointer;">
-											Show All
-										</li>
+								<div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton" style = "font-size: 0.75rem;">
+								{% for s in size_list %}
+									<li class="dropdown-item" onclick="getBySize('{{s}}');">
+										{% if s == '10' %}
+											<strong>Small</strong> - 10 to 24 inch wide
+										{% elif s == '24' %}
+											<strong>Medium</strong> - 24 to 36 inch wide
+										{% elif s == '36' %}
+											<strong>Large</strong> - 36 to 48 inch wide
+										{% else %}
+											<strong>Very Large</strong> - 48+ inch wide
+										{% endif %}
+									</li>	
+								{% endfor %}
+									<li class="dropdown-item mt-2" onclick="getByShape('show_all');"
+										style = "text-decoration: underline; cursor:pointer;">
+										All Sizes
+									</li>
 								</div>
 							</div>
 						</div>
-						<form hidden id="cat-form" action = "{% url 'stock_collage_products' %}">
-							<input hidden id = "id_page_num" name = "page">
-							<input hidden id = "id_sort" name = "sort">
-							<input hidden id = "id_keywords" name = "keywords">
-							<input hidden id = "id_color" name = "color">
-							<input hidden id = "id_size" name = "size">
-							<input hidden id = "id_category" name = "category">
-							<input hidden id = "id_shape" name = "shape">
-						</form>
+						<div class="ml-2 text-center">
+							<div class="dropdown">
+								<button class="btn btn-default dropdown-toggle" 
+								style = "color: #212529; background-color: #f6f6f6; padding:2px;"
+								type="button" id="dropdownMenuButton" 
+								data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									Art Type
+								</button>
+								<div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton" style = "font-size: 0.75rem;">
+									<li class="dropdown-item" onclick="getByArtType('0');">
+									Fine Art
+									</li>
+									<li class="dropdown-item" onclick="getByArtType('1');">
+									Photograph
+									</li>
+									<li class="dropdown-item mt-2" onclick="getByArtType('show_all');"
+										style = "text-decoration: underline; cursor:pointer;">
+										All Types
+									</li>
+								</div>
+							</div>
+						</div>
+
 					</div>
 
-					{% if filt_applied %}								
-					<div id = "filter" class = "row mt-1 " >
-						{% if shape %}
-						<div class="col-4 col-md-2 mt-2">
-						<span  id = "s_shape" 
-							onclick = "removeFilter('SHAPE', '{{shape}}');" class = "chip">
-							{{shape|title}}&nbsp;&nbsp;
-							<i class = "fa fa-remove" 
-								style = " font-size: 0.75rem; color: #aaa;">
-							</i>
-						</span>
+					{% if filt_applied %}			
+					<div id = "filter" class = "row mt-1 d-flex flex-direction" >
+						{% for s in f_shape %}
+						<div class="ml-2 mt-2">
+							<span  id = "s_shape" style = "font-size: 0.75rem; cursor: pointer;" 
+								onclick = "removeFilter('SHAPE', '{{s}}');" class = "chip">
+								{{s|title}}&nbsp;&nbsp;
+								<i class = "fa fa-remove" 
+									style = " font-size: 0.75rem; color: #aaa;">
+								</i>
+							</span>
 						</div>
-						{% endif %}
-						{% if size %}
-						<div class="col-4 col-md-2 mt-2">
-						<span  id = "s_size"
-							onclick = "removeFilter('SHAPE''{{size}}');" class = "chip">
-							{{s}}&nbsp;&nbsp;
-							<i class = "fa fa-remove" 
-								style = " font-size: 0.75rem; color: #aaa;">
-							</i>
-						</span>
+						{% endfor %}
+						{% for s in f_size %}
+						<div class="ml-2 mt-2">
+							<span  id = "s_size" style = "font-size: 0.75rem; cursor: pointer;"
+								onclick = "removeFilter('SIZE', '{{s}}');" class = "chip">
+								{% if s == '10' %}
+									Small Sizes&nbsp;&nbsp;
+								{% elif s == '24' %}
+									Medium Sizes&nbsp;&nbsp;
+								{% elif s == '36' %}
+									Large Sizes&nbsp;&nbsp;
+								{% else %}
+									Very Large Sizes&nbsp;&nbsp;
+								{% endif %}
+								<i class = "fa fa-remove" 
+									style = " font-size: 0.75rem; color: #aaa;">
+								</i>
+							</span>
 						</div>
-						{% endif %}
+						{% endfor %}
 						{% for c in f_color %}
-						<div class="col-4 col-md-2 mt-2">
-						<span id = "color_{{c}}" 
-							onclick = "removeFilter('COLOR', '{{c}}')" class = "chip">
-						{{c}}&nbsp;&nbsp;
-						<i class = "fa fa-remove"  id = "colx_{{c}}" onclick = "removeFilter('COLOR', '{{c}}')"
-							style = " font-size: 0.75rem; color: #aaa;">
-						</i>
-						</span>
-						</div>
-						{% endfor %}
-						{% for c in f_category %}
-						<div class="col-4 col-md-2 mt-2">
-						<span id = "theme_{{s}}"
-							onclick = "removeFilter('THEME', '{{c}}')" class = "chip">
+						<div class="ml-2 mt-2">
+							<span id = "color_{{c}}" style = "font-size: 0.75rem; cursor: pointer;"
+								onclick = "removeFilter('COLOR', '{{c}}');" class = "chip">
 							{{c}}&nbsp;&nbsp;
-							<i class = "fa fa-remove" 
+							<i class = "fa fa-remove"  id = "colx_{{c}}" onclick = "removeFilter('COLOR', '{{c}}')"
 								style = " font-size: 0.75rem; color: #aaa;">
 							</i>
-						</span>
+							</span>
 						</div>
 						{% endfor %}
-						<div class="col-4 col-md-2 mt-2" style = "color: #11b6bd;">
-							<span onclick="getSetsAll();"
-								style = "text-decoration: underline; font-size: 0.75rem; cursor: pointer">
-								Clear All Filters
+						
+						{% if f_art_type %}
+						<div class="ml-2 mt-2">
+							<span id = "color_{{c}}" style = "font-size: 0.75rem; cursor: pointer;"
+								onclick = "removeFilter('ART_TYPE', '{{f_art_type}}');" class = "chip">
+							{% if f_art_type == '0' %}
+								Fine Artworks&nbsp;&nbsp;
+							{% elif f_art_type == '1' %}
+								Photographs&nbsp;&nbsp;
+							{% endif %}
+							<i class = "fa fa-remove"  id = "colx_{{f_art_type}}" onclick = "removeFilter('ART_TYPE', '{{f_art_type}}')"
+								style = " font-size: 0.75rem; color: #aaa;">
+							</i>
+							</span>
+						</div>
+						{% endif %}
+						
+						{% for c in f_category %}
+						<div class="ml-2 mt-2">
+							<span id = "theme_{{s}}" style = "font-size: 0.75rem; cursor: pointer;"
+								onclick = "removeFilter('THEME', '{{c}}')" class = "chip">
+								{{c}}&nbsp;&nbsp;
+								<i class = "fa fa-remove" 
+									style = " font-size: 0.75rem; color: #aaa;">
+								</i>
+							</span>
+						</div>
+						{% endfor %}
+						<div class="ml-2 mt-2" style = "color: #11b6bd;">
+							<span class = "chip" onclick = "removeFilter('ALL', '');"
+								style = "text-decoration: underline; font-size: 0.75rem; cursor: pointer;">
+								Clear All
+								<i class = "fa fa-remove"  id = "colx_{{c}}"
+									style = " font-size: 0.75rem; color: #aaa;">
+								</i>
 							</span>
 						</div>
 					</div>
@@ -149,5 +202,115 @@
 					{% endif %}
 				</div>
 
-	
-	
+				<script>
+				function getByShape(shape){ 				
+					if (shape != '') {
+						$("#id_page_num").val('');
+						$("#id_sort").val('');
+						if (shape == 'show_all'){
+							$('#id_shape').val( '');
+						} else {
+							$('#id_shape').val( $('#id_shape').val() + ", " + shape);
+						}
+						$("#cat-form").submit();
+					}
+				}
+				function getBySize(size){ 				
+					if (size != '') {
+						$("#id_page_num").val('');
+						$("#id_sort").val('');
+						if (size == 'show_all'){
+							$('#id_size').val( '');
+						} else {
+							$('#id_size').val( $('#id_size').val() + ", " + size);
+						}
+						$("#cat-form").submit();
+					}
+				}
+				function getByColor(color){ 
+					if (color != '') {
+						$("#id_page_num").val('');
+						$("#id_sort").val('');
+						if (color == 'show_all'){
+							$('#id_color').val( '');
+						} else {
+							$('#id_color').val( $('#id_color').val() + ", " + color);
+						}
+						$("#cat-form").submit();
+					}
+				}
+				function getByArtType(type){ 
+					if (type != '') {
+						$("#id_page_num").val('');
+						$("#id_sort").val('');
+						if (type == 'show_all'){
+							$('#id_art_type').val( '');
+						} else {
+							$('#id_art_type').val(type);
+						}
+						$("#cat-form").submit();
+					}
+				}
+				</script>
+
+				<script>
+				window.onscroll = function() {stkFunc(), scrollFunction()};
+
+				var header = document.getElementById("sticky-header");
+				var sticky = header.offsetTop;
+
+				function stkFunc() {
+				  if (window.pageYOffset > sticky) {
+					header.classList.add("l-sticky");
+				  } else {
+					header.classList.remove("l-sticky");
+				  }
+				}
+
+				var scrbutton = document.getElementById("scrollBtn");
+
+				function scrollFunction() {
+				  if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+					scrbutton.style.display = "block";
+				  } else {
+					scrbutton.style.display = "none";
+				  }
+				}
+
+				// When the user clicks on the button, scroll to the top of the document
+				function topFunction() {
+				  document.body.scrollTop = 0;
+				  document.documentElement.scrollTop = 0;
+				}								
+				</script>
+
+
+				<script>
+					function removeFilter(type, filt){
+						switch (type){
+							case 'SHAPE':
+								var f = $('#id_shape').val().replace(filt, "");
+								$('#id_shape').val(f);
+								break;
+							case 'COLOR':
+								var f = $('#id_color').val().replace(filt, "");
+								$('#id_color').val(f);
+								break;
+							case 'SIZE':
+								var f = $('#id_size').val().replace(filt, "");
+								$('#id_size').val(f);
+								break;
+							case 'ART_TYPE':
+								$('#id_art_type').val('');
+								break;
+							case 'ALL':
+								$('#id_shape').val('');
+								$('#id_color').val('');
+								$('#id_size').val('');
+								$('#id_art_type').val('');
+								break;
+						}
+						$("#cat-form").submit();
+					}
+				</script>
+				

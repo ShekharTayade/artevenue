@@ -6,16 +6,17 @@
 
 {% block page-title %} 
 	<title>
-		Wall Art - Name {{product.name}}, by {{product.artist}}. Art Print ID: {{product.id}} | Buy ready size or customize it. 
+		{% if product.image_type == '1' %}Framed Painting, Titled: {{product.name}}, by {{product.artist}} | Licensed Art Print {% else %}Framed Wall Art Painting Titled: {{product.name}}, by  {{product.artist}} | Licensed Art Print {% endif %}
 	</title>
 {% endblock page-title %} 
 
 {% block page-description %}
-<meta name="description" content="Art Print ID {{product.id}}. Buy top quality art print. Buy ready size or customize it exactly as you like.">
+<meta name="description" content="Framed painting with 1 inch black frame, 1 inch offwhite mount. Choice of Paper or Canvas print. Fully Customizable.">
+
 {% endblock page-description %}
   
 {% block page-keywords %}
-<meta name="keywords" content="Art print, canvas print, paper print, {{product.artist}},{{product.name}} ">
+<meta name="keywords" content="buy paintings, framed wall art, framed painting, art print, canvas print, paper print, {{product.artist}}, {{product.name}}, large size panting, large size wall art, paintings for living room bed room home decor ">
 {% endblock page-keywords %}
   
 {% block page-author %}
@@ -90,6 +91,7 @@
 	  "genre": "{{product_category.stock_image_category.name}}"
 	}
     </script>
+	
 {% endblock JSON-LD %}
 
 {% load moulding_url %}
@@ -304,6 +306,12 @@
 											{% endfor printmedium %}
 											</span>
 										</div>
+										<div class = "col-12" style = "font-size: 0.75rem; font-weight:600;">
+										Finished Size: <span class = "fsize" ></span>
+										</div>
+										<div class = "col-12" style = "font-size: 0.75rem; font-weight:600;">
+										<span id = "mnt-size-msg" style = "font-size: 0.65rem; font-weight:600;"></span>
+										</div>
 									</div>
 								</div>
 								<div class = "col-6">
@@ -393,23 +401,23 @@
 											<div id = "print-size" class = "size-title">PRINT SIZE:</div>
 											<div id="size-slider"></div>
 											<div class = "text-center" style = "font-size: 0.8rem;">
-												(Sizes in inches)
+												(Choose Size)
 											</div>
 										</div>
 										<div class = "col-12 col-md-6">
 											<div class = "row">
 												<div class = "col-6">												
-													<div class = "form-group">
+													<div class = "form-group text-center">
 														<label>Width:</label>
 														<input class = "form-control" name = "i_width" id = "i_width" type = "number" value="16"  min = '8'>
+														<span id="a_width_cm" style= "font-size: 0.8rem;">20.32</span>
 													</div>
 												</div>
 												<div class = "col-6">												
-													<div class = "form-group">
-														<div class = "form-group">
-															<label>Height:</label>
-															<input class = "form-control" name = "i_height" id = "i_height" type = "number" min = '8'> 
-														</div>
+													<div class = "form-group text-center">
+														<label>Height:</label>
+														<input class = "form-control" name = "i_height" id = "i_height" type = "number" min = '8'> 
+														<span id="a_height_cm" style= "font-size: 0.8rem;">20.32</span>
 													</div>
 												</div>
 											</div>
@@ -568,7 +576,7 @@
 									<li id = "frm">Frame: <span id = "frame_spec"></span></li>
 									<li id="f-mnt">Mount: <span id = "f_mount">{{i.mount.name|title}}, {{i.mount_size|floatformat}} inch</span></li>
 									<li id="g-wrap">Stretched Canvas: <span id = "g_wrap">{{i.stretched_id}}</span></li>
-									<li>Finished Size: <span id = "fsize"></span></li>
+									<li>Finished Size: <span class = "fsize"></span></li>
 									<li id="rolled">The print is carefully rolled and dispatched in a tube</li>
 								</ul>
 								
@@ -581,7 +589,7 @@
 							</div>
 						</div>
 					</div>
-					{% include 'artevenue/artprint_product_desc_include1.html' %}
+					{% include 'artevenue/artprint_product_desc_include.html' %}
 					<div class = "row mt-3" style = "font-size: 0.8rem;">
 						<div class = "col-12">
 							<hr>
@@ -621,7 +629,8 @@
 										<span style = "font-weight:600; ">BUY ART HASSLE FREE</span>
 									</div>
 									<div class = "col-12 text-center mt-3">
-										<iframe width="320" height="240" src="https://youtube.com/embed/6vRss_YY48I" frameborder="0" allowfullscreen>
+										<iframe width="320" height="240" data-src="https://youtube.com/embed/6vRss_YY48I" 
+											frameborder="0" allowfullscreen class = 'lazyload'>
 										</iframe>				
 									</div>
 								</div>
@@ -632,7 +641,8 @@
 										<span style = "font-weight:600; ">IMPECCABLE QUALITY</span>
 									</div>
 									<div class = "col-12 text-center mt-3">
-										<iframe width="320" height="240" src="https://youtube.com/embed/vSrersiMjWk" frameborder="0" allowfullscreen>
+										<iframe width="320" height="240" data-src="https://youtube.com/embed/vSrersiMjWk" 
+											frameborder="0" allowfullscreen class = 'lazyload'>
 										</iframe>				
 									</div>
 								</div>
@@ -697,6 +707,7 @@
 							<div class="">
 								<img src = "{% static 'img/canvas_stretched.jpg' %}" 
 									alt = "What is Stretched Canvas"
+									class = "lazyload"
 									style = "display:block; margin-left:auto; margin-right:auto; width:200px;">
 								<ul class = "mt-3" style = "font-size:0.75rem;">
 									<li>Please check the "Streched" checkbox to get the art 
@@ -785,6 +796,9 @@
 		$( "#i_width" ).change(function() {
 			currwidth = $(this).val();
 			set_size_slider(currwidth);
+			var w_cm  = parseFloat( currwidth * 2.54);
+			w_cm = +w_cm.toFixed(2);
+			$("#a_width_cm").html( w_cm.toString() + " cm");
 		});
 		$( "#i_height" ).change(function() {
 			currheight = $(this).val();
@@ -793,6 +807,9 @@
 			}
 			currwidth = Math.round(currheight * ratio);
 			set_size_slider(currwidth);
+			var h_cm  = parseFloat( currheight * 2.54);
+			h_cm = +h_cm.toFixed(2);
+			$("#a_height_cm").html( h_cm.toString() + " cm" );
 		});
 
 		$('#no-frame').change(function () {
@@ -896,23 +913,51 @@
 		}
 
 		function set_default_frame_mount(){
-			var print_size = get_image_width();
+			var print_size = 10;
+			if (ratio > 1){
+				var hgt = 8;
+				print_size = Math.round( hgt * r);
+				//print_size = get_image_width();
+			/*
+			} else {
+				print_size = get_image_height();
+			*/
+			}
 			if ( get_print_medium_id() == 'PAPER') {				
 				if (print_size <= 18) {
 					set_mount_size('1');
-					set_moulding_id('18');
+					{% if imld_id %}
+						set_moulding_id('{{imld_id}}');
+					{% else %}
+						set_moulding_id('18');
+					{% endif %}
 				} else if (print_size <= 26) {
-					set_mount_size('2');
-					set_moulding_id('24');
-				} else if (print_size <= 34) {
-					set_mount_size('3');
-					set_moulding_id('24');
+					set_mount_size('1');
+					{% if imld_id %}
+						set_moulding_id('{{imld_id}}');
+					{% else %}
+						set_moulding_id('18');
+					{% endif %}
 				} else {
-					set_mount_size('4');
-					set_moulding_id('24');
+					set_mount_size('2');
+					{% if imld_id %}
+						set_moulding_id('{{imld_id}}');
+					{% else %}
+						set_moulding_id('24');
+					{% endif %}
 				}
-				set_mount_color('#fffff0');
-				set_mount_id('3');
+				{% if imnt_color %}
+					set_mount_color('{{imnt_color}}');
+				{% else %}
+					set_mount_color('#fffff0');
+				{% endif %}
+				
+				{% if imnt_id %}
+					set_mount_id('{{imnt_id');
+				{% else %}
+					set_mount_id('3');				
+				{% endif %}
+				
 				set_board_id('1');
 				set_acrylic_id('1');
 				set_stretch_id('0');				
@@ -922,14 +967,16 @@
 				set_mount_color('');
 				set_board_id('0');
 				set_acrylic_id('0');
-				if (print_size <= 18) {
+				{% if imld_id %}
+					set_moulding_id('{{imld_id}}');
+				{% else %}
 					set_moulding_id('26');
-				} else if (print_size <= 26) {
-					set_moulding_id('18');
-				} else {
-					set_moulding_id('24');
-				}
-				set_stretch_id('1');
+				{% endif %}
+				{% if istr_id %}
+					set_stretch_id('{{istr_id}}');
+				{% else %}
+					set_stretch_id('1');
+				{% endif %}
 			}
 			$("#no-frame").prop("checked", false);
 		}
@@ -940,9 +987,13 @@
 				return;
 			}
 			set_prod_diagram_and_frame();
-			txt = 'Art print on ' + print_medium_id + ', Print Size: ' + wth.toString() + ' X ' + hgt.toString() + ' inch';
+			var wth_cm = wth * 2.54;
+			wth_cm = +wth_cm.toFixed(2);
+			var hgt_cm = hgt * 2.54;
+			hgt_cm = +hgt_cm.toFixed(2);
+			txt = 'Art print on ' + print_medium_id + ', Print Size: ' + wth_cm.toString() + ' X ' + hgt_cm.toString() + ' cm' + '(' + wth.toString() +  ' X ' + hgt.toString() + ' inch)';
 			$("#surface").html(print_medium_id);
-			$("#print_size").html(wth.toString() + ' X ' + hgt.toString() + ' inch');
+			$("#print_size").html(wth_cm.toString() + ' X ' + hgt_cm.toString() + ' cm ' + '(' + wth.toString() +  ' X ' + hgt.toString() + ' inch)');
 			$("#g-wrap").hide();
 			var f_size = 0;
 			var mnt_size = 0;
@@ -957,7 +1008,10 @@
 						if ('{{f.moulding_id}}' == moulding_id) {			
 							txt = txt + ', Frame: {{f.moulding__name}}';
 							f_size = {{f.moulding__width_inner_inches}};
-							$("#frame_spec").html('{{f.moulding__name}}' + "({{f.moulding__width_inches}} inch)" );
+							var mld_wth = {{f.moulding__width_inches}};
+							var mld_wth_cm = {{f.moulding__width_inches}} * 2.54;
+							mld_wth_cm = +mld_wth_cm.toFixed(2);
+							$("#frame_spec").html('{{f.moulding__name}}' + "(" + mld_wth_cm.toString() + " cm)" + '(' + mld_wth.toString() + ' inch)');
 						}
 					{% endfor %}
 				} else {
@@ -965,7 +1019,10 @@
 						if ('{{f.moulding_id}}' == moulding_id) {			
 							txt = txt + ', Frame: {{f.moulding__name}}';
 							f_size = {{f.moulding__width_inner_inches}};
-							$("#frame_spec").html('{{f.moulding__name}}' + "({{f.moulding__width_inches}} inch)" );
+							var mld_wth = {{f.moulding__width_inches}};
+							var mld_wth_cm = {{f.moulding__width_inches}} * 2.54;
+							mld_wth_cm = +mld_wth_cm.toFixed(2);
+							$("#frame_spec").html('{{f.moulding__name}}' + " (" + mld_wth_cm.toString() + " cm)" + '(' + mld_wth.toString() + ' inch)' );
 						}
 					{% endfor %}
 				}
@@ -983,8 +1040,10 @@
 							}
 						{% endfor %}
 					
-						txt = txt + ", " + mount_size + ' inch ' + mnt_color + ' mount';
-						$("#f_mount").html(mount_size + '" inch, ' + 'Color: ' + mnt_color );
+						var mount_size_cm = mount_size * 2.54;
+						mount_size_cm = +mount_size_cm.toFixed(2);
+						txt = txt + ", " + mount_size_cm + ' cm ' + '(' + mount_size.toString() + ' inch)' + ", " + mnt_color + ' mount';
+						$("#f_mount").html(mount_size_cm + '" cm, ' + '(' + mount_size.toString() + ' inch)' + ", " + 'Color: ' + mnt_color );
 						mnt_size = parseFloat(mount_size);
 						frame_width = frame_width + mnt_size*2;
 						frame_height = frame_height + mnt_size*2;
@@ -1015,17 +1074,22 @@
 			
 			frame_width = Math.round(frame_width);
 			frame_height = Math.round(frame_height);
-			details_txt = txt + ', Finished Size:' + frame_width.toString() + '" X ' + frame_height.toString() + '" inch';
-			txt = 'Finished Size: ' + frame_width.toString() + '" X ' + frame_height.toString() + '" inch <br />FREE SHIPPING';
+			var frame_width_cm = frame_width * 2.54;
+			var frame_width_cm = +frame_width_cm.toFixed(2);
+			frame_height_cm = frame_height * 2.54;
+			frame_height_cm = +frame_height_cm.toFixed(2);
+			details_txt = txt + ', Finished Size:' + frame_width_cm.toString() + ' X ' + frame_height_cm.toString() + ' cm' + ' (' + frame_width.toString() +  ' X ' + frame_height.toString() + ' inch)';
+			txt = 'Finished Size: ' + frame_width_cm.toString() + ' X ' + frame_height_cm.toString() + ' cm <br />'  + ' (' + frame_width.toString() +  ' X ' + frame_height.toString() + ' inch)' + ' FREE SHIPPING';
 			$('#prod-desc').html(txt);
 			$('#prod-details').html(details_txt);
-			$("#fsize").html(frame_width.toString() + '" X ' + frame_height.toString() + '" inch');
+			$(".fsize").html(frame_width_cm.toString() + ' X ' + frame_height_cm.toString() + ' cm' + ' (' + frame_width.toString() +  ' X ' + frame_height.toString() + ' inch)');
 			
 			if ( (get_moulding_id() == '' || get_moulding_id() == '0') && (get_stretch_id() == '0' || get_stretch_id() == '') ){
 				$("#rolled").show();
 			} else {
 				$("#rolled").hide();
 			}
+			
 		}
 		
 		/******************/
@@ -1125,6 +1189,7 @@
 			
 			calc_total_price();
 			print_size_display(image_width, image_height);
+			set_max_size_with_mount();
 
 			if (fetch_img == true){
 				$.ajax({
@@ -1209,6 +1274,7 @@
 			//Calculate the price
 			calc_total_price();
 			print_size_display(image_width, image_height);
+			set_max_size_with_mount();
 		}
 			
 		
@@ -1230,6 +1296,7 @@
 				calc_total_price();
 				print_size_display(image_width, image_height);
 			}
+			set_max_size_with_mount();
 		}
 		
 		function mount_size_change(mnt_size, fetch_img = true ){
@@ -1248,6 +1315,7 @@
 					getFramedImg (product_id, moulding_id, mount_color, mount_size);
 				}
 			}				
+			set_max_size_with_mount();
 		}
 		function mount_size_change(mnt_size, mnt_w_left, mnt_w_right, mnt_w_top, mnt_w_bottom, fetch_img = true){
 			if (mnt_size == '' || mnt_size == '0'){
@@ -1265,6 +1333,7 @@
 					getFramedImg (product_id, moulding_id, mount_color, mount_size);
 				}
 			}				
+			set_max_size_with_mount();
 		}
 
 		function stretch_changed(fetch_img = true){
@@ -1282,6 +1351,7 @@
 				getFramedImg (product_id, moulding_id, mount_color, mount_size);
 			}
 			print_size_display(image_width, image_height);
+			set_max_size_with_mount();
 			calc_total_price();
 		}
 		
@@ -1293,7 +1363,8 @@
 				set_board_id('1');
 				set_moulding_id('0');
 				set_mount_size('1');
-				set_stretch_id('0');
+				set_stretch_id('0');			
+				//set_default_frame_mount();
 				$("#in_stretched").prop("checked", false);
 				$('#no-frame').prop('checked', true);
 				if (print_medium_id == 'CANVAS') {
@@ -1301,36 +1372,42 @@
 					//$("#in_stretched").prop("disabled", false);
 					$("#stretched").show();
 					$("#whatis_stretched").show();
-					if (get_moulding_id() == '0' || get_moulding_id() == ''){
-						$("#d-stretch").show();
-					} else {
-						$("#d-stretch").hide();						
-					}
-				} else { 
+					$("#d-stretch").hide();	
+					//if (get_moulding_id() == '0' || get_moulding_id() == ''){
+					//	$("#d-stretch").show();
+					//} else {
+					//	$("#d-stretch").hide();						
+					//}
+				} else { 					
 					set_stretch_id('0');
 					$("#stretched").hide();
 					$("#whatis_stretched").hide();
 					$("#d-stretch").hide();
 				}
 			} else {
+				set_default_frame_mount();
 				if (print_medium_id == 'PAPER') {
+					/*
 					set_mount_id(def_mount_id);
 					set_mount_color('#fffff0');
 					var mnt_size = $("#mount-size").val();
 					set_mount_size(mnt_size);
 					set_acrylic_id('1');
 					set_board_id('1');
+					set_stretch_id('0');
+					set_mount_size('1');
+					*/	
 					$("#stretched").hide();
 					$("#whatis_stretched").hide();
-				} else {
-					set_mount_id('0');
-					set_mount_color('');
-					set_stretch_id('1');
-					set_mount_size('1');					
+				} else {					
+					//set_mount_id('0');
+					//set_mount_color('');
+					set_stretch_id('0');
+					set_mount_size('0');					
 				}
 				
 				$("#d-stretch").hide();
-				set_moulding_id('18');
+				//set_moulding_id('18');
 				$('#no-frame').prop('checked', false);
 			}
 			if (fetch_img == true){
@@ -1341,12 +1418,14 @@
 		}
 		
 		function removeFrame(fetch_img = true){
+			set_max_size_with_mount();
 			set_moulding_id('0');
 			set_mount_id('0');
 			set_mount_color('');
 			set_mount_size('0');
 			$("#card1").hide();
 			$("#prod-card1").hide();
+			$("#d-stretch").hide();	
 			if (print_medium_id == 'PAPER') {
 				//$("#in_stretched").prop("checked", false);
 				//$("#in_stretched").prop("disabled", true);			
@@ -1359,7 +1438,7 @@
 				//$("#in_stretched").prop("disabled", false);
 				$("#stretched").show();
 				$("#whatis_stretched").show();
-				$("#d-stretch").show();
+				//$("#d-stretch").show();
 			}
 			$('#no-frame').prop('checked', true);
 			if (fetch_img == true){
@@ -1390,6 +1469,7 @@
 				ajaxStop: function() { $body.removeClass("loading");},
 				//ajaxStart: function() { $("#wall-color-tool").addClass("loading");},
 				//ajaxStop: function() { $("#wall-color-tool").removeClass("loading");}
+				
 			});
 
 		
@@ -1525,35 +1605,58 @@
 						set_image_width(wd);
 						var ht = Math.round(get_image_width() / ratio);
 						set_image_height(ht);
+
 						$("#i_width").val(wd);
+						var w_cm  = parseFloat( wd * 2.54);
+						w_cm = +w_cm.toFixed(2);
+						$("#a_width_cm").html( w_cm.toString() + " cm" );
+						
 						$("#i_height").val(ht);
-						if ('{{isurface}}' != '' ){
-							print_medium_change("{{isurface}}", false);
-							if ( '{{isurface}}' == 'CANVAS') {
-								if ( '{{istr_id}}' != '') {
-									set_stretch_id("{{istr_id}}");
-									$("#d-stretch").show();
-									$("#in_stretched").prop('checked', true);
-								}
-							}
-						} else {
-							print_medium_change('PAPER', false);
-						}
+						var h_cm  = parseFloat( ht * 2.54);
+						h_cm = +h_cm.toFixed(2);
+						$("#a_height_cm").html( h_cm.toString() + " cm" );
+						
 						if ('{{imld_id}}' != ''){
 							moulding_change("{{imld_id}}", false);
 						} else {
 							set_moulding_id("0");
 						}
+						/*
 						if (get_print_medium_id() == 'PAPER' ){
-							if ('{{imnt_id}}' != '' ){
+							{% if imnt_id %}
 								mount_id_change("{{imnt_id}}", false);
-							}
-							if ('{{ imnt_color}}' != ''){
+							{% else %}
+								set_mount_id("0");
+							{% endif %}
+							
+							set_mount_color("{{imnt_color}}");	
+							set_mount_size("{{imnt_size}}");								
+						}
+						*/
+						if ('{{isurface}}' != '' ){
+							print_medium_change("{{isurface}}", false, false);
+							if ( '{{isurface}}' == 'CANVAS') {
+								$('#mouldings_include_paper').hide(); 
+								$('#mouldings_include_canvas').show();
+								if ( '{{istr_id}}' != '') {
+									set_stretch_id("{{istr_id}}");
+									$("#d-stretch").show();
+									$("#in_stretched").prop('checked', true);
+								}
+							} else {
+								$('#mouldings_include_paper').show(); 
+								$('#mouldings_include_canvas').hide();
+								{% if imnt_id %}
+									mount_id_change("{{imnt_id}}", false);
+								{% else %}
+									set_mount_id("0");
+								{% endif %}
+								
 								set_mount_color("{{imnt_color}}");	
-							}
-							if ('{{ imnt_size}}' != ''){
-								set_mount_size("{{imnt_size}}");								
-							}
+								set_mount_size("{{imnt_size}}");							
+							}							
+						} else {
+							print_medium_change('PAPER', false, true);
 						}
 						//$( "#size-slider" ).slider( "option", "value", {{iuser_width}});
 						//$("#paper-size-10").addClass("p_clicked");
@@ -1600,11 +1703,28 @@
 						buy_without_frame_change(false, false);
 					}
 				{% endif %}
-			{% endif %}
-			
+			{% endif %}			
 			
 			set_max_size_on_tool();
 
+			wigzo('track', 'productview', 'https://artevenue.com/art-print/{{product.product_id}}/');
+
+			setTimeout(function(){ 
+				var p_price = $("#prod-price").text();
+				
+				wigzo("index", {
+					"canonicalUrl": "https://artevenue.com/art-print/{{product.product_id}}/",
+					"title": "{{product.name}}",
+					"description": "{{product.description}}",
+					"price": p_price,
+					"productId": "{{product.product_id}}",
+					"image": "https://artevenue.com{% static product.url %}",
+					"language":"en" 
+				});
+			
+			 }, 800);
+			
+			
 		});
 
 		// Initialize tooltip component
@@ -1616,6 +1736,7 @@
 		$(function () {
 		  $('[data-toggle="popover"]').popover()
 		})
+
 
 	</script>
 	
@@ -1781,7 +1902,7 @@
 			// Get the framed image
 			$.ajax({
 					url: "{% url 'get_framed_image' %}", 
-					data: {'prod_id':prod_id, 'moulding_id': moulding_id,
+					data: {'prod_id':prod_id, 'moulding_id': get_moulding_id(),
 							'mount_color':mnt_color, 'mount_size':mnt_size, 'image_width':currwidth,
 							'stretched_canvas': str_canvas
 						}, 
@@ -1805,63 +1926,130 @@
 	</script>
 	
 	<script>
-		function set_size_slider(isize) {
+		function set_size_slider(i_width) {
+			var i_height = Math.round( i_width / ratio );
+			var minwidth = 8;
+			var maxwidth = 48;
+			var maxheigth = 48;
+			var maxW_printer = 46;  
+			var maxH_printer = Math.round( 46 * ratio );
 
-			maxsize = parseFloat("{{product.max_width}}");
-			if (parseFloat("{{product.max_width}}") > 40 && parseFloat("{{product.max_height}}") > 40) {
-				if (ratio > 1) {
-					maxsize = Math.ceil( 40 * ratio );
+			// Assing max size equal to printer max
+			if (ratio <= 1) {
+				maxW_printer = 48;
+				maxH_printer = Math.round( maxW_printer / ratio );
+			} else {
+				maxH_printer = 48;
+				maxW_printer = Math.round( maxH_printer * ratio );
+			}
+			maxwidth = maxW_printer;
+			maxheight = maxH_printer;
+
+						
+			// Compare with prod max size and assign 
+			var maxW_prod = parseFloat("{{product.max_width}}");
+			var maxH_prod = Math.round( maxW_prod / ratio );		
+			if (maxW_prod > maxW_printer && maxH_prod > maxH_printer) {
+				if (ratio <= 1) {
+					maxwidth = maxW_printer;
+					maxheigth = Math.round( maxwidth / ratio );
 				} else {
-					maxsize = 40;
+					maxheight = maxH_printer;
+					maxwidth = Math.round( maxheight * ratio );
 				}
 			}
-			if (ratio > 1){
-				//////
-				minsize = Math.round(8 * ratio);
+
+			// Assign max size if it's paper with mount
+			var mnt_size = get_mount_size();
+			var mnt_id = get_mount_id();
+			if (get_print_medium_id() == 'PAPER' && get_mount_id() != '' && get_mount_id() != '0' && mnt_size > 0){
+				if ( ratio <= 1 ){
+					max_width_with_mount = 40 -  mnt_size*2;
+					max_height_with_mount = Math.round( 40 / ratio);
+					if (max_height_with_mount > 60-mnt_size*2){
+						max_height_with_mount = 60-mnt_size*2;
+						max_width_with_mount = Math.round( max_height_with_mount * ratio);	
+					}
+				} else {
+					max_height_with_mount = 40 -  mnt_size*2;
+					max_width_with_mount = Math.round( 40 * ratio);				
+					if (max_width_with_mount > 60-mnt_size*2){
+						max_width_with_mount = 60-mnt_size*2;
+						max_heigth_with_mount = Math.round( max_width_with_mount / ratio);	
+					}
+				}
+				
+				if ( maxwidth > max_width_with_mount) {
+					maxwidth = max_width_with_mount;
+					maxheight = Math.round( maxwidth / ratio);
+				} else {
+					maxheight = max_height_with_mount;
+					maxwidth = Math.round( maxheight * ratio);
+				}
 			}
+			
+			/*
+			if (i_width > maxwidth || i_height > maxheight) {
+				if (ratio <= 1) {
+					maxwidth = i_width;
+					maxheigth = Math.round( maxwidth / ratio );
+				} else {
+					maxheight = i_height;
+					maxwidth = Math.round( maxheight * ratio );
+				}
+			}
+			*/
 			
 			{% if product.artist == "Huynh, Duy" %}
 				if (ratio > 1){
 					var hgt = 16;
 					var wdth = Math.round(16 * {{product.aspect_ratio}});
-					minsize = wdth;
+					minwidth = wdth;
 				} else {
-					minsize = 16;
+					minwidth = 16;
 				}
-			{% endif %}
-
+			{% endif %}		
 			
 			if ( $( "size-slider" ).slider( "instance" ) != null ) { 
-				if (isize == $( "#size-slider" ).slider( "value" ) ){
+				if (i_width == $( "#size-slider" ).slider( "value" ) ){
 					return;
 				}
 			}
-			
-			/*
-			var mnt = get_mount_id();
-			if ( parseFloat(get_mount_size()) > 0 )  {
-				if (mnt == 2 || mnt == 5) {
-					if (ratio > 1) {
-						maxsize = 33
-					} else {
-						maxsize = Math.ceil( 44 * ratio );;
-					}
+
+			if (i_width > maxwidth) {
+				if (get_print_medium_id() == 'PAPER' && get_mount_id() != '' && get_mount_id() != '0' && mnt_size > 0){
+					$("#mnt-size-msg").html("With " + mnt_size.toString() + " inch mount, the max print size can be upto " + maxwidth.toString() + " X " +  maxheight.toString() + " inch.");
+					$("#mnt-size-msg").show();
+					i_width = maxwidth;
+					set_image_width(maxwidth);
+					set_image_height(maxheight);
+
+					$("#i_width").val(maxwidth);
+					var w_cm  = parseFloat( maxwidth * 2.54);
+					w_cm = +w_cm.toFixed(2);
+					$("#a_width_cm").html( w_cm.toString() + " cm" );
+					
+					$("#i_height").val(maxheight);
+					var h_cm  = parseFloat( maxheight * 2.54);
+					h_cm = +h_cm.toFixed(2);
+					$("#a_height_cm").html( h_cm.toString() + " cm" );
+					
+					print_size_display(maxwidth, maxheight);
 				} else {
-					if (mnt == 1 || mnt == 3 || mnt == 4) {
-						if (ratio > 1) {
-							maxsize = 40
-						} else {
-							maxsize = Math.ceil( 60 * ratio );;
-						}
-					}
+					$("#mnt-size-msg").html("The max print size can be upto " + maxwidth.toString() + " X " +  maxheight.toString() + " inch.");
+					$("#mnt-size-msg").show();
 				}
+			} else {
+				$("#mnt-size-msg").html("");
+				$("#mnt-size-msg").hide();					
 			}
-			*/
-			
+
+
+								
 			$("#size-slider").slider({
-				value:isize,
-				min:minsize,
-				max:maxsize,
+				value:i_width,
+				min:minwidth,
+				max:maxwidth,
 				step:1,
 				change:function(event, ui){
 					var currwidth = ui.value;
@@ -1870,8 +2058,16 @@
 					//$("#size").html("Width: " + currwidth + ", Height: " + currheight);
 					set_image_width(currwidth);
 					set_image_height(currheight);
+
 					$("#i_width").val(currwidth);
+					var w_cm  = parseFloat( currwidth * 2.54);
+					w_cm = +w_cm.toFixed(2);
+					$("#a_width_cm").html( w_cm.toString() + " cm" );					
+
 					$("#i_height").val(currheight);
+					var h_cm  = parseFloat( currheight * 2.54);
+					h_cm = +h_cm.toFixed(2);
+					$("#a_height_cm").html( h_cm.toString() + " cm" );
 
 
 					{% for key, value in ready_prod_data_paper.items %}
@@ -1945,7 +2141,12 @@
 			brd_id = '0';
 			mnt_id = '0';
 		}
-			
+		
+		var str_id = stretch_id;
+		
+		if	(moulding_id != '' && moulding_id != '0' && print_med == 'CANVAS'){
+			str_id = 1;		
+		}
 			
 		// Form the pricing components
 		json = '{ ' + 
@@ -1955,7 +2156,7 @@
 				'"MOULDING": {"ID" :' + moulding_id + ', "SIZE":' + rnin + '}, ' +
 				'"MOUNT": {"ID" :' + mnt_id + ', "SIZE":' + mount_size + '}, ' +
 				'"BOARD": {"ID" :' + brd_id + ', "SIZE":' + sqin + '}, ' +
-				'"STRETCH": {"ID" :' + stretch_id + ', "SIZE":' + rnin + '}, ' +
+				'"STRETCH": {"ID" :' + str_id + ', "SIZE":' + rnin + '}, ' +
 				'"PRODUCT": {"ID" :' + product_id + ', "SIZE":' + rnin + '}, ' +
 				'"PRODUCT_TYPE": {"ID" :"STOCK-IMAGE", "SIZE":' + rnin + '} ' +
 				'}';			
@@ -2008,12 +2209,13 @@
 							$("#item_total_price_nv").html(data.item_price);
 							$("#promotion_id_nv").html('');
 							$("#disc_amt_nv").html('');
-					}
+					}								
 				},
 				error: function(xhr){
 					//alert("An error occured: " + xhr.status + " " + xhr.statusText); 
 				}
 		});		
+				
 	}		
 	</script>
 	
@@ -2125,12 +2327,13 @@
 						  });
 						{% endif %}
 						*/
+						wigzo ("track", "addtocart", "https://artevenue.com/art-print/" + prod_id.toString() + "/");
 					}
 				},
 				error: function(xhr){
 					alert("An error occured: " + xhr.status + " " + xhr.statusText); 
 				}
-			});
+			});			
 
 		}
 			
@@ -2294,10 +2497,24 @@
 		function set_ready_product(print_med, p_width, unframed_width, fetch_img=true){
 
 			var prod_id = get_product_id();
-			set_size_slider(unframed_width);			
+			//set_default_frame_mount();
+			set_size_slider(unframed_width);
 			if (print_med == 'PAPER') {
-				
-				set_default_frame_mount()
+				if (unframed_width <= 18) {
+					set_mount_size('1');
+					set_moulding_id('18');
+				} else if (unframed_width <= 26) {
+					set_mount_size('1');
+					set_moulding_id('18');
+				} else {
+					set_mount_size('2');
+					set_moulding_id('24');
+				}
+				set_mount_color('#fffff0');
+				set_mount_id('3');								
+				set_board_id('1');
+				set_acrylic_id('1');
+				set_stretch_id('0');				
 				/* set_mount_id(def_mount_id);
 				if (unframed_width <= 24) {
 					set_mount_size('1');
@@ -2311,17 +2528,14 @@
 				}
 				set_mount_color('#fffff0');*/
 				
-				set_board_id('1');
-				set_acrylic_id('1');
-				set_stretch_id('0');
 			} else {
+				/*
 				set_mount_id('0');
 				set_mount_size('1');
 				set_mount_color('');
 				set_board_id('0');
 				set_acrylic_id('0');
 				
-				set_default_frame_mount();
 				/*if (unframed_width <= 24) {
 					set_moulding_id('18');
 				} else if (unframed_width <= 42) {
@@ -2329,6 +2543,12 @@
 				} else {
 					set_moulding_id('24');
 				}*/
+				set_mount_id('0');
+				set_mount_size('1');
+				set_mount_color('');
+				set_board_id('0');
+				set_acrylic_id('0');
+				set_moulding_id('26');
 				set_stretch_id('1');
 			}
 			print_size_display(image_width, image_height);
@@ -2570,9 +2790,11 @@
 	
 	<script>
 	function set_prod_diagram_and_frame(){
+		set_frame_img(get_moulding_id());
 		if ( get_print_medium_id() == 'PAPER' && (get_mount_id() != '' && get_mount_id() != '0' && mount_size != 0) && (get_moulding_id() != '' && get_moulding_id() != '0') ){
 			$("#prod-diagram").show();
 			$("#components").prop("src", "{% static 'img/prod_desc/paper_frame_mount-min.png' %}" );
+			$("#components").attr("data-src", "{% static 'img/prod_desc/paper_frame_mount-min.png' %}" );
 			$("#no_frame_msg").hide();
 			$("#frame_msg").show();
 			$("#d-hanging").show();
@@ -2580,6 +2802,7 @@
 		} else if ( get_print_medium_id() == 'PAPER' && (get_mount_id() == '' || get_mount_id() == '0') && (get_moulding_id() != '' && get_moulding_id() != '0') ){
 			$("#prod-diagram").show();
 			$("#components").prop("src", "{% static 'img/prod_desc/paper_frame_no_mount-min.png' %}" );
+			$("#components").attr("data-src", "{% static 'img/prod_desc/paper_frame_no_mount-min.png' %}" );
 			$("#no_frame_msg").hide();
 			$("#frame_msg").show();
 			$("#d-hanging").show();
@@ -2587,6 +2810,7 @@
 		} else if ( get_print_medium_id() == 'CANVAS' && (get_moulding_id() != '' && get_moulding_id() != '0') ){
 			$("#prod-diagram").show();
 			$("#components").prop("src", "{% static 'img/prod_desc/canvas_frame-min.png' %}" );							
+			$("#components").attr("data-src", "{% static 'img/prod_desc/canvas_frame-min.png' %}" );							
 			$("#no_frame_msg").hide();
 			$("#frame_msg").show();
 			$("#d-hanging").show();
@@ -2594,6 +2818,7 @@
 		} else if ( get_print_medium_id() == 'PAPER' && (get_mount_id() == '' || get_mount_id() == '0') && (get_moulding_id() == '' || get_moulding_id() == '0') ){
 			$("#prod-diagram").show();
 			$("#components").prop("src", "{% static 'img/prod_desc/paper_print-min.png' %}" );
+			$("#components").attr("data-src", "{% static 'img/prod_desc/paper_print-min.png' %}" );
 			$("#no_frame_msg").show();
 			$("#frame_msg").hide();
 			$("#d-hanging").hide();
@@ -2601,6 +2826,7 @@
 		} else if ( get_print_medium_id() == 'CANVAS'&& (get_moulding_id() == '' || get_moulding_id() == '0')  && get_stretch_id() != '1'){
 			$("#prod-diagram").show();
 			$("#components").prop("src", "{% static 'img/prod_desc/canvas_print-min.png' %}" );
+			$("#components").attr("data-src", "{% static 'img/prod_desc/canvas_print-min.png' %}" );
 			$("#no_frame_msg").show();
 			$("#frame_msg").hide();
 			$("#d-hanging").hide();
@@ -2618,6 +2844,42 @@
 			$("#d-packing").hide();
 		}
 	}
+	</script>
+	
+	<script>
+		function set_max_size_with_mount(){
+		
+			var mnt_size = get_mount_size();
+			var mnt_id = get_mount_id();
+			if (get_print_medium_id() == 'PAPER' && get_mount_id() != '' && get_mount_id() != '0' && mnt_size > 0){
+				var currwidth = get_image_width();
+				var currheight = get_image_height();
+				var max_width = 60 - mnt_size*2;
+				var max_height = 60 - mnt_size*2;
+				
+				if (ratio >= 1){
+					if (currwidth > max_width) {
+						set_size_slider(max_width);
+						var h = Math.round(max_width / ratio);
+						$("#mnt-size-msg").html("With " + mnt_size.toString() + " inch mount, the max print size can be upto " + max_width.toString() + " X " +  h.toString() + " inch.");
+						$("#mnt-size-msg").show();
+					} else {
+						$("#mnt-size-msg").hide();
+					}
+				} else {
+					if (currheight > max_height) {
+						var w = Math.round(max_height * ratio);
+						set_size_slider(w);
+						$("#mnt-size-msg").html("With " + mnt_size.toString() + " inch mount, the max print size can be upto " + w.toString() + " X " +  max_height.toString() + " inch.");
+						$("#mnt-size-msg").show();
+					} else {
+						$("#mnt-size-msg").hide();
+					}
+				}
+			} else {
+				$("#mnt-size-msg").hide();
+			}
+		}	
 	</script>
 	{% endblock jscripts %}	
 	

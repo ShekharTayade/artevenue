@@ -1,7 +1,7 @@
 from artevenue.models import Stock_image_category, Product_type, Tax
 from artevenue.models import Stock_image, Stock_image_stock_image_category
 from artevenue.models import Ecom_site, Publisher_price, Publisher, Curated_collection
-from artevenue.models import Stock_image_error, Stock_image_category_error
+from artevenue.models import Stock_image_error, Stock_image_category_error, Product_view
 from artevenue.models import Publisher_error, Stock_image_stock_image_category_error, Image_url_error
 
 from artevenue.models import Collage_stock_image, Stock_collage
@@ -244,6 +244,14 @@ def importPODImageData():
 				else:
 					disp_seq = None
 				
+				if row[5] == 'Huynh, Duy':
+					min_width = 16
+					min_height = 16
+				else:
+					min_width = 10
+					min_height = 10
+					
+				
 				## Update Product
 				newprod = Stock_image(
 					store = ecom,
@@ -266,14 +274,15 @@ def importPODImageData():
 					orientation = row[8].strip().title(),
 					max_width = row[6],
 					max_height = row[7],
-					min_width = 4,
+					min_width = min_width,
 					publisher = row[1],
 					artist = row[5],
 					colors = '',
 					key_words = row[13],
 					url = 'image_data/POD/images/' + url,
 					thumbnail_url = 'image_data/POD/images/' + thumb_url,
-					category_disp_priority = disp_seq
+					category_disp_priority = disp_seq,
+					min_height = min_height
 				)
 
 				newprod.save()
@@ -459,15 +468,15 @@ def deletePODImageData():
 	##	Remove from collage sets and gallery walls too
 	for c in collages:
 		cpr = Product_view.objects.filter(product_id = c.stock_image_id,
-			published = False).first()		
+			is_published = False).first()		
 		if cpr:
 			stk_collage = Stock_collage.objects.filter( 
 			product_id = c.stock_collage ).update( is_published = False)
 			d_cnt = d_cnt+11
 			
 	for g in gallery_items:
-		gpr = Product_view.objects.filter(product_id = g.stock_image_id,
-			published = False).first()		
+		gpr = Product_view.objects.filter(product_id = g.product_id, product_type_id = g.product_type_id,
+			is_published = False).first()		
 		if gpr:
 			gal = Gallery.objects.filter( 
 			gallery_id = g.gallery_id ).update( is_published = False)

@@ -1,0 +1,282 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+
+{% block page-title %} 
+<title>Arte'Venue | Spin and Win a Discount on Paintings</title>
+{% endblock page-title %} 
+  
+{% block page-description %}
+<meta name="description" content="Sign up and play the 'Spin and Win' game to win fabulous discounts on paintings, artworks.">
+{% endblock page-description %}
+  
+{% block page-keywords %}
+<meta name="keywords" content="artevenue, staff, artevenue contest, artevenue spin and win ">
+{% endblock page-keywords %}
+  
+{% block page-author %}
+<meta name="author" content="Arte'Venue">
+{% endblock page-author %}
+
+{% block coursel-stylesheet %}
+{% endblock coursel-stylesheet %}
+
+{% block jqueryui-script %}
+{% endblock jqueryui-script %}
+
+{% block coursel-script %}
+{% endblock coursel-script %}
+
+{% block front.js %}
+{% endblock front.js %}
+
+{% block popper-script %}
+	<script src="{% static 'vendor/popper.js/umd/popper.min.js' %}"> </script>
+{% endblock popper-script %}
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+{% block add_to_head %}
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<script src="{% static 'vendor/javascript-winwheel-2.8.0/Winwheel.min.js' %}"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/gsap/1.18.0/TweenMax.min.js"></script>
+{% endblock add_to_head %}
+
+{% block sitecontent %}
+	<div class="container mb-2">
+		<div class = "row">
+			<div class="col-12">
+				<!-- breadcrumb-->
+				<nav aria-label="breadcrumb">
+					<ol class="breadcrumb">
+						<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+						<li aria-current="page" class="breadcrumb-item active">Spain the Wheel</li>
+					</ol>
+				</nav>
+			</div>
+		</div>
+		<div class = "row mb-5">
+			<div class="col-12 text-center mb-5">
+				<h1>Spin and Win</h1>
+				<h4>Spin the Wheel and Win Discount</h4>
+			</div>
+			<div class="col-12">
+				<div class = "row">
+					<div class="col-12 d-flex align-items-center">
+						<img class = "mx-auto d-block" width="30" src = "{% static 'vendor/javascript-winwheel-2.8.0/images/pointer.png' %}">
+					</div>
+					<div class="col-12 d-flex align-items-center">
+						<div class="the_wheel mx-auto d-block" align="center" valign="center" 
+							style = "width: 250px; height:250px;">
+							<canvas id="canvas" width="240" height="240" data-responsiveMinWidth="180"
+										data-responsiveScaleHeight="true"   /* Optional Parameters */
+										data-responsiveMargin="50">
+								<p style="{color: white}" align="center">Sorry, your browser doesn't support canvas. Please try another.</p>
+							</canvas>
+						</div>
+					</div>
+					<div class="col-12 d-flex justify-content-center align-items-center mt-3" >
+						{% if user.is_authenticated %}
+						<div class="power_controls">
+							<img id="spin_button" src="{% static 'vendor/javascript-winwheel-2.8.0/images/spin_on.png' %}" alt="Spin" onClick="startSpin();" />
+						</div>
+						{% else %}
+						<div class="power_controls">
+							<img id="" src="{% static 'vendor/javascript-winwheel-2.8.0/images/spin_off.png' %}" alt="Spin-Off" />
+						</div>
+						{% endif %}
+					</div>
+					<div class="col-12 d-flex justify-content-center align-items-center" >
+						{% if user.is_authenticated %}
+						<a class = "btn btn-link" onClick="resetWheel(); return false;" style="text-decoration: underline;">
+							Play Again
+						</a>
+						{% else %}
+							<a data-toggle="modal" data-target="#login-modal" style = "text-decoration: underline;">
+							Login 
+							</a> 
+							&nbsp;or&nbsp; 
+							<a data-toggle="modal" data-target="#signup_popup-modal" style = "text-decoration: underline;"> 
+							Sign Up
+							</a>&nbsp;
+							to Play & Win
+						{% endif %}
+					</div>
+					<div id = "prize-div" class="col-12 mt-5 text-center" style = "display:none;">
+						<span id="prize" class = "text-center"></span><br />
+						COUPON CODE: <span id="coupon_code"></span>
+					</div>
+					</div>
+					<div class="col-12 mt-5">
+						<strong>RULES OF THE GAME:</strong>
+					</div>
+					<div class="col-12">
+						<ul>
+							<li>You have be signed up and logged in to be able to play "Spin and Win".</li>
+							<li>The discount or the FREE order won can only be applied to your next order at artevenue.com. </li>
+							<li>The discount will be applied on the total cart value. No minimum or maximum cart value required.</li>
+							<li>When the wheel stops, the percentage that the pointer is pointing at is the discount you win.
+								This is the percentage discount you get on your next order.</li>
+							<li>If the wheel stops at "FREE", then you have won Rs 3,000/= eGift coupon to buy any artwork. 
+								If your cart value exceeds Rs. 3,000/= then you will only pay the difference. If your cart value 
+								is less than or equal to Rs 3,000/= then you don't pay anything. Remaining balance, if any, can 
+								be used on subsequent orders.</li>
+							<li>From the date you win a discount or a FREE order, you have 3 calendar months to redeem it. 
+								After 3 months, this discount or FREE order offer expires.</li>
+							<li>To claim the discount or a FREE order won, you have to be logged in with the same account that
+								you used when you won.</li>
+							<li>The details of the discount or FREE order won will be available under "My Coupons" link under menu.</li>
+							<li>To avail the discount or the FREE order coupon, obtain the coupon code from "My Coupons"
+								link and when your shopping cart is ready, apply the coupon code in the shopping cart page.</li>
+							<li>Discount is applicable only on art print items.</li>
+							<li>The Discount or FREE order won using "Spin and Win" content, can't combined with any other
+								offer, promotion, eGift or sale discount coupons.</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+        </div>
+
+		{% include 'spinwheel/win_message.html' %}
+
+	</div>
+	{% endblock sitecontent %}
+
+
+	{% block jscripts %}
+		<script>
+			jQuery(document).ready(function(){			
+				$body = $("body");
+				$(document).on({
+					ajaxStart: function() { $body.addClass("loading");},
+					ajaxStop: function() { $body.removeClass("loading");},
+				});
+			});
+		</script>
+
+
+        <script>
+            let theWheel = new Winwheel({
+                'numSegments'  : 14,  
+                'outerRadius'  : 119, 
+                'textFontSize' : 20, 
+				'responsive'   : true,
+                'segments'     :     
+                [
+                   {'fillStyle' : '#0e71de', 'textFillStyle' : '#ffffff', 'text' : '5%'},
+                   {'fillStyle' : '#ec1c24', 'textFillStyle' : '#ffffff', 'text' : '10%'},
+                   {'fillStyle' : '#ffca18', 'textFillStyle' : '#ffffff', 'text' : '5%'},
+                   {'fillStyle' : '#0ed145', 'textFillStyle' : '#ffffff', 'text' : '15%'},
+                   {'fillStyle' : '#ff7f27', 'textFillStyle' : '#ffffff', 'text' : '25%'},
+                   {'fillStyle' : '#0e71de', 'textFillStyle' : '#ffffff', 'text' : '20%'},
+                   {'fillStyle' : '#ec1c24', 'textFillStyle' : '#ffffff', 'text' : '15%'},
+                   {'fillStyle' : '#ffca18', 'textFillStyle' : '#ffffff', 'text' : '30%'},
+                   {'fillStyle' : '#0ed145', 'textFillStyle' : '#ffffff', 'text' : '10%'},
+                   {'fillStyle' : '#ff7f27', 'textFillStyle' : '#ffffff', 'text' : '15%'},
+                   {'fillStyle' : '#0e71de', 'textFillStyle' : '#ffffff', 'text' : '5%'},
+                   {'fillStyle' : '#ec1c24', 'textFillStyle' : '#ffffff', 'text' : '15%'},
+                   {'fillStyle' : '#000000', 'textFillStyle' : '#ffffff', 'text' : 'FREE'},
+                   {'fillStyle' : '#ffca18', 'textFillStyle' : '#ffffff', 'text' : '15%'},
+                ],
+                'animation' : 
+                {
+                    'type'     : 'spinToStop',
+                    'duration' : 8, 
+                    'spins'    : 8, 
+                    'callbackFinished' : setPrize
+                }
+            });
+			
+            let wheelPower    = 0;
+            let wheelSpinning = false;
+
+            function powerSelected(powerLevel){
+                if (wheelSpinning == false) {
+                    document.getElementById('pw1').className = "";
+                    document.getElementById('pw2').className = "";
+                    document.getElementById('pw3').className = "";
+                    if (powerLevel >= 1) {
+                        document.getElementById('pw1').className = "pw1";
+                    }
+                    if (powerLevel >= 2) {
+                        document.getElementById('pw2').className = "pw2";
+                    }
+                    if (powerLevel >= 3) {
+                        document.getElementById('pw3').className = "pw3";
+                    }
+                    wheelPower = powerLevel;
+                    document.getElementById('spin_button').src = "{% static 'vendor/javascript-winwheel-2.8.0/images/spin_on.png' %}";
+                    document.getElementById('spin_button').className = "clickable";
+                }
+            }
+
+            function startSpin(){
+                if (wheelSpinning == false) {
+                    if (wheelPower == 1) {
+                        theWheel.animation.spins = 3;
+                    } else if (wheelPower == 2) {
+                        theWheel.animation.spins = 8;
+                    } else if (wheelPower == 3) {
+                        theWheel.animation.spins = 15;
+                    }
+                    document.getElementById('spin_button').src = "{% static 'vendor/javascript-winwheel-2.8.0/images/spin_off.png' %}";
+                    document.getElementById('spin_button').className = "";
+                    theWheel.startAnimation();
+
+                    wheelSpinning = true;
+                }
+            }
+
+
+            function resetWheel()
+            {
+                theWheel.stopAnimation(false); 
+                theWheel.rotationAngle = 0;
+                theWheel.draw(); 
+
+				document.getElementById('spin_button').src = "{% static 'vendor/javascript-winwheel-2.8.0/images/spin_on.png' %}";
+				document.getElementById('spin_button').className = "clickable";
+
+                wheelSpinning = false;
+            }
+
+			
+            function setPrize(indicatedSegment){
+				var prize = indicatedSegment.text;
+				$.ajax({
+						url: "{% url 'set_prize' %}", 
+						data: {'prize':prize}, 
+						dataType: 'text', 
+						type: 'POST',
+					success: function (data) {
+							data = JSON.parse(data);
+							if (data.status.toUpperCase() == 'APPLIED'){
+								if (indicatedSegment.text == 'FREE') {
+									$("#msg").html("FREE!! Your next order worth upto Rs 3,000");
+									$("#msg_1").html("If it exceeds Rs. 3,000 you pay only the difference amount.");
+									$("#prize").html("WOW!! You have won Rs. 3,000/= eGift coupon. Please see the rules below to claim it.");
+								} else {
+									$("#msg").html("You have won " + indicatedSegment.text + "  discount on your next order");
+									$("#prize").html("You have won " + indicatedSegment.text + " discount. Please see the rules below to claim it.");
+								}	
+								$("#coupon_code").html(data.voucher_code);
+								$("#prize-div").show(500);	
+								$("#msg-modal").modal("show");	
+							} else {
+								if (data.status.toUpperCase() == 'NOT-APPLIED'){								
+									$("#prize-div").addClass("alert-danger");
+									$("#prize").html(data.msg);
+									$("#coupon_code").html(data.voucher_code);
+									$("#prize-div").show(500);	
+								}
+							}
+						},
+					error: function(xhr){
+						alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+					}
+				});						
+				
+            }			
+	</script>
+	
+	{% endblock jscripts %}

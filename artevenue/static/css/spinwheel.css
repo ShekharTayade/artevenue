@@ -1,0 +1,73 @@
+@import "compass/css3";
+
+@import url(https://fonts.googleapis.com/css?family=Lobster);
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: 'Lobster', cursive;
+}
+h2 {
+  margin-bottom: 0.83em;
+}
+.backdrop {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: hsla(0,100,0,0.7);
+  @include perspective(600px);
+}
+.award-container {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  width: 300px;
+  margin-left: -100px;
+  margin-top: -160px;
+  background-color: hsla(100, 50, 100, 1);
+  @include border-radius(5px);
+  @include box-shadow(0 20px 60px hsla(0,0,0,0.8));
+  padding: 10px;
+  text-align: center;
+  @include perspective(600px);
+  cursor: pointer;
+}
+.starbusrt-container {
+  display: none;
+  position: relative;
+  overflow: visible;
+  > img {
+    position: absolute;
+    left: 50%;
+    margin-left: -150px;
+    margin-top: -90px;
+    @include border-radius(50%);
+  }
+}
+.badge-container {
+  height: 170px;
+  > img {
+    position: absolute;
+    @include border-radius(50%);
+    left: 50%;
+    margin-left: -75px;
+  }
+}
+.button {
+  display: block; 
+  width: 242px; 
+  height: 67px; 
+  background-color: #609ed2; 
+  margin: 0 auto; 
+  line-height: 67px; 
+  color: #FFF; 
+  text-transform: uppercase; 
+  font-size: 14px; 
+  text-align: center;
+  @include border-radius(3px);
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: none;
+}

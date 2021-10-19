@@ -1,0 +1,9 @@
+
+
+{
+  "name": "Wigzo Chrome Push Service",
+  "short_name": "Wigzo Push",
+  "display": "standalone",
+  "gcm_sender_id": "446212695181",
+  "gcm_user_visible_only": true
+}

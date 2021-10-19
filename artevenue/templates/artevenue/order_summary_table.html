@@ -16,36 +16,35 @@
 			{% endif %}		
 		</div>
 	</div>
-	
+
 	<div class="table table-responsive">
 		<table id = "ordTbl" class="table table-responsive table-striped">
 			<thead>
 				<tr>
-					<th>Inv No.</th>
-					<th>Inv Dt.</th>
 					<th>Ord No.</th>
 					<th>Ord Dt.</th>
+					<th>Inv No.</th>
+					<th>Inv Dt.</th>
+					<th>Payment Type</th>
 					<th>Cust Name</th>
+					<th>Cust City</th>
+					<th>Cust State</th>
+					<th>Cust GST</th>
 					<th style="text-align:right">Unit Price</th>
 					<th style="text-align:right">Qty</th>
-					<th style="text-align:right">Disc</th>
-					<th style="text-align:right">Ship</th>
 					<th style="text-align:right">Sub Total</th>
 					<th style="text-align:right">IGST</th>
 					<th style="text-align:right">CGST</th>
 					<th style="text-align:right">SGST</th>
 					<th style="text-align:right">Total</th>
+					<th style="text-align:right">Shipper</th>
+					<th style="text-align:right">Tracking Number</th>
+					<th style="text-align:right">Tracking Url</th>
 				</tr>
 			</thead>
 			<tbody>
 				{% for o in orders %}
 				<tr>
-					<td>
-						<small>{{o.invoice_number }}</small>
-					</td>																						
-					<td>
-						<small>{{o.invoice_date|date:'d/m/y'}}</small>
-					</td>																						
 					<td>
 						<small>{{o.order_number}}</small>
 					</td>
@@ -53,19 +52,31 @@
 						<small>{{o.order_date | date:'d/m/y'}}</small>
 					</td>
 					<td>
+						<small>{{o.invoice_number }}</small>
+					</td>																						
+					<td>
+						<small>{{o.invoice_date|date:'d/m/y'}}</small>
+					</td>																						
+					<td>
+						<small>{{ o.get_payment_type_display }}</small>
+					</td>
+					<td>
 						<small>{{o.order_billing.full_name }}</small>
 					</td>																						
+					<td>
+						<small>{{o.order_billing.city}}</small>
+					</td>
+					<td>
+						<small>{{o.order_billing.state_id}}</small>
+					</td>
+					<td>
+						<small>{{o.order_billing.gst_number}}</small>
+					</td>
 					<td style = "text-align:right">
 						<small>{{o.unit_price}}</small>
 					</td>
 					<td style = "text-align:right">
 						<small>{{o.quantity}}</small>
-					</td>
-					<td style = "text-align:right">
-						<small>{{o.order_discount_amt|floatformat}}</small>
-					</td>
-					<td style = "text-align:right">
-						<small>{{o.shipping_cost|floatformat}}</small>
 					</td>
 					<td style = "text-align:right">
 						<small>{{o.sub_total|floatformat}}</small>
@@ -90,17 +101,24 @@
 						</td>
 					{% endif %}
 					<td style = "text-align:right"><small>{{o.order_total|floatformat}}</small></td>
+					<td style = "text-align:right">
+						<small>{{o.shipper.name}}</small>
+					</td>
+					<td style = "text-align:right">
+						<small>{{o.tracking_number}}</small>
+					</td>
+					<td style = "text-align:right">
+						<small>{{o.tracking_url}}</small>
+					</td>
 
 				</tr>
 				{% endfor %}
 			</tbody>
 			<tfoot>
 				{% if totals %}
-				<th colspan=5 style="text-align:left">TOTAL</th>
+				<th colspan=9 style="text-align:left">TOTAL</th>
 				<th style="text-align:right">{{totals.unit_price__sum|default_if_none:'0'|indian_number_format}}</th>
 				<th style="text-align:right">{{totals.quantity__sum}}</th>
-				<th style="text-align:right">{{totals.order_discount_amt__sum|default_if_none:'0'|indian_number_format}}</th>
-				<th style="text-align:right">{{totals.shipping_cost__sum|default_if_none:'0'|indian_number_format}}</th>
 				<th style="text-align:right">{{totals.sub_total__sum|default_if_none:'0'|indian_number_format}}</th>
 				<th style="text-align:right">{{total_igst|default_if_none:'0'|indian_number_format}}</th>
 				<th style="text-align:right">{{total_cgst|default_if_none:'0'|indian_number_format}}</th>

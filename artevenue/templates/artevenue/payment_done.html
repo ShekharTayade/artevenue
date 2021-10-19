@@ -28,30 +28,34 @@
 
 
 {% block add_to_head %}
+
 	<script>
-	gtag('event', 'purchase', {
-	  "transaction_id": "{{order.order_number}}",
-	  "affiliation": "Arte'Venue.com",
-	  "value": {{order.order_total}},
-	  "currency": "INR",
-	  "tax": {{order.tax}},
-	  "shipping": 0,
-	  "items": [
-		{% for i in order_items %}
-		{
-		  "id": "{{i.product_id}}",
-		  "name": "{{i.product.name}}",
-		  "list_name": "",
-		  "brand": "Arte'Venue",
-		  "category": "",
-		  "variant": "",
-		  "list_position": 1,
-		  "quantity": {{i.quantity}},
-		  "price": '{{i.item_total}}'
-		},
-		{% endfor %}
-	  ]
-	});	
+		dataLayer.push({ ecommerce: null }); 
+		dataLayer.push({
+		  event: "purchase",
+		  ecommerce: {
+			  transaction_id: "{{order.order_number}}",
+			  affiliation: "artevenue.com",
+			  value: {{order.order_total}},
+			  tax: {{order.tax}},
+			  shipping: "0",
+			  currency: "INR",
+			  coupon: "{{order.voucher.voucher_code}}",
+			  items: [
+			  {% for i in order_items %}
+			  {
+				item_name: "{{i.product.name}}",
+				item_id: "id": "{{i.product_id}}",,
+				price: "{{i.item_total}}",
+				item_brand: "Arte'Venue",
+				item_category: "Home",
+				item_variant: "",
+				quantity: {{i.quantity}}
+			  },
+			  {% endfor %}
+			  ]
+		  }
+		});	
 	</script>
 	
 	<!-- Event snippet for Buy Art conversion page -->
@@ -71,12 +75,58 @@
 	  });
 	  
 	</script>
+
+	<script>
+		gtag('event', 'purchase', {
+		  "transaction_id": "{{order.order_number}}",
+		  "affiliation": "artevenue.com",
+		  "value": {{order.order_total}},
+		  "currency": "INR",
+		  "tax": {{order.tax}},
+		  "shipping": 0,
+		  "items": [
+			  {% for i in order_items %}
+				{
+				  "id": "{{i.product_id}}",
+				  "name": "{{i.product.name}}",
+				  "list_name": "Search Results",
+				  "brand": "ARTE'VENUE",
+				  "category": "Home",
+				  "variant": "",
+				  "list_position": 1,
+				  "quantity": {{i.quantity}},
+				  "price": {{i.item_total}}
+				},
+			  {% endfor %}
+		  ]
+		});
+	</script>
+	
+	<script>
+	window.lintrk('track', { conversion_id: 4632036 });	
+	</script>
+	
+	<script>
+		var prod_arr = [];
+		{% for i in order_items %}
+			prod_arr.push("{{i.product_id}}");
+		{% endfor %}
+		wigzo ("track", "buy", prod_arr);
+		
+		wigzo ("track", "order",
+			{orderId: {{order.order_number}}, 
+			 email: '{{order.order_billing.email_id}}', 
+			 phone: '{{order.order_billing.phone_number}}', 
+			 fullName: '{{order.order_billing.full_name}}' 
+			}
+		);
+	</script>
 	
 {% endblock add_to_head %}
 	<!-- Only Override the site content block -->
 	{% block sitecontent %}
         <div class="container">
-			<div class="row">
+			<div class="row mb-5">
 				<!-- breadcrumb-->
 				<div class="col-lg-12">
 					<nav aria-label="breadcrumb">
@@ -87,37 +137,41 @@
 					</nav>
 				</div>
 
-				<div class="col-lg-12">
-				<div class = "row">
-					<div class="box">
-						<h1>Payment Confirmation</h1>
-						<p>Thank you {{firstname}}, for choosing Arte'Venue!</p>
-					</div>
+				<div class="col-12 text-center">
+					<h1 style = "font-weight: 700;"> Order Confirmation</h1>
+					<p>Thank you {{firstname}}, for choosing Arte'Venue!</p>
 				</div>
-				<div class="row">
-					<div class="box">
-						<form id ="submit-form" method = "post" action = "{% url 'payment_submit' %}">
-							{% csrf_token %}
-							<p>Your payment of  <i class = "fa fa-inr"> {{amount|floatformat}}</i> is received. You will shortly receive an email with the order details.</p>
-							<p>Please note your order number {{order.order_number}}. You can find your order using 'Find My Order' link in the footer section, or 'My Orders' link, if you have logged in.</p>
-							<p>Please visit <a href="{% url 'contact_us' %}">Contact Us</a> page in case of any help required. Please quote the order number and your email in all communication.</p>
-							<p>Your Order is: </p>
-							
-							<div class="col-lg-12">
-								<div id="order-summary" class="box">
-									<div class="box-header">
-										<h3 class="mb-0">Order No. {{order.order_number}}</h3>
-									</div>
-									<div class = "row">
-										<div class = "col-sm-3">
-											<div class = "col-sm-12">		
+				<div class="col-12 box">
+					<form id ="submit-form" method = "post" action = "{% url 'payment_submit' %}">
+						{% csrf_token %}
+						<p>Your payment of  <i class = "fa fa-inr"> {{amount|floatformat}}</i> is received. You will shortly receive an email with the order details.</p>
+						<p>Please note your order number {{order.order_number}}. You can find your order using 'Find My Order' link in the footer section, or 'My Orders' link, if you have logged in.</p>
+						<p>Please visit <a href="{% url 'contact_us' %}">Contact Us</a> page in case of any help required. Please quote the order number and your email in all communication.</p>
+
+						<div class="row">
+							<div class="col-12 mt-3">
+								<hr>
+							</div>
+						</div>
+						
+						<div class="row">
+							<div class="col-12 mt-3">
+								Order Number: <span style="font-weight:700;">{{order.order_number}}</span>
+							</div>
+							<div class="col-12">
+								<div class = "row">
+									<div class = "col-12 col-md-3">
+										<div class = "row">
+											<div class = "col-12">		
 												<strong>Order subtotal</strong>
 											</div>
-											<div class = "col-sm-12">		
+											<div class = "col-12">		
 												<span class = "ord-row">{{order.sub_total|floatformat}}</span>
 											</div>
 										</div>
-										<div class = "col-sm-2">
+									</div>
+									<div class = "col-12 col-md-2">
+										<div class = "row">
 											<div class = "col-sm-12">		
 												<strong>Tax</strong>
 											</div>
@@ -125,7 +179,9 @@
 												<span class = "ord-row">{{order.tax|floatformat}}</span>
 											</div>
 										</div>
-										<div class = "col-sm-3">
+									</div>
+									<div class = "col-12 col-md-3">
+										<div class = "row">
 											<div class = "col-sm-12">		
 												<strong>Shipping & handling</strong>
 											</div>
@@ -133,7 +189,9 @@
 												<span id ="s-h" class = "ord-row">{{order.shipping_cost|floatformat}}</span>
 											</div>
 										</div>
-										<div class = "col-sm-2">
+									</div>
+									<div class = "col-12 col-md-2">
+										<div class = "row">
 											<div class = "col-sm-12">		
 												<strong>Order Total</strong>
 											</div>
@@ -142,8 +200,10 @@
 												<span hidden id = "total_amount">{{order.order_total|floatformat}}<span>
 											</div>
 										</div>
-										{% if order.order_discount_amt %}
-										<div class = "col-sm-2">
+									</div>
+									{% if order.order_discount_amt %}
+									<div class = "col-12 col-md-3">
+										<div class = "row">
 											<div class = "col-sm-12">		
 												<strong>Your Saving</strong>
 											</div>
@@ -151,14 +211,13 @@
 												<span style = "color:green">{{order.order_discount_amt|floatformat}}</span>
 											</div>
 										</div>
-										{% endif %}
 									</div>
-											
-								</div>					
-							</div>
+									{% endif %}
+								</div>										
+							</div>					
+						</div>
 
-						</form>
-					</div>
+					</form>
 				</div>
 			</div>
 		</div>

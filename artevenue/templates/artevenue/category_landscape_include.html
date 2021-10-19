@@ -1,77 +1,102 @@
 {% load static %}		
-  <div class="slider sub-slider" 
-	style="margin:15px;">
+	<div class="row">
+		<div class = "col-12 mt-3">
+			<h2>Landscape Collection By Themes</h2>
+		</div>
+	</div>
+	<div class="row text-center">
+		<div class = "col-12 mt-3">
+			<div class="row">
+				<div class = "col-3 col-lg-2 mt-2">
+					<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='night-scenery-paintings' %}">
+						<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
+							NIGHT SCENERY
+						</h4>
+						<div class="curated-container">
+							<picture>
+								<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/landscape/night_scenery.jpg' %}">
+								<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/landscape/night_scenery.jpg' %}">
+								<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/landscape/night_scenery.jpg' %}" alt="Night Scenery Paintings" width=150>
+							</picture>
+						</div>						
+					</a>
+				</div>
+			
+			
+				<div class = "col-3 col-lg-2 mt-2">
+					<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='abstract-landscape-paintings' %}">
+						<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
+							ABSTRACT<span class = "d-block d-md-none">&nbsp;</span>
+						</h4>
+						<div class="curated-container">
+							<picture>
+								<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/landscape/abstract_landscape.jpg' %}">
+								<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/landscape/abstract_landscape.jpg' %}">
+								<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/landscape/abstract_landscape.jpg' %}" alt="Abstract Landscape Paintings">
+							</picture>
+						</div>
+					</a>
+				</div>
+					
+				<div class = "col-3 col-lg-2 mt-2">
+					<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='paintings-of-village-scenery' %}">
+						<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
+							VILLAGE SCENERY
+						</h4>
+						<div class="curated-container">
+							<picture>
+								<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/landscape/village_scenery.jpg' %}">
+								<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/landscape/village_scenery.jpg' %}">
+								<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/landscape/village_scenery.jpg' %}" alt="Paintings of Village Scenery">
+							</picture>
+						</div>
+					</a>
+				</div>
+				
+				<div class = "col-3 col-lg-2 mt-2">
+					<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='winter-scenery-paintings' %}">
+						<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
+							WINTER LANDSCAPE
+						</h4>
+						<div class="curated-container">
+							<picture>
+								<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/landscape/winter_scenery.jpg' %}">
+								<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/landscape/winter_scenery.jpg' %}">
+								<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/landscape/winter_scenery.jpg' %}" alt="Winter Scenery Paintings">
+							</picture>
+						</div>
+					</a>
+				</div>
 
-	<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='night-scenery-paintings' %}">
-		<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
-			NIGHT SCENERY
-		</h4>
-		<div class="curated-container">
-			<picture>
-				<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/landscape/night_scenery.jpg' %}">
-				<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/landscape/night_scenery.jpg' %}">
-				<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/landscape/night_scenery.jpg' %}" alt="Night Scenery Paintings" width=150>
-			</picture>
+				<div class = "col-3 col-lg-2 mt-2">								
+					<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='sunset-art' %}">
+						<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
+							SUNSE
+						</h4>
+						<div class="curated-container">
+							<picture>
+								<source media="(max-width:465px)" srcset="{% static 'img/speciality/sunset_mobile.jpg' %}">
+								<source media="(min-width:465px)" srcset="{% static 'img/speciality/sunset.jpg' %}">
+								<img class = "d-block spciality-art-img" src="{% static 'img/speciality/sunset.jpg' %}" alt="Sunset Art">
+							</picture>
+						</div>
+					</a>
+				</div>
+				
+				<div class = "col-3 col-lg-2 mt-2">
+				<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='sunrise-art' %}">
+					<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
+						SUNRISE
+					</h4>
+					<div class="curated-container">
+						<picture>
+							<source media="(max-width:465px)" srcset="{% static 'img/speciality/sunrise_mobile.jpg' %}">
+							<source media="(min-width:465px)" srcset="{% static 'img/speciality/sunrise.jpg' %}">
+							<img class = "d-block spciality-art-img" src="{% static 'img/speciality/sunrise.jpg' %}" alt="Sunrise Art">
+						</picture>
+					</div>
+				</a>
+				</div>
+			</div>
 		</div>
-	</a>
-	<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='abstract-landscape-paintings' %}">
-		<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
-			ABSTRACT<span class = "d-block d-md-none">&nbsp;</span>
-		</h4>
-		<div class="curated-container">
-			<picture>
-				<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/landscape/abstract_landscape.jpg' %}">
-				<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/landscape/abstract_landscape.jpg' %}">
-				<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/landscape/abstract_landscape.jpg' %}" alt="Abstract Landscape Paintings">
-			</picture>
-		</div>
-	</a>
-	<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='paintings-of-village-scenery' %}">
-		<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
-			VILLAGE SCENERY
-		</h4>
-		<div class="curated-container">
-			<picture>
-				<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/landscape/village_scenery.jpg' %}">
-				<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/landscape/village_scenery.jpg' %}">
-				<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/landscape/village_scenery.jpg' %}" alt="Paintings of Village Scenery">
-			</picture>
-		</div>
-	</a>
-	<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='winter-scenery-paintings' %}">
-		<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
-			WINTER LANDSCAPE
-		</h4>
-		<div class="curated-container">
-			<picture>
-				<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/landscape/winter_scenery.jpg' %}">
-				<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/landscape/winter_scenery.jpg' %}">
-				<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/landscape/winter_scenery.jpg' %}" alt="Winter Scenery Paintings">
-			</picture>
-		</div>
-	</a>
-	<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='sunset-art' %}">
-		<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
-			SUNSET<span class = "d-block d-md-none">&nbsp;</span>
-		</h4>
-		<div class="curated-container">
-			<picture>
-				<source media="(max-width:465px)" srcset="{% static 'img/speciality/sunset_mobile.jpg' %}">
-				<source media="(min-width:465px)" srcset="{% static 'img/speciality/sunset.jpg' %}">
-				<img class = "d-block spciality-art-img" src="{% static 'img/speciality/sunset.jpg' %}" alt="Sunset Art">
-			</picture>
-		</div>
-	</a>
-	<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='sunrise-art' %}">
-		<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
-			SUNRISE<span class = "d-block d-md-none">&nbsp;</span>
-		</h4>
-		<div class="curated-container">
-			<picture>
-				<source media="(max-width:465px)" srcset="{% static 'img/speciality/sunrise_mobile.jpg' %}">
-				<source media="(min-width:465px)" srcset="{% static 'img/speciality/sunrise.jpg' %}">
-				<img class = "d-block spciality-art-img" src="{% static 'img/speciality/sunrise.jpg' %}" alt="Sunrise Art">
-			</picture>
-		</div>
-	</a>
-  </div>
+	</div>

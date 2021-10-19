@@ -63,11 +63,11 @@
 					<div class = "col-12 mt-3">
 						<label class="radio-inline">
 						  <input type="radio" name="generate_type" value = "SET" checked onchange = "set_disp();"
-							id = "all"> FOR ALL SETS AND SINGLE IMAGE PRODUCTS
+							id = "all-sets"> FOR ALL SETS AND SINGLE IMAGE PRODUCTS
 						</label>
 						<label class="radio-inline">
 						  <input class = "ml-3" type="radio" name="generate_type" value = "SINGLE"  onchange = "set_disp();"
-							id = "from"> FROM A SET/SINGLE IMAGE PRODUCT NUMBER ONWARDS
+							id = "from-set"> FROM A SET/SINGLE IMAGE PRODUCT NUMBER ONWARDS
 						</label>
 					</div>
 					<div class = "col-12">
@@ -114,14 +114,14 @@
 	
 	<script>
 		function set_disp(){
-			if ( $("#all").prop('checked') ){
+			if ( $("#all-sets").prop('checked') ){
 				$("#num-div").hide();
 				$("#from_num").val('');
 			} else {
 				$("#num-div").show();
 			}
 			
-			if ( $("#from").prop('checked') ){
+			if ( $("#from-set").prop('checked') ){
 				$("#num-div").show();				
 			} else {
 				$("#num-div").hide();
@@ -132,14 +132,13 @@
 	
 	<script>
 		function generate(){
-			var all_sets = false;
 			var from_num = '';
 			var form_data = {};
-			if ($("#all").prop('checked')){
+			if ($("#all-sets").prop('checked')){
 				all_flag = true;
 				from_flag = false;
 			}
-			if ( $("#from").prop('checked') ) {
+			if ( $("#from-set").prop('checked') ) {
 				from_num = $("#from_num").val();
 				all_flag = false;
 				from_flag = true;

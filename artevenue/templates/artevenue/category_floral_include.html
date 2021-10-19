@@ -1,248 +1,151 @@
 {% load static %}		
-  <div class="slider sub-slider" 
-	style="margin:15px;">
-
-	<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='flower-vase-painting' %}">
-		<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
-			VASE OF FLOWERS
-		</h4>
-		<div class="curated-container">
-			<picture>
-				<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/floral/vase_of_flowers.jpg' %}">
-				<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/floral/vase_of_flowers.jpg' %}">
-				<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/floral/vase_of_flowers.jpg' %}" alt="Flower Vase Paintings" width=150>
-			</picture>
-		</div>
-	</a>
-	<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='rose-paintings' %}">
-		<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
-			ROSE<span class = "d-block d-md-none">&nbsp;</span>
-		</h4>
-		<div class="curated-container">
-			<picture>
-				<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/floral/rose.jpg' %}">
-				<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/floral/rose.jpg' %}">
-				<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/floral/rose.jpg' %}" alt="Rose Paintings">
-			</picture>
-		</div>
-	</a>
-	<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='sunflower-paintings' %}">
-		<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
-			SUNFLOWER<span class = "d-block d-md-none">&nbsp;</span>
-		</h4>
-		<div class="curated-container">
-			<picture>
-				<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/floral/sunflower.jpg' %}">
-				<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/floral/sunflower.jpg' %}">
-				<img class = "d-block spciality-art-img" src="{% static 'img/speciality/sunflower.jpg' %}" alt="Sunflower Paintings">
-			</picture>
-		</div>
-	</a>
-	<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='cherry-blossom-paintings' %}">
-		<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
-			CHERRY BLOSSOM
-		</h4>
-		<div class="curated-container">
-			<picture>
-				<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/floral/cherry_blossom.jpg' %}">
-				<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/floral/cherry_blossom.jpg' %}">
-				<img class = "d-block spciality-art-img" src="{% static 'img/speciality/cherry_blossom.jpg' %}" alt="Cherry Blossom Paintings">
-			</picture>
-		</div>
-	</a>
-	<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='lotus-paintings' %}">
-		<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
-			LOTUS<span class = "d-block d-md-none">&nbsp;</span>
-		</h4>
-		<div class="curated-container">
-			<picture>
-				<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/floral/lotus.jpg' %}">
-				<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/floral/lotus.jpg' %}">
-				<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/floral/lotus.jpg' %}" alt="Lotus Paintings">
-			</picture>
-		</div>
-	</a>
-	<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='almond-blossom-paintings' %}">
-		<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
-			ALMOND BLOSSOM
-		</h4>
-		<div class="curated-container">
-			<picture>
-				<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/floral/almond_blossom.jpg' %}">
-				<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/floral/almond_blossom.jpg' %}">
-				<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/floral/almond_blossom.jpg' %}" alt="Almond Blossom Paintings">
-			</picture>
-		</div>
-	</a>
-	<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='tulip-paintings' %}">
-		<h4 class = "curatedHeading1"  style = "font-size:0.65rem;">
-			TULIP<span class = "d-block d-md-none">&nbsp;</span>
-		</h4>
-		<div class="curated-container">
-			<picture>
-				<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/floral/tulip.jpg' %}">
-				<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/floral/tulip.jpg' %}">
-				<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/floral/tulip.jpg' %}" alt="Tulip Paitings">
-			</picture>
-		</div>
-	</a>
-	<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='abstract-flower-paintings' %}">
-		<h4 class = "curatedHeading1"  style = "font-size:0.65rem;">
-			ABSTRACT FLOWERS
-		</h4>
-		<div class="curated-container">
-			<picture>
-				<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/floral/abstract_flowers.jpg' %}">
-				<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/floral/abstract_flowers.jpg' %}">
-				<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/floral/abstract_flowers.jpg' %}" alt="Abstract Flower Paintings">
-			</picture>
-		</div>
-	</a>
-	<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='van-gogh-sunflowers' %}">
-		<h4 class = "curatedHeading1"  style = "font-size:0.65rem;">
-			<span class = "d-none d-md-block">VAN GOGH</span>
-			<span class = "d-block d-md-none">VAN GOGH SUNFLOWERS</span>
-		</h4>
-		<div class="curated-container">
-			<picture>
-				<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/floral/van_gogh_sunflowers.jpg' %}">
-				<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/floral/van_gogh_sunflowers.jpg' %}">
-				<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/floral/van_gogh_sunflowers.jpg' %}" alt="Van Gogh Sunflower Paintings">
-			</picture>
-		</div>
-	</a>
-
-  </div>
-
-
-<!--
-	<div class="row text-center" id = "sub-cate-include" >
-		<div class = "col-4 col-md-4 col-lg-2 mt-3">
-			<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='flower-vase-painting' %}">
-				<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
-					VASE OF FLOWERS
-				</h4>
-				<div class="curated-container">
-					<picture>
-						<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/floral/vase_of_flowers.jpg' %}">
-						<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/floral/vase_of_flowers.jpg' %}">
-						<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/floral/vase_of_flowers.jpg' %}" alt="Flower Vase Paintings">
-					</picture>
-				</div>
-			</a>
-		</div>
-		<div class = "col-4 col-md-4 col-lg-2 mt-3">
-			<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='rose-paintings' %}">
-				<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
-					ROSE <span class = "d-block d-md-none">&nbsp;</span>
-				</h4>
-				<div class="curated-container">
-					<picture>
-						<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/floral/rose.jpg' %}">
-						<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/floral/rose.jpg' %}">
-						<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/floral/rose.jpg' %}" alt="Rose Paintings">
-					</picture>
-				</div>
-			</a>
-		</div>
-		<div class = "col-4 col-md-4 col-lg-2 mt-3">
-			<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='sunflower-paintings' %}">
-				<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
-					SUNFLOWER <span class = "d-block d-md-none">&nbsp;</span>
-				</h4>
-				<div class="curated-container">
-					<picture>
-						<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/floral/sunflower.jpg' %}">
-						<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/floral/sunflower.jpg' %}">
-						<img class = "d-block spciality-art-img" src="{% static 'img/speciality/sunflower.jpg' %}" alt="Sunflower Paintings">
-					</picture>
-				</div>
-			</a>
-		</div>
-		<div class = "col-4 col-md-4 col-lg-2 mt-3">
-			<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='cherry-blossom-paintings' %}">
-				<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
-					CHERRY BLOSSOM
-				</h4>
-				<div class="curated-container">
-					<picture>
-						<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/floral/cherry_blossom.jpg' %}">
-						<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/floral/cherry_blossom.jpg' %}">
-						<img class = "d-block spciality-art-img" src="{% static 'img/speciality/cherry_blossom.jpg' %}" alt="Cherry Blossom Paintings">
-					</picture>
-				</div>
-			</a>
-		</div>
-		<div class = "col-4 col-md-4 col-lg-2 mt-3">
-			<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='lotus-paintings' %}">
-				<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
-					LOTUS <span class = "d-block d-md-none">&nbsp;</span>
-				</h4>
-				<div class="curated-container">
-					<picture>
-						<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/floral/lotus.jpg' %}">
-						<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/floral/lotus.jpg' %}">
-						<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/floral/lotus.jpg' %}" alt="Lotus Paintings">
-					</picture>
-				</div>
-			</a>
-		</div>
-		<div class = "col-4 col-md-4 col-lg-2 mt-3">
-			<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='almond-blossom-paintings' %}">
-				<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
-					ALMOND BLOSSOM
-				</h4>
-				<div class="curated-container">
-					<picture>
-						<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/floral/almond_blossom.jpg' %}">
-						<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/floral/almond_blossom.jpg' %}">
-						<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/floral/almond_blossom.jpg' %}" alt="Almond Blossom Paintings">
-					</picture>
-				</div>
-			</a>
-		</div>
-		<div class = "col-4 col-md-4 col-lg-2 mt-3">
-			<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='tulip-paintings' %}">
-				<h4 class = "curatedHeading1"  style = "font-size:0.65rem;">
-					TULIP <span class = "d-block d-md-none">&nbsp;</span>
-				</h4>
-				<div class="curated-container">
-					<picture>
-						<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/floral/tulip.jpg' %}">
-						<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/floral/tulip.jpg' %}">
-						<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/floral/tulip.jpg' %}" alt="Tulip Paitings">
-					</picture>
-				</div>
-			</a>
-		</div>
-		<div class = "col-4 col-md-4 col-lg-2 mt-3">
-			<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='abstract-flower-paintings' %}">
-				<h4 class = "curatedHeading1"  style = "font-size:0.65rem;">
-					ABSTRACT FLOWERS
-				</h4>
-				<div class="curated-container">
-					<picture>
-						<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/floral/abstract_flowers.jpg' %}">
-						<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/floral/abstract_flowers.jpg' %}">
-						<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/floral/abstract_flowers.jpg' %}" alt="Abstract Flower Paintings">
-					</picture>
-				</div>
-			</a>
-		</div>
-		<div class = "col-4 col-md-4 col-lg-2 mt-3">
-			<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='van-gogh-sunflowers' %}">
-				<h4 class = "curatedHeading1"  style = "font-size:0.65rem;">
-					<span class = "d-none d-md-block">VAN GOGH</span>
-					<span class = "d-block d-md-none">VAN GOGH SUNFLOWERS</span>
-				</h4>
-				<div class="curated-container">
-					<picture>
-						<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/floral/van_gogh_sunflowers.jpg' %}">
-						<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/floral/van_gogh_sunflowers.jpg' %}">
-						<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/floral/van_gogh_sunflowers.jpg' %}" alt="Van Gogh Sunflowers Paitnings ">
-					</picture>
-				</div>
-			</a>
+	<div class="row">
+		<div class = "col-12 mt-3">
+			<h2>Floral Collection By Themes</h2>
 		</div>
 	</div>
--->
+	<div class="row text-center">
+		<div class = "col-12 col-md-6 mt-3">
+			<div class="row">
+				<div class = "col-3 col-md-3">
+					<h4 class = "curatedHeading1"  style = "font-size:0.65rem;">
+					VASE OF FLOWERS
+					</h4>
+					<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='flower-vase-painting' %}">
+					<div class="curated-container">
+						<picture>
+							<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/floral/vase_of_flowers.jpg' %}">
+							<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/floral/vase_of_flowers.jpg' %}">
+							<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/floral/vase_of_flowers.jpg' %}" alt="Flower Vase Paintings" width=150>
+						</picture>
+					</div>
+					</a>
+				</div>
+
+				<div class = "col-3 col-md-3">
+					<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
+						ROSE<span class = ""><br />&nbsp;</span>
+					</h4>
+					<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='rose-paintings' %}">
+					<div class="curated-container">
+						<picture>
+							<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/floral/rose.jpg' %}">
+							<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/floral/rose.jpg' %}">
+							<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/floral/rose.jpg' %}" alt="Rose Paintings">
+						</picture>
+					</div>
+					</a>
+				</div>
+				<div class = "col-3 col-md-3">
+					<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
+						SUNFLOWER<span class = ""><br />&nbsp;</span>
+					</h4>
+					<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='sunflower-paintings' %}">
+					<div class="curated-container">
+						<picture>
+							<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/floral/sunflower.jpg' %}">
+							<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/floral/sunflower.jpg' %}">
+							<img class = "d-block spciality-art-img" src="{% static 'img/speciality/sunflower.jpg' %}" alt="Sunflower Paintings">
+						</picture>
+					</div>
+					</a>
+				</div>
+				<div class = "col-3 col-md-3">
+					<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
+						CHERRY BLOSSOM
+					</h4>
+					<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='cherry-blossom-paintings' %}">
+					<div class="curated-container">
+						<picture>
+							<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/floral/cherry_blossom.jpg' %}">
+							<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/floral/cherry_blossom.jpg' %}">
+							<img class = "d-block spciality-art-img" src="{% static 'img/speciality/cherry_blossom.jpg' %}" alt="Cherry Blossom Paintings">
+						</picture>
+					</div>
+					</a>
+				</div>
+			</div>
+		</div>
+		<div class = "col-12 col-md-6 mt-3">
+			<div class = "row">
+				<div class = "col-3 col-md-3">
+					<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
+						LOTUS<span class = ""><br />&nbsp;</span>
+					</h4>
+					<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='lotus-paintings' %}">
+					<div class="curated-container">
+						<picture>
+							<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/floral/lotus.jpg' %}">
+							<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/floral/lotus.jpg' %}">
+							<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/floral/lotus.jpg' %}" alt="Lotus Paintings">
+						</picture>
+					</div>
+					</a>
+				</div>
+				
+				<div class = "col-3 col-md-3">
+					<h4 class = "curatedHeading1" style = "font-size:0.65rem;">
+						ALMOND BLOSSOM
+					</h4>
+					<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='almond-blossom-paintings' %}">
+					<div class="curated-container">
+						<picture>
+							<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/floral/almond_blossom.jpg' %}">
+							<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/floral/almond_blossom.jpg' %}">
+							<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/floral/almond_blossom.jpg' %}" alt="Almond Blossom Paintings">
+						</picture>
+					</div>
+					</a>
+				</div>
+				
+				<div class = "col-3 col-md-3">
+					<h4 class = "curatedHeading1"  style = "font-size:0.65rem;">
+						TULIP<span class = ""><br />&nbsp;</span>
+					</h4>
+					<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='tulip-paintings' %}">
+					<div class="curated-container">
+						<picture>
+							<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/floral/tulip.jpg' %}">
+							<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/floral/tulip.jpg' %}">
+							<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/floral/tulip.jpg' %}" alt="Tulip Paitings">
+						</picture>
+					</div>
+					</a>
+				</div>
+				
+				<div class = "col-3 col-md-3">
+					<h4 class = "curatedHeading1"  style = "font-size:0.65rem;">
+						ABSTRACT FLOWERS
+					</h4>
+					<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='abstract-flower-paintings' %}">
+					<div class="curated-container">
+						<picture>
+							<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/floral/abstract_flowers.jpg' %}">
+							<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/floral/abstract_flowers.jpg' %}">
+							<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/floral/abstract_flowers.jpg' %}" alt="Abstract Flower Paintings">
+						</picture>
+					</div>
+					</a>
+				</div>				
+			</div>
+		</div>
+		<div class = "col-12 col-md-6 mt-3">
+			<div class = "row">
+				<div class = "col-3 col-md-3">
+					<h4 class = "curatedHeading1"  style = "font-size:0.65rem;">
+						VAN GOGH
+					</h4>
+					<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='van-gogh-sunflowers' %}">
+					<div class="curated-container">
+						<picture>
+							<source media="(max-width:465px)" srcset="{% static 'img/sub_categories/floral/van_gogh_sunflowers.jpg' %}">
+							<source media="(min-width:465px)" srcset="{% static 'img/sub_categories/floral/van_gogh_sunflowers.jpg' %}">
+							<img class = "d-block spciality-art-img" src="{% static 'img/sub_categories/floral/van_gogh_sunflowers.jpg' %}" alt="Van Gogh Sunflower Paintings">
+						</picture>
+					</div>
+					</a>
+				</div>
+			</div>
+		</div>
+  </div>
+

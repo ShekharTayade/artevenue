@@ -380,6 +380,12 @@
 				$('#id_color').val($('#id_color').val() + "," + "{{c}}");
 			{% endfor %}
 
+			{% if singles == 'NO' %}			
+			wigzo('track', 'categoryview', 'https://artevenue.com/wall-art-sets/');
+			{% else %}
+			wigzo('track', 'categoryview', 'https://artevenue.com/framed-wall-art/?singles=YES');
+			{% endif %}
+
 		});
 
 		$("#id_page_num").val('{{page}}');

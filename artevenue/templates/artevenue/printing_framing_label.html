@@ -11,10 +11,7 @@
 
   <body>
 	<div style = "border : 2px solid gainsboro; padding:10px; line-height:normal !important; page-break-after: always;">
-		<img src="{% static 'img/artevenue_logo_new.png' %}" alt="{{ecom_site.store_name}}"  style="width:110px; height:25px;">
-		<small style = "color: #665d6f; font-family:Helvetica, sans-serif !important; float:right;">www.ArteVenue.com</small>
 		<hr>
-
 		<table "table table-responsive table-striped">
 			<thead>
 				<tr>
@@ -81,11 +78,17 @@
 						{% endif %}
 						<strong>IMAGE SIZE:</strong> {{ oi.image_width }}" X {{oi.image_height }}"<br>
 						{% if oi.print_medium_id|upper == 'CANVAS' %}
-						{% if oi.stretch_id and not oi.moulding_id %}
-						<strong>MIRRORING REQUIRED (STRETCHED CANVAS)</strong>
-						{% else %}
-						<strong>MIRRORING NOT REQUIRED</strong>
-						{% endif %}						
+							{% if oi.stretch_id and not oi.moulding_id %}
+							<strong>2" MARGIN; MIRRORING REQUIRED (STRETCHED CANVAS)</strong>
+							{% elif not oi.stretch_id and not oi.moulding_id %}
+							<strong>2" INCH MARGIN REQUIRED (ROLL)</strong>
+							{% else %}
+							<strong>1.5" INCH MARGIN REQUIRED(FOR FRAMING)</strong>
+							{% endif %}						
+						{% elif oi.print_medium_id|upper == 'PAPER' and not oi.moulding_id %}
+							<strong>1" INCH MARGIN REQUIRED (ROLL)</strong>
+						{% elif oi.print_medium_id|upper == 'PAPER' and oi.moulding_id %}
+							<strong>0.5" INCH MARGIN REQUIRED (FOR FRAMING)</strong>
 						{% endif %}						
 					</td>
 					<td style = "border:1px solid #cfcfcf;">
@@ -138,7 +141,10 @@
 							<strong>ACRYLIC COVERED</strong><br>
 						{% endif %}
 						{% if oi.stretch_id and not oi.moulding_id %}
-							<strong>CANVAS STRETCHED</strong><br>
+							<strong>STRETCHED CANVAS</strong><br>
+						{% endif %}						
+						{% if not oi.moulding_id and not oi.stretch_id %}
+							<strong>NO FRAME</strong><br>
 						{% endif %}						
 					</td>
 				</tr>
@@ -146,14 +152,8 @@
 			</tbody>
 			</tfoot>
 		</table>
-		<br>
 		<hr>
-		{{ecom_site.store_name}}
 	</div>
 
   </body>
 </html>
-
-
-
-

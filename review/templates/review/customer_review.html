@@ -15,27 +15,27 @@
 		<span class = "float-right">
 			<div>
 				{% if overall_rating == 0 %}
-					<img src = "{% static 'img/customer_reviews/0.png'%}" class = "rating-stars">
+					<img data-src = "{% static 'img/customer_reviews/0.png'%}" class = "rating-stars">
 				{% elif overall_rating > 0 and  overall_rating <= 0.5 %}
-					<img src = "{% static 'img/customer_reviews/0point5.png'%}" class = "rating-stars">
+					<img data-src = "{% static 'img/customer_reviews/0point5.png'%}" class = "rating-stars lazyload" >
 				{% elif overall_rating > 0.5 and overall_rating <= 1 %}
-					<img src = "{% static 'img/customer_reviews/1.png'%}" class = "rating-stars">
+					<img data-src = "{% static 'img/customer_reviews/1.png'%}" class = "rating-stars lazyload">
 				{% elif overall_rating > 1 and overall_rating <= 1.5 %}
-					<img src = "{% static 'img/customer_reviews/1point5.png'%}" class = "rating-stars">
+					<img data-src = "{% static 'img/customer_reviews/1point5.png'%}" class = "rating-stars lazyload">
 				{% elif overall_rating > 1.5 and overall_rating <= 2 %}
-					<img src = "{% static 'img/customer_reviews/2.png'%}" class = "rating-stars">
+					<img data-src = "{% static 'img/customer_reviews/2.png'%}" class = "rating-stars lazyload">
 				{% elif overall_rating > 2 and overall_rating <= 2.5 %}
-					<img src = "{% static 'img/customer_reviews/2point5.png'%}" class = "rating-stars">
+					<img data-src = "{% static 'img/customer_reviews/2point5.png'%}" class = "rating-stars lazyload">
 				{% elif overall_rating > 2.5 and overall_rating <= 3 %}
-					<img src = "{% static 'img/customer_reviews/3.png'%}" class = "rating-stars">
+					<img data-src = "{% static 'img/customer_reviews/3.png'%}" class = "rating-star lazyloads">
 				{% elif overall_rating > 3 and overall_rating <= 3.5 %}
-					<img src = "{% static 'img/customer_reviews/3point5.png'%}" class = "rating-stars">
+					<img data-src = "{% static 'img/customer_reviews/3point5.png'%}" class = "rating-stars lazyload">
 				{% elif overall_rating > 3.5 and overall_rating <= 4 %}
-					<img src = "{% static 'img/customer_reviews/4.png'%}" class = "rating-stars">
+					<img data-src = "{% static 'img/customer_reviews/4.png'%}" class = "rating-stars lazyload">
 				{% elif overall_rating > 4 and overall_rating <= 4.5 %}
-					<img src = "{% static 'img/customer_reviews/4point5.png'%}" class = "rating-stars">
+					<img data-src = "{% static 'img/customer_reviews/4point5.png'%}" class = "rating-stars lazyload">
 				{% elif overall_rating > 4.5 %}
-					<img src = "{% static 'img/customer_reviews/5.png'%}">
+					<img data-src = "{% static 'img/customer_reviews/5.png'%}">
 				{% endif %}					
 			</div>
 			<div class = "text-muted" style = "margin-left: 15px; font-size:0.65rem;">{%  if total_reviews > 0 %} ({{total_reviews}} reviews) {% endif %}</div>
@@ -49,27 +49,27 @@
 		<div class = "col-12">
 			<div class = "">
 				{% if r.rating == 0 %}
-					<img src = "{% static 'img/customer_reviews/0.png'%}" class = "rating-stars-review">
+					<img data-src = "{% static 'img/customer_reviews/0.png'%}" class = "rating-stars-review lazyload">
 				{% elif r.rating == 0.5 %}
-					<img src = "{% static 'img/customer_reviews/0point5.png'%}" class = "rating-stars-review">
+					<img data-src = "{% static 'img/customer_reviews/0point5.png'%}" class = "rating-stars-review lazyload">
 				{% elif r.rating == 1 %}
-					<img src = "{% static 'img/customer_reviews/1.png'%}" class = "rating-stars-review">
+					<img data-src = "{% static 'img/customer_reviews/1.png'%}" class = "rating-stars-review lazyload">
 				{% elif r.rating == 1.5 %}
-					<img src = "{% static 'img/customer_reviews/1point5.png'%}" class = "rating-stars-review">
+					<img data-src = "{% static 'img/customer_reviews/1point5.png'%}" class = "rating-stars-review lazyload">
 				{% elif r.rating == 2 %}
-					<img src = "{% static 'img/customer_reviews/2.png'%}" class = "rating-stars-review">
+					<img data-src = "{% static 'img/customer_reviews/2.png'%}" class = "rating-stars-review lazyload">
 				{% elif r.rating == 2.5 %}
-					<img src = "{% static 'img/customer_reviews/2point5.png'%}" class = "rating-stars-review">
+					<img data-src = "{% static 'img/customer_reviews/2point5.png'%}" class = "rating-stars-review lazyload">
 				{% elif r.rating == 3 %}
-					<img src = "{% static 'img/customer_reviews/3.png'%}" class = "rating-stars-review">
+					<img data-src = "{% static 'img/customer_reviews/3.png'%}" class = "rating-stars-review lazyload">
 				{% elif r.rating == 3.5 %}
-					<img src = "{% static 'img/customer_reviews/3point5.png'%}" class = "rating-stars-review">
+					<img data-src = "{% static 'img/customer_reviews/3point5.png'%}" class = "rating-stars-review lazyload">
 				{% elif r.rating == 4 %}
-					<img src = "{% static 'img/customer_reviews/4.png'%}" class = "rating-stars-review">
+					<img data-src = "{% static 'img/customer_reviews/4.png'%}" class = "rating-stars-review lazyload">
 				{% elif r.rating == 4.5 %}
-					<img src = "{% static 'img/customer_reviews/4point5.png'%}" class = "rating-stars-review">
+					<img data-src = "{% static 'img/customer_reviews/4point5.png'%}" class = "rating-stars-review lazyload">
 				{% elif r.rating == 5 %}
-					<img src = "{% static 'img/customer_reviews/5.png'%}" class = "rating-stars-review">
+					<img data-src = "{% static 'img/customer_reviews/5.png'%}" class = "rating-stars-review lazyload">
 				{% endif %}					
 			</div>
 			<div style = "font-wight:500;">
@@ -107,8 +107,8 @@
 			<div style = "padding: 10px;">
 				<div class = "display: flex; justify-content:space-around;">
 					<a onclick = "showCustImg('{{p.pic_id}}')">
-						<img src="{{ p.user_photo_thumbnail.url }}" alt="User Review Picture"
-							class="img-fluid" 
+						<img data-src="{{ p.user_photo_thumbnail.url }}" alt="User Review Picture"
+							class="img-fluid lazyload" 
 							style = "filter: drop-shadow(0.25rem 0.25rem 0.25rem grey);" width=120>
 					</a>
 				</div>		

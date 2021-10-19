@@ -92,8 +92,8 @@
 						<p>Please feel free to contact us using any of the following means</p>
 						<hr>
 						<div class="row">
-							<div class="col-md-4 mt-2" style = "border-left: 1px solid #11b6bd; padding-left: 10px;">
-								<h3><i class="fa fa-map-marker"></i> Address</h3>
+							<div class="col-md-3 mt-2" style = "border-left: 1px solid #11b6bd; padding-left: 10px;">
+								<h3><i class="fa fa-map-marker"></i> Registered Address</h3>
 								<p><strong>{{ ecom_site.store_name }}</strong><br>
 								{{ ecom_site.store_address1 }}<br>
 								{% if ecom_site.store_address2 %}
@@ -102,24 +102,25 @@
 								{{ ecom_site.store_city }}<br>
 								{{ ecom_site.store_zip }} &nbsp;{{ ecom_site.store_country }}<br>
 							</div>
-							<div class="col-md-4 mt-2" style = "border-left: 1px solid #11b6bd; padding-left: 10px;">
-								<h3><img src = "{% static 'img/whatsapp_logo.png' %}" width=15 alt="WhatsApp Logo"></i> WhatsApp Support</h3>
-								<p class="text-muted">Send us a WhatsApp message -</p>
+							<div class="col-md-3 mt-2" style = "border-left: 1px solid #11b6bd; padding-left: 10px;">
+								<!--<h3><img src = "{% static 'img/whatsapp_logo.png' %}" width=15 alt="WhatsApp Logo"></i> WhatsApp Support</h3>-->
+								<p class="text-muted">Customer support over WhatsApp -</p>
 								<p>
 									<a href = "https://wa.me/919535805505?text=Hi,%20I%20need%20help%20with"
 										style = "font-size: 0.75rem;" 
 										target = "_blank">
-										<img src = "{% static 'img/whatsapp_logo.png' %}" width=40 alt="WhatsApp Logo"> 
+										<img src = "{% static 'img/whatsapp_logo.png' %}" width=15 alt="WhatsApp Logo"> 
 										<span style = "text-decoration: underline;
 											font-family: 'Lato', sans-serif; font-size: 14px; color: #212529;
 											letter-spacing: 0.5px;">
 											95358 05505
 										</span>
+										<p class="text-muted">Time: between {{ecom_site.phone_support_start_time}} to {{ecom_site.phone_support_end_time}} We will be happy to help you.</p>
 									</a>
 								</p>
 							</div>
-							<div class="col-md-4 mt-2" style = "border-left: 1px solid #11b6bd; padding-left: 10px;">
-								<h3><i class="fa fa-phone"></i> Phone Support</h3>
+							<div class="col-md-3 mt-2" style = "border-left: 1px solid #11b6bd; padding-left: 10px;">
+								<h3><i class="fa fa-phone"></i> Sales / Bulk Orders</h3>
 								<p><a href="tel:{{ecom_site.support_phonenumber }}">
 									<span style = "text-decoration: underline;
 										font-family: 'Lato', sans-serif; font-size: 14px; color: #212529;
@@ -128,14 +129,23 @@
 									</span>
 									</a>
 								</p>
-								<p class="text-muted">Time: between {{ecom_site.phone_support_start_time}} to {{ecom_site.phone_support_end_time}}. We will be happy to help you.</p>
+								<p class="text-muted">Time: between {{ecom_site.phone_support_start_time}} to {{ecom_site.phone_support_end_time}} We will be happy to help you.</p>
 							</div>
-							<div class="col-md-4 mt-2" style = "border-left: 1px solid #11b6bd; padding-left: 10px;">
+							<div class="col-md-3 mt-2" style = "border-left: 1px solid #11b6bd; padding-left: 10px;">
 								<h3><i class="fa fa-envelope"></i> Email support</h3>
 								<p class="text-muted">Please feel free to write an email to us at -</p>
 								<p>
 								  <strong><a href="mailto:support@artevenue.com">support@artevenue.com</a></strong>
 								</p>
+							</div>
+							<div class="col-md-3 mt-2" style = "border-left: 1px solid #11b6bd; padding-left: 10px;">
+								<h3><i class="fa fa-map-marker"></i> Address For Returns</h3>
+								<p><strong>Montage</strong><br>
+								#177/4, Dorasani Palya<br>
+								Industrial Layout, JP Nagar 4th Phase<br>
+								Bengaluru<br>
+								560078 India<br>
+								Ph: 98803 37048
 							</div>
 						</div>
 						<hr>
@@ -143,7 +153,7 @@
 						<div id="map"></div>
 						<hr>
 						<div id = "contactform">
-							<h2>Contact form</h2>
+							<h2>Contact form - Send us a message</h2>
 						</div>
 						<div class="row justify-content-center">
 							<div class="col-8">

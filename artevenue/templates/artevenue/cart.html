@@ -270,12 +270,66 @@
 				$("#msg-emptycart").modal("show");
 				return false;
 			}
-			if ( parseFloat(cart_total) <= 0 ){
+			
+			var itm_qty = '{{usercart.quantity}}';
+			if (itm_qty == ''){
+				itm_qty = '0';
+			}			
+			//if ( parseFloat(cart_total) <= 0 ){
+			if (parseInt(itm_qty) < 1){
 				$("#msg-emptycart").modal("show");
 				return false;
-			} else {
-				return true;
 			}
+
+			dataLayer.push({ ecommerce: null });  // Clear the previous ecommerce object.
+			dataLayer.push({
+				event: "begin_checkout",
+				ecommerce: {
+				items: [
+				  {% for i in usercartitems %}
+				  {
+					item_name: "{{i.product__name}}", // Name or ID is required.
+					item_id: "{{i.product_id}}",
+					price: {{i.item_total}},
+					item_brand: "Arte'Venue",
+					item_category: "",
+					item_category2: "",
+					item_category3: "",
+					item_category4: "",
+					item_variant: "",
+					item_list_name: "",
+					item_list_id: "",
+					index: 1,
+					quantity: {{i.quantity}}
+				  },
+				  {% endfor %}
+				]
+				}
+			});
+			
+			userimg_flg = false;
+			var prod_arr = [];
+			{% for i in usercartitems %}
+				{% if i.product_type == 'USER-IMAGE' %}
+					prod_arr.push("https://arteveneue.com/custom-photo-frames/"); 
+					userimg_flg = true;
+				{% endif %}
+				{% if i.product_type == 'STOCK-IMAGE' %}
+					prod_arr.push("https://arteveneue.com/art-print/{{i.product_id}}/"); 
+				{% endif %}
+				{% if i.product_type == 'STOCK-COLLAGE' %}
+					prod_arr.push("https://arteveneue.com/wall-art-collage-set/{{i.product_id}}/"); 
+				{% endif %}
+			{% endfor %}
+
+			if (userimg_flg == true && parseFloat(cart_total) < 1200){
+				$("#msg").html("Cart contains custom photo framing items (image(s) uploaded by you for printing/framing). Minimum cart value of Rs 1,200 is required.");
+				$("#msg-modal").modal("show");
+				return false;
+			};
+			wigzo('track', 'checkoutstarted', prod_arr);
+			
+			return true;
 		}
 		
 		function applyVoucher(cart_id, v_code, cart_total) {
@@ -483,6 +537,24 @@
 				applyVoucher( '{{usercart.cart_id}}', '{{v_code}}','{{usercart.cart_total}}');
 			{% endif %}
 
+		    $(window).keydown(function(event){
+				if(event.keyCode == 13) {
+				event.preventDefault();
+				return false;
+				}
+			});
+
 		});
 		</script>
+		
+		<script>
+		$("#v_code").on("keyup ", function(event) {
+			if (event.keyCode === 13) {
+				event.preventDefault();
+				document.getElementById("v_btn").click();
+			}
+		});		
+
+		</script>
+				
 	{% endblock jscripts %}

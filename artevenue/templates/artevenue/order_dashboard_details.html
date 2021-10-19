@@ -53,15 +53,18 @@
 							<div class="panel-heading">
 								<h4 class="panel-title" style = "background-color: #f9f9f9; 
 										padding:15px;">
-									<a data-toggle="collapse" href="#collapse1" style = "text-decoration: underline;">
+									<a data-toggle="" href="#collapse1" style = "text-decoration: underline;">
 										<strong>FILTER</strong>
 									</a>
-									{% if filter_applied %}<span class="pull-right" style = "color: #11b6bd;"><i class = "fa fa-exclamation" style = "color: red;"></i> Filter(s) are applied</span>{% endif %}
+									{% if filter_applied %}
+									<span class="pull-right" style = "color: #11b6bd;">
+									<i class = "fa fa-exclamation" style = "color: red;"></i> 
+									Filter(s) are applied</span>{% endif %}
 								</h4>
 							</div>
 							<form method = 'POST'>
 							{% csrf_token %}
-							<div id="collapse1" class="panel-collapse collapse">
+							<div id="collapse1" class="">
 								<div class="panel-body">
 									<div class="row">
 										<div class = "col-6 col-md-3">
@@ -114,6 +117,9 @@
 												<label class = "checkbox-inline ml-2">
 													<input type="checkbox" value="IN" name ="ORDER_STATUS" id = "in_transit" {% if f_in_transit %} checked {% endif %}> In Transit
 												</label>
+												<label class = "checkbox-inline ml-2">
+													<input type="checkbox" value="CO" name ="ORDER_STATUS" id = "delivered" {% if f_delivered %} checked {% endif %}> Delivered
+												</label>
 										</div>								
 										<div class = "col-4 col-md-2">
 											<span style = "text-decoration: underline; cursor: pointer;" onclick="clearFilters();">Clear All Filters</span> 
@@ -135,17 +141,20 @@
 					<div class="panel-heading">
 						<h4 class="panel-title" style = "background-color: #11b6bd; padding:15px;">
 							<div class = "row">
-							<div class="col-3 text-center" style = "color:#fff; font-weight:700;">
+							<div class="col-3 col-md-2 text-center" style = "color:#fff; font-weight:700;">
 								New (In Process): {{new|default_if_none:'0'}} 
 							</div>
-							<div class="col-3 text-center" style = "color:#fff; font-weight:700;">
+							<div class="col-3 col-md-2  text-center" style = "color:#fff; font-weight:700;">
 								In Production: {{in_prod|default_if_none:'0'}}
 							</div>
-							<div class="col-3 text-center" style = "color:#fff; font-weight:700;">
+							<div class="col-3 col-md-2  text-center" style = "color:#fff; font-weight:700;">
 								Ready For Shipping: {{ready_for_shipping|default_if_none:'0'}}
 							</div>
-							<div class="col-3 text-center" style = "color:#fff; font-weight:700;">
+							<div class="col-3 col-md-2  text-center" style = "color:#fff; font-weight:700;">
 								In Transit: {{in_transit|default_if_none:'0'}}
+							</div>
+							<div class="col-3 col-md-2  text-center" style = "color:#fff; font-weight:700;">
+								Delivered: {{delivered|default_if_none:'0'}}
 							</div>
 							</div>
 						</h4>
@@ -172,12 +181,17 @@
 							, {{o.order_billing.city}}
 						</h4>	
 					</div>
-					<div class = "col-4"  style = "color:#11b6bd;">
+					<div class = "col-3"  style = "color:#11b6bd;">
 						<h4>
 							<strong>Order Status: {{o.get_order_status_display}}</strong>
 						</h4>
 					</div>
-					<div class="col-4">
+					<div class = "col-3"  style = "color:#11b6bd;">
+						<h4>
+							<strong>Payment Type: {{o.get_payment_type_display}}</strong>
+						</h4>
+					</div>
+					<div class="col-2">
 						<button data-toggle="collapse" data-target="#ord_details_box_{{o.order_id}}" 
 							class = "btn btn-primary pull-right">
 							Order Details
@@ -333,50 +347,6 @@
 		});	
 	</script>
 	<script>
-		function make_in_transit(order_id, order_number, shipper, method, track_no, ship_dt, track_url){
-			if (confirm("You are shipping this order: " + order_number + ". Please make sure tracking information is updated." )){
-				$.ajax({
-						url: "{% url 'make_in_transit' %}", 
-						data: {'order_id':order_id, 'order_number':order_number, 'shipper':shipper, 'method':method, 'track_no':track_no, 'track_url':track_url},
-						dataType: 'text', 
-					success: function (data) {
-						data = JSON.parse(data);
-						sts = data.status;
-						if (sts = "SUCCESS") {
-							$("#box_" + order_id ).hide();
-							var cnt = parseInt( $("#ord_cnt").html());
-							if ( isNaN(cnt) || cnt == 1){
-								i = 0;
-							} else {
-								i = cnt - 1;
-							}
-							$("#ord_cnt").html(i);
-						} else {
-							alert("Sorry! an error occured in updating the order.");
-						}
-					},
-					error: function(xhr){
-						alert("An error occured: " + xhr.status + " " + xhr.statusText); 
-					}
-				});			
-			}
-		}
-		
-		
-		function get_invoice(order_number){
-			$.ajax({
-					url: "{% url 'get_invoices' %}", 
-					data: {'order_num':order_number, 'printpdf': 'YES'},
-					dataType: 'text', 
-					type: 'POST',
-				success: function (data) {
-				},
-				error: function(xhr){
-					alert("An error occured: " + xhr.status + " " + xhr.statusText); 
-				}
-			});			
-		}
-		
 		
 		function clearFilters(){
 		
@@ -390,6 +360,7 @@
 			$("#in_prod").prop('checked', false);
 			$("#ready").prop('checked', false);
 			$("#in_transit").prop('checked', false);
+			$("#delivered").prop('checked', false);
 			
 		}
 	</script>

@@ -6,7 +6,8 @@
 				</div>
                 <div class="modal-body" style="padding:0px;">
                     <div class="coupon">
-                        <img src="{% static 'img/15off.jpg' %}" 
+                        <img data-src="{% static 'img/15off.jpg' %}" 
+							class = "lazyload"
 							alt="Arte'Venue: 15% off coupon"
 							onclick = "$('#promocontent').hide(); $('#signup_popup-modal').modal('show');"
 							style = "cursor:pointer;">

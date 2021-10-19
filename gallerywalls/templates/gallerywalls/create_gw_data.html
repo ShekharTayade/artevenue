@@ -1,0 +1,936 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load utils %}
+
+{% block page-title %} 
+	<title>
+		Arte'Venue | Create Gallery Wall
+	</title>
+{% endblock page-title %} 
+
+{% block page-description %}
+<meta name="description" content="Enter Data for a gallery wall">
+{% endblock page-description %}
+  
+{% block page-keywords %}
+<meta name="keywords" content="">
+{% endblock page-keywords %}
+  
+{% block page-author %}
+<meta name="author" content="Arte'venue">
+{% endblock page-author %}
+
+
+{% block jqueryui-stylesheet %}
+{% endblock jqueryui-stylesheet %}
+
+{% block jqueryui-script %}
+{% endblock jqueryui-script %}
+
+{% block popper-script %}
+{% endblock popper-script %}
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+{% block lazysizes %}
+{% endblock lazysizes %}
+
+{% load moulding_url %}
+{% load update_cart_message from estore_base %}
+
+
+{% block sitecontent %}
+<div class="container  mb-5">
+	<div class="row">
+		<!-- breadcrumb-->
+		<div class="col-sm-12">
+			<nav aria-label="breadcrumb">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+					<li class="breadcrumb-item"><a href="{% url 'staff_page' %}">Staff Page</a></li>
+					<li class="breadcrumb-item"><a href="{% url 'create_gallery_wall' %}">Create Gallery Wall</a></li>
+					<li aria-current="page" class="breadcrumb-item active">Enter Data For Gallery Wall</li>
+				</ol>
+			</nav>
+		</div>
+	</div>
+	<div id = "gal">
+	<div class="row">
+		<div class="col-12 tex-center">
+			<h1 class="text-center">CREATE GALLERY WALL</h1>
+			<h2 class="text-center">A SET {{set_of}}</h2>
+		</div>
+	</div>
+	
+	<div class="row mt-3">	
+		<div class = "col-12 col-md-6 mt-3">
+			<div class="form-group">
+				<label for="name">NAME/TITLE:</label>
+				<input readonly type="text" class="form-control" id="name" style="width: 100%;" value = "{{title}}">
+			</div>
+		</div>
+		<div class = "col-12  col-md-6 mt-3">
+			<div class="form-group">
+				<label for="description">DESCRIPTIONS:</label>
+				<input readonly type="text" class="form-control" id="description" style="width: 100%;" value = "{{desc}}">
+			</div>
+		</div>
+		<div class = "col-6">
+			<div class="form-group">
+				<label for="colors">ROOM:</label>
+				<input readonly type="text" class="form-control" id="colors" style="width: 100%;" value = "{{room.name}}">
+			</div>
+		</div>
+		<div class = "col-6">
+			<div class="form-group">
+				<label for="s-keywords">PLACEMENT:</label>
+				<input readonly type="text" class="form-control" id="s-keywords" style="width: 100%;" value = "{{placement.name}}">
+			</div>
+		</div>
+		<div class = "col-6">
+			<div class="form-group">
+				<label for="colors">COLORS:</label>
+				<input readonly type="text" class="form-control" id="colors" style="width: 100%;" value = "{{colors}}">
+			</div>
+		</div>
+		<div class = "col-6">
+			<div class="form-group">
+				<label for="s-keywords">KEYWORDS:</label>
+				<input readonly type="text" class="form-control" id="s-keywords" style="width: 100%;" value = "{{key_words}}">
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class = "col-12">
+			<hr>
+		</div>
+	</div>
+
+	<div class="row" style = "border: 1px solid #ddd; padding:5px;">
+		<div class="col-6 tex-center mt-3">
+			<span id = "upload_creative" class="" style = "width: 50%;">
+				ROOM VIEW / CREATIVE
+			</span>
+		</div>
+		<div class = "col-6">
+			<div id = "upload-pics" class = "row">
+				<div class = "photos-div">
+					<div class="file-upload-content" id = "content-1">
+						<img id = "room-view-img" class="file-upload-image" alt="User Photo 1" 
+							style = "padding:0px;" width=150/>
+						<i title="Remove Photo" 
+							class = "fa fa-trash pull-right" 
+							id = "delete-photo1"
+							style = "cursor: ponter; display:block;"
+							onclick = "removeUpload('1');">
+						</i> 
+					</div>
+					<div class = "row">
+						<div class = "col-12">
+							<div class="image-upload-wrap" id = "wrap-1" style = "margin-top: 0px; border: 2px solid  #e6e6e6;">
+								<div class="btn-default btn-file drag-text" style = "display: block;">
+									<input class="file-upload-input"  id = "input-1" 
+										type='file' 
+										onchange="readURL(this, '1');" 
+										accept="image/png, image/jpeg, image/gif, image/bmp" 
+										name="user_photo1" 
+										class="form-control"
+										style = "box-sizing: border-box;"/>
+									<div id = "upload-show1" onclick="$('#input-1').trigger( 'click' );">
+										<span style = "font-size: 0.7rem;" class = "text-center">
+											Click to Upload or Drag & Drop
+										</span>
+										<img id = "img-1" src = "{% static 'img/custom_framing/upload_icon.png' %}" 
+											class = "mt-4 mb-4"
+											alt="Upload Image Icon" 
+											width=40 style="  display: block; margin-left: auto; margin-right: auto; width: 30%;">
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+			</div>
+		</div>
+	</div>
+
+
+	<div class = "row" style = "">
+		<div class = "col-12">
+			<hr>
+		</div>
+	</div>
+	<div class = "row" style = "">
+		<div class = "col-12">
+			ENTER ARTWORK DETAILS
+		</div>
+	</div>
+	{% for i in set_range %}	
+	<div class = "row mt-3" style = "border: 1px solid #ddd; padding:10px;">
+		<div class = "col-12">
+			<div class = "col-12">
+				<span class = "offer_num pull-left">{{i|add:1}}</span>
+			</div>
+		</div>	
+	
+		<div class = "col-12 col-md-6 mt-3">
+			<div class="form-group">
+			  <label>PRINT SURFACE:</label>
+			  <select class="form-control" id="surface_{{i}}" onchange = "set_stretched('{{i}}');"> 
+				{% for p in printmedium %}
+				<option value = "{{p}}">{{p}}</option>
+				{% endfor %}
+			  </select>
+			</div>					
+		</div>
+		<div>
+			<input hidden type="text" class="form-control" id="duplicate_image" value = "NO">
+		</div>
+		<div class = "col-12 col-md-6 mt-3">
+			<div class="form-group">
+			  <label for="sel1">FRAME:</label>
+			  <select class="form-control" id="moulding_id_{{i}}" onchange="set_stretched('{{i}}');">
+				{% for m in mouldings %}
+				<option value = "{{m.moulding_id}}">{{m.name}} ({{m.width_inches}} inch)</option>
+				{% endfor %}
+				<option value = "0">None</option>
+			  </select>
+			</div>					
+		</div>
+		<div class = "col-12">
+			<div class = "row">
+				<div class = "col-6">
+					<div class="form-group">
+					  <label>MOUNT:</label>
+					  <select class="form-control" id="mount_id_{{i}}">
+						{% for m in mounts %}
+						<option value = "{{m.mount_id}}">{{m.name}}</option>
+						{% endfor %}
+						<option value = "">None</option>
+					  </select>
+					</div>
+				</div>
+				<div class = "col-6">
+					<label>MOUNT SIZE:</label>
+					<input type="number" class="form-control" placeholder="Mount Size" id="mount_size_{{i}}">
+				</div>
+			</div>					
+		</div>
+		<div class = "col-12">
+			<div class = "row">
+				<div class = "col-6">
+					<input id = "stretched_{{i}}" type = "checkbox" disabled>
+					Stretched Canvas?
+				</div>
+			</div>
+		</div>
+		
+		<div class = "col-12 col-md-6 mt-3">		
+			<div class = "row">
+				<div class = "col-12">
+					<label >Product ID:</label>
+					<input hidden value="" type = "number" id = "aspect_ratio_{{i}}">
+				</div>
+				<div class = "col-4">
+					<div class="form-group">
+					  <input type="text" class="form-control" id="product_id_{{i}}" max_length="8">
+					</div>
+				</div>
+				<div class = "col-8">
+					<input readonly type="text" class="form-control" id="product_name_{{i}}">
+				</div>
+			</div>
+			<div class = "row" id = "prod_{{i|add:1}}">
+				<div class = "col-12 pull-right">
+					<button id = "fetch_{{i}}" class = "btn btn-secondary" type = "button" 
+						onclick="get_product('{{i}}'); getFramedImg('1');">
+						<i class = "fa fa-caret-right"></i>
+					</button>
+				</div>
+			</div>
+		</div>
+		<div class = "col-12 col-md-6 mt-3 gal_items">
+			<div class="img-container" style= "background-color: transparent; position: relative;">
+				<img id = "prod-img_{{i}}" src="" alt="Wall art:" class="img-fluid image-display lazyload" 
+						style = "display: block; margin-left: auto; margin-right: auto;">
+			</div>
+		</div>
+		<div class = "col-12">
+			<div class = "row align-items-center">
+				<div class = "col-12 col-md-6 mt-3">
+					<label>IMAGE SIZE:</label>		
+					<div class="form-inline">
+						<div class="form-group">
+							<label>Width:</label>
+							<input type="number" class="form-control" id="image_width_1_{{i}}"
+								onchange = "getHeight( $(this).val(), '1', '{{i}}' );">
+						</div>
+						<div class="form-group">
+							<label>Height:</label>
+							<input type="number" class="form-control"id="image_height_1_{{i}}"
+								onchange = "getWidth( $(this).val(), '1', '{{i}}' );">
+						</div>
+					</div>
+				</div>
+				<div class = "col-12 col-md-6 mt-3 text-center">
+					<strong>FINISHED SIZE:</strong><span id = "f_size_1_{{i}}"></span>
+				</div>		
+				<div class="col-12 text-center">
+					<hr>
+				</div>
+			</div>
+		</div>
+	</div>
+	{% endfor %}	
+	<div class="row mt-3 align-items-center"  style = "border: 1px solid #ddd; padding:10px;">
+		<div class="col-12 text-center mt-3">
+			<strong>VARIATION 1 (PARENT)</strong>
+		</div>
+		<div class="col-12 col-md-6 text-center mt-3">
+			SIZE:
+		</div>
+		<div class="col-6 col-md-3 text-center">
+			<div class="form-group">
+				<label>Wall Area Width:</label>
+				<input value="" type = "number" id = "wall_area_width_1" class = "form-control">
+			</div>
+		</div>
+		<div class="col-6 col-md-3 text-center">
+			<div class="form-group">
+				<label">Wall Area Height:</label>
+				<input value="" type = "number" id = "wall_area_height_1" class = "form-control">
+			</div>
+		</div>
+	</div>
+	<div class="row mt-3">
+		<div class="col-12 text-center">
+			<hr>
+		</div>
+	</div>
+	<div class="row mt-3">
+		<div class="col-12 text-center">
+			<hr>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-12">
+			<button class = "btn btn-primary" onclick = "create_new_variation();"><i class = "fa fa-plus"> CREATE VARIATION </i> </buton> 
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-12 text-center">
+			<hr>
+		</div>
+	</div>
+	<div id = "variations">
+		<!--
+		<div class = "variation_1 row box mt-3">
+			<div class = "col-12 align-items-center" style = "background-color: #ddd; padding:5px;">
+				<strong>VARIATION 1 <i class = "fa fa-chevron-right"></i></strong>
+				<button class = "btn btn-secondary pull-right"><i class = "fa fa-trash"> Remove  </i> </button> 
+			</div>			
+			<div class = "col-12">
+				<div class = "row">
+					<div class = "col-12 col-md-4">
+						<label >Product ID:</label>
+						 <input readonly type="text" class="form-control" id="" max_length="8">
+					</div>
+					<div class="col-6 col-md-3 text-center">
+						<div class="form-group">
+							<label for="name">Image Width:</label>
+							<input value="" type = "number" id = "wall_area_width" class = "form-control">
+						</div>
+					</div>
+					<div class="col-6 col-md-3 text-center">
+						<div class="form-group">
+							<label for="name">Image Height:</label>
+							<input value="" type = "number" id = "wall_area_height" class = "form-control">
+						</div>
+					</div>			
+					<div class = "col-12 col-md-2 text-center">
+						<strong>Finished Size:</strong><span id = ""></span>
+					</div>		
+				</div>
+			</div>
+			<div class = "col-12">
+				<div class = "row">
+					<div class = "col-12 col-md-4">
+						<label >Product ID:</label>
+						 <input readonly type="text" class="form-control" id="" max_length="8">
+					</div>
+					<div class="col-6 col-md-3 text-center">
+						<div class="form-group">
+							<label for="name">Image Width:</label>
+							<input value="" type = "number" id = "wall_area_width" class = "form-control">
+						</div>
+					</div>
+					<div class="col-6 col-md-3 text-center">
+						<div class="form-group">
+							<label for="name">Image Height:</label>
+							<input value="" type = "number" id = "wall_area_height" class = "form-control">
+						</div>
+					</div>			
+					<div class = "col-12 col-md-2 text-center">
+						<strong>Finished Size:</strong><span id = ""></span>
+					</div>		
+				</div>
+			</div>
+			<div class = "col-12">
+				<div class = "row align-items-center">
+					<div class="col-12 col-md-3 text-center mt-3">
+						SIZE: 
+					</div>
+					<div class="col-6 col-md-4 text-center">
+						<div class="form-group">
+							<label for="name">Wall Area Width:</label>
+							<input value="" type = "number" id = "wall_area_width" class = "form-control">
+						</div>
+					</div>
+					<div class="col-6 col-md-4 text-center">
+						<div class="form-group">
+							<label for="name">Wall Area Height:</label>
+							<input value="" type = "number" id = "wall_area_height" class = "form-control">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		-->
+	</div>
+	<div id = "remove-div" class="row mt-3" style = "display:none;">
+		<div class = "col-12"> 
+			<div class = "row align-items-center"> ' 
+				<div class = "col-12"> 
+					<button class = "btn btn-secondary" id = "remove_vaiation" onclick="remove_variation();" >
+						<i class = "fa fa-trash"> Remove Variation </i>
+					</button>
+				</div>
+				<div class = "col-12"> 
+					<span>(Latest variation will be removed)</span>
+				</div>
+			</div>
+		</div>			
+	</div>
+	<div class="row mt-3">
+		<div class="col-12 text-center">
+			<hr>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-12 text-center mt-3">
+			<button id = "create_gallery" class="btn btn-primary" style = "width: 50%;"
+				onclick = "save();">
+				CREATE GALLERY WALL
+			</button>
+		</div>
+	</div>
+	{% include 'artevenue/message-modal_ok.html' %}		
+	{% include 'artevenue/modal_yesno.html' %}	
+	</div>
+</div>
+
+{% endblock sitecontent %}
+
+{% block jscripts %}
+	<script>
+		$( document ).ready(function() {
+		});	
+		
+		num_of_variations = 1;
+	</script>
+
+
+	<script>
+		function get_product(seq){
+			var prod_id = $("#product_id_"+seq).val();
+			
+			if (prod_id == 'undefined' || prod_id == ''){
+				return
+			}
+
+			$.ajax({
+					url: "{% url 'get_product' %}", 
+					data: {'prod_id':prod_id, 
+						}, 
+					dataType: 'text', 
+				success: function (data) {
+					response = JSON.parse(data);
+					$("#aspect_ratio_" + seq).val(response.aspect_ratio);
+					$("#product_name_" + seq).val(response.product_name);
+					var wdt = $("#width").val();
+					if (wdt != 'undefined' && wdt != ''){
+						getHeight( wdt );
+					}
+					
+				},
+				error: function(xhr){
+					alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+				}
+			});					
+		}
+	
+		function getFramedImg (v) {
+			{% for i in set_range %}
+				var currwidth = $("#image_width_" + v + "_{{i}}").val();
+				if (currwidth == 'undefined' || currwidth == '') {
+					currwidth = 10;	
+					$("#width").val(10);
+				}
+				
+				var prod_id = $("#product_id_{{i}}").val();
+				if (prod_id != 'undefined' && prod_id != '' ){			
+					var moulding_id = $("#moulding_id_{{i}}").val();
+					var mnt_id = $("#mount_id_{{i}}").val();
+
+					var mnt_color = '0';
+					{% for m in mounts %}
+					if ({{m.mount_id}} == mnt_id) {
+						mnt_color = "{{m.color}}"
+					}
+					{% endfor%}
+					
+					var mnt_size = $("#mount_size_{{i}}").val();
+					if ($('#surface_{{i}}').val() != 'PAPER') {
+						mnt_id = '0';
+						mnt_color = '';
+						mnt_size = '0'			
+					}
+
+					var str_canvas = 'NO';
+					if ( $('#stretched_{{i}}').prop('checked') == true) {
+						str_canvas = 'YES';			
+					}
+					
+					
+					// Get the framed image
+					$.ajax({
+							url: "{% url 'get_framed_image' %}", 
+							data: {'prod_id':prod_id, 'moulding_id': moulding_id,
+									'mount_color':mnt_color, 'mount_size':mnt_size, 'image_width':currwidth,
+									'stretched_canvas': str_canvas, 'imgtilt': 'YES', 'dropshadow': 'YES'
+								}, 
+							dataType: 'text', 
+						success: function (data) {
+							document.getElementById("prod-img_{{i}}").src = "data:image/png;base64," + data;						
+							},
+						error: function(xhr){
+							alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+						}
+					});
+				}
+			{% endfor %}
+		}
+		
+		function validate_all_data(){
+			var width = $("#width").val();
+			if ( width == 'undefined' || width == '' ){
+				$('#msg').html("Image width is not entered");
+				$('#msg-modal').modal('show');
+				return false;
+			}
+			var surface = $("#surface").val();
+			if ( surface == 'undefined' || surface == '' ){
+				$('#msg').html("Print surface is not selected");
+				$('#msg-modal').modal('show');
+				return false;
+			}
+			
+			
+			// Check data
+			{% for s in set_range %}			
+				var ratio = [];
+				var prod_arr = [];
+				var valid_flg = true;
+				var all_prods = true;
+
+				{% for i in set_range %}
+					var pid = $("#product_id_{{i}}").val(); 
+					var img = $("#prod-img_{{i}}").prop('src'); 
+					prod_arr.push(pid);
+					
+					if ( pid == 'undefined' || pid == ''){
+						all_prods = false;
+						valid_flg = false;
+					}
+					if (img == 'undefined' || img == ''){
+						$('#msg').html("Please fetch images for all products");
+						$('#msg-modal').modal('show');
+						return;
+					}
+						
+				{% endfor %}
+				if (all_prods == false){
+					$('#msg').html("Please enter product ID for all");
+					$('#msg-modal').modal('show');
+					return false;
+				}								
+			{% endfor %}
+			
+			if ( $("#room-view-img").prop('src') == '' ) {
+				$('#msg').html("Room view/creative image is not uploaded.");
+				$('#msg-modal').modal('show');
+				return false;
+			}
+		
+		}
+	</script>
+	
+
+
+	<script>
+		function readURL(input, num) {
+		    if (input.files && input.files[0]) {
+				var reader = new FileReader();
+				var upd_wrap = '#wrap-' + num;
+				var upd_img = '#room-view-img';
+				var upd_content = '#content-' + num;
+				reader.onload = function(e) {
+				$(upd_wrap).hide();
+				$(upd_img).attr('src', e.target.result);
+				$(upd_content).show();
+			};
+			reader.readAsDataURL(input.files[0]);
+		  } else {
+			removeUpload(num);
+		  }
+		}
+
+		function removeUpload(num) {
+			var upd_wrap = '#wrap-' + num;
+			var upd_img = '#room-view-img'
+			var upd_inp = '#upd-input-' + num
+			var upd_content = '#content-' + num;
+			var inp = "#input-" + num;
+			$(upd_inp).replaceWith($(upd_inp).clone());
+			$(upd_content).hide();
+			$(upd_wrap).show();
+			$("#room-view-img").prop('src', '');
+		}
+	</script>
+
+	<script>
+		$('.image-upload-wrap').bind('dragover', function () {
+			$('.image-upload-wrap').addClass('image-dropping');
+		});
+		$('.image-upload-wrap').bind('dragleave', function () {
+			$('.image-upload-wrap').removeClass('image-dropping');
+		});
+	</script>	
+
+	
+	<script>
+		function save(){
+			if (validate_all_data() == false) {
+				return;
+			}
+		
+			var fileInput = document.getElementById('input-1');
+			var file1 = fileInput.files[0];
+			var formData = new FormData();
+			formData.append('file1', file1);
+		
+			var ratio = [];
+			var prod_arr = [];
+			var category_id_str = '';
+			var valid_flg = true;
+			var all_prods = true;
+
+			var json_i = [];
+			{% for i in set_range %}
+				var pid = $("#product_id_{{i}}").val(); 
+				if ( pid == 'undefined' || pid == ''){
+					formData.append('product_id_{{i}}', 0);
+				} else {
+					formData.append('product_id_{{i}}', pid);
+				}
+
+				var print_surface = $('#surface_{{i}}').val();
+				if ( print_surface == 'undefined' || print_surface == ''){
+					formData.append('print_medium_id_{{i}}', '');
+				} else {
+					formData.append('print_medium_id_{{i}}', print_surface);
+				}
+				var mld_id = $('#moulding_id_{{i}}').val();
+				if ( mld_id == 'undefined' || mld_id == ''){
+					formData.append('moulding_id_{{i}}', 0);
+				} else {
+					formData.append('moulding_id_{{i}}', mld_id);
+				}
+				var mnt_id = $('#mount_id_{{i}}').val();
+				if ( mnt_id == 'undefined' || mnt_id == ''){
+					formData.append('mount_id{{i}}', 0);
+				} else {
+					formData.append('mount_id_{{i}}', mnt_id);
+				}
+				var mnt_size = $('#mount_size_{{i}}').val();
+				if ( mnt_size == 'undefined' || mnt_size == ''){
+					formData.append('mount_size_{{i}}', 0);
+				} else {
+					formData.append('mount_size_{{i}}', mnt_size);
+				}
+				
+				if ( print_surface == "CANVAS" ){
+					formData.append('stretch_id_{{i}}', 1);
+				} else {
+					formData.append('stretch_id_{{i}}', 0);
+				}
+				
+			{% endfor %}
+			
+			for (let j = 1; j <= num_of_variations; j++) {
+				{% for i in set_range %}
+				var w = $('#image_width_' + j.toString() + '_{{i}}').val();
+				if ( w== 'undefined' || w == ''){
+					formData.append( 'image_width_' + j.toString() + '_{{i}}', 0);
+				} else {
+					formData.append( 'image_width_' + j.toString() + '_{{i}}', w);
+				} 
+				var h = $('#image_height_' + j.toString() + '_{{i}}').val();
+				if ( w== 'undefined' || w == ''){
+					formData.append( 'image_height_' + j.toString() + '_{{i}}', 0);
+				} else {
+					formData.append( 'image_height_' + j.toString() + '_{{i}}', h);
+				}
+				{% endfor %}
+
+				var w = $('#wall_area_width_' + j.toString()).val();
+				if ( w== 'undefined' || w == ''){
+					formData.append( 'wall_area_width_' + j.toString(), 0);
+				} else {
+					formData.append( 'wall_area_width_' + j.toString(), w);
+				}
+				var h = $('#wall_area_height_' + j.toString()).val();
+				if ( w== 'undefined' || w == ''){
+					formData.append( 'wall_area_height_' + j.toString(), 0);
+				} else {
+					formData.append( 'wall_area_height_' + j.toString(), h);
+				}
+			}
+			
+			formData.append( 'set_of', '{{set_of}}');
+			formData.append( 'title', '{{title}}' );
+			formData.append( 'desc', '{{desc}}' );
+			formData.append( 'colors', '{{colors}}' );
+			formData.append( 'key_words', '{{key_words}}' );
+			formData.append( 'num_of_variations', num_of_variations );
+			formData.append( 'room_id', '{{room.room_id}}')
+			formData.append( 'placement_id', '{{placement.placement_id}}');
+			
+			$.ajax({
+				url: '{% url "save_gw" %}', 
+				data:formData,
+				processData: false,
+				contentType: false,
+				type: 'post',				
+				success: function (data) {
+					//data = JSON.parse(data);
+					if (data.err_cd == "01") {
+						$("#yesno-title").html("Image being used again!");
+						$("#yesno-question").html(data.msg);
+						$("#modal-yesno").modal('show');
+					} else if (data.err_cd == "99") {
+						$('#msg').html(data.msg);
+						$('#msg-modal').modal('show');
+					} else if (data.err_cd == "00") {
+						$('#msg').html("SET IS CREATED SUCCESSFULLY!");
+						$('#msg-modal').modal('show');
+						/////////////////////////////////////////////////////////////$("#gal").prop('disabled', 'true');
+						/////////////////////////////////////////////////////////////$("#create_gallery").prop('disabled', 'true');
+					}
+				},
+				error: function(xhr){
+					$('#msg').html("An error occured: " + xhr.status + "; " + xhr.statusText);
+					$('#msg-modal').modal('show');
+					return;
+				}
+			});				
+		}	
+	</script>
+	
+
+	<script>
+		function getHeight(wdt, v, i){
+			var width = parseInt(wdt);
+			if (width == 'undefined' || width == 0){
+				return;
+			}
+			
+			if ( $("#aspect_ratio_" + v + "_" + i).val() != '' ){
+				var ratio = $("#aspect_ratio_"  + i).val();
+				$("#image_height_" + v + "_" + i).val( Math.round(width / ratio) );
+			}
+			finished_size(v, i);
+		}
+		
+		function getWidth(hgt, v, i){
+			var height = parseInt(hgt);
+			if (height == 'undefined' || height == 0){
+				return;
+			}
+			
+			if ( $("#aspect_ratio"+ v + "_" + i).val() != '' ){
+				var ratio = $("#aspect_ratio" + i).val();
+				$("#image_width_" + v + "_" + i).val( Math.round(height * ratio) );
+			}
+			finished_size(v, i);
+		}
+	</script>
+	
+	<script>
+		function answerNo(){
+			$("#modal-yesno").modal('hide');
+		}
+		function answerYes(){
+			$("#modal-yesno").modal('hide');
+			$("#duplicate_image").val('YES');
+			$('#msg').html("Click on CREATE GALLERY WALL button again to procced.");
+			$('#msg-modal').modal('show');
+		}
+	</script>
+	
+	<script>
+	function set_stretched(i){
+		if ( $("#moulding_id_"+i).val() == '0' && $("#surface_"+i).val() == 'CANVAS' ){
+			$("#stretched_"+i).prop('checked', true);
+		} else {
+			$("#stretched_"+i).prop('checked', false);
+		}
+	}
+	</script>
+	<script>
+	function finished_size(v, i){
+		if ( $("#image_width_" + v + "_" + i).val() == 'undefined' || $("#image_width_" + v + "_" + i).val() == ''){
+			var frame_width = 0;
+		} else {
+			var frame_width = parseInt($("#image_width_" + v + "_" + i).val());
+		}
+		if ( $("#image_height_" + v + "_" + i).val() == 'undefined' || $("#image_height_" + v + "_" + i).val() == '') {
+			var frame_height = 0;
+		} else {
+			var frame_height = parseInt($("#image_height_" + v + "_" + i).val());
+		}
+		if ( $("#moulding_id_" + i).val() == 'undefined' || $("#moulding_id_" + i).val() == '') {
+			var moulding_id = 0;
+		} else {
+			var moulding_id = parseInt($("#moulding_id_" + i).val());
+		}
+		if ( $("#mount_id_" +  i).val() == 'undefined' || $("#mount_id_" + i).val() == '') {
+			var mount_id = 0;
+		} else {
+			var mount_id = parseInt($("#mount_id_" + i).val());
+		}
+		if ( $("#mount_size_" + i).val() == 'undefined' || $("#mount_size_" + i).val() == '') {
+			var mount_size = 0;
+		} else {
+			var mount_size = parseInt($("#mount_size_" + i).val());
+		}
+		var print_medium_id = $("#surface_" + i).val();
+
+		var fm_size = 0;
+		
+		if (moulding_id != '0' && moulding_id != ''){
+			if (print_medium_id == 'PAPER'){
+				{% for f in paper_mouldings_show %}
+					if ('{{f.moulding_id}}' == moulding_id) {			
+						fm_size = {{f.moulding__width_inner_inches}};
+					}
+				{% endfor %}
+				
+				if (mount_id != '0' && mount_id != '') {
+					frame_width = frame_width + mount_size*2;
+					frame_height = frame_height + mount_size*2;				
+				
+				} else {
+					{% for f in canvas_mouldings_show %}
+						if ('{{f.moulding_id}}' == moulding_id) {			
+							fm_size = {{f.moulding__width_inner_inches}};
+						}
+					{% endfor %}
+				}
+			
+			frame_width = frame_width + fm_size*2;
+			frame_height = frame_height + fm_size*2;
+			frame_width = Math.round(frame_width);
+			frame_height = Math.round(frame_height);			
+			$("#f_size_" + v + "_" + i).html( frame_width.toString() + " X " +  frame_height.toString());
+			}
+		}
+	}
+	</script>
+	
+	<script>
+
+	function create_new_variation(){ 
+		num_of_variations = num_of_variations + 1;
+
+		var var_html = '' +
+		'<div id = "variation_' + num_of_variations.toString() + '" class = "row box mt-3">' +
+			'<div class = "col-12 align-items-center" style = "background-color: #ddd; padding:5px;">' +
+				'<strong>VARIATION ' + num_of_variations.toString().trim()  + ' <i class = "fa fa-chevron-right"></i></strong>' +
+			'</div> ' +
+			'<div class = "col-12"> ' +
+				{% for i in set_range %}
+				'<div class = "row"> ' +
+					'<div class = "col-12 col-md-4"> ' +
+						'<label >Product ID:</label> ' +
+						 '<input readonly type="text" class="form-control" max_length="8" value = "' + $("#product_id_{{i}}" ).val() + ': ' + $("#product_name_{{i}}").val() + '"> ' +
+					'</div> ' +
+					'<div class="col-6 col-md-3 text-center"> ' +
+						'<div class="form-group"> ' +
+							'<label>Image Width:</label> ' +
+							'<input value="" type = "number" id = "image_width_' + num_of_variations.toString().trim() + '_{{i}}" class = "form-control" onchange = "getHeight( $(this).val(), \'' + num_of_variations.toString().trim()  + '\', \'{{i}}\' );"> ' +
+						'</div> ' +
+					'</div> ' +
+					'<div class="col-6 col-md-3 text-center"> ' +
+						'<div class="form-group"> ' +
+							'<label>Image Height:</label> ' +
+							'<input value="" type = "number" id = "image_height_' + num_of_variations.toString().trim() + '_{{i}}" class = "form-control" onchange = \'getWidth( $(this).val(), \'' + num_of_variations.toString().trim()  + '\', \'{{i}}\' );\'> ' +	
+						'</div> ' +
+					'</div> ' +			
+					'<div class = "col-12 col-md-2 text-center"> ' +
+						'<strong>Finished Size:</strong><br /><span id = "f_size_'  + num_of_variations.toString().trim() + '_{{i}}"></span> ' +
+					'</div> ' +		
+				'</div> ' +
+				{% endfor %}
+			'</div> ' +
+			'<div class = "col-12"> ' +
+				'<div class = "row align-items-center"> ' +
+					'<div class="col-12 col-md-3 text-center mt-3"> ' +
+						'SIZE:  ' +
+					'</div> ' +
+					'<div class="col-6 col-md-4 text-center"> ' +
+						'<div class="form-group"> ' +
+							'<label>Wall Area Width:</label> ' +
+							'<input value="" type = "number" id = "wall_area_width_'  + num_of_variations.toString().trim() + '" class = "form-control"> ' +
+						'</div> ' +
+					'</div> ' +
+					'<div class="col-6 col-md-4 text-center"> ' +
+						'<div class="form-group"> ' +
+							'<label>Wall Area Height:</label> ' +
+							'<input value="" type = "number" id = "wall_area_height_'  + num_of_variations.toString().trim() + '" class = "form-control"> ' +
+						'</div> ' +
+					'</div> ' +
+				'</div> ' +
+			'</div> ' +
+		'</div> '
+		
+		$("#variations").append(var_html);
+		$("#remove-div").show();
+	}
+	</script>
+	
+	
+	<script>
+	function remove_variation(){		
+		$("#variation_" + num_of_variations).remove();
+		num_of_variations = num_of_variations - 1;
+		if (num_of_variations < 2) {
+			$("#remove-div").hide();
+		}
+	}	
+	</script>
+{% endblock jscripts %}
+	

@@ -277,7 +277,7 @@ def search_products_by_keywords(request):
 	# Let's strat with all the products and then it will get filtered below
 	if not keywords:
 		products = Stock_image.objects.filter(is_published = True)
-		
+	
 	width = 0
 	height = 0
 	if request.is_ajax():
@@ -322,7 +322,7 @@ def search_products_by_keywords(request):
 	prod_filters = ['ORIENTATION', 'ARTIST', 'IMAGE-TYPE']	
 	prod_filter_values ={}
 	orientation_values = products.values('orientation').distinct()
-
+	
 	or_arr = []
 	for v in orientation_values:
 		if v['orientation'] not in or_arr:
@@ -343,6 +343,7 @@ def search_products_by_keywords(request):
 			im_arr.append(i['image_type'] )
 	prod_filter_values['IMAGE-TYPE'] = im_arr
 
+	
 	if show == None or show == '50':
 		perpage = 50 #default
 		show = '50'
@@ -1209,20 +1210,9 @@ def all_stock_images(request):
 		
 @csrf_exempt		
 def curated_collections(request, cat_nm=None, page = None,  prod_id=None, ):
-	#cat_nm = cat_nm.replace("-", " ")
 
-	if page is None:
-		page = request.GET.get("page_num", 1)
 
-	if page is None or page == 0:
-		page = 1 # default
-
-	sortOrder = request.GET.get("sort")
-	show = request.GET.get("show", "100")
-	result_limit = request.GET.get("result_limit", "0-50")
-	filt_colors = request.GET.get("filt_colors", "")
-	colors = filt_colors.split('|')
-	
+	'''
 	filt_size = request.GET.get("filt_size", "")
 	filt_width = request.GET.get("filt_width", "")
 	filt_height = request.GET.get("filt_height", "")
@@ -1234,6 +1224,7 @@ def curated_collections(request, cat_nm=None, page = None,  prod_id=None, ):
 
 	filt_image_type = request.GET.get("filt_image_type", "")
 	image_type = filt_image_type.split('|')
+	'''
 
 	if cat_nm:
 		try:
@@ -1242,6 +1233,8 @@ def curated_collections(request, cat_nm=None, page = None,  prod_id=None, ):
 		except Curated_category.DoesNotExist:
 			product_cate = {}
 			cat_id = 0
+			from django.http import Http404
+			raise Http404("Category does not exist")
 		except Curated_category.MultipleObjectsReturned:
 			product_cate = {}
 			cat_id = 0
@@ -1254,9 +1247,9 @@ def curated_collections(request, cat_nm=None, page = None,  prod_id=None, ):
 		except Stock_image_category.MultipleObjectsReturned:
 			cat_id_p = 0
 		'''
-	else:
+	else:		
 		cat_id = 0
-		product_cate = None
+		product_cate = None		
 
 	if cat_id == None:
 		return
@@ -1266,21 +1259,30 @@ def curated_collections(request, cat_nm=None, page = None,  prod_id=None, ):
 
 	sortOrder = request.GET.get("sort")
 	show = request.GET.get("show")
-	
-	if prod_id:
-		'''
-		## remove earlier priority, if any
-		p_c = Stock_image_stock_image_category.objects.filter(
-			stock_image_category_id = cat_id_p,
-			stock_image__category_disp_priority = -2).values_list('stock_image_id', flat=True)
-			
-		prod_u = Stock_image.objects.filter(category_disp_priority = -2, 
-			product_id__in = p_c).update(category_disp_priority = None)
 
-		## set priority for current product
-		prod_ups = Stock_image.objects.filter(product_id = prod_id).update(
-			category_disp_priority = -2)
-		'''
+	if page is None:
+		page = request.GET.get("page_num", 1)
+
+	sortOrder = request.GET.get("sort")
+	show = request.GET.get("show", "100")
+	result_limit = request.GET.get("result_limit", "0-50")
+
+	ikeywords = request.GET.get('keywords', '')	
+	keywords = ikeywords.split()
+	keyword_filter = False # Turned on only if a keyword filter is present (through the AJAX call)
+
+	f_shape = request.GET.get("shape", "").split(',')
+	f_shape = [x.strip() for x in f_shape if x.strip()]
+	
+	f_size = request.GET.get("size", "").split(',')
+	f_size = [x.strip() for x in f_size if x.strip()]
+
+	f_color = request.GET.get("color", "").split(',')
+	f_color = [x.strip() for x in f_color if x.strip()]
+
+	f_art_type = request.GET.get("art_type", "").strip()
+
+	
 	prod_categories = Stock_image_category.objects.filter(store_id=settings.STORE_ID, trending = True )
 	
 	curated_coll = Curated_collection.objects.filter(curated_category_id = cat_id,
@@ -1288,6 +1290,59 @@ def curated_collections(request, cat_nm=None, page = None,  prod_id=None, ):
 
 	products = Stock_image.objects.filter(product_id__in = curated_coll).order_by('category_disp_priority', 'product_id')
 
+	
+	filt_applied = False
+
+	all_filters = Q()
+	
+	if f_shape:
+		filter_shape = Q()
+		for f in f_shape:		
+			if f.upper().strip() == 'HORIZONTAL':
+				filter_shape = filter_shape | Q(aspect_ratio__gt = 1.01, aspect_ratio__lte = 2)
+				filt_applied = True
+			elif f.upper().strip() == 'SLIM HORIZONTAL':
+				filter_shape = filter_shape | Q(aspect_ratio__gt = 2)
+				filt_applied = True
+			elif f.upper().strip() == 'VERTICAL':
+				filter_shape = filter_shape | Q(aspect_ratio__lt = 1, aspect_ratio__gte = 0.666)
+				filt_applied = True
+			elif f.upper().strip() == 'SLIM VERTICAL':
+				filter_shape = filter_shape | Q(aspect_ratio__lt = 0.666)
+				filt_applied = True
+			elif f.upper().strip() == 'SQUARE':
+				filter_shape = filter_shape | Q(aspect_ratio__gte = 0.97, aspect_ratio__lt = 1.01)
+				filt_applied = True
+		products = products.filter( filter_shape )
+
+	if f_size:
+		filter_size = Q()
+		for f in f_size:		
+			if f.upper().strip() == '10':
+				filter_size = filter_size | Q(max_width__gte = 10)
+				filt_applied = True
+			elif f.upper().strip() == '24':
+				filter_size = filter_size | Q(max_width__gte = 24)
+				filt_applied = True
+			elif f.upper().strip() == '36':
+				filter_size = filter_size | Q(max_width__gte = 36)
+				filt_applied = True
+			elif f.upper().strip() == '48':
+				filter_size = filter_size | Q(max_width__gte = 48)
+				filt_applied = True
+		products = products.filter( filter_size )
+
+	if f_color:
+		filter_color = Q()
+		for f in f_color:		
+			filter_color = filter_color | Q(key_words__icontains = f)
+			filt_applied = True
+		products = products.filter( filter_color )
+	
+	if f_art_type:
+		products = products.filter( image_type = f_art_type )
+
+	'''
 	###### Apply the user selected filters
 	t_f = Q()
 	f = Q()
@@ -1426,12 +1481,14 @@ def curated_collections(request, cat_nm=None, page = None,  prod_id=None, ):
 		if i['image_type'] not in im_arr:
 			im_arr.append(i['image_type'] )
 	prod_filter_values['IMAGE-TYPE'] = im_arr
+	'''
+
 
 	products = products.order_by('category_disp_priority')
 	
-	#image_type_values = products.values('colors').distinct()
-	im_arr = ['Red', 'Orange',  'Yellow', 'Green', 'Blue', 'Purple', 'Pink', 'Brown', 'black', 'White']
-	prod_filter_values['COLORS'] = im_arr
+
+	colors_list = ['Red', 'Orange',  'Yellow', 'Green', 'Blue', 'Purple', 'Pink', 'Brown', 'black', 'White']
+	size_list = ['10', '24', '36', '48']
 	
 	price = Publisher_price.objects.filter(print_medium_id = 'PAPER') 
 
@@ -1467,22 +1524,24 @@ def curated_collections(request, cat_nm=None, page = None,  prod_id=None, ):
 	page_range = list(paginator.page_range)[start_index:end_index]
 	#=====================
 		
-	if request.is_ajax():
-
-		template = "artevenue/prod_display_include.html"
-	else :
-		template = "artevenue/curated_products.html"
+	template = "artevenue/curated_products.html"
 
 	env = settings.EXEC_ENV
 	return render(request, template, {'prod_categories':prod_categories, 
 		'product_category':product_cate, 
-		'products':products, 'prods':prods, 'sortOrder':sortOrder, 'show':show,'prod_filters':prod_filters,
+		'products':products, 'prods':prods, 'sortOrder':sortOrder, 'show':show,
+		'''
+		'prod_filters':prod_filters,
 		'prod_filter_values':prod_filter_values, 'price':price, 'show_artist':True,
-		'width':width, 'height':height, 'page_range':page_range, 'env':env,
+		'width':width, 'height':height, 
+		'''
+		'page_range':page_range, 'env':env,
 		'page': page,
-		'filt_width':filt_width, 'filt_height':filt_height, 'page_range':page_range,
-		'filt_colors':filt_colors, 'filt_size':filt_size, 'filt_artist':filt_artist,
-		'filt_orientation':filt_orientation, 'filt_image_type':filt_image_type,
+
+		'env':env, 'colors_list': colors_list,
+		'size_list': size_list, 'filt_applied': filt_applied, 'f_shape': f_shape, 'cat_nm': cat_nm,
+		'f_size': f_size, 'f_color': f_color, 'f_art_type': f_art_type,
+		'cat_id': cat_id		
 		} )		
 
 @staff_member_required
@@ -1577,31 +1636,29 @@ def get_stock_images(request, cat_nm = None, page = None, curated_coll_id = None
 	else:
 		cat_id = 0
 		product_cate = None
-		
+
 	if page is None:
 		page = request.GET.get("page_num", 1)
 
 	sortOrder = request.GET.get("sort")
 	show = request.GET.get("show", "100")
 	result_limit = request.GET.get("result_limit", "0-50")
-	filt_colors = request.GET.get("filt_colors", "")
-	colors = filt_colors.split('|')
-	
-	filt_size = request.GET.get("filt_size", "")
-	filt_width = request.GET.get("filt_width", "")
-	filt_height = request.GET.get("filt_height", "")
-	filt_artist = request.GET.get("filt_artist", "")
-	artists = filt_artist.split('|')
-	
-	filt_orientation = request.GET.get("filt_orientation", "")
-	orientation = filt_orientation.split('|')
-
-	filt_image_type = request.GET.get("filt_image_type", "")
-	image_type = filt_image_type.split('|')
 
 	ikeywords = request.GET.get('keywords', '')	
 	keywords = ikeywords.split()
 	keyword_filter = False # Turned on only if a keyword filter is present (through the AJAX call)
+
+	f_shape = request.GET.get("shape", "").split(',')
+	f_shape = [x.strip() for x in f_shape if x.strip()]
+	
+	f_size = request.GET.get("size", "").split(',')
+	f_size = [x.strip() for x in f_size if x.strip()]
+
+	f_color = request.GET.get("color", "").split(',')
+	f_color = [x.strip() for x in f_color if x.strip()]
+
+	f_art_type = request.GET.get("art_type", "").strip()
+
 
 	if page is None or page == 0:
 		page = 1 # default
@@ -1645,8 +1702,71 @@ def get_stock_images(request, cat_nm = None, page = None, curated_coll_id = None
 	if wishlistitems:
 		for w in wishlistitems:
 			wishlist_prods.append(w.product_id)
-		
 	
+	filt_applied = False
+
+	if keywords:
+		filt_applied = False
+		for word in keywords:
+			if word == '':
+				continue
+			products = products.filter( 
+				Q(key_words__icontains = word) |
+				Q(artist__icontains = word) |
+				Q(name__icontains = word) |
+				Q(part_number__icontains = word)
+				)
+
+	all_filters = Q()
+	
+	if f_shape:
+		filter_shape = Q()
+		for f in f_shape:		
+			if f.upper().strip() == 'HORIZONTAL':
+				filter_shape = filter_shape | Q(aspect_ratio__gt = 1.01, aspect_ratio__lte = 2)
+				filt_applied = True
+			elif f.upper().strip() == 'SLIM HORIZONTAL':
+				filter_shape = filter_shape | Q(aspect_ratio__gt = 2)
+				filt_applied = True
+			elif f.upper().strip() == 'VERTICAL':
+				filter_shape = filter_shape | Q(aspect_ratio__lt = 1, aspect_ratio__gte = 0.666)
+				filt_applied = True
+			elif f.upper().strip() == 'SLIM VERTICAL':
+				filter_shape = filter_shape | Q(aspect_ratio__lt = 0.666)
+				filt_applied = True
+			elif f.upper().strip() == 'SQUARE':
+				filter_shape = filter_shape | Q(aspect_ratio__gte = 0.97, aspect_ratio__lt = 1.01)
+				filt_applied = True
+		products = products.filter( filter_shape )
+
+	if f_size:
+		filter_size = Q()
+		for f in f_size:		
+			if f.upper().strip() == '10':
+				filter_size = filter_size | Q(max_width__gte = 10)
+				filt_applied = True
+			elif f.upper().strip() == '24':
+				filter_size = filter_size | Q(max_width__gte = 24)
+				filt_applied = True
+			elif f.upper().strip() == '36':
+				filter_size = filter_size | Q(max_width__gte = 36)
+				filt_applied = True
+			elif f.upper().strip() == '48':
+				filter_size = filter_size | Q(max_width__gte = 48)
+				filt_applied = True
+		products = products.filter( filter_size )
+
+	if f_color:
+		filter_color = Q()
+		for f in f_color:		
+			filter_color = filter_color | Q(key_words__icontains = f)
+			filt_applied = True
+		products = products.filter( filter_color )
+	
+	if f_art_type:
+		products = products.filter( image_type = f_art_type )
+	
+	'''
 	###### Apply the user selected filters
 	t_f = Q()
 	f = Q()
@@ -1705,21 +1825,11 @@ def get_stock_images(request, cat_nm = None, page = None, curated_coll_id = None
 			)
 		
 	'''
-	dt =  today.day
-	if dt >= 1 and dt <= 5:
-		products = products.order_by('category_disp_priority', '?')
-	elif dt > 5 and dt <= 10:
-		products = products.order_by('category_disp_priority', 'product_id')
-	elif dt > 10 and dt <= 20:
-		products = products.order_by('category_disp_priority', 'name')
-	else:
-		products = products.order_by('category_disp_priority', 'part_number')
-	'''
-	
 	products = products.order_by('category_disp_priority', 'product_id')
 	
 	price = Publisher_price.objects.filter(print_medium_id = 'PAPER') 
 	
+	'''
 	prod_filters = ['ORIENTATION', 'IMAGE-TYPE', 'COLORS', 'ARTIST' ]	
 	prod_filter_values ={}
 	orientation_values = products.values('orientation').distinct()
@@ -1743,12 +1853,14 @@ def get_stock_images(request, cat_nm = None, page = None, curated_coll_id = None
 		if i['image_type'] not in im_arr:
 			im_arr.append(i['image_type'] )
 	prod_filter_values['IMAGE-TYPE'] = im_arr
-
+	'''
 
 	#image_type_values = products.values('colors').distinct()
 	im_arr = ['Red', 'Orange',  'Yellow', 'Green', 'Blue', 'Purple', 'Pink', 'Brown', 'black', 'White']
-	prod_filter_values['COLORS'] = im_arr
+	#prod_filter_values['COLORS'] = im_arr
 	colors_list = ['Red', 'Orange',  'Yellow', 'Green', 'Blue', 'Purple', 'Pink', 'Brown', 'black', 'White']
+
+	size_list = ['10', '24', '36', '48']
 
 	####################################
 	####### Limiting the result set
@@ -1823,28 +1935,42 @@ def get_stock_images(request, cat_nm = None, page = None, curated_coll_id = None
 	page_range = list(paginator.page_range)[start_index:end_index]
 	#=====================
 
+	template = "artevenue/art_by_category.html"
+	'''
 	if cat_id == 2:
-		template = "artevenue/art_by_floral_category.html"
+		#template = "artevenue/art_by_floral_category.html"
+		template = "artevenue/art_by_category.html"
 	elif cat_id == 3:
 		template = "artevenue/art_by_landscape_category.html"
 	elif cat_id == 5:
-		template = "artevenue/art_by_abstract_category.html"
+		#template = "artevenue/art_by_abstract_category.html"
+		template = "artevenue/art_by_category.html"
 	else:
 		template = "artevenue/art_by_category.html"
-
+	'''
+	
 	env = settings.EXEC_ENV
 	
 	return render(request, template, {'prod_categories':prod_categories, 
 		'category_prods': category_prods, 'product_category':product_cate, 
-		'products':products, 'prods':prods, 'sortOrder':sortOrder, 'show':show,'prod_filters':prod_filters,
-		'prod_filter_values':prod_filter_values, 'price':price, 'ikeywords':ikeywords,
+		'products':products, 'prods':prods, 'sortOrder':sortOrder, 'show':show,
+		#'prod_filters':prod_filters,
+		#'prod_filter_values':prod_filter_values, 
+		'price':price, 'ikeywords':ikeywords,
 		'page':page, 'wishlistitems':wishlistitems, 'wishlist_prods':wishlist_prods,
-		'filt_width':filt_width, 'filt_height':filt_height, 'page_range':page_range, 'result_limit':result_limit,
+		#'filt_width':filt_width, 'filt_height':filt_height, 
+		'page_range':page_range, 'result_limit':result_limit,
+		
+		'''
 		'filt_colors':filt_colors, 'filt_size':filt_size, 'filt_artist':filt_artist,
 		'filt_orientation':filt_orientation, 'filt_image_type':filt_image_type,
+		'''
 		'total_count':total_count, 'sliced_count':sliced_count, 'result_limit':result_limit,
 		'slab_0_50':slab_0_50, 'slab_50_100':slab_50_100, 'slab_100_150':slab_100_150, 
-		'slab_150_200':slab_150_200, 'slab_200_plus':slab_200_plus, 'env':env, 'colors_list': colors_list} )
+		'slab_150_200':slab_150_200, 'slab_200_plus':slab_200_plus, 'env':env, 'colors_list': colors_list,
+		'size_list': size_list, 'filt_applied': filt_applied, 'f_shape': f_shape, 'cat_nm': cat_nm,
+		'f_size': f_size, 'f_color': f_color, 'f_art_type': f_art_type,
+		'cat_id': cat_id} )
 
 '''
 @csrf_exempt		

@@ -45,11 +45,11 @@
 							<div class = "col-12 text-center mt-3" style = "font-size:0.7rem;">
 								<form id = "f_{{i.item_id}}" action = "{% url 'stock_image_detail' i.product_id %}" method = "GET">
 									<input hidden name = "iuser_width" value = "{{i.image_width}}">
-									<input hidden name = "frame_id" value = "{{i.moulding_id}}">
+									<input hidden name = "frame_id" value = "{{i.moulding_id|default_if_none:''}}">
 									<input hidden name = "surface" value = "{{i.print_medium_id}}">
-									<input hidden name = "mount_id" value = "{{i.mount_id}}">
-									<input hidden name = "mount_color" value = "{{i.mount_color}}">
-									<input hidden name = "stretched_id" value = "{{i.stretched_id}}">
+									<input hidden name = "mount_id" value = "{{i.mount_id|default_if_none:''}}">
+									<input hidden name = "mount_color" value = "{{i.mount_color|default_if_none:''}}">
+									<input hidden name = "stretch_id" value = "{{i.stretch_id|default_if_none:''}}">
 									<button class = "btn btn-outline btn-sm" type = "submit" form="f_{{i.item_id}}"
 										target = "_blank"
 										style = "border: 1px solid #ddd;">

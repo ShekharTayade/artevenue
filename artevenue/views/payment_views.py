@@ -12,7 +12,7 @@ from django.template.context_processors import csrf
 from django.contrib.auth.models import User
 from django.db import IntegrityError, DatabaseError, Error
 from decimal import Decimal
-from django.db.models import F
+from django.db.models import F, Count, Q, Max, Sum
 
 from django.conf import settings
 from django.core.mail import send_mail, EmailMultiAlternatives, EmailMessage
@@ -24,7 +24,7 @@ import urllib
 from django.core.exceptions import PermissionDenied
 
 from artevenue.models import Order, Order_billing, PrePaymentGateway
-from artevenue.models import Payment_details, Cart, Egift, Voucher, Business_profile
+from artevenue.models import Payment_details, Cart, Egift, Voucher, Business_profile, Egift_redemption
 from artevenue.models import Voucher_user, Egift_card_design, Voucher_used
 from artevenue.models import Order_sms_email, eGift_sms_email, Referral, Order_items_view
 
@@ -129,7 +129,9 @@ def payment_submit(request):
 	else:
 		cod_flag = False
 
-	if deferred_payment or cod_flag :
+	## Don't need to go to payment gateway if an order is eligible for deferred_payment or is a COD 
+	## or it's a 0 value order
+	if deferred_payment or cod_flag or order.order_total == 0:
 		order_items = Order_items_view.objects.select_related(
 				'product', 'promotion').filter(
 				order = order, product__product_type_id = F('product_type_id'))		
@@ -161,7 +163,45 @@ def payment_submit(request):
 					elif r.email_id == order.user.email:
 						ref_upd = Referral.objects.filter(id = order.referral_id).update(
 							referee_claimed_date = today)			
-		
+	
+		## If a voucher is applied in order, and it was an egift then update the redemption
+		if order.user:
+			eGift = Egift.objects.filter(voucher = order.voucher, receiver_email = order.user.email).first()
+			if eGift:
+				eGift_redemption = Egift_redemption.objects.filter( egift = eGift 
+						).aggregate(total_redemption=Sum('redemption_amount'))		
+				if eGift_redemption['total_redemption']:
+					total_redemption = Decimal(eGift_redemption['total_redemption'])
+				else: 
+					total_redemption = 0				
+				
+				# If there is no more balance left in voucher, then update the voucher as used.			
+				voucher_bal_amount = eGift.gift_amount - total_redemption - order.voucher_disc_amount			
+				voucher_user = Voucher_user.objects.filter(voucher = order.voucher, effective_from__lte = today.date(), 
+						effective_to__gte = today.date(), user = order.user).first()
+				if voucher_bal_amount <= 0:
+					if voucher_user:
+						v = Voucher_user (
+							id = voucher_user.id,
+							voucher = voucher_user.voucher,
+							user = voucher_user.user,
+							effective_from = voucher_user.effective_from,
+							effective_to = voucher_user.effective_to,
+							used_date = datetime.datetime.now(),
+							created_date = voucher_user.created_date,
+							updated_date = datetime.datetime.now()
+						)
+						v.save()		
+
+				eGr = Egift_redemption( 
+					egift = eGift,
+					redemption_date = today.date(),
+					redemption_amount = order.voucher_disc_amount,
+					created_date = datetime.datetime.now(),
+					updated_date = datetime.datetime.now()				
+				)
+				eGr.save()
+			
 		## Update the voucher used table, if a voucher was used
 		if order.voucher_id and order.user:
 			vu = Voucher_used( 
@@ -184,77 +224,97 @@ def payment_submit(request):
 		)
 		o_email.save()
 		
-		if cod_flag:
-			o_template = 'artevenue/order_confirmation_cod.html'
+		if order.order_total == 0:
+			o_template = 'artevenue/order_confirmation_zero_value.html'
 		else:
-			o_template = 'artevenue/order_confirmation_deferred_payment.html'
+			if cod_flag:
+				o_template = 'artevenue/order_confirmation_cod.html'
+			else:
+				o_template = 'artevenue/order_confirmation_deferred_payment.html'
 
 		return render (request, o_template, {"posted":posted,
-						'order':order, 'order_items':order_items, 'env':env,
-						'firstname': firstname })
+				'order':order, 'order_items':order_items, 'env':env,
+				'firstname': firstname })
 	else:
-		order_billing = Order_billing.objects.get(order_id = order.order_id)
-		##### Firstname, lastname, email and phonenumber are already in the 'posted'
-		##### as enetered by user
-		posted['amount'] = order.order_total
-		posted['productinfo'] = str(order.quantity) + ' items in Order Id: ' + order_id 
-		posted['surl'] = SURL
-		posted['furl'] = FURL
-		posted['service_provider'] = SERVICE_PROVIDER
-		posted['curl'] = CURL
-		posted['udf1'] = str(order.order_id) 
-		posted['udf2'] = str(order.voucher_id)
-		posted['udf3'] = str(order.referral_id)
-		posted['udf4'] = str(order.order_discount_amt)
-		posted['udf6'] = request.POST.get('company','')
-
-		print("Logging pre payment gateway******************")
-
-		try:
-			prePay = PrePaymentGateway (
-							first_name = posted['firstname'],
-							last_name = posted['lastname'],
-							phone_number = posted['phone'],
-							email_id = posted['email'],
-							rec_id = order.order_id,
-							date = today,
-							amount = order.order_total,
-							trn_type = 'ORD'
-							)
-
-			prePay.save()
-		except Error as e:
-			print(e)
+		order_billing = Order_billing.objects.get(order_id = order.order_id)		
 		
-		hash_object = hashlib.sha256(b'randint(0,20)')
-		txnid=hash_object.hexdigest()[0:20]
-		hashh = ''
-		posted['txnid']=txnid
-		hashSequence = "key|txnid|amount|productinfo|firstname|email|udf1|udf2|udf3|udf4|udf5|udf6|udf7|udf8|udf9|udf10"
-		posted['key']=key
-		hash_string=''
-		hash_string+= MERCHANT_KEY
-		
-		hashVarsSeq=hashSequence.split('|')
-		for i in hashVarsSeq:
-			try:
-				hash_string+=str(posted[i])
-			except Exception:
-				hash_string+=''
-			hash_string+='|'
-		hash_string+=SALT
-		hashh=hashlib.sha512(hash_string.encode('utf8')).hexdigest().lower()
+		if order.order_total == 0:
+			order_items = Order_items_view.objects.select_related(
+					'product', 'promotion').filter(
+					order = order, product__product_type_id = F('product_type_id'))		
 
-		action = PAYU_BASE_URL
+			o = Order.objects.filter(order_id = order_id).update(
+				order_status = 'PC', deferred_payment = True, order_date = today.date(),
+				updated_date = today, payment_type = 'ONP')
+				
+			cart = Cart.objects.filter(cart_id = order.cart_id).update(cart_status = 'CO',
+				updated_date = today)
 
-		if(posted.get("key")!=None and posted.get("txnid")!=None and posted.get("productinfo")!=None and posted.get("firstname")!=None and posted.get("email")!=None):
-			return render (request, 'artevenue/payment_submit.html', {"posted":posted,"hashh":hashh,
-							"MERCHANT_KEY":MERCHANT_KEY,"txnid":txnid,"hash_string":hash_string,
-							"action":action, 'env':env })
+			o_template = 'artevenue/order_confirmation_zero_value.html'
+			return render (request, o_template, {"posted":posted, 'order':order, 'order_items': order_items,
+				'firstname': firstname })
 		else:		
-			return render (request, 'artevenue/payment_submit.html', {"posted":posted,"hashh":hashh,
-							"MERCHANT_KEY":MERCHANT_KEY,"txnid":txnid,"hash_string":hash_string,
-							"action":".", 'env':env })
+			##### Firstname, lastname, email and phonenumber are already in the 'posted'
+			##### as enetered by user
+			posted['amount'] = order.order_total
+			posted['productinfo'] = str(order.quantity) + ' items in Order Id: ' + order_id 
+			posted['surl'] = SURL
+			posted['furl'] = FURL
+			posted['service_provider'] = SERVICE_PROVIDER
+			posted['curl'] = CURL
+			posted['udf1'] = str(order.order_id) 
+			posted['udf2'] = str(order.voucher_id)
+			posted['udf3'] = str(order.referral_id)
+			posted['udf4'] = str(order.order_discount_amt)
+			posted['udf6'] = request.POST.get('company','')
+
+			print("Logging pre payment gateway******************")
+
+			try:
+				prePay = PrePaymentGateway (
+								first_name = posted['firstname'],
+								last_name = posted['lastname'],
+								phone_number = posted['phone'],
+								email_id = posted['email'],
+								rec_id = order.order_id,
+								date = today,
+								amount = order.order_total,
+								trn_type = 'ORD'
+								)
+
+				prePay.save()
+			except Error as e:
+				print(e)
+			
+			hash_object = hashlib.sha256(b'randint(0,20)')
+			txnid=hash_object.hexdigest()[0:20]
+			hashh = ''
+			posted['txnid']=txnid
+			hashSequence = "key|txnid|amount|productinfo|firstname|email|udf1|udf2|udf3|udf4|udf5|udf6|udf7|udf8|udf9|udf10"
+			posted['key']=key
+			hash_string=''
+			hash_string+= MERCHANT_KEY
+			
+			hashVarsSeq=hashSequence.split('|')
+			for i in hashVarsSeq:
+				try:
+					hash_string+=str(posted[i])
+				except Exception:
+					hash_string+=''
+				hash_string+='|'
+			hash_string+=SALT
+			hashh=hashlib.sha512(hash_string.encode('utf8')).hexdigest().lower()
+
+			action = PAYU_BASE_URL
+
+			if(posted.get("key")!=None and posted.get("txnid")!=None and posted.get("productinfo")!=None and posted.get("firstname")!=None and posted.get("email")!=None):
+				return render (request, 'artevenue/payment_submit.html', {"posted":posted,"hashh":hashh,
+								"MERCHANT_KEY":MERCHANT_KEY,"txnid":txnid,"hash_string":hash_string,
+								"action":action, 'env':env })
+			else:		
+				return render (request, 'artevenue/payment_submit.html', {"posted":posted,"hashh":hashh,
+								"MERCHANT_KEY":MERCHANT_KEY,"txnid":txnid,"hash_string":hash_string,
+								"action":".", 'env':env })
 
 @csrf_protect
 @csrf_exempt						
@@ -348,18 +408,58 @@ def payment_done(request):
 							referred_by_claimed_date = today)
 					elif r.email_id == order.user.email:
 						ref_upd = Referral.objects.filter(id = order.referral_id).update(
-							referee_claimed_date = today)			
+							referee_claimed_date = today)				
+					
 		
-		## Update the voucher used table, if a voucher was used
-		if order.voucher_id and order.user:
-			vu = Voucher_used( 
-				voucher_id = order.voucher_id,
-				user = order.user,
-				created_date = today,
-				updated_date = today
-			)
-			vu.save()
+		## If a voucher is applied in order, and it was an egift then update the redemption
+		if order.user:
+			eGift = Egift.objects.filter(voucher = order.voucher, receiver_email = order.user.email).first()
+			if eGift:
+				eGift_redemption = Egift_redemption( 
+					egift = eGift,
+					redemption_date = today.date(),
+					redemption_amount = order.voucher_disc_amount,
+					created_date = datetime.datetime.now(),
+					updated_date = datetime.datetime.now()				
+				)
+
+				# If the applied voucher was for a perticular user and if there is no more balance 
+				# left in voucher, then update the voucher as used.			
+				eGift_redemption = Egift_redemption.objects.filter( egift = eGift 
+						).aggregate(total_redemption=Sum('redemption_amount'))		
+				if eGift_redemption['total_redemption']:
+					total_redemption = Decimal(eGift_redemption['total_redemption'])
+				else: 
+					total_redemption = 0
+					
+				voucher_bal_amount = eGift.voucher_amount - total_redemption - order.voucher_disc_amount
+				
+				voucher_user = Voucher_user.objects.filter(voucher = voucher, effective_from__lte = today.date(), 
+						effective_to__gte = today.date(), user = order.user).first()
+				if voucher_bal_amount <= 0:
+					if voucher_user:
+						v = Voucher_user (
+							id = voucher_user.id,
+							voucher = voucher_user.voucher,
+							user = voucher_user.user,
+							effective_from = voucher_user.effective_from,
+							effective_to = voucher_user.effective_to,
+							used_date = datetime.datetime.now(),
+							created_date = voucher_user.created_date,
+							updated_date = datetime.datetime.now()
+						)
+						v.save()		
+
 		
+			## Update the voucher used table, if a voucher was used
+			if order.voucher_id and order.user:
+				vu = Voucher_used( 
+					voucher_id = order.voucher_id,
+					user = order.user,
+					created_date = today,
+					updated_date = today
+				)
+				vu.save()
 
 		# Update email, sms table
 		o_email = Order_sms_email(

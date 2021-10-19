@@ -79,7 +79,7 @@
 						<input hidden name="pg" value="{{ posted.PG }}" />
 						
 						
-						<h1>Checkout - Payment</h1>
+						<h1 style="font-weight:700;">Checkout - Order Review</h1>
 						
 						<div class="table table-responsive">
 							<table id = "cartTbl" class="table table-responsive">
@@ -116,16 +116,25 @@
 												<li>Print surface {{i.print_medium_id|title}}</li>
 											{% endif %}
 											{% if i.moulding_id %}
-												<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+												<li>Print Size : 
+												{{ i.image_width|covert_inch_to_cm }} X {{i.image_height|covert_inch_to_cm }} cm
+												({{ i.image_width }}" X {{i.image_height }}")</li>
 												<li>Frame: {{i.moulding__name }} ({{i.moulding__width_inches}} inch, Polystyrene)</li>
 												{% if i.mount_id %}
 													<li>Mount: {{i.mount_size }}", Color: {{i.mount__name|title }} </li>
 												{% endif %}
-												<li>Total Size: 
-													{{ i.image_width|add_width:width|add_width:width }}" X {{i.image_height|add_width:width|add_width:width }}"</li>
+												<li>Finished Size: 
+													{{ i.image_width|add_width:width|add_width:width|covert_inch_to_cm }} X {{i.image_height|add_width:width|add_width:width|covert_inch_to_cm }} cm												
+													({{ i.image_width|add_width:width|add_width:width }}" X {{i.image_height|add_width:width|add_width:width }}" inch)</li>
 													
 											{% else %}
-												<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+												<li>Print Size : 
+												{{ i.image_width|covert_inch_to_cm }} X {{i.image_height|covert_inch_to_cm }}
+												({{ i.image_width }}" X {{i.image_height }}" inch)</li>
+												
+												{% if not i.stretch_id %}
+													<li>Print Only.</li>
+												{% endif %}
 											{% endif %}
 											{% if i.acrylic_id %}
 												<li>Acrylic covered</li>
@@ -168,6 +177,7 @@
 							<div class = "col-6">
 								<a href="{% url 'show_cart' %}" class="btn btn-outline-secondary pull-left"><i class="fa fa-chevron-left"></i>Back to Cart</a>
 							</div>
+							{% if order.order_total > 0 %}
 							<div class = "col-6">
 								<div class="row">
 									<div class = "col-12">
@@ -215,6 +225,18 @@
 									<input hidden id = "online_val" name = "online_val" type = "checkbox">
 								<!--</span> -->
 							</div>
+							{% else %}
+							<div class = "col-6">
+								<div class="row">
+									<div class = "col-12">
+										<button type="submit" class="btn btn-primary pull-right" id = "confirm_btn"
+												form="order_confirm_form">
+											Confirm Order<i class="fa fa-chevron-right"></i>
+										</button>
+									</div>
+								</div>
+							</div>
+							{% endif %}
 						</div>
 						<div class="box-footer row">
 							<div class="col-12 mb-3">

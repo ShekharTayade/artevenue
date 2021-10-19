@@ -18,6 +18,9 @@ def get_prod_price(prod_id,**kwargs):
 	stretch_id = kwargs['stretch_id']
 	msg = "SUCCESS"
 
+	if print_medium_id == 'CANVAS' and moulding_id != 0 and moulding_id != None and moulding_id != '' and moulding_id != '0':
+		stretch_id = 1
+
 	prod = Product_view.objects.filter(product_id = prod_id, 
 			product_type_id = prod_type).first()
 
@@ -300,8 +303,7 @@ def get_price_for_6_prods(prod_id, aspect_ratio, prod_type='STOCK-IMAGE'):
 	except Stock_image.DoesNotExists:
 		return ({'size_price_paper':0, 'size_price_canvas':0})
 	
-	##STANDARD_PROD_WIDTHS = [12, 18, 24, 30, 36, 42]
-	
+	##STANDARD_PROD_WIDTHS = [12, 18, 24, 30, 36, 42]	
 	if aspect_ratio > 1:
 		h = 8
 		w = round(h * aspect_ratio)
@@ -329,7 +331,6 @@ def get_price_for_6_prods(prod_id, aspect_ratio, prod_type='STOCK-IMAGE'):
 	mount_id = 3 # Offwhite
 	board_id = 1
 	stretch_id = 1	
-	
 	size_price_paper = {}
 	size_price_canvas = {}
 	
@@ -344,8 +345,11 @@ def get_price_for_6_prods(prod_id, aspect_ratio, prod_type='STOCK-IMAGE'):
 		image_width = i
 		image_height = round(image_width / aspect_ratio)
 
-		mount_size = 1 if i <= 24 else 2 if i <= 42 else 3
-		moulding_id = 18 if i <= 24 else 24 
+		#side = image_width if aspect_ratio > 1 else image_height		
+		#mount_size = 1 if side <= 24 else 2 if side <= 42 else 3
+		#mount_size = 1 if side <= 18 else 2 if side <= 26 else 3 if side <= 34 else 4
+		mount_size = 1 if image_width <= 26 else 2 
+		moulding_id = 18 if i <= 26 else 24 
 		############################
 		## PAPER
 		############################
@@ -390,6 +394,8 @@ def get_price_for_6_prods(prod_id, aspect_ratio, prod_type='STOCK-IMAGE'):
 		############################
 		## CANVAS
 		############################
+		moulding_id = 26 
+		moulding = Moulding.objects.get(pk = moulding_id)
 		if image_width > 0 and image_height > 0:
 			item_price = get_price_reduction_by_size(per_sqinch_canvas, image_width * image_height)
 
@@ -425,7 +431,7 @@ def apply_special_price(prod, item_price):
 	## Increasing product price by 20% if it's work Art Group(47) publusher
 	## and image code ends with "GG" or "FN"
 	if prod.publisher :
-		if prod.publisher == "47" and (prod.part_number[-2:] == "GG" or prod.part_number[-2:] == "FN"):
+		if prod.publisher == "47" and ( prod.part_number[-2:] == "GG" or prod.part_number[-2:] == "FN" or prod.part_number[-1:] == "D" or prod.part_number[-1:] == "Z" ):
 			item_price = Decimal(item_price  + ( item_price * 20 / 100))
 	
 	return item_price
@@ -456,8 +462,12 @@ def get_artset_price_for_6_prods(prod_id, aspect_ratio, prod_type='STOCK-IMAGE')
 		image_width = i
 		image_height = round(image_width / aspect_ratio)
 
-		mount_size = 1 if i <= 24 else 2 if i <= 42 else 3
-		moulding_id = 18 if i <= 24 else 24 
+		#mount_size = 1 if i <= 24 else 2 if i <= 42 else 3
+		#moulding_id = 18 if i <= 24 else 24 
+		mount_size = 1 if image_width <= 26 else 2 
+		moulding_id = 18 if i <= 26 else 24 
+		
+		
 		moulding = Moulding.objects.get(pk = moulding_id)
 		i_width_p = image_width + moulding.width_inner_inches * 2 + mount_size * 2
 		i_height_p = image_height + moulding.width_inner_inches * 2 + mount_size * 2

@@ -461,6 +461,7 @@ def checkout_step1_address(request):
 			new_ord.save()
 			order_id = new_ord.order_id
 			order_number = new_ord.order_number
+			order = new_ord
 			shipping_cost = 0 # as it's newly created order
 			ord_unit_price = new_ord.unit_price,
 			sub_total = new_ord.sub_total

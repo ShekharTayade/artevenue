@@ -1,0 +1,21 @@
+<!-- Message Modal -->
+<div id="msg-modal" tabindex="-1" role="dialog" aria-labelledby="Message_OK" aria-hidden="true" class="modal fade">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content" style = "background-color: #FFD700;">
+			<div class="modal-header">
+				<h3 class="modal-title"><span id = "modal-hedline">Congratulations!!</span></h3>
+				<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
+			</div>
+			<div class="modal-body">
+				<div class = "mb-4 w3-container w3-center w3-animate-zoom">
+					<h4><span id = "msg"></span></h4>
+					<p><span style = "font-size: 0.65rem;" id = "msg_1"></span></p>
+				</div>
+				<div class = "text-center">
+					<button class="btn btn-primary" onclick="$('#msg-modal').modal('hide');"><i class="fa fa-chevron-right"></i>Ok</button>
+				</div>					
+			</div>
+		</div>
+	</div>
+</div>
+<!-- END: Message modal -->		

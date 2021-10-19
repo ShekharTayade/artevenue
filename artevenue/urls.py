@@ -1,8 +1,8 @@
-
 from django.urls import path
 from django.conf.urls import url, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.generic import TemplateView
 
 from . import views
 
@@ -202,6 +202,10 @@ urlpatterns = [
 	url(r'^store-order-summary/$', views.store_order_summary, name='store_order_summary'),	
 	url(r'^ajax/get_order_summary/$', views.get_order_summary, name='get_order_summary'),	
 	
+	url(r'^store-orders-by-payment-type/$', views.store_orders_by_payment_type, name='store_orders_by_payment_type'),	
+	url(r'^ajax/get-orders-by_payment-type/$', views.get_orders_by_payment_type, name='get_orders_by_payment_type'),	
+	
+	
 	#url(r'^manage-amazon-orders/$', views.amazon_orders_manage, name='amazon_orders_manage'),
 	#url(r'^amazon-enter-new-order/$', views.amazon_enter_new_order, name='amazon_enter_new_order'),	
 	#url(r'^ajax/amazon_order_details/$', views.amazon_order_details, name='amazon_order_details'),	
@@ -285,7 +289,11 @@ urlpatterns = [
 	url(r'^ajax/save-new-set-single/$', views.save_new_set_single, name='save_new_set_single'),
 	url(r'^generate-set-prices/', views.generate_set_prices, name='generate_set_prices'),
 	url(r'^ajax/create_initial_data/$', views.createInitialData, name='createInitialData'),
+	url(r'^staff-image-search/$', views.get_stock_images_staff, name='staff_image_search'),
+	url(r'^generate-print-data-csv/$', views.generate_print_data_csv, name='generate_print_data_csv'),
 
+	url(r'^gcm_service_worker.js/$', (TemplateView.as_view(template_name="artevenue/gcm_service_worker.js", content_type='application/javascript', )), name='gcm_service_worker.js'),
+	url(r'^gcm_manifest.json/$', (TemplateView.as_view(template_name="artevenue/gcm_manifest.json", content_type='application/json', )), name='gcm_manifest.json'),
 	
 	] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

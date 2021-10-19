@@ -5,6 +5,7 @@ from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.db.models import Count, Q, F
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpRequest
+from django.core.exceptions import ObjectDoesNotExist
 
 from datetime import datetime
 import datetime
@@ -596,12 +597,17 @@ def createInitialData(request):
 	msg = ''
 	from_product_id = request.GET.get('from_product_id', '')
 
-	collages = Stock_collage.objects.all()
+	collages = Stock_collage.objects.filter(is_published = True)
 	
 	if from_product_id:
 		collages = collages.filter(product_id__gte = from_product_id)
 
 	for i in collages:
+		try:
+			if not i.stock_collage_specs:
+				pass
+		except ObjectDoesNotExist:	
+			continue
 		coll = Collage_stock_image.objects.filter(stock_collage = i)	
 		t_price = 0
 		img = []
@@ -622,20 +628,57 @@ def createInitialData(request):
 			min_width = 8
 			orientation = c.stock_image.orientation
 			
-			height = 10 / c.stock_image.aspect_ratio
+			image_width = 10
+			image_height = round(image_width / aspect_ratio)
+
+
+			## Common pricing components
+			print_medium_id = None
+			moulding = None
+			moulding_id = '0'
+			moulding_id = None
+			mount_id = None
+			mount_size = 0
+			board_id = None
+			acrylic_id = None 
+			stretch_id = None
+			
+			product = c.stock_collage
+		
+
+			if product.stock_collage_specs.print_medium_id:
+				print_medium_id = product.stock_collage_specs.print_medium_id
+			if product.stock_collage_specs.moulding:
+				moulding_id = product.stock_collage_specs.moulding_id
+				moulding = product.stock_collage_specs.moulding
+			if product.stock_collage_specs.mount:
+				mount_id = product.stock_collage_specs.mount_id
+			if product.stock_collage_specs.mount_size:
+				mount_size = 1
+			if product.stock_collage_specs.board:
+				board_id = product.stock_collage_specs.board_id
+			if product.stock_collage_specs.acrylic:
+				acrylic_id = product.stock_collage_specs.acrylic_id
+			if product.stock_collage_specs.stretch:
+				stretch_id = product.stock_collage_specs.stretch_id
+			
+			## Add the stretch by default is it's a framed canvas
+			if product.stock_collage_specs.print_medium_id == 'CANVAS':
+				if product.stock_collage_specs.moulding:
+					stretch_id = '1'
 			
 			try:
 				price = get_prod_price(c.stock_image_id, 
 						prod_type='STOCK-IMAGE',
-						image_width=10, 
-						image_height=height,
-						print_medium_id = 'PAPER',
-						acrylic_id = '1',
-						moulding_id = 18,
-						mount_size = 1,
-						mount_id = 3,
-						board_id = 1,
-						stretch_id = '')
+						image_width=image_width, 
+						image_height=image_height,
+						print_medium_id = print_medium_id,
+						acrylic_id = acrylic_id,
+						moulding_id = moulding_id,
+						mount_size = mount_size,
+						mount_id = mount_id,
+						board_id = board_id,
+						stretch_id = stretch_id)
 				
 							
 				request = HttpRequest()
@@ -819,23 +862,24 @@ def get_wall_art_set_sizes_prices(prod_id, aspect_ratio, prod_type='STOCK-IMAGE'
 				break
 
 			##If the default print surface for this set is CANVAS and if it's stretched canvas, then if users
-			## select PAPER, we use the default frame and mount.
+			## selects PAPER, we use the default frame and mount.
 			## If its' CANVAS and the moulding is also present, then we remove the mount to keep it consistent with
 			## the way it looks in the room view.
 			if product.stock_collage_specs.print_medium_id == 'CANVAS' and product.stock_collage_specs.stretch_id :
-				if image_width <= 18:
+				side = image_width if aspect_ratio > 1 else image_height
+				if side <= 18:
 					if product.stock_collage_specs.print_medium_id == 'CANVAS' and product.stock_collage_specs.stretch_id and product.stock_collage_specs.moulding_id:
 						p_mount_size = 0
 					else:
 						p_mount_size = 1
 					p_moulding_id = 18
-				elif image_width <= 26:
+				elif side <= 26:
 					if product.stock_collage_specs.print_medium_id == 'CANVAS' and product.stock_collage_specs.stretch_id and product.stock_collage_specs.moulding_id:
 						p_mount_size = 0
 					else:
 						p_mount_size = 2
 					p_moulding_id = 24
-				elif image_width <= 34:
+				elif side <= 34:
 					if product.stock_collage_specs.print_medium_id == 'CANVAS' and product.stock_collage_specs.stretch_id and product.stock_collage_specs.moulding_id:
 						p_mount_size = 0
 					else:
@@ -858,7 +902,12 @@ def get_wall_art_set_sizes_prices(prod_id, aspect_ratio, prod_type='STOCK-IMAGE'
 					p_width_inner_inches = moulding.width_inner_inches
 				
 			else: 
-				p_mount_size = mount_size
+				if aspect_ratio > 1:
+					p_mount_size = 1 if image_width <= 18 else 2 if image_width <= 26 else 3 if image_width <= 34 else 4
+				else:
+					p_mount_size = 1 if image_height <= 18 else 2 if image_height <= 26 else 3 if image_height <= 34 else 4
+				#p_mount_size = mount_size
+				
 				p_moulding_id = moulding_id
 				p_mount_id = mount_id
 				p_board_id = board_id

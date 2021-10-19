@@ -371,10 +371,11 @@
 			<div class="modal-body">	
 				<div id = "framing-card" class = "row">
 					<div class = "col-6 text-center mt-2">
+						<p>Customer Support</p>
 						<a href = "https://wa.me/919535805505?text=Hi,%20I%20need%20help%20with"
 							style = "font-size: 0.75rem;" 
 							target = "_blank">
-							<img src = "{% static 'img/whatsapp_logo.png' %}" width=40 alt="WhatsApp Logo"> 
+							<img src = "{% static 'img/whatsapp_logo.png' %}" width=20 alt="WhatsApp Logo"> 
 							<span style = "text-decoration: underline;
 								font-family: 'Lato', sans-serif; font-size: 14px; color: #212529;
 								letter-spacing: 0.5px;">
@@ -383,12 +384,14 @@
 						</a>						
 					</div>
 					<div class = "col-6 text-center mt-2">
-						<img src = "{% static 'img/phone_support.png' %}" width=40 alt="Phone Support"> 
+						<p>Sales/Bulk Orders </p>
+						<img src = "{% static 'img/phone_support.png' %}" width=20 alt="Phone Support"> 
 						<a href="tel:{{ecom_site.support_phonenumber }}">
 							<span style = "text-decoration: underline;
 								font-family: 'Lato', sans-serif; font-size: 14px; color: #212529;
 								letter-spacing: 0.5px;">
-								{{ecom_site.support_phonenumber }}
+								<!--{{ecom_site.support_phonenumber }}-->
+								96115 03626 
 							</span>
 						</a>
 					</div>
@@ -400,7 +403,7 @@
 									<li>How to choose artworks and size</li>
 									<li>How to customize artworks</li>
 									<li>Questions on ordering, shipping, returns, status</li>
-									<li>Ask our designers</li>
+									<li>Ask our designers for recommedations</li>
 									<li>Anything else....</li>
 								</ul>
 								For Most General Questions:
@@ -408,7 +411,7 @@
 								<hr>
 								<span class = "pull-left">
 									We are here to help!<br />
-									<small>Timing: {{ecom_site.phone_support_start_time}} to {{ecom_site.phone_support_end_time}}</small>
+									<p style = "font-size:0.65rem;">Timing: {{ecom_site.phone_support_start_time}} to {{ecom_site.phone_support_end_time}}</p>
 								</span>
 								<!--
 								<span class = "pull-right" style = "font-size: 1.5rem;">
@@ -557,10 +560,12 @@
 		var s_txt = $("#keywords_m").val();		
 		var txt = s_txt.replace(/[&<>]/g, '');
 		$("#keywords_m").val(txt);
+		wigzo ("track", "search", txt);
 	});
 	$("#search_form").submit(function(){
 		var s_txt = $("#keywords").val();
 		var txt = s_txt.replace(/[&<>]/g, '');
 		$("#keywords").val(txt);
+		wigzo ("track", "search", txt);
 	});
 </script>

@@ -65,7 +65,7 @@
 							{% csrf_token %}
 							<input hidden name = "order_id" value = "{{order_id}}">
 						
-							<h1>Checkout - Address</h1>
+							<h1 style="font-weight:700;">Checkout - Address</h1>
 							<div class="py-3">
 								{% if msg %}
 								<div class="row mb-3">
@@ -89,7 +89,6 @@
 											<label class = "pull-right">
 												<input type="checkbox" onclick= "sameAddr();" id = "sameaddr" name = "sameaddr"> 
 												<span style = "color: #11b6bd; font-size:0.8rem;">My Billing Address is same as Shipping Address</span><br />
-												<span style = "font-size:0.65rem;">(Check to enter GST number)</span>
 											</label>
 										</div>
 									</div>
@@ -270,16 +269,6 @@
 									</div>
 								</div>
 								<div class = "row">
-									<div class="col-6">
-										<div class="form-group">
-											<label for="billing_gst_number">GST No.<small>(Pls enter if you have)</small></label>
-											<input id="billing_gst_number" name = "billing_gst_number" 
-											type="text" class="form-control"
-											value = "{{billing_addr.gst_number}}">
-										</div>
-									</div>
-								</div>
-								<div class = "row">
 									<div class="col-6 col-md-6">
 										<div class="form-group">
 											<label for="billing_address_1">Street Address</label>
@@ -350,6 +339,21 @@
 									</div>									
 								</div>
 								
+							</div>
+							<div class = "row">
+								<div class="col-12">
+									<hr>
+								</div>
+							</div>
+							<div class = "row">
+								<div class="col-12">
+									<div class="form-group">
+										<label for="billing_gst_number">GST No.<span style = "font-size:0.65rem;">(Pls enter if you have)</span></label>
+										<input id="billing_gst_number" name = "billing_gst_number" 
+										type="text" class="form-control"
+										value = "{{billing_addr.gst_number}}">
+									</div>
+								</div>
 							</div>
 							<div class = "row">
 								<div class = "col-12">
@@ -435,7 +439,8 @@
 	{% block jscripts %}
 	<script>
 	$(document).ready(function(){
-		{% if order_total %}
+		//{% if order_total %}{% endif %}
+		{% if order.quantity > 0 %}
 			$("#btn-delMethod").prop('disabled', false);
 		{% else %}
 			$("#btn-delMethod").prop('disabled', true);

@@ -1,0 +1,158 @@
+{% load static %}
+{% load utils %}
+<hr>
+<div class="row">
+	<div class="col-12">
+		<div class="text-muted">
+			{% if order_list.count > 0 %} 
+				{{ order_list.count }} orders found {% if startDt %} between {{startDt|date:'d-M-Y'}} and {{endDt|date:'d-M-Y'}} {% endif %} 
+			{% else %} 
+				No orders found {% if startDt %} between {{startDt|date:'d-M-Y'}} and {{endDt|date:'d-M-Y'}} {% endif %}
+			{% endif %}
+		</div>
+	</div>
+</div>	
+<div style = "border : 2px solid gainsboro; line-height:normal !important;">
+	<table id = "" class="table table-responsive table-striped">
+		<thead>
+			<tr>
+				<th><input id = "select_all" name = "select_all" type ="checkbox"> Select All</th>
+			</tr>
+		</thead>
+	</table>
+	<table id = "ordTbl" class="table table-responsive table-striped">
+		<thead>
+			<tr>
+				<th width="2%">Select</th>
+				<th width="10%">Arte'Venue Order No.</th>
+				<th width="10%">Status</th>
+				<th width="10%">Order value</th>
+				<th width="20%">Ship To</th>
+				<th width="20%">City</th>
+				<th width="10%">Order Quantity</th>
+				<th width="10%">Payment Type</th>
+				<th>
+				</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for order in order_list %}
+				{% for i in order_items_list %}
+				{% if i.order_id != order.order_id %}
+					<!-- Nothing -->
+					
+				{% else %}
+				
+				{% endif %}
+				{% endfor %}
+			<tr>
+				<td>
+					<input id = "id_{{order.order_id}}" name = "nm_{{order.order_id}}" type ="checkbox">
+				<td>
+					{{order.order_number}}
+				</td>
+				<td>
+					{{order.get_order_status_display}}
+				</td>
+				<td>
+					{{order.order_total|floatformat}}
+				</td>
+				<td>
+					{% if order.order_shipping %}
+						{{order.order_shipping.full_name}}
+					{% endif %}
+				</td>
+				<td>
+					{% if order.order_shipping %}
+						{{order.order_shipping.city}}, {{order.order_shipping.state.state_name}} 
+					{% endif %}
+				</td>
+				<td>
+					{{order.quantity}}
+				</td>
+				<td>
+					{{order.get_payment_type_display}}
+				</td>
+				<td>
+					<button data-toggle="collapse" data-target="#ord_details_box_{{order.order_id}}" 
+						class = "btn btn-primary pull-right">
+						Order Details
+					</button>
+				
+				</td>
+			</tr>
+			
+			<tr class="box collapse" id = "ord_details_box_{{order.order_id}}">
+				<td colspan="9">
+				{% for oi in orderitems %}
+					{% if order.order_id == oi.order_id %}
+						<div class = "col-12 col-md-6">
+							<div class="row">
+								<div class = "col-12">
+									<span style = "font-weight:600;" >
+									{% if oi.product.product_type_id|cut:' ' == 'USER-IMAGE' %}  
+										Customer Image; Prod Id: {{oi.product.product_id}}
+									{% elif oi.product.product_type_id|cut:' ' == 'STOCK-COLLAGE' %}
+										Image Codes:
+										{% for c in orderitems_stock_collage %}
+										{% if c.stock_collage_id == oi.product_id %}
+											{{c.stock_image.part_number}}, 
+										{% endif %}
+										{% endfor %}										
+										<!--Prod Id: {{oi.product.product_id}}-->
+									{% else %}
+										{{oi.product.name}};<br />  
+										Image Code: {{oi.product.part_number}}
+									{% endif %}													
+									</span>		
+								</div>
+								<div class = "col-12">
+									<span style = "font-weight:600;" >
+										{{oi.product.quantity|floatformat}}
+									</span>
+								</div>
+							</div>
+							<div class="row">									
+								<div class = "col-5">
+									<img src = "{% if oi.product_type_id|cut:' ' == 'USER-IMAGE' %} https://artevenue.com{{MEDIA_URL}}{{oi.product.image_to_frame_thumbnail}} {% else %} {% if env == 'DEV' or env == 'TESTING' %} {{ oi.product.thumbnail_url }} {% else %} {% static oi.product.thumbnail_url %} {% endif %} {% endif %}" style = "width:75px; height:75px; object-fit:contain; float: left;">
+								</div>
+								<div class = "col-7">
+									{% with width=oi.moulding.width_inner_inches|add_width_frame_mount:oi.mount_size %}
+									{% if oi.product_type_id == 'STOCK-COLLAGE' %}
+										EACH ITEM: <br/>
+									{% endif %}
+									{% if oi.product_type_id == 'ORIGINAL-ART' %}
+										<li>{{oi.product.description}}</li>
+									{% else %}													
+										<li>Print on {{oi.print_medium_id|title}}</li>
+									{% endif %}
+									{% if oi.moulding_id %}
+										<li>Image Size : {{ oi.image_width }}" X {{oi.image_height }}"</li>
+										<li>Frame: {{oi.moulding.name }} ({{oi.moulding.width_inches}} inch, Polystyrene)</li>
+										{% if oi.mount_id %}
+											<li>Mount: {{oi.mount_size }}", Color: {{oi.mount.name|title }} </li>
+										{% endif %}
+										<li>Total Size: 
+											{{ oi.image_width|add_width:width|add_width:width }}" X {{oi.image_height|add_width:width|add_width:width }}"</li>
+									{% else %}
+										<li>Image Size : {{ oi.image_width }}" X {{oi.image_height }}"</li>
+									{% endif %}
+									{% if oi.acrylic_id and oi.print_medium_id == 'PAPER' %}
+										<li>Acrylic covered</li>
+									{% endif %}
+									{% if oi.stretch_id and not oi.moulding_id %}
+										<li>Canvas Stretched</li>
+									{% endif %}
+									{% endwith %}
+									<br />
+								</div>
+							</div>
+						</div>
+					{% endif %}
+				{% endfor %}
+				</td>
+			</tr>
+			{% endfor orders %}
+		</tbody>
+	</table>
+</div>

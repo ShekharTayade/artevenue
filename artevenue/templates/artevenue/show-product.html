@@ -24,6 +24,8 @@
 <script>
 
 		function getFramedImg (prod_id, prod_type='STOCK-IMAGE', image_width, moulding_id, mount_color, mount_size, prod_url) {
+			if (prod_type == "STOCK-IMAGE") {
+		
 				// Get the framed image
 				$.ajax({
 						url: "{% url 'get_framed_image' %}", 
@@ -40,7 +42,26 @@
 					}
 				});
 
-			//}
+			}
+			if (prod_type == "STOCK-COLLAGE") {
+				$.ajax({
+						url: "{% url 'get_framed_collage' %}", 
+						data: {'coll_id':prod_id, 'moulding_id': moulding_id,
+								'mount_color':mnt_color, 'mount_size':mount_size, 'image_width':image_width
+							}, 
+						dataType: 'text', 
+						type: 'POST',
+					success: function (data) {
+						document.getElementById("disp-img").src = "data:image/png;base64," + data;
+						$("#show-prod").modal('show');
+						},
+					error: function(xhr){
+						alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+					}
+				});
+			
+			
+			}
 		}		
 		
 		function getFramedUserImg (user_image_id, image_width, moulding_id, mount_color, mount_size, prod_url) {

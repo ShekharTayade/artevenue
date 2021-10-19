@@ -1,5 +1,8 @@
 User-agent: *
-Disallow: 
+Disallow: /artist-page/
+Disallow: /artist-profile/
+Disallow: /upload-art/
+Disallow: /store_order_summary/
 Disallow: /store_order_summary/
 Disallow: /store_orders/
 Disallow: /store_invoices/
@@ -14,6 +17,62 @@ Disallow: /ajax/add_to_wishlist/
 Disallow: /ajax/delete_wishlist_item/
 Disallow: /ajax/move_all_to_cart/
 Disallow: /ajax/move_item_to_cart/
-
-
 Sitemap: https://www.artevenue.com/static/sitemap.xml
+
+
+User-agent: LieBaoFast
+Disallow: /
+
+User-agent: MauiBot
+Disallow:/
+
+User-agent: MauiBot (crawler.feedback+wc@gmail.com) 
+Disallow: /
+
+User-agent: MegaIndex.ru/2.0
+Disallow: /
+
+User-agent: MqqBrowser
+Disallow:/
+
+User-agent: Nimbostratus-Bot/v1.3.2
+Disallow: /
+
+User-agent: Qwant-news
+Disallow: /
+
+User-agent: Qwantify
+Disallow: /
+
+User-agent: Seekport Crawler
+Disallow: / 
+
+User-agent: SeznamBot
+Disallow: /
+
+User-agent: SputnikBot/2.3
+Disallow:/
+
+User-agent: The Knowledge AI 
+Disallow:/
+
+User-agent: TinyTestBot
+Disallow: /
+
+User-agent: TurnitinBot
+Disallow: /
+
+User-agent: UCBrowser
+Disallow: / 
+
+User-agent: yacybot
+Disallow: / 
+
+User-agent: YandexBot
+Disallow: / 
+
+User-agent: Yeti
+Disallow: / 
+
+User-agent: YisouSpider
+Disallow: / 

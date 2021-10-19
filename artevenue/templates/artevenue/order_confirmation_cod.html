@@ -24,30 +24,99 @@
 {% endblock imagemap-resize-script %}
 {% block add_to_head %}
 	<script>
-	gtag('event', 'purchase', {
-	  "transaction_id": "{{order.order_number}}",
-	  "affiliation": "Arte'Venue.com",
-	  "value": {{order.order_total}},
-	  "currency": "INR",
-	  "tax": {{order.tax}},
-	  "shipping": 0,
-	  "items": [
-		{% for i in order_items %}
-		{
-		  "id": "{{i.product_id}}",
-		  "name": "{{i.product.name}}",
-		  "list_name": "",
-		  "brand": "Arte'Venue",
-		  "category": "",
-		  "variant": "",
-		  "list_position": 1,
-		  "quantity": {{i.quantity}},
-		  "price": '{{i.item_total}}'
-		},
-		{% endfor %}
-	  ]
-	});
+		dataLayer.push({ ecommerce: null }); 
+		dataLayer.push({
+		  event: "purchase",
+		  ecommerce: {
+			  transaction_id: "{{order.order_number}}",
+			  affiliation: "artevenue.com",
+			  value: {{order.order_total}},
+			  tax: {{order.tax}},
+			  shipping: "0",
+			  currency: "INR",
+			  coupon: "{{order.voucher.voucher_code}}",
+			  items: [
+			  {% for i in order_items %}
+			  {
+				item_name: "{{i.product.name}}",
+				item_id: "{{i.product_id}}",
+				price: "{{i.item_total}}",
+				item_brand: "Arte'Venue",
+				item_category: "Home",
+				item_variant: "",
+				quantity: {{i.quantity}}
+			  },
+			  {% endfor %}
+			  ]
+		  }
+		});
+		
 	</script>
+
+	<!-- Event snippet for Buy Art conversion page -->
+	<script>
+	  gtag('event', 'conversion', {
+		  'send_to': 'AW-704394330/egnUCKr4gdMBENro8M8C',
+		  'value': {{order.order_total}},
+		  'currency': 'INR',
+		  'transaction_id': '{{order.order_number}}'
+	  });
+
+	  gtag('event', 'conversion', {
+		  'send_to': 'AW-766463166/n9HDCNOUyPsBEL6Zve0C',
+		  'value': {{order.order_total}},
+		  'currency': 'INR',
+		  'transaction_id': '{{order.order_number}}'
+	  });
+	  
+	</script>
+
+	<script>
+		gtag('event', 'purchase', {
+		  "transaction_id": "{{order.order_number}}",
+		  "affiliation": "artevenue.com",
+		  "value": {{order.order_total}},
+		  "currency": "INR",
+		  "tax": {{order.tax}},
+		  "shipping": 0,
+		  "items": [
+			  {% for i in order_items %}
+				{
+				  "id": "{{i.product_id}}",
+				  "name": "{{i.product.name}}",
+				  "list_name": "Search Results",
+				  "brand": "ARTE'VENUE",
+				  "category": "Home",
+				  "variant": "",
+				  "list_position": 1,
+				  "quantity": {{i.quantity}},
+				  "price": {{i.item_total}}
+				},
+			  {% endfor %}
+		  ]
+		});
+	</script>
+	
+	<script>
+	window.lintrk('track', { conversion_id: 4632036 });	
+	</script>	
+
+	<script>
+		var prod_arr = [];
+		{% for i in order_items %}
+			prod_arr.push("{{i.product_id}}");
+		{% endfor %}
+		wigzo ("track", "buy", prod_arr);
+		
+		wigzo ("track", "order",
+			{orderId: {{order.order_number}}, 
+			 email: '{{order.order_billing.email_id}}', 
+			 phone: '{{order.order_billing.phone_number}}', 
+			 fullName: '{{order.order_billing.full_name}}'			 
+			}
+		);
+	</script>
+	
 {% endblock add_to_head %}
 
 	<!-- Only Override the site content block -->
@@ -152,6 +221,7 @@
 
 	
 	{% block jscripts %}
+
 
 	{% endblock jscripts %}
 			

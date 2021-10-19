@@ -5,24 +5,24 @@
 {% load indian_numbers_tags %}
 
 {% block page-title %} 
-	<title>{% if product.set_of > 1 %} {{product.stock_image_category.name|title}} Wall Art Set of {{ product.set_of }} {% if product.name %} |  {{product.name}} {% endif %} {% else %} Buy Framed Wall Art | {{product.name}} | Print on {{print_medium_id}}{% endif %}
+	<title>{% if product.set_of > 1 %} Framed Wall Art Painting Set of {{ product.set_of }} on {{print_medium_id|title}}, Titled: {{product.name|title}}, Customization Available {% else %} Buy Framed Wall Art Painting Titled: {{product.name}} | Licensed Art Print on {{print_medium_id|title}}{% endif %}
 	</title>
 {% endblock page-title %} 
 
 
 {% block page-description %}
 {% if product.set_of > 1 %}
-<meta name="description" content="Buy set of {{ product.set_of }} {{product.stock_image_category.name|title}} wall art paintings. Premium Quality. Size options and customization available.">
+<meta name="description" content="A framed wall art set of {{ product.set_of }} artworks on {{print_medium_id|title}}. Premium Quality. Size options and customization available.">
 {% else %}
-<meta name="description" content="Buy framed wall art painting | {{product.name}} | Artwork on {{print_medium_id}}, Size options available.">
+<meta name="description" content="A framed wall art on {{print_medium_id|title}}, size options & customization available.">
 {% endif %}	
 {% endblock page-description %}
   
 {% block page-keywords %}
 {% if product.set_of > 1 %}
-<meta name="keywords" content="set of {{ product.set_of }} paintings, set of {{ product.set_of }} wall art, {{ product.set_of }} piece framed wall art, {{ product.set_of }} piece painting, {{ product.set_of }} piece wall art,{{product.stock_image_category.name|title}} set of paintings, {{product.stock_image_category.name|title}} wall art set, {{product.stock_image_category.name|title}} painting set, {{product.stock_image_category.name|title}} wall art set">
+<meta name="keywords" content="buy set of {{ product.set_of }} paintings, set of {{ product.set_of }} wall art, {{ product.set_of }} piece framed wall art, {{ product.set_of }} piece painting, {{ product.set_of }} piece wall art,{{product.stock_image_category.name|title}} set of paintings, {{product.stock_image_category.name|title}} wall art set, {{product.stock_image_category.name|title}} painting set, {{product.stock_image_category.name|title}} wall art set">
 {% else %}
-<meta name="keywords" content="buy framed wall art, painting,{{product.name}}, framed painting, {{product.stock_image_category.name|title}} painting set, {{product.stock_image_category.name|title}} wall art set">
+<meta name="keywords" content="buy framed wall art, painting, {{product.name}}, framed painting, {{set.stock_image_category.name|title}} painting set, {{product.stock_image_category.name|title}} wall art set">
 {% endif %}
 {% endblock page-keywords %}
   
@@ -60,8 +60,22 @@
 					<nav aria-label="breadcrumb">
 						<ol class="breadcrumb">
 							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
-							<li class="breadcrumb-item"><a href="{% url 'stock_collage_products' %}">Art Print Sets</a></li>
-							<li class="breadcrumb-item active">{{ product.product_id }}</li>
+							{% if product.set_of == 1 %}
+							<li class="breadcrumb-item">
+								<!--<a href="{% url 'framed_wall_art_collection'%} ">Best Sellers</a>-->
+								<form hidden class = "form-inline" method = 'GET' action = "{% url 'framed_wall_art_collection' %}" id = "best_seller_form">
+									<input hidden name = "singles" value = 'YES'>
+								</form>
+								<button class = "btn-link" style = "border:none;" type = "submit"
+									form = "best_seller_form">Best Sellers
+								</button>
+							</li>
+							{% else %}
+							<li class="breadcrumb-item">
+								<a href="{% url 'framed_wall_art_collection'%} ">Wall Art Sets</a>
+							</i>
+							{% endif %}
+							<li class="breadcrumb-item active">{{product.name}}</li>
 						</ol>
 					</nav>
 				</div>
@@ -279,7 +293,7 @@
 							<div class="row mt-4">
 								<div class = "col-12 mb-3" style = "">
 									<div id = "print-med" class = "size-title">
-										{% if product.set_of > 1 %} EACH {% endif %} ARTWORK SIZE (in inch):
+										CHOOSE {% if product.set_of > 1 %} EACH {% endif %} ARTWORK SIZE:
 									</div>
 									{% if product.set_of > 1 %}
 									Price is for the set of {{ product.set_of }}
@@ -431,7 +445,7 @@
 										<input hidden name = "surface" id = "surface_{{s.stock_image_id}}" value = "{{product.stock_collage_specs.print_medium_id|default_if_none:''}}">
 										<input hidden name = "mount_id" value = "{{product.stock_collage_specs.mount_id|default_if_none:''}}">
 										<input hidden name = "mount_color" value = "{{product.stock_collage_specs.mount_color|default_if_none:''}}">
-										<input hidden name = "mount_size" value = "{{product.stock_collage_specs.mount_size|default_if_none:''}}">
+										<input hidden name = "mount_size" id = "id_mount_size" value = "{{product.stock_collage_specs.mount_size|default_if_none:''}}">
 										<input hidden name = "stretched_id" value = "{{product.stock_collage_specs.stretched_id|default_if_none:''}}">
 										<button class = "btn btn-outline btn-sm" type = "submit" form="f_{{s.stock_image_id}}"
 											style = "border: 1px solid #ddd;">
@@ -550,7 +564,11 @@
 
 		function defaults_from_set(){
 			{% if moulding_id %}
-				moulding_id = '{{moulding_id}}';
+				{% if '{{moulding_id}}' == 'None' %}
+					moulding_id = '0';
+				{% else %}
+					moulding_id = '{{moulding_id}}';
+				{% endif %}
 			{% else %}
 				moulding_id = '0';
 			{% endif %}
@@ -593,18 +611,24 @@
 			{% endif %}
 
 			if ( get_print_medium_id() == 'PAPER') {				
-				if (get_image_width() <= 18) {
-					set_mount_size(1);
-					//set_moulding_id('18');
-				} else if (get_image_width() <= 26) {
-					set_mount_size(2);
-					//set_moulding_id('24');
-				} else if (get_image_width() <= 34) {
-					set_mount_size(3);
-					//set_moulding_id('24');
+				var print_size = 10;
+				if (ratio > 1){
+					print_size = get_image_width();
 				} else {
-					set_mount_size(4);
-					//set_moulding_id('24');
+					print_size = get_image_height();
+				}
+				if (print_size <= 18) {
+					set_mount_size(1);
+					$("#id_mount_size").val(1);
+				} else if (print_size <= 26) {
+					set_mount_size(2);
+					$("#id_mount_size").val(2);
+				} else if (print_size <= 34) {
+					set_mount_size(2);
+					$("#id_mount_size").val(2);
+				} else {
+					set_mount_size(2);
+					$("#id_mount_size").val(2);
 				}
 			}
 		
@@ -701,20 +725,30 @@
 		}		
 
 		function set_paper_default_frame_mount(){
-			var print_size = get_image_width();
+			var print_size = 10;
+			if (ratio > 1){
+				print_size = get_image_width();
+			} else {
+				print_size = get_image_height();
+			}
+
 			if ( get_print_medium_id() == 'PAPER') {				
 				if (print_size <= 18) {
 					set_mount_size(1);
 					set_moulding_id('18');
+					$("#id_mount_size").val(1);
 				} else if (print_size <= 26) {
 					set_mount_size(2);
 					set_moulding_id('24');
+					$("#id_mount_size").val(2);
 				} else if (print_size <= 34) {
-					set_mount_size(3);
+					set_mount_size(2);
 					set_moulding_id('24');
+					$("#id_mount_size").val(2);
 				} else {
-					set_mount_size(4);
+					set_mount_size(2);
 					set_moulding_id('24');
+					$("#id_mount_size").val(2);
 				}
 				set_mount_color('#fffff0');
 				set_mount_id('3');
@@ -741,7 +775,13 @@
 				$("#iuser_width_{{s.stock_image_id}}").val(image_width);
 				$("#surface_{{s.stock_image_id}}").val(print_medium_id);
 			{% endfor %}
-			$("#print_size").html(wth.toString() + ' X ' + hgt.toString() + ' inch');
+			
+			var pw_cm = wth * 2.54;
+			pw_cm = +pw_cm.toFixed(2);			
+			var ph_cm = hgt * 2.54;
+			ph_cm = +ph_cm.toFixed(2);			
+			$("#print_size").html(pw_cm.toString() + ' X ' + ph_cm.toString() + ' cm (' + wth.toString() +  ' X ' + hgt.toString() + ' inch)');
+			
 			$("#g-wrap").hide();
 			var f_size = 0;
 			var mnt_size = 0;
@@ -757,11 +797,17 @@
 				{% endif %}
 			
 				if  (moulding_id == '{{moulding.moulding_id}}') {
-					$("#frame_spec").html('{{moulding.name}}' + ' ({{moulding.width_inner_inches}}" inch)');
+					{% if moulding %}
+						var mld_cm =  {{moulding.width_inches}} * 2.54;
+						mld_cm = +mld_cm.toFixed(2);			
+						$("#frame_spec").html('{{moulding.name}} (' + mld_cm.toString() + ' cm ({{moulding.width_inches}}" inch ))');
+					{% endif %}
 				} else {
 					{% for m in all_mouldings %}
 						if (moulding_id == '{{m.moulding_id}}') {
-							$("#frame_spec").html('{{m.name}}' + ' ({{m.width_inner_inches}}" inch)');
+							var mld_cm =  {{m.width_inner_inches}} * 2.54;
+							mld_cm = +mld_cm.toFixed(2);			
+							$("#frame_spec").html('{{m.name}} (' + mld_cm.toString() + 'cm ({{m.width_inches}}" inch ))');
 						}
 					{% endfor %}
 				}
@@ -785,7 +831,11 @@
 						mount_size = parseFloat(mount_size);
 						frame_width = frame_width + mount_size*2;
 						frame_height = frame_height + mount_size*2;
-						$("#f_mount").html(mount_size + '" inch, Color: ' + mnt_nm);
+						
+						var mnt_cm = mount_size * 2.54;
+						mnt_cm = +mnt_cm.toFixed(2);			
+						
+						$("#f_mount").html(mnt_cm.toString() + " , " + mount_size.toString() + '" inch, Color: ' + mnt_nm);
 						$("#f-mnt").show();						
 					} else {
 						$("#f-mnt").hide();
@@ -808,7 +858,7 @@
 				if (get_stretch_id() == '1'){
 					$("#g-wrap").show();
 					$("#g_wrap").html("Canvas wrapped over wooden frame at the back");
-					$("d-stretch").show();
+					$("#d-stretch").show();
 				} else {
 					$("#g-wrap").hide();
 					$("#d-stretch").hide();
@@ -818,7 +868,12 @@
 			frame_width = Math.round(frame_width)
 			frame_height = Math.round(frame_height)
 
-			$("#fsize").html(frame_width.toString() + '" X ' + frame_height.toString() + '" inch');
+			var frame_width_cm = frame_width * 2.54;
+			frame_width_cm = +frame_width_cm.toFixed(2);
+			var frame_height_cm = frame_height * 2.54;
+			frame_height_cm = +frame_height_cm.toFixed(2);
+
+			$("#fsize").html(frame_width_cm.toString() + " X " + frame_height_cm.toString() + " cm (" + frame_width.toString() + '" X ' + frame_height.toString() + '" inch)');
 			
 			if ( (get_moulding_id() == '' || get_moulding_id() == '0') && (get_stretch_id() == '0' || get_stretch_id() == '') ){
 				$("#rolled").show();
@@ -838,6 +893,7 @@
 			{% for s in stock_images %}
 				$("#surface_{{s.stock_image_id}}").val(prt_med);
 			{% endfor %}
+			set_prod_diagram_and_frame();
 			var mld_id = get_moulding_id();
 			var mnt_color = '';
 			var mnt_size = '0';
@@ -1137,6 +1193,9 @@
 					set_ready_product(print_medium_id, 10, 10, true);
 				{% endif %}
 			{% endif %}
+			
+			wigzo('track', 'productview', 'https://artevenue.com/wall-art-collage-set/{{product.product_id}}/');
+			
 		});
 
 	</script>
@@ -1438,13 +1497,11 @@
 						data = JSON.parse(data);
 						if (data.msg.toUpperCase() != 'SUCCESS'){
 								alert(data.msg);
-						} else {					
-								
+						} else {													
 							cart_qty = data.cart_qty;
-							//Update items in cart
 							$("#itemsincart").html(cart_qty); 
 							$('#cart-msg-modal').modal('show');
-							
+							wigzo ("track", "addtocart", "https://artevenue.com/wall-art-collage-set/" + prod_id.toString() + "/");
 						}
 					},
 					error: function(xhr){
@@ -1475,12 +1532,11 @@
 							data = JSON.parse(data);
 							if (data.msg.toUpperCase() != 'SUCCESS'){
 									alert(data.msg);
-							} else {					
-									
+							} else {									
 								cart_qty = data.cart_qty;
-								//Update items in cart
 								$("#itemsincart").html(cart_qty); 
 								$('#cart-msg-modal').modal('show');
+								wigzo ("track", "addtocart", "https://artevenue.com/wall-art-collage-set/" + prod_id.toString() + "/");
 								
 							}
 						},
@@ -1667,23 +1723,37 @@
 			var prod_id = get_product_id();
 			image_width = p_width;
 			image_height = Math.round(p_width / ratio);
-
-			if ( print_med == 'PAPER') {				
-				if (p_width <= 18) {
-					set_mount_size(1);
-					//set_moulding_id('18');
-				} else if (p_width <= 26) {
-					set_mount_size(2);
-					//set_moulding_id('24');
-				} else if (p_width <= 34) {
-					set_mount_size(3);
-					//set_moulding_id('24');
+			if ( print_med == 'PAPER') {
+				if (ratio > 1){
+					if (p_width <= 18) {
+						set_mount_size(1);
+						$("#id_mount_size").val(1);
+					} else if (p_width <= 26) {
+						set_mount_size(2);
+						$("#id_mount_size").val(2);
+					} else if (p_width <= 34) {
+						set_mount_size(2);
+						$("#id_mount_size").val(2);
+					} else {
+						set_mount_size(2);
+						$("#id_mount_size").val(2);
+					}
 				} else {
-					set_mount_size(4);
-					//set_moulding_id('24');
+					if (image_height <= 18) {
+						set_mount_size(1);
+						$("#id_mount_size").val(1);
+					} else if (image_height <= 26) {
+						set_mount_size(2);
+						$("#id_mount_size").val(2);
+					} else if (image_height <= 34) {
+						set_mount_size(2);
+						$("#id_mount_size").val(2);
+					} else {
+						set_mount_size(2);
+						$("#id_mount_size").val(2);
+					}
 				}
 			}
-
 			{% for s in stock_images %}
 				$("#iuser_width_{{s.stock_image_id}}").val(p_width);
 				$("#surface_{{s.stock_image_id}}").val(print_med);
@@ -1735,6 +1805,16 @@
 				getFramedImg (product_id, moulding_id, mnt_color, mnt_size);
 			
 			}
+
+			wigzo("index", {
+				"canonicalUrl": "https://artevenue.com/wall-art-collage-set/{{product.product_id}}/",
+				"title": "{{product.name}}",
+				"description": {% if product.set_of > 1 %} "A wall art set of {{product.set_of}}" {% else %} "Best Seller Framed Wall Art" {% endif %},
+				"price": $('#prod-price').text(),
+				"productId": "{{product.product_id}}",
+				"image": "https://artevenue.com{% static product.stock_collage_specs.display_url %}",
+				"language":"en" 
+			});	
 			
 			
 		}
@@ -1806,6 +1886,66 @@
 	  document.documentElement.scrollTop = 0;
 	}
 	</script>
+	
+	
+	<script>
+	function set_prod_diagram_and_frame(){
+		set_frame_img(get_moulding_id());
+		if ( get_print_medium_id() == 'PAPER' && (get_mount_id() != '' && get_mount_id() != '0' && mount_size != 0) && (get_moulding_id() != '' && get_moulding_id() != '0') ){
+			$("#prod-diagram").show();
+			$("#components").attr("data-src", "{% static 'img/prod_desc/paper_frame_mount-min.png' %}" );
+			$("#components").prop("src", "{% static 'img/prod_desc/paper_frame_mount-min.png' %}" );
+			$("#no_frame_msg").hide();
+			$("#frame_msg").show();
+			$("#d-hanging").show();
+			$("#d-packing").show();
+		} else if ( get_print_medium_id() == 'PAPER' && (get_mount_id() == '' || get_mount_id() == '0') && (get_moulding_id() != '' && get_moulding_id() != '0') ){
+			$("#prod-diagram").show();
+			$("#components").attr("data-src", "{% static 'img/prod_desc/paper_frame_no_mount-min.png' %}" );
+			$("#components").prop("src", "{% static 'img/prod_desc/paper_frame_no_mount-min.png' %}" );
+			$("#no_frame_msg").hide();
+			$("#frame_msg").show();
+			$("#d-hanging").show();
+			$("#d-packing").show();
+		} else if ( get_print_medium_id() == 'CANVAS' && (get_moulding_id() != '' && get_moulding_id() != '0') ){
+			$("#prod-diagram").show();
+			$("#components").attr("data-src", "{% static 'img/prod_desc/canvas_frame-min.png' %}" );							
+			$("#components").prop("src", "{% static 'img/prod_desc/canvas_frame-min.png' %}" );							
+			$("#no_frame_msg").hide();
+			$("#frame_msg").show();
+			$("#d-hanging").show();
+			$("#d-packing").show();
+		} else if ( get_print_medium_id() == 'PAPER' && (get_mount_id() == '' || get_mount_id() == '0') && (get_moulding_id() == '' || get_moulding_id() == '0') ){
+			$("#prod-diagram").show();
+			$("#components").attr("data-src", "{% static 'img/prod_desc/paper_print-min.png' %}" );
+			$("#components").prop("src", "{% static 'img/prod_desc/paper_print-min.png' %}" );
+			$("#no_frame_msg").show();
+			$("#frame_msg").hide();
+			$("#d-hanging").hide();
+			$("#d-packing").hide();
+		} else if ( get_print_medium_id() == 'CANVAS'&& (get_moulding_id() == '' || get_moulding_id() == '0')  && get_stretch_id() != '1'){
+			$("#prod-diagram").show();
+			$("#components").attr("data-src", "{% static 'img/prod_desc/canvas_print-min.png' %}" );
+			$("#components").prop("src", "{% static 'img/prod_desc/canvas_print-min.png' %}" );
+			$("#no_frame_msg").show();
+			$("#frame_msg").hide();
+			$("#d-hanging").hide();
+			$("#d-packing").hide();
+		} else if ( get_print_medium_id() == 'CANVAS' && (get_moulding_id() == '' || get_moulding_id() == '0') && get_stretch_id() == '1'){
+			$("#prod-diagram").hide();
+			$("#frame_msg").hide();
+			$("#d-hanging").show();
+			$("#d-packing").show();
+		} else {
+			$("#prod-diagram").hide();
+			$("#no_frame_msg").hide();
+			$("#frame_msg").hide();
+			$("#d-hanging").hide();
+			$("#d-packing").hide();
+		}
+	}
+	</script>
+	
 	{% endblock jscripts %}	
 
 	{% block tawkto %}

@@ -6,11 +6,12 @@
 			<div class = "col-12 py-2" style ="color:#082a4c; background-color: #f6f6f6;">
 				<span style = "font-weight:600; ">ARTWORK DESCRIPTION</span>			
 			</div>
+			
 			<div class = "mt-3 col-12" id = "prod-diagram" style = "display:none;">
-				<div class = "row">
+				<div class="row">
 					<div class = "col-12 d-flex justify-content-center">
-						<img id = "components" class = "img-fluid frame-display lazyloaded" 
-							src = "{% static 'img/prod_desc/paper_frame_mount-min.png' %}">	
+						<img id = "components" class = "img-fluid frame-display lazyload" 
+							data-src = "{% static 'img/prod_desc/paper_frame_mount-min.png' %}">	
 					</div>
 					<div class = "col-12 text-center" id = "frame_msg" style = "display: none;">
 						<span style = "font-size: 0.7rem;">(Frame, art print will be that you select)</span>
@@ -20,126 +21,157 @@
 					</div>
 				</div>
 			</div>
-			<div class = "col-12 mt-5">
-				<strong>Art Print</strong>
-			</div>
-			<div class = "col-12">
-				The best quality giclee' prints produced at a very high resolution with full saturation 
-				which are fade resistant. We use large format inkjet printers and archival inks to ensure 
-				consistent quality. Each artwork has an associated copyright and is licensed from the artist.
-			</div>				
-			<div class = "col-12 mt-3">
-				<strong>Print Surface</strong>
-			</div>
-			<span id = "d-paper">
-				<div class = "col-12">
-					Paper: Coated premium matte paper 230 GSM. Bright white, smooth finish matte, 
-					top-coated with an ink-receptive layer.
+			<div class = "mt-5 col-12">
+				<div class = "row">
+					<div class="col-12 col-md-4 col-lg-3 card-column mt-2">
+						<div class="card-card h-100">
+							<h3><strong>Art Print</strong></h3>
+							<p>The best quality giclee' prints produced at a very high resolution with full saturation 
+								and are fade resistant. We use large format inkjet printers and archival inks to ensure 
+								consistent quality. Each artwork has an associated copyright and is licensed from the artist.
+							</p>
+						</div>
+					</div>
+					<div class="col-12 col-md-4 col-lg-3 card-column mt-2">
+						<div class="card-card h-100">
+							<h3><strong>Print Surface</strong></h3>
+							<p id = "d-paper">
+								Paper: Coated premium matte paper 230 GSM. Bright white, smooth finish matte, 
+								top-coated with an ink-receptive layer.
+							</p>
+							<p id = "d-canvas">
+								Canvas: 
+								Artistic matte cotton canvas 410 GSM. Matte finished, crack-resistant, water-resistant, 
+								top-coated with an ink-receptive layer. 
+							</p>
+						</div>
+					</div>
+					<div class="col-12 col-md-4 col-lg-3 card-column mt-2" id = "d-frame">
+						<div class="card-card h-100">
+							<h3><strong>Frame</strong></h3>
+							<img id = "prod-desc-frame" class = "img-fluid frame-display lazyload mt-2" 
+								data-src = "" width=500>
+							<P id = "frame-desc">
+							Made of high density polystyrene. Moisture resistant, premium finish, durable and light weight.
+							</P>					
+						</div>
+					</div>
+					<div class="col-12 col-md-4 col-lg-3 card-column mt-2" id = "d-stretch">
+						<div class="card-card h-100">
+							<h3><strong>Stretched Canvas</strong></h3>
+							<img data-src = "{% static 'img/canvas_stretched.jpg' %}" 
+								alt = "Stretched Canvas"
+								class = "lazyload"
+								style = "width:100px;">
+							<p>
+								The canvas is stretched over wooden frame at the back. The wooden frame is
+								not visible from the front and sides. It comes with hooks and is ready for hanging on the wall.
+							</p>
+						</div>
+					</div>
+					<div class="col-12 col-md-4 col-lg-3 card-column d-acrylic mt-2">
+						<div class="card-card h-100">
+							<div class = "col-12 mt-3">
+								<strong>Acrylic</strong>
+							</div>
+							<div class = "col-12">
+								Acrylic is a cover on top of paper art prints. Premium quality, clear and shatterproof. 
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-md-4 col-lg-3 card-column d-acrylic mt-2">
+						<div class="card-card h-100">
+							<div class = "col-12 mt-3">
+								<strong>Mount Board(Mat)</strong>
+							</div>
+							<div class = "col-12">
+								Add a decorative element within the frame. 
+								Acid free, resists aging, matte finish.
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-md-4 col-lg-3 card-column d-acrylic mt-2">
+						<div class="card-card h-100">
+							<div class = "col-12 mt-3">
+								<strong>Back Board</strong>
+							</div>
+							<div class = "col-12">
+								Medium density fibreboard used to support art print at the back. 
+							</div>
+							<div class = "col-12 mt-2">
+								<small>Note:  Acrylic cover, mount board and back board used only for framed paper art prints and not canvas art prints.</small>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-md-4 col-lg-3 card-column mt-2" id = "d-hanging">
+						<div class="card-card h-100">
+							<h3><strong>Hanging Hardware</strong></h3>
+							<p>All pieces are ready to hang and come with the hooks.</p>
+						</div>
+					</div>
+					<div class="col-12 col-md-4 col-lg-3 card-column mt-2" id = "d-packing">
+						<div class="card-card h-100">
+							<h3><strong>Packaging</strong></h3>
+							<p>
+							All our products are manufactured, assembled and packaged in Bangalore, India.
+							The artworks are secured with a three layer packing -shrink wrapped, 
+							followed by thermocol and corrugated sheet. The package is brand labelled.
+							</p>
+						</div>
+					</div>
 				</div>
-			</span>
-			<span id = "d-canvas">
-				<div class = "col-12">
-					Canvas: 
-					Artistic matte cotton canvas 410 GSM. Matte finished, crack-resistant, water-resistant, 
-					top-coated with an ink-receptive layer. 
-				</div>
-			</span>
-			<span id = "d-frame">
-				<div class = "col-12 mt-3">
-					<strong>Frame</strong>
-				</div>
-				<div class = "col-12 text-center">
-					<img id = "frame-18" style="display: none;" class = "img-fluid frame-display lazyloaded" 
-						src = "{% static 'img/prod_desc/charcoal_black-min.png' %}">
-					<img id = "frame-20"  style="display: none;" class = "img-fluid frame-display lazyloaded" 
-						src = "{% static 'img/prod_desc/salt_white-min.png' %}">
-					<P id = "frame-desc">
-					Made of high density polystyrene. Moisture resistant, premium finish, durable and light weight.
-					</P>
-				</div>
-			</span>
-			<span id = "d-stretch">
-				<div class = "col-12 mt-3">
-					<strong>Stretched Canvas</strong>
-				</div>
-				<div class="col-12">
-					<img src = "{% static 'img/canvas_stretched.jpg' %}" 
-						alt = "Stretched Canvas"
-						style = "width:100px;">
-				</div>
-				<div class = "col-12">
-					The canvas is stretched over wooden frame at the back. The wooden frame is
-					not visible from the front and sides. It comes with hooks and is ready for hanging on the wall.
-				</div>
-			</span>
-			<span id = "d-acrylic">
-				<div class = "col-12 mt-3">
-					<strong>Acrylic</strong>
-				</div>
-				<div class = "col-12">
-					Acrylic is a cover on top of paper art prints. Premium quality, clear and shatterproof acrylic 
-					cover is added on top of framed paper artworks. 
-				</div>
-				<div class = "col-12 mt-3">
-					<strong>Mount Board</strong>
-				</div>
-				<div class = "col-12">
-					Mat boards add a decorative element within the frame. 
-					They are acid free, buffered to resist aging and are matt finished.
-				</div>
-				<div class = "col-12 mt-3">
-					<strong>Back Board</strong>
-				</div>
-				<div class = "col-12">
-					Medium density fibreboards are used to cover paper art prints at the back. 
-				</div>
-				<div class = "col-12 mt-2">
-					Note:  Acrylic cover, mount board and back board is used only for framed paper art prints and not canvas art prints.
-				</div>
-			</span>
-			<span id = "d-hanging">
-				<div class = "col-12 mt-3">
-					<strong>Hanging Hardware</strong>
-				</div>
-				<div class = "col-12">				
-					All pieces are ready to hang and come with necessary hardware.
-				</div>
-			</span>
-			<span id = "d-pcking">
-				<div class = "col-12 mt-3">
-					<strong>Packaging</strong>
-				</div>
-				<div class = "col-12">				
-					All our products are manufactured, assembled and packaged in Bangalore, India.
-					The artworks are secured with a three layer packaging that is shrink wrapped, 
-					followed by thermocol and corrugated sheet. The package is brand labelled.
-				</div>
-			</span>			
-
-			<div class = "col-12 mt-3 text-center">
-				<a class = "btn btn-light" style = "color: #212529;"
-					href = "#dd-faq" data-toggle="collapse">General FAQ</a>
-			</div>
-			<div class = "col-12">
-				<span id = "dd-faq" class="collapse">
-					<ol>
-						<li> Why is canvas not covered with acrylic? </li>
-							Canvas is a cloth medium and is not as delicate as paper. 
-							Canvas needs to breathe and covering it with acrylic or glass could eventually reduce 
-							its life.
-						<li> Why is mount board not included in canvas artworks? </li>
-							Mount board is secured between an acrylic cover and the art print. 
-							Canvas is not covered and hence a mount board cannot be added.
-						<li> What is the difference between framed canvas, stretched canvas and rolled canvas?</li>
-						<ul>
-							<li>Framed Canvas: Canvas is first stretched on wooden bars and then framed.</li>
-							<li>Stretched Canvas: The canvas is stretched over stretcher bars 
-								(wooden frame) at the back. It comes ready for hanging.
-								The stretcher bars are not visible from the front and sides. 
-								It comes with hooks and is ready for hanging.</li>
-							<li>Rolled Canvas: These come in a roll and cannot be hung on a wall.</li>
-						</ul>
-					</ol>
-				</span>
 			</div>
 		</div>
+		
+		<script>
+			function set_frame_img(frm){
+				var frm_id = frm;
+				if (isNaN(frm_id) ){
+					return;
+				} else {
+					frm_id = parseInt(frm);
+				}
+				switch (frm_id) {
+					case 18:
+						$("#prod-desc-frame").attr('src', "{% static 'img/prod_desc/18_charcoal_black-min.png' %}");
+						$("#prod-desc-frame").attr('display', "block");
+						break;
+					case 20:
+						$("#prod-desc-frame").attr('src', "{% static 'img/prod_desc/20_saltwhite-min.png' %}");
+						$("#prod-desc-frame").attr('display', "block");
+						break;
+					case 26:
+						$("#prod-desc-frame").attr('src', "{% static 'img/prod_desc/26_slateblack-min.png' %}");
+						$("#prod-desc-frame").attr('display', "block");
+						break;
+					case 22:
+						$("#prod-desc-frame").attr('src', "{% static 'img/prod_desc/22_umberbrown-min.png' %}");
+						$("#prod-desc-frame").attr('display', "block");
+						break;
+					case 8:
+						$("#prod-desc-frame").attr('src', "{% static 'img/prod_desc/8_snowwhite-min.png' %}");
+						$("#prod-desc-frame").attr('display', "block");
+						break;
+					case 25:
+						$("#prod-desc-frame").attr('src', "{% static 'img/prod_desc/25_chestnut_brown-min.png' %}");
+						$("#prod-desc-frame").attr('display', "block");
+						break;
+						break;
+					case 23:
+						$("#prod-desc-frame").attr('src', "{% static 'img/prod_desc/23_pecan_brown-min.png' %}");
+						$("#prod-desc-frame").attr('display', "block");
+						break;
+					case 24:
+						$("#prod-desc-frame").attr('src', "{% static 'img/prod_desc/24_midnightblack-min.png' %}");
+						$("#prod-desc-frame").attr('display', "block");
+						break;
+					case 6:
+						$("#prod-desc-frame").attr('src', "{% static 'img/prod_desc/6_frost_white-min.png' %}");											
+						$("#prod-desc-frame").attr('display', "block");
+						break;
+					default:
+						$("#prod-desc-frame").attr('src', "");
+						$("#prod-desc-frame").attr('display', "none");
+				}
+			}
+		</script>		

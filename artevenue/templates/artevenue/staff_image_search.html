@@ -1,0 +1,291 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load utils %}
+{% load how_to_tips from estore_base %}
+{% block page-title %} 
+	<title>
+		Arte'Venue | Staff Image Search 
+	</title>
+	<meta name="description" content="Image search for staff">
+	<meta name="keywords" content="">
+{% endblock page-title %} 
+{% block page-description %}
+{% endblock page-description %}
+{% block page-keywords %}
+{% endblock page-keywords %}
+
+{% block coursel-stylesheet %}
+{% endblock coursel-stylesheet %}
+
+{% block coursel-script %}
+{% endblock coursel-script %}
+
+{% block front.js %}
+{% endblock front.js %}
+
+{% block lazysizes %}
+<script src="{% static '/vendor/lazysizes/lazysizes.min.js' %}" async=""></script>
+{% endblock lazysizes %}
+
+{% block slick-slider %}
+{% endblock slick-slider %}
+
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+{% block gmap-script %}
+{% endblock gmap-script %}
+
+
+{% block popper-script %}
+	<script src="{% static 'vendor/popper.js/umd/popper.min.js' %}"> </script>
+{% endblock popper-script %}
+
+
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+        <div class="container">
+			<div class="row">
+
+				<!-- breadcrumb-->
+				<div class="col-12">
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+							<li class="breadcrumb-item"><a href= "{% url 'staff_page' %}">Staff Page</a></li>
+							<li aria-current="page" class="breadcrumb-item active">Image Search</li>
+						</ol>
+					</nav>
+				</div>	
+
+				<div class="col-12">
+					<div class="mt-3 text-center">
+						<h1 style = "font-weight:700">SEARCH IMAGES</h1>
+					</div>
+				</div>
+			</div>					
+			<form id="cat-form" >
+				<input hidden id = "id_page_num" name = "page_num" value = "{{page}}">
+				<input hidden id = "id_sort" name = "sort" value = "{{sortOrder}}">
+				<input hidden id = "id_show" name = "show" value = "{{show}}">
+				<input hidden id = "id_result_limit" name = "result_limit">
+				<div class="row">
+					<div class = "col-6" class = "form-group">
+						<label for="width">Width:</label>
+						<input class = "form-control" type="number" id="width" placeholder="Enter image width" name="width" value="{{width}}">
+					</div>
+					<div class = "col-6">
+						<label for="pwd">height:</label>
+						<input class = "form-control" type="number" id="height" placeholder="Enter image height" name="height" value="{{height}}">
+					</div>
+					<div class = "col-12 col-md-4">
+						<label for="pwd">Keywords:</label>
+						<input class = "form-control" type="text" id="id_keywords" placeholder="Enter keywords separated by comma" name="keywords" value="{{keywords}}">
+					</div>
+					<div class = "col-12 col-md-4">
+						<label for="pwd">Colors:</label>
+						<input class = "form-control" type="text" id="colors" placeholder="Enter colors separated by comma" name="colors" value="{{colors}}">
+					</div>
+					<div class = "col-12 col-md-4">
+						<label for="pwd">Artist:</label>
+						<input class = "form-control" type="text" id="artist" placeholder="Enter artist name (partial name can be entered)" name="artist" value="{{artist}}">
+					</div>
+					<div class = "col-12 col-md-4">
+						<label for="pwd">Image Code:</label>
+						<input class = "form-control" type="text" id="image_code" placeholder="Enter image code" name="image_code" value="{{image_code}}">
+					</div>
+					<div class = "col-12 col-md-4">
+						<label for="pwd">Image Title:</label>
+						<input class = "form-control" type="text" id="image_title" placeholder="Enter image title (partial title can be entered)" name="image_title" value="{{image_title}}">
+					</div>
+					<div class = "col-12 col-md-4">
+						<label for="pwd">Art Type:</label>
+						<input class = "form-control" type="text" id="art_type" placeholder="Enter 0 or 1 (fine art or Photograph)" name="art_type" value="{{art_type}}">
+						<span style = "font-size: 0.65rem;">Enter 0 for fine art and 1 for photographs
+					</div>
+					<div class = "col-12 col-md-4">
+						<label for="pwd">Category:</label>
+						<select id = "cat-select" class = "form-control" name  = "category_id">
+							<option value = ""></option>
+							{% for c in categories %}
+								<option value = "{{c.category_id}}" {% if category_id == c.category_id %} selected {% endif %}>
+								{{c.name}}
+								</option>
+							{% endfor %}
+						</select>
+					</div>
+					<div class = "col-12 col-md-4">
+						<label for="pwd">Product Id(Website):</label>
+						<input class = "form-control" type="text" id="product_id" placeholder="Enter website product id" name="product_id" value="{{product_id}}">
+						<span style = "font-size: 0.65rem;">Enter product id from website
+					</div>
+					<div class = "col-12 mt-3 text-center">
+						<button class = "btn btn-primary" type="submit">
+							<i class = "fa fa-search"> Search</i>
+						</button>
+					</div>
+				</div>
+			</form>
+			<div class="row">
+				<div class="col-12">
+					<hr>
+				</div>
+			</div>
+			<div class="row">
+				<div class = "sticky-content" style = "width:100%;">
+					<div class="col-12 ">
+						<div id = "img-display mt-5">
+						{% include 'artevenue/prod_display_include.html' %}
+						</div>
+					</div>
+				</div>
+				{% include 'artevenue/message-modal_ok.html' %}
+			</div>
+		</div>
+	{% endblock sitecontent %}
+	
+	{% block jscripts %}
+
+	<script>		
+		function page_perpage_change(page, sort, show, keywords, result_limit=''){ 
+			$('#id_sort').val(sort);
+			$('#id_show').val(show);
+			$('#id_keywords').val(keywords);
+			$('#id_result_limit').val(result_limit);
+			
+			if (isNaN(page) == false) {
+				page_num = parseInt(page);
+			} else {
+				page_num = 1;  // default
+			}
+			$("#id_page_num").val(page_num);
+						
+						
+			if (isNaN(show) == false) {
+				show_num = show;
+			} else {
+				if (show != 'ALL') {
+					show_num = '50' // default
+				} else {
+					show_num = show;  
+				}
+			}
+			if (show_num != '' ){
+				$("#id_show").val(show_num);
+			}
+			
+			document.body.scrollTop = 0; // For Safari
+			document.documentElement.scrollTop = 0; 
+			
+			$("#cat-form").submit();
+		}
+	</script>
+	
+	<script>
+		$(document).on({
+			ajaxStart: function() { $body.addClass("loading");},
+			ajaxStop: function() { $body.removeClass("loading");},
+			ajaxStart: function() { $("#wall-color-tool").addClass("loading");},
+			ajaxStop: function() { $("#wall-color-tool").removeClass("loading");}
+		});
+	</script>
+
+	<script>
+		function addToFav(prod_id, currwidth, aspect_ratio, total_price,
+				discount, promotion_id, disc_amt, item_unit_price){
+			currheight = Math.round(currwidth / aspect_ratio);
+			qty = 1; moulding_id = 0; moulding_size = 0; 
+			print_medium_id = 'PAPER'; print_medium_size = currheight * currwidth;
+			mount_id = 0; mount_size = 0; mount_w_left =0; mount_w_right = 0;
+			mount_w_top =0; mount_w_bottom = 0;acrylic_id = 1;
+			acrylic_size = currheight * currwidth; board_id = 0; board_size = 0;
+			stretch_id = 0; stretch_size = 0; discount = 0;
+		
+			$.ajax({
+				url: "{% url 'add_to_wishlist' %}", 
+				data: { 'prod_id':prod_id,'qty':qty, 
+						'width':currwidth, 'height':currheight, 'moulding_id': moulding_id,
+						'moulding_size' : moulding_size,
+						'print_medium_id':print_medium_id, 'print_medium_size':print_medium_size, 
+						'mount_id':mount_id, 'mount_size':mount_size,
+						'mount_w_left' : mount_w_left, 'mount_w_right':mount_w_right, 
+						'mount_w_top':mount_w_top, 'mount_w_bottom' : mount_w_bottom, 
+						'acrylic_id':acrylic_id, 'acrylic_size':acrylic_size,
+						'board_id':board_id, 'board_size':board_size, 'stretch_id':stretch_id,
+						'stretch_size':stretch_size, 
+						'total_price':total_price, 'image_width':currwidth, 'image_height':currheight,
+						'discount':discount, 'promotion_id':promotion_id, 'disc_amt':disc_amt,
+						'item_unit_price':item_unit_price,  'prod_type':'STOCK-IMAGE'}, 
+				dataType: 'text', 
+					type: 'POST',
+				success: function (data) {
+					data = JSON.parse(data);
+					cart_qty = data.cart_qty;
+					$('#fav_'+prod_id).html('<i class = "fa fa-heart" onclick = "deleteItem(' + prod_id + ')"style="color:red; padding-right:5px;" data-toggle="tooltip" title="Added to Favorites!"></i>');
+					/* $('#msg-wishlist-modal').modal('show');
+					setTimeout(function() {
+						$('#msg-wishlist-modal').modal('hide');
+						}, 1000);
+					*/
+				},
+				error: function(xhr){
+					alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+				}
+			});	
+		}
+	</script>
+
+		<script>
+		
+		function deleteItem(prod_id){
+			wishlist_item_id = 0;
+			sub_total = 0;
+			tax = 0;
+			wishlist_total= 0;
+			item_total = 0;
+			{% for w in wishlistitems %}
+				if ({{w.product_id}} == prod_id){
+					wishlist_item_id = {{w.wishlist_item_id}};
+				}
+			{% endfor %}
+
+			sub_total = '';
+			tax='';
+			wishlist_total='';
+			item_total='';
+			
+			$.ajax({
+				url: "{% url 'delete_wishlist_item' %}", 
+				data: {'wishlist_item_id':wishlist_item_id, 'sub_total':sub_total, 'tax':tax, 
+				'wishlist_total':wishlist_total, 'item_total':item_total}, 
+				dataType: 'text', 
+				type: 'post',
+				success: function (data) {
+					data = JSON.parse(data);
+					wishlist_qty = data.msg;
+					$('#fav_'+prod_id).html('<i class = "fa fa-heart-o"  style="color:red; padding-right:5px;" data-toggle="tooltip" title="Add to Favorites!"></i>')
+					if (data = "SUCCESS") {
+						// Update the display
+						//show_wishlist();
+						$("#w_msg").html('Item removed from favorites');
+						/*$('#msg-wishlist-modal').modal('show');
+						setTimeout(function() {
+							$('#msg-wishlist-modal').modal('hide');
+							}, 1000); */
+					} else {
+						alert(data);
+					}
+				},
+				error: function(xhr){
+					alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+				}
+			});			
+		}
+	</script>
+	
+	{% endblock jscripts %}
+	{% block tawkto %}
+	{% endblock tawkto %}
+			
+	

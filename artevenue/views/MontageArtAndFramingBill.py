@@ -19,7 +19,8 @@ def get_production_cost(yrmonth):
 	order_items = Order_items_view.objects.select_related(
 		'product').filter(order__order_date__gte = start_date,
 		order__order_date__lte = end_date,
-		product__product_type_id = F('product_type_id')).exclude(order__order_status = 'PP')
+		quantity__gte = 1,
+		product__product_type_id = F('product_type_id')).exclude(order__order_status = 'PP').exclude(order__order_status = 'CN')
 
 	printroyalty = Decimal(1.4)
 	paperinkrate = Decimal(0.3)
@@ -39,7 +40,7 @@ def get_production_cost(yrmonth):
 	#framerate_box = 2.17
 	#framerate_simple1 = 1.42
 	#framerate_simple2 = 2.5
-	frame_cost = {'11': 1.42, '22': 1.42, '8': 1.42, '23': 2.5, '24': 2.5, '10': 2.17, '25': 2.17, '26': 2.17, '18': 1.42, '20':  2.17}
+	frame_cost = {'11': 1.42, '22': 1.42, '8': 1.42, '23': 2.5, '24': 2.5, '10': 2.17, '25': 2.17, '26': 2.17, '18': 1.42, '20':  2.17, '6': 2.17}
 	
 
 	with open('Production_Cost_' + yrmonth + '.csv', 'w', newline='') as myfile:

@@ -1,0 +1,218 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% block page-title %} 
+	<title>Arte'Venue COD Order Confirmation</title>
+{% endblock page-title %} 
+{% block page-description %}
+	<meta name="description" content="Confirmation of COD order placed at artevenue.com">
+{% endblock page-description %}
+{% block page-keywords %}
+	<meta name="keywords" content="artevenue, order, COD">
+{% endblock page-keywords %}
+
+{% block page-author %}
+	<meta name="author" content="Arte'Venue">
+{% endblock page-author %}
+
+{% block jqueryui-stylesheet %}
+{% endblock jqueryui-stylesheet %}
+
+{% block jqueryui-script %}
+{% endblock jqueryui-script %}
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+{% block add_to_head %}
+	<script>
+		dataLayer.push({ ecommerce: null }); 
+		dataLayer.push({
+		  event: "purchase",
+		  ecommerce: {
+			  transaction_id: "{{order.order_number}}",
+			  affiliation: "artevenue.com",
+			  value: {{order.order_total}},
+			  tax: {{order.tax}},
+			  shipping: "0",
+			  currency: "INR",
+			  coupon: "{{order.voucher.voucher_code}}",
+			  items: [
+			  {% for i in order_items %}
+			  {
+				item_name: "{{i.product.name}}",
+				item_id: "{{i.product_id}}",
+				price: "{{i.item_total}}",
+				item_brand: "Arte'Venue",
+				item_category: "Home",
+				item_variant: "",
+				quantity: {{i.quantity}}
+			  },
+			  {% endfor %}
+			  ]
+		  }
+		});
+		
+	</script>
+
+	<!-- Event snippet for Buy Art conversion page -->
+	<script>
+	  gtag('event', 'conversion', {
+		  'send_to': 'AW-704394330/egnUCKr4gdMBENro8M8C',
+		  'value': {{order.order_total}},
+		  'currency': 'INR',
+		  'transaction_id': '{{order.order_number}}'
+	  });
+
+	  gtag('event', 'conversion', {
+		  'send_to': 'AW-766463166/n9HDCNOUyPsBEL6Zve0C',
+		  'value': {{order.order_total}},
+		  'currency': 'INR',
+		  'transaction_id': '{{order.order_number}}'
+	  });
+	  
+	</script>
+
+	<script>
+		gtag('event', 'purchase', {
+		  "transaction_id": "{{order.order_number}}",
+		  "affiliation": "artevenue.com",
+		  "value": {{order.order_total}},
+		  "currency": "INR",
+		  "tax": {{order.tax}},
+		  "shipping": 0,
+		  "items": [
+			  {% for i in order_items %}
+				{
+				  "id": "{{i.product_id}}",
+				  "name": "{{i.product.name}}",
+				  "list_name": "Search Results",
+				  "brand": "ARTE'VENUE",
+				  "category": "Home",
+				  "variant": "",
+				  "list_position": 1,
+				  "quantity": {{i.quantity}},
+				  "price": {{i.item_total}}
+				},
+			  {% endfor %}
+		  ]
+		});
+	</script>
+	
+	<script>
+	window.lintrk('track', { conversion_id: 4632036 });	
+	</script>	
+{% endblock add_to_head %}
+
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+        <div class="container">
+			<div class="row mb-5">
+				<!-- breadcrumb-->
+				<div class="col-12">
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+							<li aria-current="page" class="breadcrumb-item active">Order Confirmation</li>
+						</ol>
+					</nav>
+				</div>
+
+				<div class="col-12 text-center">
+					<h1 style = "font-weight: 700;"> Order Confirmation</h1>
+					<p>Thank you {{firstname}}, for choosing Arte'Venue!</p>
+				</div>
+				<div class="col-12 box">
+					<div class="mt-2">
+						<form id ="submit-form" method = "post" action = "{% url 'payment_submit' %}">
+							{% csrf_token %}
+							<p><strong>Congratulations!! No payment is required. Your order is confirmed.</strong>
+							</p>
+							<p>Order number is {{order.order_number}}. You can find your order using 
+							'Find My Order' link in the footer section, or 'My Orders' link, 
+							if you have logged in.</p>
+							<p>Please visit <a href="{% url 'contact_us' %}">Contact Us</a> page in 
+							case of any help required. Please quote the order number and your email 
+							in all communication.</p>
+							<div class="row">
+								<div class="col-12 mt-3">
+									<hr>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-12 mt-3">
+									Order Number: <span style="font-weight:700;">{{order.order_number}}</span>
+								</div>
+								<div class="col-12">
+									<div id="order-summary" class="mt-2">
+										<div class = "row mt-2">
+											<div class = "col-12 col-md-3">
+												<div class = "row">
+													<div class = "col-12">		
+														<strong>Subtotal</strong>
+													</div>
+													<div class = "col-12">		
+														<span class = "ord-row">{{order.sub_total|floatformat}}</span>
+													</div>
+												</div>
+											</div>
+											<div class = "col-12 col-md-3">
+												<div class = "row">
+													<div class = "col-12">		
+														<strong>Tax</strong>
+													</div>
+													<div class = "col-12">		
+														<span class = "ord-row">{{order.tax|floatformat}}</span>
+													</div>
+												</div>
+											</div>
+											<div class = "col-12 col-md-3">
+												<div class = "row">
+													<div class = "col-12">		
+														<strong>Shipping & handling</strong>
+													</div>
+													<div class = "col-12">		
+														<span id ="s-h" class = "ord-row">{{order.shipping_cost|floatformat}}</span>
+													</div>
+												</div>
+											</div>
+											<div class = "col-12 col-md-3">
+												<div class = "row">
+													<div class = "col-12">		
+														<strong>Order Total</strong>
+													</div>
+													<div class = "col-12">		
+														<span id ="ord-total" class = "ord-row"><strong>{{order.order_total|floatformat}}</strong></span>
+													</div>
+												</div>
+											</div>
+											{% if order.order_discount_amt %}
+											<div class = "col-12 col-md-3">
+												<div class = "row">
+													<div class = "col-12">		
+														<strong style = "color:green;">Your Savings</strong>
+													</div>
+													<div class = "col-12">		
+														<span style = "color:green;">{{order.order_discount_amt|floatformat}}</span>
+													</div>
+												</div>
+											</div>
+											{% endif %}
+										</div>								
+									</div>					
+								</div>
+							</div>
+
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+				
+	{% endblock sitecontent %}
+
+	
+	{% block jscripts %}
+
+
+	{% endblock jscripts %}
+			
+	

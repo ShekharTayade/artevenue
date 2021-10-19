@@ -56,6 +56,7 @@ INSTALLED_APPS = [
 	'review.apps.ReviewConfig',	
 	'gallerywalls.apps.GallerywallsConfig',	
 	'returns.apps.ReturnsConfig',
+	'spinwheel.apps.SpinwheelConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -77,6 +78,7 @@ INSTALLED_APPS = [
 	'django.contrib.sitemaps',
 	'indian_numbers',
 	'webmaster_verification',
+	'django.contrib.redirects',
 	]
 
 MIDDLEWARE = [
@@ -87,6 +89,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+	'django.contrib.redirects.middleware.RedirectFallbackMiddleware',
 ]
 
 ROOT_URLCONF = 'estore.urls'

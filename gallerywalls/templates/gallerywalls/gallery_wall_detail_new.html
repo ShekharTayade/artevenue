@@ -3,10 +3,10 @@
 {% load utils %}
 {% block page-title %} 
 {% load customer_review from customer_review %}
-	<title>Gallery Wall - {{gal.gallery.title}}, Set of {{gal.gallery.set_of}}, Customization Available</title>
+	<title>Gallery Wall Set: {{gal.gallery.title}}, Set of {{gal.gallery.set_of}} Paintings | Customization Available</title>
 {% endblock page-title %} 
 {% block page-description %}
-	<meta name="description" content="Designer curated gallery wall. pucture wall, collage set for your home and office decor.">
+	<meta name="description" content="Designer curated gallery wall set. Contains " + {{gal.gallery.set_of}} + " framed paintings and covers wall area of approx " + str({{gal.wall_area_height|floatformat}}) + " X " + str(gallery_variation.wall_area_height) + " inch (with gap between artworks).">
 {% endblock page-description %}
 {% block page-keywords %}
 	<meta name="keywords" content="gallery wall, set of paintings, set of 2 paintings, set of 3 paintings, picture wall, collage frames">
@@ -28,6 +28,10 @@
 {% block popper-script %}
 	<script src="{% static 'vendor/popper.js/umd/popper.min.js' %}"> </script>
 {% endblock popper-script %}
+
+{% block lazysizes %}
+<script src="{% static '/vendor/lazysizes/lazysizes.min.js' %}" async=""></script>
+{% endblock lazysizes %}
 
 	<!-- Only Override the site content block -->
 	{% block sitecontent %}
@@ -80,14 +84,25 @@
 					</div>		
 					{% if gal.gallery.set_of > 1 %}
 					<div class = "col-8 text-center" style = "font-size:0.7rem;">
-						(Covers approximately <span id="g-width">{{gal.wall_area_width|floatformat}}</span>" 
+						Covers approximately 
+							<span id="g-width-cm"></span>
+							X 
+							<span id="g-height-cm"></span>
+							cm (
+							<span id="g-width">{{gal.wall_area_width|floatformat}}</span>" 
 							X 
 							<span id="g-height">{{gal.wall_area_height|floatformat}}</span>"
-							inch on the wall with all the artworks selected. Includes space in-between.)
+							inch) on the wall with all the artworks selected. Includes space in-between.
 					</div>
 					{% else %}
 					<div class = "col-8 text-center" style = "font-size:0.7rem;">
-						(Product Size: <span id="g-width">{{gal.wall_area_width|floatformat}}</span>" 
+						Product Size: 
+							<span id="g-width-cm"></span>
+							X 
+							<span id="g-height-cm"></span>
+							cm (
+						
+							<span id="g-width">{{gal.wall_area_width|floatformat}}</span>" 
 							X 
 							<span id="g-height">{{gal.wall_area_height|floatformat}}</span>"
 							inch)
@@ -97,11 +112,11 @@
 					
 					{% if gal.gallery.set_of > 1 %}
 					<div class = "col-12 text-center mt-5">
-						WALL AREA (in inches)
+						CHOOSE WALL AREA
 					</div>
 					{% else %}
 					<div class = "col-12 text-center mt-5">
-						CHOOSE SIZE (inches)
+						CHOOSE SIZE
 					</div>
 					
 					{% endif %}
@@ -333,7 +348,7 @@
 					<strong>Hanging Hardware</strong>
 				</div>
 				<div class = "col-12">				
-					All pieces are ready to hang and come with necessary hardware.
+					All pieces are ready to hang and come with the hooks.
 				</div>
 			</span>
 			<span id = "d-pcking">
@@ -636,7 +651,7 @@
 	<script>
 		$(document).ready(function(){			
 			{% for i in gallery_items %}
-				getFramedImg ('{{i.product_id}}', '{{i.moulding_id}}', '{{i.mount.color}}', '{{i.mount_size}}', '{{i.image_width}}');
+				getFramedImg ('{{i.product_id}}', '{{i.moulding_id}}', '{{i.mount.color}}', '{{i.mount_size}}', '{{i.image_width}}', '{{i.print_medium_id}}', '{{i.stretch_id}}');
 				$('#add-btn_{{i.product_id}}').hide();
 			{% endfor %}
 
@@ -672,6 +687,8 @@
 				 }
 			});
 			
+			wigzo('track', 'productview', "https://artevenue.com/gallery-wall/{{gal.gallery_id}}/");			
+			
 		});
 	</script>
 
@@ -681,7 +698,7 @@
 	</script>
 
 	<script>
-		function getFramedImg (product_id, moulding_id, mount_color, mount_size,img_width) {
+		function getFramedImg (product_id, moulding_id, mount_color, mount_size,img_width, print_medium_id, stretch_id) {
 
 			if (!moulding_id || moulding_id == 'None'){
 				moulding_id = '0';
@@ -693,11 +710,19 @@
 				mount_size = '0';
 			}
 			
+			var stretched_canvas = 'NO';
+			if (print_medium_id == 'CANVAS') {
+				if ((!moulding_id || moulding_id == 'None' || moulding_id == '0') && stretch_id == '1'){
+					stretched_canvas = 'YES';
+				}
+			}
+			
 			// Get the framed image
 			$.ajax({
 					url: "{% url 'get_framed_image' %}", 
 					data: {'prod_id':product_id, 'moulding_id': moulding_id,
-								'mount_color':mount_color, 'mount_size':mount_size, 'image_width':img_width
+								'mount_color':mount_color, 'mount_size':mount_size, 'image_width':img_width,
+								'stretched_canvas': stretched_canvas
 						}, 
 					dataType: 'text', 
 				success: function (data) {
@@ -757,13 +782,23 @@
 							var ptext = items[i].print_medium_id;
 							
 							$("#" + items[i].product_id + "_surface").html(ptext);
-							$("#" + items[i].product_id + "_psize").html(items[i].image_width + " X " + items[i].image_height + " inch" );
+
+							var pw_cm = parseFloat(items[i].image_width) * 2.54;
+							pw_cm = +pw_cm.toFixed(2);
+							var ph_cm = parseFloat(items[i].image_height) * 2.54;
+							ph_cm = +ph_cm.toFixed(2);							
+							
+							$("#" + items[i].product_id + "_psize").html( String(pw_cm) + " X " + String(ph_cm) + " (" + items[i].image_width + " X " + items[i].image_height + " inch)" );
+							
 							if (items[i].moulding__name == '' || !items[i].moulding__name || items[i].moulding__name == 'None'){
 								$("#" + items[i].product_id + "_frame").html('-');
 								is_moulding = false;
 								$("#" + items[i].product_id + "_frm").hide();
 							} else {
-								$("#" + items[i].product_id + "_frame").html(items[i].moulding__name + " (" + items[i].moulding__width_inner_inches + " inch)");
+								
+								var mld_cm = parseFloat(items[i].moulding__width_inches) * 2.54;
+								mld_cm = +mld_cm.toFixed(2);
+								$("#" + items[i].product_id + "_frame").html(items[i].moulding__name + " (" + mld_cm.toString() + " cm, " + items[i].moulding__width_inches + " inch)");
 								is_moulding = true;
 								$("#" + items[i].product_id + "_frm").show();
 							}
@@ -772,7 +807,10 @@
 								 is_mount = false;
 								$("#" + items[i].product_id + "_f-mnt").hide();
 							} else {
-								$("#" + items[i].product_id + "_mount").html(items[i].mount__name + ", " + items[i].mount_size + " inch");
+							
+								var mnt_cm = items[i].mount_size * 2.54;
+								mnt_cm = +mnt_cm.toFixed(2);
+								$("#" + items[i].product_id + "_mount").html(items[i].mount__name + ", " + mnt_cm.toString() + " cm, " + items[i].mount_size + " inch");
 								 is_mount = true;
 								$("#" + items[i].product_id + "_f-mnt").show();
 							}
@@ -796,11 +834,28 @@
 									h = h + parseFloat(items[i].mount_size)*2;
 								}
 							}
+
+							var w_cm = w * 2.54;
+							w_cm = +w_cm.toFixed(2);
+
+							var h_cm = w * 2.54;
+							h_cm = +h_cm.toFixed(2);
 							
-							$("#" + items[i].product_id + "_fsize").html( String(w) + '" X ' + String(h) + '" inch');
+							$("#" + items[i].product_id + "_fsize").html( String(w_cm) + " X" + String(h_cm) + " (" + String(w) + '" X ' + String(h) + '") inch');
 							
-							getFramedImg (items[i].product_id, items[i].moulding_id, items[i].mount__color, items[i].mount_size, items[i].image_width);	
+							getFramedImg (items[i].product_id, items[i].moulding_id, items[i].mount__color, items[i].mount_size, items[i].image_width, items[i].print_medium_id, items[i].stretch_id );	
 						}
+						
+						wigzo("index", {
+							"canonicalUrl": "https://artevenue.com/gallery-wall/" + gallery_id.toString() + "/",
+							"title": "{{gal.name}}",
+							"description": "A gallery wall art set of {{gal.set_of}}",
+							"price": $('#price').text(),
+							"productId": "{{gal.gallery_id}}",
+							"image": "https://artevenue.com{% static gal.room_view_url %}",
+							"language":"en" 
+						});	
+						
 					},
 				error: function(xhr){
 					alert("An error occured: " + xhr.status + " " + xhr.statusText); 
@@ -835,8 +890,17 @@
 			{% for g in gallery_variations %}
 				if ({{g.id}} == gallery_variation_id) {
 					$("#s-"+gallery_variation_id).addClass('p_clicked');
-					$("#g-width").html('{{g.wall_area_width}}');
-					$("#g-height").html('{{g.wall_area_height}}');
+					$("#g-width").html('{{g.wall_area_width|floatformat}}');
+					$("#g-height").html('{{g.wall_area_height|floatformat}}');
+
+					var width_cm = {{g.wall_area_width}} * 2.54;
+					width_cm = +width_cm.toFixed(2);
+					var height_cm = {{g.wall_area_height}} * 2.54;
+					height_cm = +height_cm.toFixed(2);
+					$("#g-width-cm").html(width_cm);
+					$("#g-height-cm").html(height_cm);
+					
+					
 				} else {
 					$("#s-{{g.id}}").removeClass('p_clicked');
 				}
@@ -882,6 +946,7 @@
 						$("#itemsincart").html(cart_qty); 
 						$("#itemsincart_m").html(cart_qty); 
 						$('#cart-msg-modal').modal('show');
+						wigzo ("track", "addtocart", "https://artevenue.com/gallery-wall/{{gal.gallery_id}}/");
 					} else {
 						alert("Alert, Sorry we seems to encountered a system error! Please let us know using the contact us link in the footer and we will be happy to sort it out.");
 					}
