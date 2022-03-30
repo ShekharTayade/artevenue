@@ -245,8 +245,8 @@ def get_per_sqinch_price(prod_id, prod_type):
 	elif prod_type == 'USER-IMAGE':
 		#per_sqin_paper = Decimal(1.3)
 		#per_sqin_canvas = Decimal(2.7)
-		per_sqin_paper = Decimal(3)
-		per_sqin_canvas = Decimal(6.2)
+		per_sqin_paper = Decimal(3.5)
+		per_sqin_canvas = Decimal(7.5)
 	
 	return ({'per_sqin_paper':per_sqin_paper, 'per_sqin_canvas' : per_sqin_canvas})
 
@@ -325,18 +325,24 @@ def get_price_for_6_prods(prod_id, aspect_ratio, prod_type='STOCK-IMAGE'):
 	per_sqinch_canvas = per_sqinch_price['per_sqin_canvas']	
 
 		
-	## Common pricing components
-	acrylic_id = 1
-	moulding_id = 18  # Simple Black
-	mount_id = 3 # Offwhite
-	board_id = 1
-	stretch_id = 1	
+
 	size_price_paper = {}
 	size_price_canvas = {}
 	
+
 	## Six prods with PAPER medium
+	first_size = True
 	for i in STANDARD_PROD_WIDTHS:
-	
+        
+		## Common pricing components
+		acrylic_id = 1
+		moulding_id = 18  # Simple Black
+		mount_id = 3 # Offwhite
+		board_id = 1
+		stretch_id = 1	
+		mount_color = '#fffff0'	
+
+
 		if i > product.max_width:
 			continue
 			
@@ -345,23 +351,64 @@ def get_price_for_6_prods(prod_id, aspect_ratio, prod_type='STOCK-IMAGE'):
 		image_width = i
 		image_height = round(image_width / aspect_ratio)
 
+
 		#side = image_width if aspect_ratio > 1 else image_height		
 		#mount_size = 1 if side <= 24 else 2 if side <= 42 else 3
 		#mount_size = 1 if side <= 18 else 2 if side <= 26 else 3 if side <= 34 else 4
 		mount_size = 1 if image_width <= 26 else 2 
 		moulding_id = 18 if i <= 26 else 24 
+		
+		## Max width, length with mount
+		maxwidth = 40
+		if aspect_ratio <= 1 :
+			max_height_with_mount = 40 -  mount_size*2
+			max_width_with_mount = round( max_height_with_mount * aspect_ratio)
+			if (max_height_with_mount > 60-mount_size*2):
+				max_height_with_mount = 60-mount_size*2
+				max_width_with_mount = round( max_height_with_mount * aspect_ratio)
+		else:
+			max_width_with_mount = 40 -  mount_size*2
+			max_height_with_mount = round( max_width_with_mount / aspect_ratio)
+			if max_width_with_mount > 60-mount_size*2:
+				max_width_with_mount = 60-mount_size*2
+				max_height_with_mount = round( max_width_with_mount / aspect_ratio)
+        
+		if i > max_width_with_mount:
+			if maxwidth > max_width_with_mount:
+				i = max_width_with_mount
+				image_width = i
+				image_height = round(image_width / aspect_ratio)
+
+
+
 		############################
 		## PAPER
 		############################
+		p_data_paper['MOULDING_ID'] = moulding_id
+		p_data_paper['MOUNT_ID'] = mount_id
+		p_data_paper['MOUNT_SIZE'] = mount_size
+		p_data_paper['MOUNT_COLOR'] = mount_color
+		p_data_paper['ACRYLIC_ID'] = acrylic_id
+		p_data_paper['BOARD_ID'] = board_id
+		p_data_paper['STRETCH_ID'] = stretch_id
+
+
 		item_price = get_price_reduction_by_size(per_sqinch_paper, image_width * image_height)
 
 		## Apply any special prices
 		item_price = apply_special_price(product, item_price)
 
+		p_data_paper['PAPER_WIDTH_ROLLED'] = image_width
+		p_data_paper['PAPER_HEIGHT_ROLLED'] = image_height
+		p_data_paper['PAPER_PRICE_ROLLED'] = Decimal(round(float(item_price),-1))
+		if first_size:
+			p_data_paper['PAPER_DEFAULT_WIDTH_ROLLED'] = image_width
+			p_data_paper['PAPER_DEFAULT_HEIGHT_ROLLED'] = image_height
+
 		p_data_paper['PAPER_WIDTH_UNFRAMED'] = image_width
 		p_data_paper['PAPER_HEIGHT_UNFRAMED'] = image_height
-		p_data_paper['PAPER_PRICE_UNFRAMED'] = Decimal(round(float(item_price),-1))
-		
+
+
 		# Acrylic Price	
 		if acrylic_id:
 			acrylic_price = image_width * image_height * get_acrylic_price_by_id(acrylic_id)
@@ -389,12 +436,46 @@ def get_price_for_6_prods(prod_id, aspect_ratio, prod_type='STOCK-IMAGE'):
 		p_data_paper['PAPER_WIDTH'] = i_width
 		p_data_paper['PAPER_HEIGHT'] = i_height
 		p_data_paper['PAPER_PRICE'] = Decimal(round(float(item_price),-1))
+
+		
+		## SIZE & PRICE WITHOUT MOUNT        
+		item_price_without_mount = item_price - mount_price if mount_price else 0
+		i_width_without_mount = image_width + moulding.width_inner_inches * 2
+		i_height_without_mount = image_height + moulding.width_inner_inches * 2
+
+
+		p_data_paper['PAPER_WIDTH_FRAMED_WITH_MOUNT'] = i_width
+		p_data_paper['PAPER_HEIGHT_FRAMED_WITH_MOUNT'] = i_height
+		p_data_paper['PAPER_PRICE_FRAMED_WITH_MOUNT'] = Decimal(round(float(item_price),-1))
+
+		if first_size:
+			p_data_paper['PAPER_DEFAULT_WIDTH_FRAMED_WITH_MOUNT'] = i_width
+			p_data_paper['PAPER_DEFAULT_HEIGHT_FRAMED_WITH_MOUNT'] = i_height              
+
+
+		p_data_paper['PAPER_WIDTH_FRAMED_WITHOUT_MOUNT'] = i_width_without_mount
+		p_data_paper['PAPER_HEIGHT_FRAMED_WITHOUT_MOUNT'] = i_height_without_mount
+		p_data_paper['PAPER_PRICE_FRAMED_WITHOUT_MOUNT'] = Decimal(round(float(item_price_without_mount),-1))
+
+		if first_size:
+			p_data_paper['PAPER_DEFAULT_WIDTH_FRAMED_WITHOUT_MOUNT'] = i_width
+			p_data_paper['PAPER_DEFAULT_HEIGHT_FRAMED_WITHOUT_MOUNT'] = i_height
+
 		size_price_paper[str(i)] = p_data_paper
 
 		############################
 		## CANVAS
 		############################
 		moulding_id = 26 
+
+		p_data_canvas['MOULDING_ID'] = moulding_id
+		p_data_canvas['MOUNT_ID'] = 0
+		p_data_canvas['MOUNT_SIZE'] = 0
+		p_data_canvas['MOUNT_COLOR'] = ' '
+		p_data_canvas['ACRYLIC_ID'] = 0
+		p_data_canvas['BOARD_ID'] = 0
+		p_data_canvas['STRETCH_ID'] = stretch_id
+
 		moulding = Moulding.objects.get(pk = moulding_id)
 		if image_width > 0 and image_height > 0:
 			item_price = get_price_reduction_by_size(per_sqinch_canvas, image_width * image_height)
@@ -402,9 +483,16 @@ def get_price_for_6_prods(prod_id, aspect_ratio, prod_type='STOCK-IMAGE'):
 		## Apply any special prices
 		item_price = apply_special_price(product, item_price)
 
+		p_data_canvas['CANVAS_WIDTH_ROLLED'] = image_width
+		p_data_canvas['CANVAS_HEIGHT_ROLLED'] = image_height
+		p_data_canvas['CANVAS_PRICE_ROLLED'] = Decimal(round(float(item_price),-1))
+		if first_size:
+			p_data_canvas['CANVAS_DEFAULT_WIDTH_ROLLED'] = image_width
+			p_data_canvas['CANVAS_DEFAULT_HEIGHT_ROLLED'] = image_height
+
 		p_data_canvas['CANVAS_WIDTH_UNFRAMED'] = image_width
 		p_data_canvas['CANVAS_HEIGHT_UNFRAMED'] = image_height
-		p_data_canvas['CANVAS_PRICE_UNFRAMED'] = Decimal(round(float(item_price),-1))
+
 
 		# Moulding price
 		if moulding_id:
@@ -421,8 +509,28 @@ def get_price_for_6_prods(prod_id, aspect_ratio, prod_type='STOCK-IMAGE'):
 		p_data_canvas['CANVAS_WIDTH'] = i_width
 		p_data_canvas['CANVAS_HEIGHT'] = i_height
 		p_data_canvas['CANVAS_PRICE'] = Decimal(round(float(item_price),-1))
+
+		p_data_canvas['CANVAS_FRAMED_WIDTH'] = i_width
+		p_data_canvas['CANVAS_FRAMED_HEIGHT'] = i_height
+		p_data_canvas['CANVAS_FRAMED_PRICE'] = Decimal(round(float(item_price),-1))
+
+		if first_size:
+			p_data_canvas['CANVAS_FRAMED_DEFAULT_WIDTH'] = i_width
+			p_data_canvas['CANVAS_FRAMED_DEFAULT_HEIGHT'] = i_height
+
+		## STRECHED CANVAS SIZE & PRICE 
+		str_price = item_price - moulding_price if moulding_price else 0
+		p_data_canvas['CANVAS_STRETCHED_WIDTH'] = image_width
+		p_data_canvas['CANVAS_STRETCHED_HEIGHT'] = image_height
+		p_data_canvas['CANVAS_STRETCHED_PRICE'] = Decimal(round(float(str_price),-1))
+
+		if first_size:
+			p_data_canvas['CANVAS_DEFAULT_WIDTH_STRETCHED'] = i_width
+			p_data_canvas['CANVAS_DEFAULT_HEIGHT_STRETCHED'] = i_height
+
+		first_size = False
 		size_price_canvas[str(i)] = p_data_canvas
-		
+
 	return ({'size_price_paper':size_price_paper, 'size_price_canvas':size_price_canvas})
 
 
@@ -570,6 +678,5 @@ def get_artset_price_for_6_prods(prod_id, aspect_ratio, prod_type='STOCK-IMAGE')
 		size_price_paper[str(i)] = p_data_paper
 		size_price_canvas[str(i)] = p_data_canvas
 
-		
 	return ({'size_price_paper':size_price_paper, 'size_price_canvas':size_price_canvas})
 	

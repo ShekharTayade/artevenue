@@ -18,7 +18,8 @@ if env == 'PROD':
 	google_file_nm = '/home/artevenue/website/estore/static/feeds/google/google_feed_all_prods.csv'
 	#google_ad_file_nm = '/home/artevenue/website/estore/static/feeds/google/google_feed_ad_prods.csv'
 	#cfile = '/home/artevenue/website/estore/static/feeds/non_gallery_creatives.csv'
-	ad_prods_csv = '/home/artevenue/website/estore/static/feeds/ad_prods.csv'
+	sale_ad_prods_csv = '/home/artevenue/website/estore/static/feeds/sale_ad_prods.csv' ### Products for ads during a sale
+	ad_prods_csv = '/home/artevenue/website/estore/static/feeds/ad_prods.csv'			### Products for ads in normal course
 	
 	domus_input = '/home/artevenue/website/estore/static/feeds/domus/domus_input.csv'
 	domus_feed = '/home/artevenue/website/estore/static/feeds/domus/domus_feed.csv'
@@ -48,6 +49,7 @@ else:
 	google_file_nm = 'c:/artevenue/PRODUCT_FEEDS/google_feed_all_prods.csv'
 	#google_ad_file_nm = 'c:/artevenue/PRODUCT_FEEDS/google_feed_ad_prods.csv'
 	#cfile = 'c:/artevenue/PRODUCT_FEEDS/non_gallery_creatives.csv'
+	sale_ad_prods_csv = 'c:/artevenue/PRODUCT_FEEDS/sale_ad_prods.csv'
 	ad_prods_csv = 'c:/artevenue/PRODUCT_FEEDS/ad_prods.csv'
 	
 	domus_input = 'c:/artevenue/PRODUCT_FEEDS/domus/domus_input.csv'
@@ -91,25 +93,44 @@ def generate_all_prod_feed():
 	with open(ad_prods_csv) as afile:
 		ad_p = csv.reader(afile, delimiter=',')
 		for n in ad_p:
-			if n[0] == 'SINGLES':				## Singles that are not part of set
-				ad_prods_singles[n[1]]=n[2]
-			if n[0] == 'GW':
-				ad_prods_gw[n[1]]=n[2]
-			if n[0] == 'SETS':					## Including singles as set
-				ad_prods_sets[n[1]]=n[2]
+			if n:
+				if n[0] == 'SINGLES':				## Singles that are not part of set
+					ad_prods_singles[n[1]]=n[2]
+				if n[0] == 'GW':
+					ad_prods_gw[n[1]]=n[2]
+				if n[0] == 'SETS':					## Including singles as set
+					ad_prods_sets[n[1]]=n[2]
+
+	## Collect all prod ids that are be used for AD display during a Sale
+	sale_ad_prods_singles = {}
+	sale_ad_prods_gw = {}
+	sale_ad_prods_sets = {}
+	with open(sale_ad_prods_csv) as s_afile:
+		ad_p = csv.reader(s_afile, delimiter=',')
+		for n in ad_p:
+			if n:
+				if n[0] == 'SINGLES':				## Singles that are not part of set
+					sale_ad_prods_singles[n[1]]=n[2]
+				if n[0] == 'GW':
+					sale_ad_prods_gw[n[1]]=n[2]
+				if n[0] == 'SETS':					## Including singles as set
+					sale_ad_prods_sets[n[1]]=n[2]
 	
 	fb_prods = []
 	with open(fb_file_nm) as f_file:
 		fb_p = csv.reader(f_file, delimiter=',')
 		for n in fb_p:
-			fb_prods.append(n[0])
+			if n:
+				fb_prods.append(n[0])
 
 	google_prods = []
+	'''
 	with open(google_file_nm) as g_file:
 		g_p = csv.reader(g_file, delimiter=',')
 		for n in g_p:
-			google_prods.append(n[0])
-
+			if n:
+				google_prods.append(n[0])
+	'''
 	############Product features, Images, Videos
 	features_1 = "The best quality giclee prints produced at a very high resolution with full saturation and are fade resistant. Large format inkjet printers with archival inks are used to ensure consistent quality. Each artwork has an associated copyright and is licensed from the artist."
 	features_2 = "Smooth finish matte, top-coated with an ink-receptive layer."				
@@ -118,7 +139,6 @@ def generate_all_prod_feed():
 	video_1 = 'https://youtu.be/6vRss_YY48I'
 	video_2 = 'https://youtu.be/vSrersiMjWk'
 	product_highlight = "Fade-proof and high resolution giclee prints" + "," + "Best quality polystyrene frames" + "," + "Artist licensed artworks" + "," + "Premium quality" + "," + "Fully customizable"
-
 
 	with open(fb_file_nm, 'w', newline='') as fb_file, open(google_file_nm, 'w', newline='') as google_file :
 		#open(cfile) as ngal_file, open(fb_ad_file_nm, 'w', newline='') as fb_ad_file, open(google_ad_file_nm, 'w', newline='') as google_ad_file
@@ -168,7 +188,6 @@ def generate_all_prod_feed():
 		for c in curated:
 			cnt = cnt + 1
 			print(str(cnt) + "....")
-			
 			p = c.product
 
 			if p.product_id in processed_prods:
@@ -182,6 +201,9 @@ def generate_all_prod_feed():
 
 			## Skip the products that apprear to be victims of click fraud
 			if p.product_id in [269770, 269777, 62834, 487444, 163008, 251877, 130528, 276423, 105996]:
+				continue
+				
+			if str(p.product_id) in ad_prods_sets: 	## Sets may also have singles (best sellers are part of sets)
 				continue
 			
 			## Standard sizes
@@ -326,20 +348,26 @@ def generate_all_prod_feed():
 			#		print('AD Prod: ' + f )
 			desc = str(image_width + 4) + " X " + str(image_height + 4) + " inch framed wall art printed on paper, 1 inch black frame, 1 inch offwhite mount. Fully Customizable. "
 			if p.image_type == '1':
-				title = 'Framed Wall Art Titled "' + p.name + '", by ' + p.artist + '| Licensed Art Print '
+				title = 'Framed Wall Art Titled: ' + p.name + ', by ' + p.artist + '| Licensed Art Print '
 			else:
-				title = 'Framed Wall Art Painting Titled "' + p.name + '", by ' + p.artist + '| Licensed Art Print '
+				title = 'Framed Wall Art Painting Titled ' + p.name + ', by ' + p.artist + '| Licensed Art Print '
 
 			
 			custom_label1 = ''
 			custom_label2 = ''
 			custom_label4 = ''
-			if str(p.product_id) not in fb_prods:
-				custom_label1 = 'NEW'	
+			if str(p.product_id) in sale_ad_prods_singles:
+				img_link = sale_ad_prods_singles[str(p.product_id)]
+				custom_label4 = 'SALE-AD'
 
+			### Use singles only for the ones not part of best sellers
 			if str(p.product_id) in ad_prods_singles:
 				img_link = ad_prods_singles[str(p.product_id)]
-				custom_label4 = 'SALE-AD'
+				custom_label2 = 'AD'
+			
+			
+			#elif str(p.product_id) not in fb_prods:
+			#		custom_label1 = 'NEW'
 			
 			row_fb = [p.product_id, title[:140], desc, 'in stock', 'new', 
 			str(item_price) + " INR", 'https://artevenue.com/art-print/' + str(p.product_id) + '/', img_link, 
@@ -389,34 +417,36 @@ def generate_all_prod_feed():
 			#g_prod_type = "Home > Decor > Artworks > Framed Wall Art > Paintings > Set of Paingints > Gallery Walls"
 			g_prod_type = "Home & Garden > Decor > Artwork > Posters, Prints, & Visual Artwork > Paintings > Set of Paingints > Gallery Walls"
 			
-			g_title = 'Gallery Wall Set: ' + g.title + ' A set of ' + str(g.set_of) + ", Customization Available"
-			g_desc = 'Designer curated allery wall set. Contains ' + str(g.set_of) + ' framed art prints of licesed artworks. Covers wall area of approx ' + str(gallery_variation.wall_area_width) + " X " + str(gallery_variation.wall_area_height) + " inch (with 2 inch more gap between artworks)."
+			g_title = "Gallery Wall Set: " + g.title + " A set of " + str(g.set_of) + ", Customization Available."
+			g_desc = "Designer curated gallery wall set. Contains " + str(g.set_of) + " framed art prints of licesed artworks. Covers wall area of approx " + str(gallery_variation.wall_area_width) + " X " + str(gallery_variation.wall_area_height) + " inch (with 2 inch more gap between artworks). Ships in 1-3 days."
 
 			gallery_variation_price = 0	
 			gi_cnt = 0
 			ship_weight = 0
+			i_desc = ''
+			
 			for gal_item in gallery_items:
 				gi_cnt = gi_cnt + 1
 				item_price = get_variation_item_price(gal_item.item_id)
 				gallery_variation_price = gallery_variation_price + item_price
-				i_desc = "\n\nArtwork " + str(gi_cnt) + ": " + "Printed on " + gal_item.print_medium_id.title() 				
+				#i_desc = "\n\nArtwork " + str(gi_cnt) + ": " + "Printed on " + gal_item.print_medium_id.title() 				
 
 				prod_height = gal_item.image_height
 				prod_width = gal_item.image_width
 				if gal_item.moulding:
-					i_desc = i_desc + "\nFrame: " + gal_item.moulding.name + "( " + str(gal_item.moulding.width_inner_inches*2) + " inch)"
+					#i_desc = i_desc + "\nFrame: " + gal_item.moulding.name + "( " + str(gal_item.moulding.width_inner_inches*2) + " inch)"
 					if gal_item.moulding.width_inner_inches:
 						prod_width = round(prod_width + (gal_item.moulding.width_inner_inches*2))
 						prod_height = round(prod_height + (gal_item.moulding.width_inner_inches*2))
 					if gal_item.mount and gal_item.print_medium_id == 'PAPER':					
 						if mount_size:
-							i_desc = i_desc + "\nMount: " + gal_item.mount.name + ", " + str(gal_item.mount_size) + " inch"
+							#i_desc = i_desc + "\nMount: " + gal_item.mount.name + ", " + str(gal_item.mount_size) + " inch"
 							prod_width = round(prod_width + (mount_size * 2))
 							prod_height = round(prod_height + (mount_size * 2))
-				else :
-					if gal_item.print_medium_id == 'CANVAS' and gal_item.stretch_id == 1:
-						i_desc = i_desc + "\nCanvas is stretched over wodden frame at the back"
-				i_desc = i_desc + "\nFinished artwork size: " + str(prod_width) + " X " + str(prod_width)
+				#else :
+					#if gal_item.print_medium_id == 'CANVAS' and gal_item.stretch_id == 1:
+						#i_desc = i_desc + "Canvas is stretched over wodden frame at the back. "
+				#i_desc = i_desc + "Finished artwork size: " + str(prod_width) + " X " + str(prod_width) + "."
 				
 				g_desc = g_desc + i_desc
 
@@ -434,18 +464,22 @@ def generate_all_prod_feed():
 						
 			
 			custom_label1 = ''
-			if 'G' + str(g.gallery_id) not in fb_prods:	## Same for FB and Google
-				custom_label1 = 'NEW'
+			#if 'G' + str(g.gallery_id) not in fb_prods:	## Same for FB and Google
+			#	custom_label1 = 'NEW'
 
-			custom_label2 = 'AD'				
+			custom_label2 = ''
 			custom_label4 = ''
-			if str(g.gallery_id) in ad_prods_gw:
-				img_link = ad_prods_gw[str(g.gallery_id)]
+			if str(g.gallery_id) in sale_ad_prods_gw:
+				img_link = sale_ad_prods_gw[str(g.gallery_id)]
 				custom_label4 = 'SALE-AD'
-			else: 	
-				img_link = 'https://artevenue.com/static/' + g.room_view_url
+				
+			#img_link = ad_prods_singles[str(p.product_id)]
+			custom_label2 = 'AD'
+			img_link = 'https://artevenue.com/static/' + g.room_view_url
+			
+			g_id = 'G' + str(g.gallery_id)
 
-			row_fb = ['G' + str(g.gallery_id), g_title, g_desc, 'in stock', 'new', 
+			row_fb = [g_id, g_title, g_desc, 'in stock', 'new', 
 				str(gallery_variation_price) + ' INR', 'https://artevenue.com/gallery-wall/' + str(g.gallery_id) + '/', 			 
 				img_link, "ARTE'VENUE", '999', '1000', str(gallery_variation_price) + " INR",  
 				'', '', '', '',
@@ -457,7 +491,7 @@ def generate_all_prod_feed():
 			wr_fb.writerow(row_fb)
 
 
-			row_google = ['G' + str(g.gallery_id), 'Gallery Wall: ' + g.title + ', Set of ' + str(g.set_of)  + ', Customization Available', 
+			row_google = [g_id, 'Gallery Wall: ' + g.title + ', Set of ' + str(g.set_of)  + ', Customization Available', 
 				g_desc, 'https://artevenue.com/gallery-wall/' + str(g.gallery_id) + '/', img_link,
 				'', 'in_stock',
 				'2021-01-01', '', str(gallery_variation_price) + ' INR', '500044',
@@ -627,9 +661,11 @@ def generate_all_prod_feed():
 		##################################################################################
 		##################################################################################
 		sets = Stock_collage.objects.filter(is_published = True)
+
 		if not sets:	
 			return
-			
+
+
 		for set in sets:
 			try:
 				has_specs = (set.stock_collage_specs is not None)
@@ -649,9 +685,9 @@ def generate_all_prod_feed():
 
 			if set.stock_collage_specs.print_medium_id == 'PAPER':
 				if set.aspect_ratio > 1:
-					mount_size = 1 if image_width <= 18 else 2 if image_width <= 26 else 3 if image_width <= 34 else 4
+					mount_size = 1 if image_width <= 18 else 2 
 				else:
-					mount_size = 1 if image_height <= 18 else 2 if image_height <= 26 else 3 if image_height <= 34 else 4
+					mount_size = 1 if image_height <= 18 else 2 
 			else :
 				mount_size = 0
 				
@@ -722,9 +758,9 @@ def generate_all_prod_feed():
 				prod_name = "Framed Wall Art on " + set.stock_collage_specs.print_medium_id.title()  + ", Title: " + set.name + ", Customization Available"
 			
 			if set.set_of > 1:
-				prod_desc = "A framed wall art set of " + str(set.set_of) + " artworks."
+				prod_desc = "A framed wall art set of " + str(set.set_of) + " artworks on " + set.stock_collage_specs.print_medium_id.title() + ". Finished size of each artwork is " + str(prod_data['prod_width']) + " X " + str(prod_data['prod_height']) + " inches. Comes with hooks for hanging."
 			else:
-				prod_desc = "Framed wall art."
+				prod_desc = "Framed wall art on " + set.stock_collage_specs.print_medium_id.title() + ". Finished size is " + str(prod_data['prod_width']) + " X " + str(prod_data['prod_height']) + " inches. Comes with hooks for hanging."
 			
 			if set.set_of > 1:
 				search_terms = "framed wall art set, set of " + str(set.set_of) + " paintings"
@@ -848,14 +884,15 @@ def generate_all_prod_feed():
 					ship_weight = 2.75 * set.set_of
 				else:
 					ship_weight = 3.5 * set.set_of
-
+				'''    
 				if set.set_of > 1:
 					prod_desc = prod_desc + "\n\nArtwork " + str(p_cnt) + ": Finished Size " + str(prod_width) + " X " + str(prod_height) + " inches."
 				else:
 					prod_desc = prod_desc + "\nFinished Size: " + str(prod_width) + " X " + str(prod_height) + " inches."
-					
-				prod_desc = prod_desc + "\nPrint Surface: " + set.stock_collage_specs.print_medium_id.title() + ". "
-				prod_desc = prod_desc + "\nPrint Size: " + str(image_width) + " X " + str(image_height) + " inches."
+				'''
+				#prod_desc = prod_desc + "\nPrint Surface: " + set.stock_collage_specs.print_medium_id.title() + ". "
+				#prod_desc = prod_desc + "\nPrint Size: " + str(image_width) + " X " + str(image_height) + " inches."
+				'''
 				if set.stock_collage_specs.moulding:
 					prod_desc = prod_desc + "\nFrame: " + set.stock_collage_specs.moulding.name + " (" + str(set.stock_collage_specs.moulding.width_inches) + " inch)." if set.stock_collage_specs.moulding_id else '' 
 				if set.stock_collage_specs.mount_id and set.stock_collage_specs.print_medium_id == 'PAPER' and set.stock_collage_specs.moulding:
@@ -863,9 +900,10 @@ def generate_all_prod_feed():
 				
 				if not set.stock_collage_specs.moulding_id and set.stock_collage_specs.print_medium_id == 'CANVAS':
 					prod_desc = prod_desc + "\nCanvas is stretched over a wooden frame at the back. Frame not visible from the front and sides."				
-
+				'''
 				search_terms = search_terms + p.stock_image.key_words
 				
+			p_type = 'SET'
 			if set.set_of > 1:
 				#g_prod_type = "Home > Decor > Artworks > Framed Wall Art > Paintings > Set of Paintings"
 				g_prod_type = "Home & Garden > Decor > Artwork > Posters, Prints, & Visual Artwork > Paintings > Set of Paintings"	
@@ -873,6 +911,7 @@ def generate_all_prod_feed():
 			else:
 				#g_prod_type = "Home > Decor > Artworks > Framed Wall Art > Paintings"
 				g_prod_type = "Home & Garden > Decor > Artwork > Posters, Prints, & Visual Artwork"	
+				p_type = 'SINGLE'
 
 			
 			cate = ''
@@ -882,18 +921,22 @@ def generate_all_prod_feed():
 			
 			prod_data['prod_sku'] = prod_data['sets_sku_prefix'] + str(set.product_id)
 
-			custom_label_1 = ''
+			custom_label1 = ''
 
-			if prod_data['prod_sku'] not in fb_prods:	## Same for FB & Google
-				custom_label_1 = 'NEW'
+			#if prod_data['prod_sku'] not in fb_prods:	## Same for FB & Google
+			#	custom_label1 = 'NEW'
 				
-			custom_label_2 = 'AD'
+			custom_label2 = ''
 			custom_label4 = ''
-			if str(set.product_id) in ad_prods_sets:
-				img_link = ad_prods_sets[str(set.product_id)]
+			if str(set.product_id) in sale_ad_prods_sets:
+				img_link = sale_ad_prods_sets[str(set.product_id)]
 				custom_label4 = 'SALE-AD'
-			else:
-				img_link = 'https://artevenue.com/static/' + set.stock_collage_specs.display_url
+			#else:
+			#	if str(set.product_id) in ad_prods_sets:
+			#img_link = ad_prods_singles[str(p.product_id)]
+			custom_label2 = 'AD'
+			img_link = 'https://artevenue.com/static/' + set.stock_collage_specs.display_url
+				
 			row_fb = [prod_data['prod_sku'], prod_name, prod_desc, 'in stock', 'new', 
 				str(prod_mrp) + ' INR', 'https://artevenue.com/wall-art-collage-set/' + str(set.product_id) + '/', 			 
 				img_link, "ARTE'VENUE", '999', '1000', str(prod_mrp) + ' INR',  
@@ -912,7 +955,7 @@ def generate_all_prod_feed():
 				'',
 				'', str(prod_width) + " in", str(prod_height) + " in", str(ship_weight) + " kg",
 				'', product_highlight,
-				'SET', custom_label_1, custom_label_2, cate, custom_label4, '', 
+				p_type, custom_label1, custom_label2, cate, custom_label4, '', 
 				'IN:::0.0 INR', 'IN', '3'
 			]		
 			wr_google.writerow(row_google)
@@ -1405,14 +1448,16 @@ def generate_tli_feed():
 			
 			cnt = cnt+1
 			product_id = row[1]
-			type = row[2]
+			
+			#type = row[2]
+			
 			print("Processing...." + product_id)
 			if not product_id:
 				print("Product id not found, skipped...")
 				wr_nf.writerow([row[1], "Product not found"])
 				continue
 			
-			p = Stock_image.objects.filter(product_id = product_id).first()				
+			p = Stock_image.objects.filter(product_id = product_id).first()
 			if not p:
 				print("Product " + product_id + " not found, skipped...")
 				wr_nf.writerow([row[1], "Product not found"])
@@ -1423,6 +1468,15 @@ def generate_tli_feed():
 				wr_nf.writerow([row[1], "Product is unpublished"])
 				continue
 			
+			if p.aspect_ratio < 0.999:
+				t_sizes = type_a
+			elif p.aspect_ratio > 0.9 and p.aspect_ratio < 1.01:
+				t_sizes = type_b
+			else:
+				t_sizes = type_c
+			
+			
+			'''
 			if type == 'A':
 				t_sizes = type_a
 			elif type == 'B':
@@ -1433,7 +1487,8 @@ def generate_tli_feed():
 				print("Product " + product_id + " wrong TYPE, skipped...")
 				wr_nf.writerow([row[1], "Wrong Size"])
 				continue
-				
+			'''
+			
 			product_type_id = 'STOCK-IMAGE'
 			for s in t_sizes:
 				total_size = s.split("X")
@@ -3545,11 +3600,11 @@ def generate_livspacestore_feed():
 		#####################################
 		### Get products #######
 		#####################################
-		singles = Collage_stock_image.objects.filter(stock_collage__set_of = 1, stock_image__is_published = True)
+		sets = Collage_stock_image.objects.filter(stock_image__is_published = True)
 		#sets = Collage_stock_image.object.filter(stock_image__set_of__gt = 1, is_published = True)
 		#gw = Gallery_item.object.filter(is_published = True)
 		
-		for h in singles:
+		for h in sets:
 			print("processing..." + str(h.stock_collage.product_id) )
 			
 			if h.stock_image.aspect_ratio <= 1:
@@ -5403,13 +5458,19 @@ def generate_av_sets_feed(platform=None):
 	
 	
 def generate_tatacliq_feed(feed_data):
+	today = datetime.datetime.today()
+	
+	d_str = datetime.datetime.now().strftime('%d-%m-%Y')
+	dt_str = d_str.replace("/", "-")
+    
+    
 	if env == 'PROD':
-		av_tatacliq_feed = '/home/artevenue/website/estore/static/feeds/AV/av_tatacliq_feed_1.csv'
+		av_tatacliq_feed = '/home/artevenue/website/estore/static/feeds/AV/av_tatacliq_feed_' + dt_str + '.csv'
 		img_loc = '/home/artevenue/website/estore/static/feeds/AV/images/'
 		img_url = 'https://artevenue.com/static/feeds/AV/images/'
 		av_url = 'https://artevenue.com/static/'
 	else:
-		av_tatacliq_feed = 'C:/artevenue/PRODUCT_FEEDS/AV/av_tatacliq_feed_1.csv'
+		av_tatacliq_feed = 'C:/artevenue/PRODUCT_FEEDS/AV/av_tatacliq_feed_' + dt_str + '.csv'
 		img_loc = 'C:/artevenue/PRODUCT_FEEDS/AV/images/'
 		img_url = 'C:/artevenue/PRODUCT_FEEDS/AV/images/'
 		av_url = 'https://artevenue.com/static/'
@@ -5698,6 +5759,8 @@ def generate_livspace_feed(feed_data):
 
 	with open(av_livspace_feed, 'w', newline='') as livfile:
 		wr_livspace = csv.writer(livfile, quoting=csv.QUOTE_ALL)
+		
+		'''
 		row =["product_type", "artevenue_sku", 'brand', 'product_id', 'product_type',
 			'product_description', 'product_title', 'country_of_origin', 'HSN_Code',
 			'Maximum Retail Price(incl GST)', 'Main Image URL', 
@@ -5728,13 +5791,49 @@ def generate_livspace_feed(feed_data):
 			'Condition', 'Sale Price(incl GST)', 
 			'Sale Start Date', 'Sale End Date'
 		]
-
+		'''
+		
+		row = ['Imported', 'Country of origin', 'HSN', 'GSt %', 'Product Title', 'Set of', 'Brand Name', 
+				'MRP', 'Discount %', 'Revenue %', 'Category', 'Sub-Category', 'Product Description', 
+				'Care Instruction', 'Items included', 'Vendor Article Number', 'Model Name/Number', 
+				'Variant 1(type/name)', 'Variant 1(Value)', 'Variant 2(type/name)', 'Variant 2(Value)', 
+				'Key Features', 'Inventory Qty', 'Measurement Unit', 'Width', 'Depth', 'Height', 'Measurement Unit', 
+				'Package Width', 'Package Depth', 'Package Height', 'Frame Material', 'Shape', 'Theme', 'Color Name', 
+				'Color Map', 'Instalation Reqired', 'Installation Provided', 'Warranty in days', 
+				'Measurement Unit of Product & Package weight', 'Product weight', 'No of Packages', 
+				'Product weight after packing', 'Barcode', '1. Front', '2. Angular Left Side', '3. Set up Image', 
+				'7. Close up Image', '8. Size Reference image', 'Product Video', 
+				"Incase Vendor doesnt have all the mandatory images, they can avail Ukeyo's photography services? (comes with cost)", 
+				'Any other information you would like to share', 'Share the images with the brand SKU folder name format'
+				]
+		
+		
 		wr_livspace.writerow(row)
 
 
 		for prod_id, prod_data in feed_data.items():
 			if prod_data['parent_child'] == 'P':
 				continue
+				
+			row = ['No', prod_data['country_of_origin'], prod_data['hsn_code'], '18%', prod_data['prod_name'], 
+				prod_data['num_pieces'], prod_data['brand'], prod_data['prod_mrp'], '15%', '25%',  
+				'Wall Art', prod_data['theme'], str(prod_data['num_pieces']) + ' piece wall art', 'Wipe with clean, dry and soft cloth',
+				prod_data['prod_desc'], prod_data['prod_sku'], prod_data['part_number'], 
+				'', '', '', '', '',
+				prod_data['features_1'] + ", " +  prod_data['features_2'] + ", " + prod_data['features_3']+ ", " +  prod_data['features_4'],
+				100, 'inch', prod_data['prod_width'], '2', prod_data['prod_height'], 
+				'inch', prod_data['package_width'], '3', prod_data['package_height'], 
+				prod_data['frame_material'], prod_data['shape'], prod_data['theme'], 'Multicolour', 'Multi', 'Yes', 'No',
+				'120', 'KG', prod_data['prod_weight'], 1, prod_data['package_weight'], '' ,
+				'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'No', '', '', '',
+				prod_data['image_1'], prod_data['image_2'], prod_data['image_3'], prod_data['image_4'], prod_data['image_5'],
+				prod_data['dimensions_image1'], prod_data['dimensions_image2'], prod_data['dimensions_image3'], prod_data['dimensions_image4'], prod_data['dimensions_image5'],	
+				]
+			   
+				
+			
+				
+			'''	
 			row =[ prod_data['prod_type'], prod_data['prod_sku'], prod_data['brand'], 
 				prod_data['part_number'], 'Framed Artwork',
 				prod_data['prod_desc'], prod_data['prod_name'], prod_data['country_of_origin'], prod_data['hsn_code'], 
@@ -5769,7 +5868,7 @@ def generate_livspace_feed(feed_data):
 				'New', prod_data['prod_price'], 
 				prod_data['sale_start_date'], prod_data['sale_end_date'],
 				]
-				
+			'''
 			wr_livspace.writerow(row)
 
 

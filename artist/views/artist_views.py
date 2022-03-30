@@ -1601,4 +1601,7 @@ def artist_terms(request):
 	
 	return render(request, "artist/artist_terms.html", {'artist': artist, 'ecom_site': ecom})
 
-		
+
+def coming_soon(request):
+
+	return render(request, "artist/coming_soon.html", {} )

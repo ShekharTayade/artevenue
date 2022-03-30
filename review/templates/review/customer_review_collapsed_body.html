@@ -1,0 +1,168 @@
+{% load static %}
+<div class = "row mt-2 mb-5">
+
+	<div class = "col-12" >
+		<span style = "font-weight:600;">CUSTOMER REVIEW RATING</span>
+	</div>
+
+	{% if reviews %}
+	<div class = "col-12 customer-rating">
+		<div style = "font-size: 1.1rem;">Overall Rating: </div>
+	</div>
+	<div class = "col-6">
+		<div class = "rating">{{overall_rating}}</div> 
+	</div>
+	<div class = "col-6">
+		<span class = "float-right">
+			<div>
+				{% if overall_rating == 0 %}
+					<img data-src = "{% static 'img/customer_reviews/0.png'%}" class = "rating-stars">
+				{% elif overall_rating > 0 and  overall_rating <= 0.5 %}
+					<img data-src = "{% static 'img/customer_reviews/0point5.png'%}" class = "rating-stars lazyload" >
+				{% elif overall_rating > 0.5 and overall_rating <= 1 %}
+					<img data-src = "{% static 'img/customer_reviews/1.png'%}" class = "rating-stars lazyload">
+				{% elif overall_rating > 1 and overall_rating <= 1.5 %}
+					<img data-src = "{% static 'img/customer_reviews/1point5.png'%}" class = "rating-stars lazyload">
+				{% elif overall_rating > 1.5 and overall_rating <= 2 %}
+					<img data-src = "{% static 'img/customer_reviews/2.png'%}" class = "rating-stars lazyload">
+				{% elif overall_rating > 2 and overall_rating <= 2.5 %}
+					<img data-src = "{% static 'img/customer_reviews/2point5.png'%}" class = "rating-stars lazyload">
+				{% elif overall_rating > 2.5 and overall_rating <= 3 %}
+					<img data-src = "{% static 'img/customer_reviews/3.png'%}" class = "rating-star lazyloads">
+				{% elif overall_rating > 3 and overall_rating <= 3.5 %}
+					<img data-src = "{% static 'img/customer_reviews/3point5.png'%}" class = "rating-stars lazyload">
+				{% elif overall_rating > 3.5 and overall_rating <= 4 %}
+					<img data-src = "{% static 'img/customer_reviews/4.png'%}" class = "rating-stars lazyload">
+				{% elif overall_rating > 4 and overall_rating <= 4.5 %}
+					<img data-src = "{% static 'img/customer_reviews/4point5.png'%}" class = "rating-stars lazyload">
+				{% elif overall_rating > 4.5 %}
+					<img data-src = "{% static 'img/customer_reviews/5.png'%}">
+				{% endif %}					
+			</div>
+			<div class = "text-muted" style = "margin-left: 15px; font-size:0.65rem;">{%  if total_reviews > 0 %} ({{total_reviews}} reviews) {% endif %}</div>
+		</span>
+	</div>
+	<div class = "col-12">
+		<hr>
+	</div>
+	<div class = "col-12 p-1" style ="color:#082a4c; background-color: #f6f6f6;" onclick="toggle_reviews();"
+			data-toggle="collapse" data-target="#reviews-show" id="cust-reviews-sec">
+		<span style = "font-weight:600;">VERIFIED CUSTOMER REVIEWS</span>
+		<span class = "pull-right"><i id = "r-chevron" class = "fa fa-chevron-down"></i></span>
+	</div>
+	<script>
+		function toggle_reviews() {
+			if ($("#r-chevron").hasClass('fa-chevron-down')) {	
+				$("#r-chevron").addClass('fa-chevron-up');
+				$("#r-chevron").removeClass('fa-chevron-down');				
+			} else {
+				$("#r-chevron").addClass('fa-chevron-down');				
+				$("#r-chevron").removeClass('fa-chevron-up');
+			}
+		}
+	</script>
+	<div class = "col-12">
+		<hr>
+	</div>
+	<div class = "col-12 mt-3 customer-review collapse" id = "reviews-show">
+	{% for r in reviews %}
+		<div class = "row m-2">
+			<div class = "col-12">
+				{% if r.rating == 0 %}
+					<img data-src = "{% static 'img/customer_reviews/0.png'%}" class = "rating-stars-review lazyload">
+				{% elif r.rating == 0.5 %}
+					<img data-src = "{% static 'img/customer_reviews/0point5.png'%}" class = "rating-stars-review lazyload">
+				{% elif r.rating == 1 %}
+					<img data-src = "{% static 'img/customer_reviews/1.png'%}" class = "rating-stars-review lazyload">
+				{% elif r.rating == 1.5 %}
+					<img data-src = "{% static 'img/customer_reviews/1point5.png'%}" class = "rating-stars-review lazyload">
+				{% elif r.rating == 2 %}
+					<img data-src = "{% static 'img/customer_reviews/2.png'%}" class = "rating-stars-review lazyload">
+				{% elif r.rating == 2.5 %}
+					<img data-src = "{% static 'img/customer_reviews/2point5.png'%}" class = "rating-stars-review lazyload">
+				{% elif r.rating == 3 %}
+					<img data-src = "{% static 'img/customer_reviews/3.png'%}" class = "rating-stars-review lazyload">
+				{% elif r.rating == 3.5 %}
+					<img data-src = "{% static 'img/customer_reviews/3point5.png'%}" class = "rating-stars-review lazyload">
+				{% elif r.rating == 4 %}
+					<img data-src = "{% static 'img/customer_reviews/4.png'%}" class = "rating-stars-review lazyload">
+				{% elif r.rating == 4.5 %}
+					<img data-src = "{% static 'img/customer_reviews/4point5.png'%}" class = "rating-stars-review lazyload">
+				{% elif r.rating == 5 %}
+					<img data-src = "{% static 'img/customer_reviews/5.png'%}" class = "rating-stars-review lazyload">
+				{% endif %}					
+			</div>
+			<div class = "col-12" style = "font-wight:500;">
+				{{r.headline}}
+			</div>
+		
+			<div class = "col-12" style = "font-size:0.75rem;">
+				{{r.comments|truncatechars:200}}{% if r.comments|length > 200 %}
+					<form action = "{% url 'customer_review_one' r.review_id %}" id = "one-form{{r.review_id}}" method = "POST">
+						{% csrf_token %}
+						<input hidden name = "product_id" value = "{{product_id}}">
+						<input hidden name = "cart_item_id" value = "{{cart_item_id}}">
+						<input hidden name = "wishlist_item_id" value = "{{wishlist_item_id}}">
+						<input hidden name = "user_width" value = "{{user_width|default_if_none:''}}">
+						<input hidden name = "user_height" value = "{{user_height|default_if_none:''}}">
+						<button class = "btn btn-link" type = "submit" form = "one-form{{r.review_id}}">read more</a>
+					</form>
+				<!--<a href = "{% url 'customer_review_one' r.review_id %}">read more</a> -->{% endif %}
+			</div>
+			<div class = "row mt-3 mb-2" style= "padding-left: 15px;">
+				<div class = "col-6 text-muted" style = "font-size:0.6rem;">
+					{{r.name}}, {{r.location}}, {{r.country.country_name}}
+				</div>
+				<div class = "col-6 text-muted pull-right" style = "font-size:0.55rem;">
+					{{r.updated_date|date:'d M Y'}}
+				</div>
+			</div>
+			<div class = "row mt-3 mb-2">
+				{% for p in review_pics %}
+				{% if p.customer_review_stock_image == r %}
+				<div style = "padding: 10px;">
+					<div class = "display: flex; justify-content:space-around;">
+						<a onclick = "showCustImg('{{p.pic_id}}')">
+							<img data-src="{{ p.user_photo_thumbnail.url }}" alt="User Review Picture"
+								class="img-fluid lazyload" 
+								style = "filter: drop-shadow(0.25rem 0.25rem 0.25rem grey);" width=120>
+						</a>
+					</div>		
+				</div>
+				{% endif %}
+				{% endfor %}
+			</div>
+		</div>
+		{% endfor %}
+		<div class = "col-12 mt-3">
+			<hr>
+			<div class = "row review-footer">
+				<div class = "col-6">
+					<form action = "{% url 'all_customer_reviews' %}" id = "all-form" method = "POST">
+						{% csrf_token %}
+						<input hidden name = "product_id" value = "{{product_id}}">
+						<input hidden name = "cart_item_id" value = "{{cart_item_id}}">
+						<input hidden name = "wishlist_item_id" value = "{{wishlist_item_id}}">
+						<input hidden name = "user_width" value = "{{user_width|default_if_none:''}}">
+						<input hidden name = "user_height" value = "{{user_height|default_if_none:''}}">
+						<button class = "btn btn-link" type = "submit" form = "all-form"
+							style = "font-size: 1rem;">
+							All Reviews<i class = "fa fa-chevron-right"></i>
+						</button>
+					</form>
+				</div>
+				<!--
+				<div class = "col-6 pull-right">
+					<a href = "{% url 'write_customer_review' %} " class = "">Write Review <i class = "fa fa-plus"></i></a>
+				</div>
+				-->
+			</div>
+		</div>	
+	</div>
+	{% else %}
+	<div class = "col-12 customer-rating-summary">
+		No reviews yet
+	</div>
+	{% endif %}
+	{% include 'review/show_customer_image.html' %}
+</div>

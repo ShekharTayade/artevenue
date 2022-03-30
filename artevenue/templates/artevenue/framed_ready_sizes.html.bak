@@ -1,0 +1,119 @@
+{% load static %}
+{% load utils %}
+{% load indian_numbers_tags %}
+
+
+<div id = "sizes_paper_unframed" style="display:none;">
+	<div class = "row justify-content-center" style = "padding: 10px;">
+		{% for key, value in ready_prod_data_paper.items %}
+			<div style = "padding: 0px 5px 10px;">
+			<p class ="text-center" style = "margin:0px; cursor:pointer;"
+				onclick = "set_ready_product('PAPER', 'PAPER_ROLLED', {{ value.PAPER_WIDTH_ROLLED}}, {{value.PAPER_WIDTH_ROLLED}}, {{value.PAPER_WIDTH_UNFRAMED}}, {{value.PAPER_HEIGHT_UNFRAMED}}, {{value.MOULDING_ID}}, {{value.MOUNT_ID}}, {{value.MOUNT_SIZE}}, '{{value.MOUNT_COLOR}}', {{value.ACRYLIC_ID}},  {{value.BOARD_ID}}, {{value.STRETCH_ID}}, true);">
+				<span id= "paper-size-ROLLED-{{value.PAPER_WIDTH_ROLLED|floatformat}}"  style = "margin:0px; border:1px solid #ddd; cursor:pointer; padding:7px;">
+					{{ value.PAPER_WIDTH_ROLLED|floatformat }}" X {{ value.PAPER_HEIGHT_ROLLED|floatformat}}"
+				</span>
+			</p>
+			<h4 style = "margin-top:5px;" class = "text-center">										
+				<i id = "price-{{key}}-paper-unframed" class = "fa fa-inr"> {{ value.PAPER_PRICE_ROLLED|floatformat|intcomma_indian }} </i>
+			</h4>
+			</div>
+		{% endfor %}
+	</div>
+</div>
+
+
+<div id = "sizes_paper_framed_with_mount" >
+	<div class = "row justify-content-center" style = "padding: 10px;">
+		{% for key, value in ready_prod_data_paper.items %}
+			<div style = "padding: 0px 5px 10px;">
+			<p class ="text-center" style = "margin:0px; cursor:pointer;"
+				onclick = "set_ready_product('PAPER', 'PAPER_FRAMED_WITH_MOUNT', {{ value.PAPER_WIDTH_FRAMED_WITH_MOUNT}}, {{ value.PAPER_HEIGHT_FRAMED_WITH_MOUNT}}, {{value.PAPER_WIDTH_UNFRAMED}}, {{value.PAPER_HEIGHT_UNFRAMED}}, {{value.MOULDING_ID}}, {{value.MOUNT_ID}}, {{value.MOUNT_SIZE}}, '{{value.MOUNT_COLOR}}', {{value.ACRYLIC_ID}},  {{value.BOARD_ID}}, {{value.STRETCH_ID}}, true);">
+				<span id= "paper-size-FRAMED_WITH_MOUNT-{{value.PAPER_WIDTH_FRAMED_WITH_MOUNT|floatformat}}"  style = "margin:0px; border:1px solid #ddd; cursor:pointer; padding:7px;">
+					{{ value.PAPER_WIDTH_FRAMED_WITH_MOUNT|floatformat }}" X {{ value.PAPER_HEIGHT_FRAMED_WITH_MOUNT|floatformat}}"
+				</span>
+			</p>
+			<h4 style = "margin-top:5px;" class = "text-center">										
+				<i id = "price-{{key}}-paper-framed-with-mount" class = "fa fa-inr"> {{ value.PAPER_PRICE_FRAMED_WITH_MOUNT|floatformat|intcomma_indian }} </i>
+			</h4>
+			</div>
+		{% endfor %}
+	</div>
+</div>
+
+
+<div id = "sizes_paper_framed_without_mount" style="display:none;">
+	<div class = "row justify-content-center" style = "padding: 10px;">
+		{% for key, value in ready_prod_data_paper.items %}
+			<div style = "padding: 0px 5px 10px;">
+			<p class ="text-center" style = "margin:0px; cursor:pointer;"
+				onclick = "set_ready_product('PAPER', 'PAPER_FRAMED_WITHOUT_MOUNT', {{ value.PAPER_WIDTH_FRAMED_WITHOUT_MOUNT}}, {{ value.PAPER_HEIGHT_FRAMED_WITHOUT_MOUNT}}, {{value.PAPER_WIDTH_UNFRAMED}}, {{value.PAPER_HEIGHT_UNFRAMED}},{{value.MOULDING_ID}}, 0, 0, '{{value.MOUNT_COLOR}}', {{value.ACRYLIC_ID}},  {{value.BOARD_ID}}, {{value.STRETCH_ID}}, true);">
+				<span id= "paper-size-FRAMED_WITHOUT_MOUNT-{{value.PAPER_WIDTH_FRAMED_WITHOUT_MOUNT|floatformat}}"  style = "margin:0px; border:1px solid #ddd; cursor:pointer; padding:7px;">
+					{{ value.PAPER_WIDTH_FRAMED_WITHOUT_MOUNT|floatformat }}" X {{ value.PAPER_HEIGHT_FRAMED_WITHOUT_MOUNT|floatformat}}"
+				</span>
+			</p>
+			<h4 style = "margin-top:5px;" class = "text-center">										
+				<i id = "price-{{key}}-paper-framed-without-mount" class = "fa fa-inr"> {{ value.PAPER_PRICE_FRAMED_WITHOUT_MOUNT|floatformat|intcomma_indian }} </i>
+			</h4>
+			</div>
+		{% endfor %}
+	</div>
+</div>
+
+
+<div id = "sizes_canvas_rolled" style="display:none;">
+	<div class = "row justify-content-center" style = "padding: 10px;">
+		{% for key, value in ready_prod_data_canvas.items %}
+			<div style = "padding: 0px 5px 10px;">
+			<p class ="text-center" style = "margin:0px; cursor:pointer;"
+				onclick = "set_ready_product('CANVAS', 'CANVAS_ROLLED', {{ value.CANVAS_WIDTH_ROLLED}}, {{value.CANVAS_HEIGHT_ROLLED}}, {{value.CANVAS_WIDTH_UNFRAMED}}, {{value.CANVAS_HEIGHT_UNFRAMED}}, {{value.MOULDING_ID}}, {{value.MOUNT_ID}}, {{value.MOUNT_SIZE}}, '{{value.MOUNT_COLOR}}', {{value.ACRYLIC_ID}},  {{value.BOARD_ID}}, {{value.STRETCH_ID}}, true);">
+				<span id= "canvas-size-ROLLED-{{value.CANVAS_WIDTH_ROLLED|floatformat}}" style = "margin:0px; border:1px solid #ddd; cursor:pointer; padding:7px;">
+					{{ value.CANVAS_WIDTH_ROLLED|floatformat }}" X {{ value.CANVAS_HEIGHT_ROLLED|floatformat}}"
+				</span>
+			</p>
+			<h4 style = "margin-top:5px;" class = "text-center">
+				<i id = "price-{{key}}-canvas" class = "fa fa-inr"> {{ value.CANVAS_PRICE_ROLLED|floatformat|intcomma_indian }} </i>
+			</h4>
+			</div>
+		{% endfor %}
+
+	</div>
+</div>
+
+
+<div id = "sizes_canvas_framed" style="display:none;">
+	<div class = "row justify-content-center" style = "padding: 10px;">
+		{% for key, value in ready_prod_data_canvas.items %}
+			<div style = "padding: 0px 5px 10px;">
+			<p class ="text-center" style = "margin:0px; cursor:pointer;"
+				onclick = "set_ready_product('CANVAS', 'CANVAS_FRAMED', {{ value.CANVAS_FRAMED_WIDTH}}, {{value.CANVAS_FRAMED_HEIGHT}}, {{value.CANVAS_WIDTH_UNFRAMED}}, {{value.CANVAS_HEIGHT_UNFRAMED}}, {{value.MOULDING_ID}}, {{value.MOUNT_ID}}, {{value.MOUNT_SIZE}}, '{{value.MOUNT_COLOR}}', {{value.ACRYLIC_ID}},  {{value.BOARD_ID}}, {{value.STRETCH_ID}},  true)">
+				<span id= "canvas-size-FRAMED-{{value.CANVAS_FRAMED_WIDTH|floatformat}}" style = "margin:0px; border:1px solid #ddd; cursor:pointer; padding:7px;">
+					{{ value.CANVAS_FRAMED_WIDTH|floatformat }}" X {{ value.CANVAS_FRAMED_HEIGHT|floatformat}}"
+				</span>
+			</p>
+			<h4 style = "margin-top:5px;" class = "text-center">
+				<i id = "price-{{key}}-framed-canvas" class = "fa fa-inr"> {{ value.CANVAS_FRAMED_PRICE|floatformat|intcomma_indian }} </i>
+			</h4>
+			</div>
+		{% endfor %}
+
+	</div>
+</div>
+
+<div id = "sizes_canvas_stretched" style="display:none;">
+	<div class = "row justify-content-center" style = "padding: 10px;">
+		{% for key, value in ready_prod_data_canvas.items %}
+			<div style = "padding: 0px 5px 10px;">
+			<p class ="text-center" style = "margin:0px; cursor:pointer;"
+				onclick = "set_ready_product('CANVAS', 'CANVAS_STRETCHED', {{ value.CANVAS_STRETCHED_WIDTH|floatformat}}, {{ value.CANVAS_STRETCHED_HEIGHT|floatformat}}, {{value.CANVAS_WIDTH_UNFRAMED|floatformat}}, {{value.CANVAS_HEIGHT_UNFRAMED|floatformat}}, 0, 0, 0, '', 0, 0, {{value.STRETCH_ID}}, true);">
+				<span id= "canvas-size-STRETCHED_CANVAS-{{value.CANVAS_STRETCHED_WIDTH|floatformat}}" style = "margin:0px; border:1px solid #ddd; cursor:pointer; padding:7px;">
+					{{ value.CANVAS_STRETCHED_WIDTH|floatformat }}" X {{ value.CANVAS_STRETCHED_HEIGHT|floatformat}}"
+				</span>
+			</p>
+			<h4 style = "margin-top:5px;" class = "text-center">
+				<i id = "price-{{key}}-stretched-canvas" class = "fa fa-inr"> {{ value.CANVAS_STRETCHED_PRICE|floatformat|intcomma_indian }} </i>
+			</h4>
+			</div>
+		{% endfor %}
+
+	</div>
+</div>

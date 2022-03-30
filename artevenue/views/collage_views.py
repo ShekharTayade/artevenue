@@ -903,10 +903,11 @@ def get_wall_art_set_sizes_prices(prod_id, aspect_ratio, prod_type='STOCK-IMAGE'
 				
 			else: 
 				if aspect_ratio > 1:
-					p_mount_size = 1 if image_width <= 18 else 2 if image_width <= 26 else 3 if image_width <= 34 else 4
+					#p_mount_size = 1 if image_width <= 18 else 2 if image_width <= 26 else 3 if image_width <= 34 else 4
+					p_mount_size = 1 if image_width <= 18 else 2
 				else:
-					p_mount_size = 1 if image_height <= 18 else 2 if image_height <= 26 else 3 if image_height <= 34 else 4
-				#p_mount_size = mount_size
+					#p_mount_size = 1 if image_height <= 18 else 2 if image_height <= 26 else 3 if image_height <= 34 else 4
+					p_mount_size = 1 if image_height <= 18 else 2 
 				
 				p_moulding_id = moulding_id
 				p_mount_id = mount_id
@@ -918,7 +919,7 @@ def get_wall_art_set_sizes_prices(prod_id, aspect_ratio, prod_type='STOCK-IMAGE'
 			###########################
 			### PAPER SIZE & PRICE
 			###########################			
-			i_width_p = round((image_width + p_width_inner_inches * 2 + p_mount_size * 2 ))
+			i_width_p = round(image_width + p_width_inner_inches * 2 + p_mount_size * 2 )
 			i_height_p = round(image_height + p_width_inner_inches * 2 + p_mount_size * 2)
 			p_data_paper['PAPER_WIDTH'] = i_width_p
 			p_data_paper['PAPER_HEIGHT'] = i_height_p

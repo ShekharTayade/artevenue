@@ -47,9 +47,21 @@
 {% endblock imagemap-resize-script %}
 
 {% block popper-script %}
-
 {% endblock popper-script %}
 
+{% block google-recaptcha-3 %}
+{% endblock google-recaptcha-3 %}
+
+{% block yt-scr %}
+{% endblock yt-scr %}
+
+{% block add_to_head %}
+	<script
+		src="https://content.helloviewer.io/js/helloar_embed_0.0.6.min.js"
+		data-helloar-class="helloar-button"
+	></script>
+	
+{% endblock %}
 	<!-- Only Override the site content block -->
 	{% block sitecontent %}
 
@@ -125,6 +137,36 @@
 									<i class="fa fa-heart-o fa-lg" ></i>
 								</button>
 							</div>
+
+							<div class = "col-12 d-none d-md-flex justify-content-center align-items-center">
+								<img id = "ar-img" src = "{% static '/img/viewonyourwall/viewonyourwall_icon.png' %}" width=50>
+								<div
+								  id ="av-helloar-button"
+								  class="helloar-button"
+								  data-valid = "false"
+								  data-image-blob="ENTER_YOUR_BLOB_HERE"
+								  data-application-id="616fbb4d7fb8d872f47a05b3"
+								  data-unique-id="ENTER_UNIQUE_ID_FOR_BLOB_HERE"
+								  data-button-color="#11b6bd"
+								  data-font-color="#fff"
+								  data-font-size="15px"
+								  data-font-bold="false"
+								  data-button-width="100%"
+								  data-margin-top="5px"
+								  data-button-border-radius="10px"
+								  data-button-text="See It On Your Wall"
+								  data-type="BLOB_TO_3D"
+								  data-display-type="AR_ONLY"
+								  data-product-name="Enter your product name here"
+								  data-placement="wall"
+								  data-image-width="1000"
+								  data-image-height="1000">								
+								</div>
+							</div>
+
+							<div class = "col-12">
+								<hr>
+							</div>
 							<!--
 							<div class = "mt-4 d-flex flex-column align-items-center">
 								<button class = "btn btn-primary"
@@ -161,7 +203,33 @@
 									<i class="fa fa-heart-o fa-lg" ></i>
 								</button>
 							</div>
-							<!--
+						<div class = "col-12 d-md-none d-flex justify-content-center align-items-center">
+							<img  id = "ar-img-m" src = "{% static '/img/viewonyourwall/viewonyourwall_icon.png' %}" width=50>
+							<div
+							  id ="av-helloar-button-m"
+							  class="helloar-button"
+							  data-valid = "true"
+							  data-image-blob="ENTER_YOUR_BLOB_HERE"
+							  data-application-id="616fbb4d7fb8d872f47a05b3"
+							  data-unique-id="ENTER_UNIQUE_ID_FOR_BLOB_HERE"
+							  data-button-color="#11b6bd"
+							  data-font-color="#fff"
+							  data-font-size="15px"
+							  data-font-bold="false"
+							  data-button-width="100%"
+							  data-margin-top="5px"
+							  data-button-border-radius="10px"
+							  data-button-text="See It On Your Wall"
+							  data-type="BLOB_TO_3D"
+							  data-display-type="AR_ONLY"
+							  data-product-name="Enter your product name here"
+							  data-placement="wall"
+							  data-image-width="1000"
+							  data-image-height="1000">								
+							</div>
+							
+						</div>
+						<!--							<!--
 							<div class = "mt-4 d-flex flex-column align-items-center">
 								<button class = "btn btn-primary"
 									onclick = "show_size_color_tool();">
@@ -1196,6 +1264,23 @@
 			
 			wigzo('track', 'productview', 'https://artevenue.com/wall-art-collage-set/{{product.product_id}}/');
 			
+
+			setTimeout(function(){ 
+				$("#ar-img-m").hide();
+				$("#ar-img").hide();
+				const bList = document.querySelectorAll("button");
+				for (let i = 0; i < bList.length; i++) {
+				  if (bList[i].innerText == 'See It On Your Wall'){
+						$("#ar-img-m").show();
+						$("#ar-img").show();
+					}
+
+				}
+
+				//if ($( "#av-helloar-button-m button" ).text() === 'See It On Your Wall'){
+				//	}
+			
+			}, 1000);
 		});
 
 	</script>
@@ -1363,6 +1448,9 @@
 							document.getElementById("s_card_{{s.stock_image_id}}").src = "data:image/png;base64," + data;
 							//document.body.scrollTop = 0; // For Safari
 							//document.documentElement.scrollTop = 0;
+
+							getblob(moulding_id, mnt_color, mnt_size, image_width, strt);
+
 							},
 						error: function(xhr){
 							alert("An error occured: " + xhr.status + " " + xhr.statusText); 
@@ -1946,6 +2034,56 @@
 	}
 	</script>
 	
+	<script>
+		var isBreakpoint = function(viewport_size){
+		  //return $('.device-' + viewport_size).is(':visible');
+		  if (viewport_size == 'xs'){
+			return window.innerWidth < 768;
+		  }
+		  if (viewport_size == 'sm'){
+			return window.innerWidth < 991;
+		  }
+		  if (viewport_size == 'md'){
+			return window.innerWidth < 1199;
+		  }
+		  if (viewport_size == 'lg'){
+			return window.innerWidth > 1199;
+		  }
+		}
+	</script>
+
+	<script>
+		async function getblob(moulding_id, mnt_color, mnt_size, image_width, str_canvas){
+			if (ratio >= 1){
+				var wdt = 1000;			
+				var hgt = Math.round(1000 / ratio);
+			} else {
+				var hgt = 1000;			
+				var wdt = Math.round(1000 * ratio);
+			}
+			var base64string = document.getElementById("prod-img-card").src;
+			var mount_col = mnt_color.replace('#','');
+			if (isBreakpoint('xs')) {
+				document.getElementById("av-helloar-button-m").setAttribute('data-image-blob', base64string  );
+				document.getElementById("av-helloar-button-m").setAttribute("data-valid", "true");
+				document.getElementById("av-helloar-button").setAttribute("data-valid", "false");
+				document.getElementById("av-helloar-button-m").setAttribute("data-image-width", wdt);
+				document.getElementById("av-helloar-button-m").setAttribute("data-image-height", hgt);
+				document.getElementById("av-helloar-button-m").setAttribute('data-unique-id', '{{product.product_id}}' + '-' + moulding_id + '-' + mount_col + '-' + mnt_size + '-' + image_width + '-' + str_canvas );
+				HelloManager.insertHelloButton();
+			} else {
+				document.getElementById("av-helloar-button").setAttribute('data-image-blob', base64string  );
+				document.getElementById("av-helloar-button-m").setAttribute("data-valid", "false");
+				document.getElementById("av-helloar-button").setAttribute("data-valid", "true");
+				document.getElementById("av-helloar-button").setAttribute("data-image-width", wdt);
+				document.getElementById("av-helloar-button").setAttribute("data-image-height", hgt);
+				document.getElementById("av-helloar-button").setAttribute('data-unique-id', '{{product.product_id}}' + '-' + moulding_id + '-' + mount_col + '-' + mnt_size + '-' + image_width + '-' + str_canvas );
+				HelloManager.insertHelloButton();
+			}
+						
+		}	
+
+	</script>
 	{% endblock jscripts %}	
 
 	{% block tawkto %}

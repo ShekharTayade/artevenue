@@ -1,0 +1,140 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% block page-title %} 
+	<title>View Our Paintings on Your Wall | About Augmented Reality at Arte'Venue </title>
+	<meta name="description" content="Information about viweing our paintings on your wall using the augmented reality.">
+	<meta name="keywords" content="augmented reality, Arte'venue, Montage Art Pvt Ltd, Online art gallery, view paintings on your wall, see paininting on wall">
+{% endblock page-title %} 
+{% block page-description %}
+{% endblock page-description %}
+{% block page-keywords %}
+{% endblock page-keywords %}
+
+{% block coursel-stylesheet %}
+{% endblock coursel-stylesheet %}
+
+{% block jqueryui-script %}
+{% endblock jqueryui-script %}
+
+{% block slick-slider %}
+{% endblock slick-slider %}
+
+{% block front.js %}
+{% endblock front.js %}
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+{% block google-recaptcha-3 %}
+{% endblock google-recaptcha-3 %}
+
+{% block yt-scr %}
+{% endblock yt-scr %}
+
+{% block sitecontent %}
+	<div class="container mb-2">
+		<div class="row">
+			<div class="col-12">
+				<nav aria-label="breadcrumb">
+					<ol class="breadcrumb">
+						<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+						<li aria-current="page" class="breadcrumb-item active">About Augmented Reality @Arte'Venue</li>
+					</ol>
+				</nav>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-12 col-md-6" style = " background: rgba(0, 0, 0, 0.5); color: #f1f1f1; padding: 20px;">
+				<video autoplay loop muted controls id="arPromoVideo" style = "width: 350px; min-height: 100%;">
+					  <source src="{% static '/img/viewonyourwall/ar_promo_video.mp4' %}"  type="video/mp4">
+					  Your browser does not support HTML5 video.
+				</video>
+			</div>
+			<div class="col-12 col-md-6" style = " background: rgba(0, 0, 0, 0.5); color: #f1f1f1; width: 100%; padding: 20px;">
+				<h1 style = "font-weight:700; font-size:1.5rem;">VIEW OUR ARTWORKS ON YOUR WALL</h1>
+				<h2 >ART MEETS TECHNOLOGY</h2>
+				<h3 >First time in India, Arte'Venue brings to you Augmented Reality(AR) to view our artworks on your wall</h3>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-12">
+				<h5 class = "pull-right">Music Courtsey: tunetank.com</h5>
+			</div>
+		</div>
+		<div class="row mt-4 text-center">
+			<div class="col-12">
+				<strong>HOW TO VIEW THE ARTWORK ON YOUR WALL:</strong>
+			</div>
+			<div class="col-12">
+				It's As Simple As 1, 2, 3
+			</div>
+		</div>
+		<div class="row mt-3">
+			<div class="col-12 col-md-4" style = "border: 1px solid #cfcfcf; padding:20px;">
+				<div class = "d-flex justify-content-center d-flex-row  mb-3">
+					<span class = "offer_num">1</span>
+					<span class = "offer_text" >CHOOSE THE ARTWORK</span>
+				</div>
+				<ul>
+					<li>Browse through various categories (Menu->Categories), or access the list of artworks (except gallery walls and wall art sets) from various sections on the home page </li>
+					<li>Identify and navigate to the artwork you like</li>
+					<li>Tap on it to go the product page</li>
+				</ul>
+				<hr>
+				<img src = "{% static '/img/viewonyourwall/pic_for_ar1.jpg' %}" width=350>
+			</div>
+			<div class="col-12 col-md-4" style = "border: 1px solid #cfcfcf; padding:20px;">
+				<div class = "d-flex justify-content-center d-flex-row  mb-3">
+					<span class = "offer_num">2</span>
+					<span class = "offer_text" >START THE AR</span>
+				</div>
+				<ul>
+					<li>Choose the size or customize as you like</li>
+					<li>Locate the wall/space where you want the artwork placed virtually</li>
+					<li>Hold your mobile/device phone with back camera facing the wall/space</li>
+					<li>Click on the "See It on Your Wall" button</li>
+				</ul>
+				<hr>
+				<img src = "{% static '/img/viewonyourwall/pic_for_ar2.jpg' %}"  width=350>
+			</div>
+			<div class="col-12 col-md-4" style = "border: 1px solid #cfcfcf; padding:20px;">
+				<div class = "d-flex justify-content-center d-flex-row  mb-3">
+					<span class = "offer_num">3</span>
+					<span class = "offer_text" >SEE IT ON YOUR WALL</span>
+				</div>
+				<ul>
+					<li>Move your device a bit so artwork gets placed on the wall<</li>
+					<li>Drag, pinch to position and size the artwork<b</li>
+					<li>Move closer/away from the wall, rotate the device to get a better view<b</li>
+					<li>After you are done, tap on the screen and tap X to close the AR</li>
+				</ul>
+				<hr>
+				<video width="350" controls muted>
+					<source src="{% static '/img/viewonyourwall/ar_video.mp4' %}"  type="video/mp4">
+					Your browser does not support the video tag.
+				</video>
+			</div>
+		</div>
+		<div class="row mt-2" style = "font-size: 0.8rem;">
+			<div class="col-12">
+				<strong>Please Note:</strong>
+			</div>
+				<ul>
+					<li>Works on iPhone7 & above and Google ARCore compatible devices 
+						<a href = "https://developers.google.com/ar/devices">(List of supported devices)</a></li>
+					<li>Currently our AR works only for single artwork. It does not for gallery walls, wall art sets where there are multiple artworks in the set</li>
+					<li>Before you start the AR, please ensure there is good ambient light</li>
+					<li>You may have to move the device/mobile phone around a bit to get the artwork placed on the wall</li>
+				</ul>
+		</div>
+	</div>
+
+	{% include 'artevenue/message-modal_ok.html' %}
+	
+	{% endblock sitecontent %}
+
+	
+	{% block jscripts %}
+
+	{% endblock jscripts %}
+	

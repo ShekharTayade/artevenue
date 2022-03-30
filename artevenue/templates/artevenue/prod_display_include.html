@@ -8,7 +8,7 @@
 					<h5>
 						{% if total_count > 50000 %}
 							<div class = "text-center form-group form-inline" >
-								Total {{total_count|floatformat:"0"|intcomma_indian}} results found, showing results
+								{{total_count|floatformat:"0"|intcomma_indian}} artworks found, showing
 								{% if result_limit == '0-50' %}
 									up to 50 thousand.
 								{% endif %}
@@ -127,7 +127,7 @@
 											{% endif %}
 										{% endfor %}
 										<span class="price text-center">
-											<a style="color:#000 !important; font-weight:600;" href="{% url 'stock_image_detail' prod.product_id %}">, Multiple Sizes</a>
+											<a style="color:#000 !important;" href="{% url 'stock_image_detail' prod.product_id %}"> Multiple Sizes</a>
 										</span>
 									</div>
 								</div>

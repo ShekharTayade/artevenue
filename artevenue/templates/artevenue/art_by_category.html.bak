@@ -1,0 +1,437 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load utils %}
+{% load how_to_tips from estore_base %}
+{% block page-title %} 
+	<title>
+		{% if product_category.page_title %}{{product_category.page_title}} 
+		{% else %}Beautiful{% if product_category.url_suffix|endswith:'paintings' or product_category.url_suffix|endswith:'painting'  or product_category.url_suffix|startswith:'paintings' or product_category.url_suffix|startswith:'painting'%}Framed Wall Art Prints from{{ product_category.url_suffix|replace_dash|title }} Theme{% else %}Premium Quality Framed Wall Art | Curated Collection from {{ product_category.url_suffix|replace_dash|title }} Category{% endif %}
+		{% endif %}
+	</title>
+	{% if product_category.page_description %} 
+	<meta name="description" content="{{product_category.page_description}}">
+	{% else %}
+	<meta name="description" content="Framed wall art from {% if product_category.url_suffix|endswith:'paintings' or product_category.url_suffix|endswith:'painting'  or product_category.url_suffix|startswith:'paintings' or product_category.url_suffix|startswith:'painting'%} {{ product_category.url_suffix|replace_dash|title }}{% else %}{{ product_category.url_suffix|title }}{% endif %} theme. Art Prints on Canvas or Paper| Premium Quality | Licensed | Fully Customizable">
+	{% endif %}
+	<meta name="keywords" content="framed paintings, wall art, art prints on canvas, paper, {{product_category.url_suffix|replace_dash}} paintings, {{product_category.keywords}},paintings for home walls, home decor">
+{% endblock page-title %} 
+{% block page-description %}
+{% endblock page-description %}
+{% block page-keywords %}
+{% endblock page-keywords %}
+
+{% block coursel-stylesheet %}
+{% endblock coursel-stylesheet %}
+
+{% block coursel-script %}
+{% endblock coursel-script %}
+
+{% block front.js %}
+{% endblock front.js %}
+
+{% block lazysizes %}
+<script src="{% static '/vendor/lazysizes/lazysizes.min.js' %}" async=""></script>
+{% endblock lazysizes %}
+
+{% block slick-slider %}
+{% endblock slick-slider %}
+
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+{% block gmap-script %}
+{% endblock gmap-script %}
+
+
+{% block popper-script %}
+	<script src="{% static 'vendor/popper.js/umd/popper.min.js' %}"> </script>
+{% endblock popper-script %}
+
+
+{% block JSON-LD %}
+	<script type="application/ld+json">
+	{% for prod in prods %}
+	{% if prod.publisher %}
+    {
+      "@context": "https://schema.org/",
+      "@type": "Product",
+      "name": "{{ prod.name }}",
+      "image": [
+        "{% static prod.url %}"
+       ],
+      "description": "Choose from ready sizes or customize it.",
+      "sku": "{{ prod.product_id }}",
+      "mpn": "",
+      "brand": {
+        "@type": "Brand",
+        "name": "Arte'Venue"
+      },
+      
+      "offers": {
+        "@type": "Offer",
+        "url": "https://www.artevenue.com/offers",
+        "priceCurrency": "INR",
+        "price": "500",
+        "priceValidUntil": "2022-12-31",
+        "itemCondition": "NewCondition",
+        "availability": "InStock",
+        "seller": {
+          "@type": "Organization",
+          "name": "Montage Art Pvt Ltd"
+        }
+      }
+    }
+	{% endif %}
+	{% endfor %}
+	</script>
+	
+	{% for prod in prods %}
+	{% if prod.publisher %}
+	<script type="application/ld+json">
+	{
+	  "@context": "http://schema.org",
+	  "@type": "Painting",
+	  "name": "{{product.name}}",
+	  "genre": "{{product_category.stock_image_category.name}}"
+	}
+	{% endif %}
+	{% endfor %}
+    </script>
+{% endblock JSON-LD %}
+
+
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+        <div class="container">
+			<div class="row">
+
+				<!-- breadcrumb-->
+				<div class="col-12">
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+							<li class="breadcrumb-item"><a href= "{% url 'show_all_categories' %}">Categories</a></li>
+							<li aria-current="page" class="breadcrumb-item active">{{product_category.name}}</li>
+						</ol>
+					</nav>
+				</div>	
+
+				<div class="col-12">
+					<div class="mt-3 text-center">
+						{% autoescape off %}
+						{% if ikeywords %}
+							<h1>Art Prints for Your Search "{{ikeywords}}"</h1>
+							<h3><span style = "font-style: italic;">
+								Wall art</span> is a must when it comes to 
+								paintings for home decor, office or any other space.
+							    Choose from our largest collection of beautiful artworks. 
+							</h3>
+						{% else %}
+							<h1>
+							{% if product_category %} 
+								{% if product_category.header %}
+									{{product_category.header}}
+								{% else %}
+									{% if product_category.url_suffix|endswith:'paintings' or product_category.url_suffix|endswith:'painting'  or product_category.url_suffix|startswith:'paintings' or product_category.url_suffix|startswith:'painting'%}
+										FRAMED WALL ART PRINTS | {{ product_category.url_suffix|replace_dash|upper }}
+									{% else %}
+										{{ product_category.url_suffix|replace_dash|upper }} THEME FRAMED WALL ART PRINTS
+									{% endif %}
+								{% endif %}
+							{% endif %}
+							</h1>
+							<h3>
+							{% if product_category.description %} 
+								{{product_category.description}}
+							{% else %}
+								Largest and beautiful collection of wall art of from across the world 
+								for home decor, office and interiors. Framed canvas or
+								paper prints.
+							{% endif %}
+							</h3>
+							<h3>
+							{% if product_category.second_description %} 								
+								{{product_category.second_description}}
+							{% else %}
+								Licensed | Premium Quality | Fully Customizable
+							{% endif %}							
+							</h3>
+						{% endif %}
+						{% endautoescape %}
+					</div>
+				</div>
+				<button onclick="topFunction();" id="scrollBtn" title="Go to top">
+					<i class = "fa fa-chevron-up fa-lg"></i>
+				</button>
+								
+				<div class="col-12 mt-3">
+				{% include 'artevenue/art_by_category_filter.html' %}
+				</div>
+				
+				<div class = "sticky-content" style = "width:100%;">
+					<div class="col-12 ">
+						<div id = "img-display mt-5">
+						{% include 'artevenue/prod_display_include.html' %}
+						</div>
+					</div>
+				</div>
+
+				<div class="col-12">
+					<hr>
+				</div>
+				{% if cat_id == 5 %}
+				<div class="col-12">
+					{% include 'artevenue/category_abstract_include.html' %}
+				</div>
+				{% endif %}
+				{% if cat_id == 2 %}
+				<div class="col-12">
+					{% include 'artevenue/category_floral_include.html' %}
+				</div>
+				{% endif %}
+				{% if cat_id == 3 %}
+				<div class="col-12">
+					{% include 'artevenue/category_landscape_include.html' %}
+				</div>
+				{% endif %}
+				
+				{% how_to_tips request %}
+
+				<!-- /.col-lg-9-->
+				{% include 'artevenue/wishlist-add-message.html' %}
+				{% include 'artevenue/message-modal_ok.html' %}
+				{% if product_category.category_id %}
+					<form hidden id="cat-form" action = "{% url 'art_by_category' cat_nm=product_category.url_suffix %}">
+						<input id = "id_page_num" name = "page_num">
+						<input id = "id_sort" name = "sort">
+						<input id = "id_show" name = "show">
+						<input id = "id_keywords" name = "keywords">
+						<input id = "id_result_limit" name = "result_limit">
+						<input id = "id_f_colors" name = "filt_colors">
+						<input id = "id_f_size" name = "filt_size">
+						<input id = "id_f_width" name = "filt_width">
+						<input id = "id_f_height" name = "filt_height">
+						<input id = "id_f_artist" name = "filt_artist">
+						<input id = "id_f_orientation" name = "filt_orientation">
+						<input id = "id_f_image_type" name = "filt_image_type">
+						<input id = "id_tf" name = "t_f">
+						
+						<!--<input id = "id_page_num" name = "page_num">
+						<input id = "id_keywords" name = "keywords">
+						<input id = "id_sort" name = "sort"> -->
+						<input id = "id_color" name = "color">
+						<input id = "id_size" name = "size">
+						<input id = "id_category" name = "category">
+						<input id = "id_shape" name = "shape">
+						<input id = "id_art_type" name = "art_type"> 
+						
+						
+					</form>
+				{% else %}
+					<form hidden id="cat-form" action = "{% url 'art_by_category' %}">
+						<input id = "id_page_num" name = "page_num">
+						<input id = "id_sort" name = "sort">
+						<input id = "id_show" name = "show">
+						<input id = "id_keywords" name = "keywords">
+						<input id = "id_result_limit" name = "result_limit">
+						<!--
+							<input id = "id_f_colors" name = "filt_colors">
+							<input id = "id_f_size" name = "filt_size">
+							<input id = "id_f_width" name = "filt_width">
+							<input id = "id_f_height" name = "filt_height">
+							<input id = "id_f_artist" name = "filt_artist">
+							<input id = "id_f_orientation" name = "filt_orientation">
+							<input id = "id_f_image_type" name = "filt_image_type">
+						-->
+						<input id = "id_tf" name = "t_f">
+						<input id = "id_color" name = "color">
+						<input id = "id_size" name = "size">
+						<input id = "id_category" name = "category">
+						<input id = "id_shape" name = "shape">
+						<input id = "id_art_type" name = "art_type"> 
+					</form>
+				{% endif %}
+			</div>
+		</div>
+	{% endblock sitecontent %}
+	
+	{% block footer-text %}
+		{% if product_category.url_suffix|endswith:'paintings' or product_category.url_suffix|endswith:'painting'  or product_category.url_suffix|startswith:'paintings' or product_category.url_suffix|startswith:'painting'%}
+			We have the largest collection of licesed art from  
+			{{ product_category.url_suffix|replace_dash }} them.
+		{% else %}
+			We have the largest collection of art prints from {{ product_category.url_suffix|replace_dash }} theme.
+		{% endif %}
+		Buy the best quality framed wall art with confidence. We offer complete satisfaction gurantee, free returns and free delivery. So look no further.
+	{% endblock footer-text %}
+
+
+	{% block jscripts %}
+
+	<script>		
+		function page_perpage_change(page, sort, show, keywords, result_limit=''){ 
+			$('#id_sort').val(sort);
+			$('#id_show').val(show);
+			$('#id_keywords').val(keywords);
+			$('#id_result_limit').val(result_limit);
+			
+			if (isNaN(page) == false) {
+				page_num = parseInt(page);
+			} else {
+				page_num = 1;  // default
+			}
+			$("#id_page_num").val(page_num);
+						
+						
+			if (isNaN(show) == false) {
+				show_num = show;
+			} else {
+				if (show != 'ALL') {
+					show_num = '50' // default
+				} else {
+					show_num = show;  
+				}
+			}
+			if (show_num != '' ){
+				$("#id_show").val(show_num);
+			}
+			
+			document.body.scrollTop = 0; // For Safari
+			document.documentElement.scrollTop = 0; 
+			
+			$("#cat-form").submit();
+		}
+	</script>
+	
+	<script>
+		$(document).on({
+			ajaxStart: function() { $body.addClass("loading");},
+			ajaxStop: function() { $body.removeClass("loading");},								
+		});
+		
+		{% for c in f_category %}
+			$('#id_category').val($('#id_category').val() + "," + "{{c}}");
+		{% endfor %}
+		{% for s in f_shape %}
+			$('#id_shape').val($('#id_shape').val() + "," + "{{s}}");
+		{% endfor %}
+		{% for c in f_color %}
+			$('#id_color').val($('#id_color').val() + "," + "{{c}}");
+		{% endfor %}
+		{% for c in f_size %}
+			$('#id_size').val($('#id_size').val() + "," + "{{c}}");
+		{% endfor %}
+		{% if f_art_type %}
+			$('#id_art_type').val("{{f_art_type}}");
+		{% endif %}
+		{% if ikeywords %}
+			$('#id_keywords').val("{{ikeywords}}");
+		{% endif %}
+
+
+		$("#id_page_num").val('{{page}}');			
+		$("#id_sort").val('{{sortOrder}}');
+		$("#id_show").val('{{show}}');
+		
+		wigzo('track', 'categoryview', "https://artevenue.com/art-prints/{{product_category.url_suffix}}/");
+	</script>
+
+	<script>
+		function addToFav(prod_id, currwidth, aspect_ratio, total_price,
+				discount, promotion_id, disc_amt, item_unit_price){
+			currheight = Math.round(currwidth / aspect_ratio);
+			qty = 1; moulding_id = 0; moulding_size = 0; 
+			print_medium_id = 'PAPER'; print_medium_size = currheight * currwidth;
+			mount_id = 0; mount_size = 0; mount_w_left =0; mount_w_right = 0;
+			mount_w_top =0; mount_w_bottom = 0;acrylic_id = 1;
+			acrylic_size = currheight * currwidth; board_id = 0; board_size = 0;
+			stretch_id = 0; stretch_size = 0; discount = 0;
+		
+			$.ajax({
+				url: "{% url 'add_to_wishlist' %}", 
+				data: { 'prod_id':prod_id,'qty':qty, 
+						'width':currwidth, 'height':currheight, 'moulding_id': moulding_id,
+						'moulding_size' : moulding_size,
+						'print_medium_id':print_medium_id, 'print_medium_size':print_medium_size, 
+						'mount_id':mount_id, 'mount_size':mount_size,
+						'mount_w_left' : mount_w_left, 'mount_w_right':mount_w_right, 
+						'mount_w_top':mount_w_top, 'mount_w_bottom' : mount_w_bottom, 
+						'acrylic_id':acrylic_id, 'acrylic_size':acrylic_size,
+						'board_id':board_id, 'board_size':board_size, 'stretch_id':stretch_id,
+						'stretch_size':stretch_size, 
+						'total_price':total_price, 'image_width':currwidth, 'image_height':currheight,
+						'discount':discount, 'promotion_id':promotion_id, 'disc_amt':disc_amt,
+						'item_unit_price':item_unit_price,  'prod_type':'STOCK-IMAGE'}, 
+				dataType: 'text', 
+					type: 'POST',
+				success: function (data) {
+					data = JSON.parse(data);
+					cart_qty = data.cart_qty;
+					$('#fav_'+prod_id).html('<i class = "fa fa-heart" onclick = "deleteItem(' + prod_id + ')"style="color:red; padding-right:5px;" data-toggle="tooltip" title="Added to Favorites!"></i>');
+					/* $('#msg-wishlist-modal').modal('show');
+					setTimeout(function() {
+						$('#msg-wishlist-modal').modal('hide');
+						}, 1000);
+					*/
+				},
+				error: function(xhr){
+					alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+				}
+			});	
+		}
+	</script>
+
+		<script>
+		
+		function deleteItem(prod_id){
+			wishlist_item_id = 0;
+			sub_total = 0;
+			tax = 0;
+			wishlist_total= 0;
+			item_total = 0;
+			{% for w in wishlistitems %}
+				if ({{w.product_id}} == prod_id){
+					wishlist_item_id = {{w.wishlist_item_id}};
+				}
+			{% endfor %}
+
+			sub_total = '';
+			tax='';
+			wishlist_total='';
+			item_total='';
+			
+			$.ajax({
+				url: "{% url 'delete_wishlist_item' %}", 
+				data: {'wishlist_item_id':wishlist_item_id, 'sub_total':sub_total, 'tax':tax, 
+				'wishlist_total':wishlist_total, 'item_total':item_total}, 
+				dataType: 'text', 
+				type: 'post',
+				success: function (data) {
+					data = JSON.parse(data);
+					wishlist_qty = data.msg;
+					$('#fav_'+prod_id).html('<i class = "fa fa-heart-o"  style="color:red; padding-right:5px;" data-toggle="tooltip" title="Add to Favorites!"></i>')
+					if (data = "SUCCESS") {
+						// Update the display
+						//show_wishlist();
+						$("#w_msg").html('Item removed from favorites');
+						/*$('#msg-wishlist-modal').modal('show');
+						setTimeout(function() {
+							$('#msg-wishlist-modal').modal('hide');
+							}, 1000); */
+					} else {
+						alert(data);
+					}
+				},
+				error: function(xhr){
+					alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+				}
+			});			
+		}
+	</script>
+	
+	{% endblock jscripts %}
+	{% block tawkto %}
+	{% endblock tawkto %}
+			
+	

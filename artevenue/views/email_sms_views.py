@@ -631,7 +631,7 @@ def send_customer_review_emails():
 	orders = Order_sms_email.objects.filter(
 			(Q(order__order_status = 'IN') | Q(order__order_status = 'CO')),
 			customer_review_email_sent = False,
-			updated_date__date__lte = dt,
+			updated_date__lte = dt,
 			updated_date__gt = dt_g
 			)
 	

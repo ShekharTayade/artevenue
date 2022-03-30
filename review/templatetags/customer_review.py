@@ -16,7 +16,8 @@ today = datetime.date.today()
 
 register = template.Library()
 
-@register.inclusion_tag('review/customer_review.html')
+#@register.inclusion_tag('review/customer_review.html')
+@register.inclusion_tag('review/customer_review_collapsed_body.html')
 def customer_review(product_id=None, cart_item_id=None, wishlist_item_id=None, user_width=None, user_height=None):
 	overall_rating = None
 	total_reviews = None

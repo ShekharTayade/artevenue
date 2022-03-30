@@ -24,8 +24,8 @@ from .price_views import *
 
 today = datetime.date.today()		
 wall_colors = ['255,255,255', '255,255,224', '242,242,242', '230,242,255', '65,182,230', '64,224,208', '204,255,204', '128,128,0', '255,255,179', '255,205,72', '255,215,0', '255,230,230', '137,46,58', '255,0,0']
-		
-@csrf_exempt		
+
+@csrf_exempt	
 def category_stock_images(request, cat_id = '', page = 1):
 	if cat_id is None or cat_id == '':
 		return
@@ -35,7 +35,7 @@ def category_stock_images(request, cat_id = '', page = 1):
 	keyword_filter = False # Turned on only if a keyword filter is present (through the AJAX call)
 	sortOrder = request.GET.get("sort")
 	show = request.GET.get("show", '100')
-	
+
 	if page is None or page == 0:
 		page = 1 # default
 
@@ -378,6 +378,7 @@ def search_products_by_keywords(request):
 		'width':width, 'height':height, 'page_range':page_range} )
 	
 def stock_image_detail(request, prod_id = '', iuser_width='', iuser_height=''):
+    
 	imld_id = request.GET.get("frame_id", "")
 	isurface = request.GET.get("surface", "").upper()
 	imnt_id = request.GET.get("mount_id", "")
@@ -404,9 +405,9 @@ def stock_image_detail(request, prod_id = '', iuser_width='', iuser_height=''):
 		return
 	
 	if not iuser_width or iuser_width == '':
-		iuser_width = request.GET.get('iuser_width','0')
+		iuser_width = request.GET.get('iuser_width','')
 	if not iuser_height or iuser_height == '' :
-		iuser_height = request.GET.get('iuser_height','0')
+		iuser_height = request.GET.get('iuser_height','')
 
 	# get the product
 	#product = Stock_image.objects.get(product_id = prod_id, is_published = True)
@@ -620,7 +621,14 @@ def stock_image_detail(request, prod_id = '', iuser_width='', iuser_height=''):
 				creative_exists = True
 	'''
 	
-	return render(request, "artevenue/stock_image_detail_new.html", {'product':product,
+	if  request.user_agent.is_mobile:
+		template = "artevenue/stock_image_prod_page_xs.html"
+	else:
+		#template = "artevenue/stock_image_detail_new.html"
+		template = "artevenue/stock_image_prod_page_md.html"
+        
+	
+	return render(request, template, {'product':product,
 		'prod_categories':prod_categories, 'printmedium':printmedium, 'product_category':product_category,
 		'mouldings_apply':paper_mouldings_apply, 'paper_mouldings_show':paper_mouldings_show, 
 		'canvas_mouldings_show':canvas_mouldings_show, 'mounts':mounts,
@@ -1615,6 +1623,7 @@ def image_by_image_code(request):
 			{'prods':prods, 'show':show, 'perpage':perpage, 'width':16,
 			'page_range':page_range})
 
+
 def get_stock_images(request, cat_nm = None, page = None, curated_coll_id = None):
 	
 	if cat_nm:
@@ -1870,7 +1879,7 @@ def get_stock_images(request, cat_nm = None, page = None, curated_coll_id = None
 	slab_100_150 = 'NO'
 	slab_150_200 = 'NO'
 	slab_200_plus = 'NO'
-	
+
 	sliced_count = 0
 	total_count = products.count()
 	if total_count > 50000 and result_limit != '0-50':		
@@ -1960,11 +1969,6 @@ def get_stock_images(request, cat_nm = None, page = None, curated_coll_id = None
 		'page':page, 'wishlistitems':wishlistitems, 'wishlist_prods':wishlist_prods,
 		#'filt_width':filt_width, 'filt_height':filt_height, 
 		'page_range':page_range, 'result_limit':result_limit,
-		
-		'''
-		'filt_colors':filt_colors, 'filt_size':filt_size, 'filt_artist':filt_artist,
-		'filt_orientation':filt_orientation, 'filt_image_type':filt_image_type,
-		'''
 		'total_count':total_count, 'sliced_count':sliced_count, 'result_limit':result_limit,
 		'slab_0_50':slab_0_50, 'slab_50_100':slab_50_100, 'slab_100_150':slab_100_150, 
 		'slab_150_200':slab_150_200, 'slab_200_plus':slab_200_plus, 'env':env, 'colors_list': colors_list,

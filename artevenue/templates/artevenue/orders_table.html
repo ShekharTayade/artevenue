@@ -11,15 +11,15 @@
 								</p>
 							</div>	
 							{% for o in orders %}
-							<h3 style = "color:blue"}>Order Number : {{o.order_number}}
+							<h3 style = "color:blue"}>Order Number : {{o.order_number}}, Dt : {{o.order_date|date:"d m Y"}}
 							</h3>
-							<h4>Dated : {{o.order_date|date:"d m Y"}}  | Status: {{ o.get_order_status_display }} 
+							<h3>Status: {{ o.get_order_status_display }} 
 							{% if o.order_status == 'CO' %}
 								{% if o.delivery_date %}
 									on {{o.delivery_date | date:'d-M-Y'}}
 								{% endif %}
 							{% endif %}
-							</h4>
+							</h3>
 							{% if o.order_status == 'IN' %} 
 								{% if o.tracking_number %} 
 									<h4> Order Tracking:<br />

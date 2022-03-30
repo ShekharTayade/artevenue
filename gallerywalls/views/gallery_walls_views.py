@@ -435,7 +435,7 @@ def create_gw_data(request):
 	
 	
 	return render(request, "gallerywalls/create_gw_data.html", {
-		'title': title, 'desc': title, 'set_of':set_of, 'set_range': range(int(set_of)),
+		'title': title, 'desc': desc, 'set_of':set_of, 'set_range': range(int(set_of)),
 		'room': room, 'placement': placement, 'colors': colors, 'key_words': key_words,
 		'mouldings_apply':paper_mouldings_apply, 'paper_mouldings_show':paper_mouldings_show, 
 		'canvas_mouldings_show':canvas_mouldings_show, 
@@ -450,7 +450,6 @@ def save_gw(request):
 
 	room_id = request.POST.get("room_id", '')
 	placement_id = request.POST.get("placement_id", '')
-	placement_id
 	set_of = int(request.POST.get('set_of', '0'))
 	title = request.POST.get('title', '')
 	desc = request.POST.get('desc', '')
@@ -530,12 +529,12 @@ def save_gw(request):
 				print_medium_id = request.POST.get('print_medium_id_' +str(i), '')
 				moulding_id = int(request.POST.get('moulding_id_' +str(i), '0'))
 				if moulding_id == 0:
-					mould_id = None
+					moulding_id = None
 				mount_id = int(request.POST.get('mount_id_' +str(i), '0'))
 				if mount_id == 0:
 					mount_id = None
-				mount_color = request.POST.get('mount_color_' +str(i), '')
-				mount_size = int(request.POST.get('mount_size_' +str(i), '0'))
+				mount_color = request.POST.get('mount_color_' +str(i), '') if print_medium_id == 'PAPER' else None
+				mount_size = int(request.POST.get('mount_size_' +str(i), '0')) if print_medium_id == 'PAPER' else None
 				stretch_id = int(request.POST.get('stretch_id_' +str(i), '0')) if print_medium_id == 'CANVAS' else None
 				if stretch_id == 0:
 					stretch_id = None

@@ -1,0 +1,115 @@
+{% load static %}
+{% load utils %}
+
+<div class = "container mt-1Sq">
+	<!-- Featured Products  Header -->
+	{% if ecom_site.show_featured_section %}
+	<div class="row">
+		<div class="col-12 py-3 text-center" style = "background-color: #fafafa;">
+			<h1>
+				<!--BEAUTIFUL WALL ART TO MAKE INTERIORS AWESOME-->
+				BUY PAINTINGS ONLINE
+			</h1> 
+			<h3> Give Life To Your Walls </h2>
+			<h3>
+				Paintings on Canvas or Paper | Licensed Art Prints | Fully Customizable
+			</h4>
+			<h3>
+
+				Collection of 3.5+ Lakh Artworks | Free Shipping & Returns
+			</h3>
+		</div>
+
+	</div>
+	{% endif %}
+	<div class="mt-5 py-2">
+		<div class="row">
+			<div class="col-12" >
+				<h2 class="text-center">
+					Painting Categories Trending Now
+				</h2> 
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+<!-- Featured items slider -->
+<div class="trending-slider mt-2" 
+	style="margin:10px; padding:10px 5px 5px;">
+	{% for c in trending_categories %}
+	{% with 'img/'|add:c.url as image_static %}
+		{% if c.url_suffix %}	
+		<div>
+		<a href="{% url 'art_by_category' cat_nm=c.url_suffix %}"> 
+			<img data-src="{% static image_static %}" alt="Wall art prints in {{c.name}} category" class="img-fluid img-container-cat lazyload"
+				width=100 height=100>
+			<span class="text text-center" onclick = "moulding_change('{{f.moulding_id}}')">
+				<div class = "mt-1" style = "font-size:0.6rem; color:#000 !important; line-height: 1;">
+				{{ c.name|title }}
+				</div>
+			</span>
+		</a>
+		</div>
+		{% else %}
+		<div>
+		<a href="{% url 'art_by_category' cat_nm=c.name %}"> 
+			<img data-src="{% static image_static %}" alt="Wall art prints in {{c.name}} category" class="img-fluid img-container-cat lazyload">
+			<span class="text text-center" onclick = "moulding_change('{{f.moulding_id}}')">
+				<div class = "mt-1" style = "font-size:0.6rem; color:#000 !important; line-height: 1;">
+				{{ c.name|title }}
+				</div>
+			</span>
+		</a>
+		</div>
+		{% endif %}
+	</a>
+	{% endwith %}
+	{% endfor %}
+</div>
+
+<script type="text/javascript" src="{% static 'vendor/slick/slick.min.js' %}"></script>	
+<script type="text/javascript">
+	$(".trending-slider").slick({
+		arrows: false,
+		dots: false,
+		autoplay: true,
+		infinite: true,
+		mobileFirst: true,
+		slidesToShow: 6,
+		slidesToScroll: 6,
+		responsive: [
+			{
+			  breakpoint: 1024,
+			  settings: {
+				slidesToShow: 6,
+				slidesToScroll: 6,
+			  }
+			},
+			{
+			  breakpoint: 600,
+			  settings: {
+				slidesToShow: 4,
+				slidesToScroll: 4
+			  }
+			},
+			{
+			  breakpoint: 480,
+			  settings: {
+				slidesToShow: 3,
+				slidesToScroll: 3
+			  }
+			},
+			{
+			  breakpoint: 370,
+			  settings: {
+				slidesToShow: 3,
+				slidesToScroll: 3
+			  }
+			}
+		  ]
+	});
+
+</script>
+

@@ -1,0 +1,69 @@
+{% load static %}
+
+
+<div class="col-12 text-center py-1" style = "background-color: #000;">
+	<a style = "color: #fff; font-weight: 700; font-size:0.8rem;"		
+		class = "d-none d-md-flex align-items-center justify-content-center"
+		target = '_blank' 
+		href = "{% url 'offers' %}">
+			<span style = "font-weight:800; font-size:1rem; color:#ff1717;">
+				FINAL CALL &nbsp; | Dussehra Sale Ends In &nbsp; 
+			</span>
+			<span id="count_down1"> </span>
+			<span style = "font-weight:800; font-size:1rem; color:#ff1717;">
+				&nbsp;⭐ FLAT 25% OFF ⭐
+			</span>&nbsp; | 
+			COUPON CODE: SAVE25  <i class = "fa fa-caret-right fa-lg"></i> 
+	</a>
+	<a style = "color: #fff; font-weight: 700; font-size:0.8rem;" 
+		class = "d-md-none d-flex align-items-center justify-content-center"
+		target = '_blank' 
+		href = "{% url 'offers' %}">
+		<div class= "row">
+			<div class = "col-12">
+				<span style = "font-weight:800; font-size:1rem; color:#ff1717;">LAST DAY, FINAL CALL!</span>
+			</div>
+			<div class = "col-12">
+				Dussehra Sale | Ends in <span style = "font-weight:800;color:#ff1717;" id="count_down2"> </span>&nbsp; | Coupon: SAVE25 
+			</div>
+		
+			<div class = "col-12">
+				<span style = "font-weight:700; font-size:1.2rem;"> ⭐FLAT 25% OFF ⭐</span> <i class = "fa fa-caret-right fa-lg"></i>
+			</div>
+		</div>
+	</a>
+</div>
+
+
+
+<script>
+// Set the date we're counting down to
+var countDownDate = new Date("Oct 17, 2021 23:59:59").getTime();
+
+// Update the count down every 1 second
+var x = setInterval(function() {
+
+  // Get today's date and time
+  var now = new Date().getTime();
+
+  // Find the distance between now and the count down date
+  var distance = countDownDate - now;
+
+  // Time calculations for days, hours, minutes and seconds
+  var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+  var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+  // Display the result in the element with id="demo"
+  document.getElementById("count_down1").innerHTML = hours + "hrs "
+	+ minutes + "min " + seconds + "sec ";
+  document.getElementById("count_down2").innerHTML = hours + "hrs "
+	+ minutes + "min " + seconds + "sec ";
+
+  // If the count down is finished, write some text
+  if (distance < 0) {
+    clearInterval(x);
+    document.getElementById("counter").innerHTML = "EXPIRED";
+  }
+}, 1000);
+</script>

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+{% load utils %}
+{% load static %}
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="robots" content="all,follow">
+		<!-- Bootstrap CSS-->
+		<link rel="stylesheet" href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}">
+				
+		<!-- Font Awesome CSS-->
+		<link rel="stylesheet" href="{% static 'vendor/font-awesome/css/font-awesome.min.css' %}">
+		<!-- Google fonts - Roboto -->
+		<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:400,500,700,300,100">
+		<!-- Custom stylesheet -->
+		<link rel="stylesheet" href="{% static  'css/custom.css' %}">
+		<!-- theme stylesheet-->
+		<link rel="stylesheet" href="{% static 'css/style.default.css' %}" id="theme-stylesheet">
+
+	</head>
+
+	<body>
+		<div class = "row"  style = "border:1px solid #d4d4d4; padding:10px; margin:0px;">
+			<table style = "width: 100%; maring-bottom: 15px; ">
+				<tbody>
+					<tr>
+						<td>
+							<img src = "https://artevenue.com/static/img/av_logo_circle2_m1.png" %}" alt="Arte'venue" style = "left:0, margin:0px; padding:0px;" width=150>
+						</td>
+						<td style = "text-align: right;">
+							<span style = "font-size: 10px; right:0px;">www.artevenue.com</span><br>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<div style = "margin-top:10px; border-top: 1px solid #dddddd;">
+				<h3></h3>	<!-- Heading/Headline -->
+				<h5 style = "margin-top:20px;" >
+					Dear {{order.order_billing.full_name}} 
+						{% if order.order_billing.Company %}
+							<br />{{order.order_billing.Company}}
+						{% endif %}
+				</h5>
+
+				<!-- Email content -->
+				<h5>Thank you for choosing Arte’Venue!</h5>
+				<h5>	Your order number 
+					<span  style = "color:#11b6bd;">{{order.order_number}}</span> 
+					has been received and is under process. <br />
+					You will receive an intimation along with the tracking 
+					number via email/SMS once your order is dispatched.
+				</h5>
+				<h5>
+					Order Number: 
+					<span  style = "color:#11b6bd">{{order.order_number}}</span>
+					, <small>Dated : {{order.order_date}}</small>
+				</h5>
+				
+				{% if order.payment_type == 'COD' %}
+				<h5>
+					Payment Type: {{order.get_payment_type_display}}
+				</h5>
+				{% endif %}
+				
+				<hr>
+
+				<table>
+					<thead>
+						<tr>
+							<th width="50%" style="text-align:left"><strong>Shipping Address:</strong></th>
+							<th width="50%" style="text-align:left"><strong>Billing Address:</strong></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>
+								{% if order.order_shipping %}
+								<div style = "left:10px;">
+									{{order.order_shipping.full_name}} 
+									{% if order.order_shipping.Company %}
+										<br />{{order.order_shipping.Company}}
+									{% endif %}
+									<br />
+									{{order.order_shipping.address_1}}
+									{% if order.order_shipping.address_2 %}
+										<br />
+										{{order.order_shipping.address_2 }}
+									{% endif %}
+									{% if order.order_shipping.land_mark %}
+										{{order.order_shipping.land_mark}}
+										<br />
+									{% endif %}
+									
+									{{order.order_shipping.city}} {{order.order_shipping.state}} {{order.order_shipping.pin_code_id}}
+									<br />
+									Ph: {{order.order_shipping.phone_number}} Email: {{order.order_shipping.email_id}}
+								</div>
+								{% endif %}
+							</td>
+							<td>
+								{% if order.order_billing %}
+								<div style = "left:600px; right:0px;">
+									{{order.order_billing.full_name}} 
+									{% if order.order_billing.Company %}
+										<br />{{order.order_billing.Company}}
+									{% endif %}
+									<br />
+									{{order.order_billing.address_1}}
+									{% if order.order_billing.address_2 %}
+										{{order.order_billing.address_2 }}
+									{% endif %}
+									{% if order.order_billing.land_mark %}
+										{{order.order_billing.land_mark}}
+										<br />
+									{% endif %}
+									
+									{{order.order_billing.city}} {{order.order_billing.state}} {{order.order_billing.pin_code_id}}
+									<br />
+									Ph: {{order.order_billing.phone_number}} Email: {{order.order_billing.email_id}}
+									{% if order.order_billing.gst_number %}
+										<br>
+										GST Number: {{order.order_billing.gst_number}}
+									{% endif %}
+								</div>
+								{% endif %}
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<hr>
+				<table>
+					<thead>
+						<tr>
+							<th width="15%" style="text-align:left">Product</th>
+							<th width="30%" style="text-align:left">Details</th>
+							<th width="15%" style="text-align:right">Unit Price</th>
+							<th width="10%" style="text-align:right">Quantity</th>
+							<th width="10%" style="text-align:right">Discount</th>
+							<th width="10%" style="text-align:right">Tax</th>
+							<th width="10%" style="text-align:right">Item Total</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for i in order_items_list %}
+						{% if i.order_id != order.order_id %}
+							<!-- Nothing -->
+						{% else %}
+						<tr>
+							<td>
+								<img src = "{% if i.product_type|cut:' ' == 'USER-IMAGE' %} https://artevenue.com{{MEDIA_URL}}{{i.product.image_to_frame_thumbnail}} {% else %}https://www.artevenue.com/{% static i.product.thumbnail_url %}{% endif %}" style = "width:50px; height:50px; object-fit:contain;">
+							
+								<br />
+								<div class = "pull-left">
+									<span style = "padding-left:0px;" >
+										{% if i.product_type == 'USER-IMAGE' %}
+											User Uploaded Image
+										{% else %}
+											{{i.product.name}}
+										{% endif %}
+									</span>
+								</div>
+							</td>
+							<td>
+								{% with width=i.moulding.width_inner_inches|add_width_frame_mount:i.mount_size %}
+								<small>
+								<li>Print on {{i.print_medium_id|title}}</li>
+								{% if i.moulding_id %}
+								<li>Image Print Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+								<li>Frame {{i.moulding.name }} ({{i.moulding.width_inches}} inch)</li>
+								{% if i.mount_id %}
+									<li>Mount: {{i.mount_size }}", Color: {{i.mount.name|title }} </li>
+								{% endif %}
+								<li>Total Size: 
+									{{ i.image_width|add_width:width|add_width:width }}" X {{i.image_height|add_width:width|add_width:width }}"</li>
+								{% else %}
+									<li>Image Size : {{ i.image_width }}" X {{i.image_height }}"</li>
+								{% endif %}
+								
+								{% if i.acrylic_id %}
+									<li>Acrylic covered</li>
+								{% endif %}
+								{% if i.stretch_id and not i.moulding_id %}
+									<li>Canvas Stretched</li>
+								{% endif %}
+								</small>
+								{% endwith %}
+							</td>
+							<td style = "text-align:right">
+								<small>{{i.item_sub_total}}</small>
+							</td>
+							<td style = "text-align:right">
+								<small>{{i.quantity}}</small>
+							</td>
+							<td style = "text-align:right">
+							
+								{% if i.promotion.discount_type == "PERCENTAGE" %}
+									<small>{{i.promotion.discount_value|floatformat}}</small>
+								{% else %}
+									<small>{{i.promotion.discount_value|floatformat}}</small>
+								{% endif %}
+							</td>
+							<td style = "text-align:right">
+								<small>{{i.item_tax}}</small>
+							</td>
+							<td style = "text-align:right">{{i.item_total|floatformat}}</td>
+
+						</tr>
+						{% endif %}
+						{% endfor %}
+						
+					</tbody>
+					<tfoot>
+						<tr>
+							<th colspan="4" style="text-align:right">
+								<small>Order Sub Total</small>
+							</th>
+							<th colspan="2" style = "text-align:right">
+								<small>{{order.sub_total|floatformat}}</small>
+							</th>
+							<th></th>
+						</tr>
+						<tr>
+							<th colspan="4"style="text-align:right">
+								<small>Shipping & Handing</small>
+							</th>
+							<th colspan="2" style = "text-align:right">
+								<small>{{order.shipping_cost|floatformat}}</small>
+							</th>
+							<th></th>
+						</tr>
+						<tr>
+							<th colspan="4" style="text-align:right">
+								<small>Discount</small>
+							</th>
+							<th colspan="1" style = "text-align:right">
+								{% if order.order_discount_amt %} <small>- ({{order.order_discount_amt|floatformat}})</small>{% endif %}
+							</th>
+							<th></th>
+						</tr>
+						<tr>
+							<th colspan="4" style="text-align:right">
+								<small>Tax</small>
+							</th>
+							<th colspan="2" style = "text-align:right">
+								<small>{{order.tax|floatformat}}</small>
+							</th>
+							<th></th>
+						</tr>
+						<tr>
+							<th colspan="4" style="text-align:right">Order Total</th>
+							<th colspan="2" style = "text-align:right">
+								<i class = "fa fa-inr"> </i> {{order.order_total|floatformat}}
+							</th>
+							<th></th>
+						</tr>
+					</tfoot>
+				</table>
+
+				<!-- END: Email content -->
+				<hr>
+
+				<h6>If you need any assitance, please feel free to write to us at 
+					support@artevenue.com or WhatsApp/call us at +91 95358 05505. We will be happy to help.
+				</h6>
+				<h6>
+					Kindly note that the delivery agent may ask for ID proof at the time of delivery. This is to ensure that delivery 
+					is done to the correct customer as per order. Arte'Venue doesn't collect, store or use customer ID proof data in any manner.
+				</h6>
+			</div>
+
+			<!--  Signature -->
+			<div style = " margin-top: 20px;">
+				<h5>
+					With warm regards,<br />
+					Team Arte'Venue
+					<br />
+					<img src = "https://artevenue.com/static/img/artevenue_logo_new.png" alt="Arte'Venue Logo"  height="25" width="110"> <br />
+					<a href = "https://www.artevenue.com">www.artevenue.com</a>
+				</h5>
+			</div>
+		</div>
+	</body>
+</html>

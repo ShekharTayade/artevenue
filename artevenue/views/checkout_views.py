@@ -18,6 +18,7 @@ from artevenue.models import Order_billing, Order_shipping, Shipping_cost_slabs
 from artevenue.models import Country, State, City, Pin_code, Pin_city_state_country
 from artevenue.models import Generate_number_by_month
 
+from av_products.models import Order_round_artwork
 
 env = settings.EXEC_ENV
 
@@ -263,6 +264,37 @@ def checkout_step1_address(request):
 								created_date = 	today,
 								updated_date = today
 								)
+					if c.product_type_id == 'NON-RECTANGULAR':
+						Order_round_artwork.objects.filter(
+							order_item_id = ord_itm.order_item_id).update(
+								#quantity = c.quantity, item_sub_total=c.item_sub_total,
+								#item_disc_amt = c.item_disc_amt, item_tax = c.item_tax,
+								#item_total = c.item_total
+								
+								promotion_id = c.promotion_id,
+								quantity = c.quantity,
+								item_unit_price = c.item_unit_price,
+								item_sub_total = c.item_sub_total,
+								item_disc_amt  = c.item_disc_amt,
+								item_tax  = c.item_tax,
+								item_total = c.item_total,
+								moulding_id = c.moulding_id,
+								moulding_size = c.moulding_size,
+								print_medium_id = c.print_medium_id, 
+								print_medium_size = c.print_medium_size,
+								mount_id = c.mount_id,
+								mount_size = c.mount_size,
+								board_id = c.board_id,
+								board_size = c.board_size,
+								acrylic_id = c.acrylic_id,
+								acrylic_size = c.acrylic_size,
+								stretch_id = c.stretch_id,
+								stretch_size = c.stretch_size,
+								image_width = c.image_width,
+								image_height = c.image_height,
+								created_date = 	today,
+								updated_date = today
+								)
 				else:
 					update_ord_itm = True
 					# Insert the new order item
@@ -387,7 +419,37 @@ def checkout_step1_address(request):
 							original_art_id = c.product_id
 						)
 						new_ord_item.save()
-						
+
+					if c.product_type_id == 'NON-RECTANGULAR' :
+						new_ord_item = Order_round_artwork(	
+							order = order,
+							cart_item_id = c.cart_item_id,
+							promotion_id = c.promotion_id,
+							quantity = c.quantity,
+							item_unit_price = c.item_unit_price,
+							item_sub_total = c.item_sub_total,
+							item_disc_amt  = c.item_disc_amt,
+							item_tax  = c.item_tax,
+							item_total = c.item_total,
+							moulding_id = c.moulding_id,
+							moulding_size = c.moulding_size,
+							print_medium_id = c.print_medium_id, 
+							print_medium_size = c.print_medium_size,
+							mount_id = c.mount_id,
+							mount_size = c.mount_size,
+							board_id = c.board_id,
+							board_size = c.board_size,
+							acrylic_id = c.acrylic_id,
+							acrylic_size = c.acrylic_size,
+							stretch_id = c.stretch_id,
+							stretch_size = c.stretch_size,
+							image_width = c.image_width,
+							image_height = c.image_height,
+							created_date = 	today,
+							updated_date = today,
+							av_product_variant_id = c.product_id
+						)
+						new_ord_item.save()
 			# Update Order
 			ord = Order(
 				order_id = order.order_id,
@@ -586,11 +648,41 @@ def checkout_step1_address(request):
 						original_art_id = c.product_id
 					)				
 
+				if c.product_type_id == 'NON-RECTANGULAR':	
+					new_ord_item = Order_round_artwork(	
+						order = new_ord,
+						cart_item_id = c.cart_item_id,
+						promotion_id = c.promotion_id,
+						quantity = c.quantity,
+						item_unit_price = c.item_unit_price,
+						item_sub_total = c.item_sub_total,
+						item_disc_amt  = c.item_disc_amt,
+						item_tax  = c.item_tax,
+						item_total = c.item_total,
+						moulding_id = c.moulding_id,
+						moulding_size = c.moulding_size,
+						print_medium_id = c.print_medium_id, 
+						print_medium_size = c.print_medium_size,
+						mount_id = c.mount_id,
+						mount_size = c.mount_size,
+						board_id = c.board_id,
+						board_size = c.board_size,
+						acrylic_id = c.acrylic_id,
+						acrylic_size = c.acrylic_size,
+						stretch_id = c.stretch_id,
+						stretch_size = c.stretch_size,
+						image_width = c.image_width,
+						image_height = c.image_height,
+						created_date = 	today,
+						updated_date = today,
+						av_product_variant_id = c.product_id
+					)
 				new_ord_item.save()
 				
 	
 		except Error as e:
 			msg = 'Apologies!! Could not save your cart. Please use the "Contact Us" link at the bottom of this page and let us know. We will be glad to help you.'
+			print(e.e.message)
 
 	# Let's get shipping, billing addressm if exists 	
 	# if it already exists, take it from Order Shipping, else get it from preferred addr, if it exists

@@ -62,21 +62,35 @@
 					<div class = "col-lg-12">
 						<div class="box info-bar">
 							<div class = "row">
-								<div class = "col-sm-5 col-lg-3">
+								<div class = "col-6 col-lg-3">
 									<div class="form-group">
-										<label>From:</label>
+										<label>Ord Dt From:</label>
 										<input name = "fromdate" id = "fromdate" 
 											class = "form-control" type="date" onchange = "copy_date('FROMDATE');"/>
 									</div>
 								</div>
-								<div class = "col-sm-5 col-lg-3">
+								<div class = "col-6 col-lg-3">
 									<div class="form-group">
-										<label>To:</label>
+										<label>Ord Dt To:</label>
 										<input name = "todate" id = "todate" 
 											class = "form-control" type="date" onchange = "copy_date('TODATE');" />
 									</div>
 								</div>
-								<div class = "col-sm-2 col-lg-2">
+								<div class = "col-6 col-lg-3">
+									<div class="form-group">
+										<label>Order Number:</label>
+										<input name="order_number" id = "order_number"
+											class = "form-control" onchange = "copy_ordnum();">
+									</div>
+								</div>								
+								<div class = "col-6 col-lg-3">
+									<div class="form-group">
+										<label>Include Cancelled Orders:</label>
+										<input type = "checkbox" id = "flag" checked
+											class = "form-control" onchange = "set_flag();">
+									</div>
+								</div>								
+								<div class = "col-12 col-lg-2">
 									<div class="form-group">
 										<label>&nbsp; </label><br />
 										<button type="button" id = "date-submit" 
@@ -96,7 +110,9 @@
 									<input hidden name = "printpdf" value = "YES">
 									<input hidden name = "fromdate" id = "fromdate_pdf" value = "$('#fromdate').val();">
 									<input hidden name = "todate" id = "todate_pdf" value = "$('#todate').val();">
+									<input hidden name = "order_numb" id = "order_numb">
 									<input hidden name = "ordtype" id = "ordtype" value = "A">
+									<input hidden name = "incl_cancelled" id="incl_cancelled" value= "YES">
 									<div class="form-group">
 										<button type="submit" id = "submit_pdf" 
 										class = "btn btn-primary" form = "getpdf">
@@ -135,6 +151,12 @@
 	
 	<script>
 		$( document ).ready(function() {
+			$body = $("body");
+			$(document).on({
+				ajaxStart: function() { $body.addClass("loading");},
+				ajaxStop: function() { $body.removeClass("loading");},
+			});
+
 			var today = new Date();
 
 			var from_dt = new Date();
@@ -156,7 +178,7 @@
 		
 		
 			// Trigger the inital fetch of orders
-			document.getElementById("date-submit").click();
+			//document.getElementById("date-submit").click();
 
 		});
 	
@@ -189,7 +211,11 @@
 				$("#msg-modal").modal("show");
 				return;
 			}
-			query_data = {'fromdate':from_date, 'todate':to_date, 'page':page, 'printpdf':printpdf, 'ordtype':'A'}
+			
+			var incl_cancelled = $("#incl_cancelled").val();
+			var order_numb = $("#order_numb").val()
+			query_data = {'fromdate':from_date, 'todate':to_date, 'page':page, 'printpdf':printpdf, 'ordtype':'A',
+				'incl_cancelled': incl_cancelled, 'order_numb': order_numb}
 
 			$.ajax({
 				url: "{% url 'get_orders' %}", 
@@ -240,6 +266,17 @@
 			var to_yy = to_d.getFullYear();			
 			var to_date = to_yy + "-" + to_mn + "-" + to_dt;
 			$('#todate_pdf').val(to_date);
+		}
+	}
+	function copy_ordnum() {
+		var num = document.getElementById("order_number").value;
+		$('#order_numb').val(num);	
+	}
+	function set_flag(){
+		if (document.getElementById("flag").checked == true) {
+			$('#incl_cancelled').val('YES');
+		} else {
+			$('#incl_cancelled').val('NO');
 		}
 	}
 	</script>

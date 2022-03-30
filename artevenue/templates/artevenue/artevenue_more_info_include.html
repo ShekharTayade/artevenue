@@ -1,16 +1,8 @@
 		{% load static %}
-		<div class = "row mt-5">
-			<div class = "col-12">
-				<hr>
-			</div>	
-			<div class = "col-12 py-2" style ="color:#082a4c; background-color: #f6f6f6;">
+			<div class = "col-12" style ="color:#082a4c; background-color: #f6f6f6;" 
+					id = "more-info-m" data-toggle="collapse" data-target="#more-sec" >
 				<span style = "font-weight:600;">SHIPPING, RETURNS, & GUARANTEE</span>
-			</div>
-			<div class = "col-12 mt-3">
-				<div style="float:left;">
-					<img data-src = "{% static 'img/why_artevenue/truck.png' %}" class = "lazyload" width=30px>			
-					<strong>Shipping & Delivery</strong>
-				</div>
+				<span class = "pull-right"><i id = "d-chevron-info" class = "fa fa-chevron-down"></i></span>
 			</div>
 			<div class = "col-12">
 				<ul>
@@ -18,104 +10,117 @@
 						Free shipping across India. 
 					</li>
 					<li>
-						We ship in 1-3 days via reputed courier companies such as FedEx, Xpressbees.
+						We ship orders in up to 3 days via reputed courier companies.
 					</li>
 					<li>Courier takes about 4-7 days to deliver in 
 						major cities in India. In some places, it may take up to 10-12 days. 
 					</li>
 					<li>
-						Due to high volume, the orders placed during a sale period will take 4-5 days more than usual to 
-						ship.
+						<strong>Due to high volume, the orders placed during a sale period may take us up to 8 days to ship.</strong>
 					</li>
-					<a id = "shipping" href = "#more-shipping" data-toggle="collapse">See more...</a>
-					<span id = "more-shipping" class="collapse">
-					<li>
-						Owing to the pandamic situation in the country, delivery may be delayed.
-					</li>
-					<li>
-						International shipping cost is charged extra, at actual.
-					</li>
-					</span>
 				</ul>
 			</div>
-			<div class = "col-12 mt-3">
-				<div style="float:left;">
-					<img data-src = "{% static 'img/why_artevenue/returns.png' %}" class = "lazyload" width=30px>			
-					<strong>Eligible for Returns</strong>
+			<div class = "col-12 collpase" id = "more-sec">
+				<div class = "row ">
+					<div class = "col-12">
+						<div style="float:left;">
+							<img data-src = "{% static 'img/why_artevenue/truck.png' %}" class = "lazyload" width=30px>			
+							<strong>Shipping & Delivery</strong>
+						</div>
+					</div>
+					<div class = "col-12">
+						<ul>
+							<a id = "shipping" href = "#more-shipping" data-toggle="collapse">See more...</a>
+							<span id = "more-shipping" class="collapse">
+							<li>
+								Owing to the pandamic situation in the country, delivery may be delayed.
+							</li>
+							<li>
+								International shipping cost is charged extra, at actual.
+							</li>
+							</span>
+						</ul>
+					</div>
+					<div class = "col-12 mt-3">
+						<div style="float:left;">
+							<img data-src = "{% static 'img/why_artevenue/returns.png' %}" class = "lazyload" width=30px>			
+							<strong>Eligible for Returns</strong>
+						</div>
+					</div>
+					<div class = "col-12">
+						<ul>
+							<li>
+								Don't like it? return it to us and get 100% refund. 
+							</li>
+							<a id = "returns" href = "#more-returns" data-toggle="collapse">See more...</a>
+							<span id = "more-returns" class="collapse">
+							<li>
+								Inform us within 5 days of delivery and ship it back to us.
+							</li>
+							<li>
+								Cash on Delivery (COD) orders are not eligible for returns.
+							</li>
+							<li>
+								For complete return process and 
+								details please see section 5 of <a href="{% url 'terms_conditions' %}">our terms of use</a>.
+							</li>
+							</span>
+						</ul>
+					</div>
+					<div class = "col-12 mt-3">
+						<div style="float:left;">
+							<img data-src = "{% static 'img/why_artevenue/guarantee.png' %}" class = "lazyload"  width=30px>
+							<strong>100% Satisfaction Guarantee</strong>
+						</div>
+					</div>
+					<div class = "col-12">
+						<ul>
+							<li>
+								In case artworks delivered are not as per your order, damaged or wrong
+								artworks are delivered, we replace it at our cost.
+							</li>
+							<li>
+								All our artworks are licensed from artists.
+							</li>
+							<a id = "more_guarantee" href = "#more-guarantee" data-toggle="collapse">See more...</a>
+							<span id = "more-guarantee" class="collapse">
+							<li>
+								Authentic reproduction from original artwork images. If you are not happy with the 
+								quality, we accept returns.
+							</li>
+							</span>
+						</ul>
+					</div>
+				</div>
+				<div class = "row mt-5">
+					<div class = "col-12">
+						<hr>
+					</div>	
+					<div class = "col-12 py-2" style ="color:#082a4c; background-color: #f6f6f6;">
+						<span style = "font-weight:600;">PRICE, PAYMENT MODES, COUPONS</span>
+					</div>
+					<div class = "col-12 mt-2">
+						<ul>
+							<li>
+								The price you see in your shopping cart is the final price you pay. 						
+							</li>
+							<li>
+								Pay online using credit/debit cards, netbanking, UPI, Wallets.
+							</li>
+							<a id = "more-info" href = "#more-addln" data-toggle="collapse">See more...</a>
+							<span id = "more-addln" class="collapse">
+							<li>
+								If you have a coupon code or an eGift code, after you add artworks your shopping cart page, apply 
+								the code on the cart page, in "Apply Discount Coupon/eGift code" box.
+								Prices listed on this page are before any coupon/eGift discounts.
+							</li>
+							</span>
+						</ul>
+					</div>
 				</div>
 			</div>
-			<div class = "col-12">
-				<ul>
-					<li>
-						Don't like it? return it to us and get 100% refund. 
-					</li>
-					<a id = "returns" href = "#more-returns" data-toggle="collapse">See more...</a>
-					<span id = "more-returns" class="collapse">
-					<li>
-						Inform us within 5 days of delivery and ship it back to us.
-					</li>
-					<li>
-						Cash on Delivery (COD) orders are not eligible for returns.
-					</li>
-					<li>
-						For complete return process and 
-						details please see section 5 of <a href="{% url 'terms_conditions' %}">our terms of use</a>.
-					</li>
-					</span>
-				</ul>
-			</div>
-			<div class = "col-12 mt-3">
-				<div style="float:left;">
-					<img data-src = "{% static 'img/why_artevenue/guarantee.png' %}" class = "lazyload"  width=30px>
-					<strong>100% Satisfaction Guarantee</strong>
-				</div>
-			</div>
-			<div class = "col-12">
-				<ul>
-					<li>
-						In case artworks delivered are not as per your order, damaged or wrong
-						artworks are delivered, we replace it at our cost.
-					</li>
-					<li>
-						All our artworks are licensed from artists.
-					</li>
-					<a id = "more_guarantee" href = "#more-guarantee" data-toggle="collapse">See more...</a>
-					<span id = "more-guarantee" class="collapse">
-					<li>
-						Authentic reproduction from original artwork images. If you are not happy with the 
-						quality, we accept returns.
-					</li>
-					</span>
-				</ul>
-			</div>
-		</div>
-		<div class = "row mt-5">
-			<div class = "col-12">
-				<hr>
-			</div>	
-			<div class = "col-12 py-2" style ="color:#082a4c; background-color: #f6f6f6;">
-				<span style = "font-weight:600;">PRICE, PAYMENT MODES, COUPONS</span>
-			</div>
-			<div class = "col-12 mt-2">
-				<ul>
-					<li>
-						The price you see in your shopping cart is the final price you pay. 						
-					</li>
-					<li>
-						Pay online using credit/debit cards, netbanking, UPI, Wallets.
-					</li>
-					<a id = "more-info" href = "#more-addln" data-toggle="collapse">See more...</a>
-					<span id = "more-addln" class="collapse">
-					<li>
-						If you have a coupon code or an eGift code, after you add artworks your shopping cart page, apply 
-						the code on the cart page, in "Apply Discount Coupon/eGift code" box.
-						Prices listed on this page are before any coupon/eGift discounts.
-					</li>
-					</span>
-				</ul>
-			</div>
-		</div>
-		
+
+			
 
 		<script>
 			$('#more-info').click( function () {

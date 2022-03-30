@@ -1,0 +1,395 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load utils %}
+{% block page-title %} 
+	<title>Checkout - Order Review | Arte'Venue </title>
+{% endblock page-title %} 
+{% block page-description %}
+	<meta name="description" content="Checkout - Order review at artevenue.com">
+{% endblock page-description %}
+{% block page-keywords %}
+	<meta name="keywords" content="artevenue, order, checkout order review">
+{% endblock page-keywords %}
+
+{% block page-author %}
+	<meta name="author" content="Arte'Venue">
+{% endblock page-author %}
+
+{% block jqueryui-stylesheet %}
+{% endblock jqueryui-stylesheet %}
+
+{% block jqueryui-script %}
+{% endblock jqueryui-script %}
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+	{% block sitecontent %}
+	<div class="container-fluid">
+        <div class="row">
+			<div class="col-lg-12">
+				<!-- breadcrumb-->
+				<nav aria-label="breadcrumb">
+					<ol class="breadcrumb">
+						<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+						<li class="breadcrumb-item"><a href="{% url 'show_cart' %}">Cart</a></li>
+						<li aria-current="page" class="breadcrumb-item active">Checkout - Order Review</li>
+					</ol>
+				</nav>
+            </div>
+			
+				
+ 			{% if order.order_number %}
+			<div id="checkout" class="col-12 col-md-9">
+				<div class="box">
+					<form id = "order_confirm_form" method = "post" action="{% url 'payment_submit' %}">
+						{% csrf_token %}
+						<input hidden name = "order_id" value = "{{order.order_id}}">
+						<input hidden name = "cart_id" value = "{{order.cart_id}}">
+						<input hidden name = "sub_total" value = "{{order.sub_total}}">
+						<input hidden name = "tax" value = "{{order.tax}}">
+						<input hidden name = "disc_amt" value = "{{order.disc_amt}}">
+						<input hidden name = "order_total" value = "{{order.order_total}}">
+						<input hidden name = "shipping_cost" value = "{{order.shipping_cost}}">
+
+						<input hidden class="form-control" name="firstname" 
+							id="firstname" value="{{ posted.firstname|default_if_none:'' }}" 
+							required />
+						<input hidden class="form-control" name="lastname" 
+							id="lastname" value="{{ posted.lastname }}"/>						
+
+						<input hidden type = "email" class="form-control" 
+							name="email" id="email" 
+							value="{{ posted.email|default_if_none:' ' }}" 
+							required />
+
+						<input hidden class="form-control" name="phone" 
+							value="{{ posted.phone|default_if_none:' '}}" 
+							required />
+						
+						<input hidden name="productinfo" required value="{{ posted.productinfo|default_if_none:' ' }}" />
+						<input hidden name="surl" value="{{ posted.surl }}" size="64" required />
+						<input hidden name="furl" value="{{ posted.furl }}" size="64" required />
+						<input hidden type="hidden" name="service_provider" value="{{posted.service_provider}}" size="64" required />
+						<input hidden name="curl" value="{{ posted.furl }}" />
+						<input hidden name="udf1" value="{{ posted.udf1 }}" />
+						<input hidden name="udf2" value="{{ posted.udf2 }}" />
+						<input hidden name="udf3" value="{{ posted.udf3 }}" />
+						<input hidden name="udf4" value="{{ posted.udf4 }}" />
+						<input hidden name="udf5" value="{{ posted.udf5 }}" />
+						<input hidden name="pg" value="{{ posted.PG }}" />
+						
+						
+						<h1 style="font-weight:700;">Checkout - Order Review</h1>
+						
+						<div class="table table-responsive">
+							<table id = "cartTbl" class="table table-responsive">
+								<thead>
+									<tr>
+										<th width="20%">Item</th>
+										<th width="50%">Details</th>
+										<th width="15%" style="text-align:right">Qty</th>
+										<th width="15%" style="text-align:right">Total</th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for i in usercartitems %}
+									<tr>
+										<td>
+											<img src = "{% if i.product_type == 'USER-IMAGE' %} {{MEDIA_URL}}{{i.product__image_to_frame}} {% else %} {% if env == 'DEV' or env == 'TESTING' %} {{i.product__thumbnail_url}} {% else %} {% static i.product__thumbnail_url %} {% endif %} {% endif %}" style = "width:50px; height:50px; object-fit:contain;">
+											<br />
+
+											<div class = "pull-left">
+												<button style="padding-left:0px;" type ="button" class = "btn btn-link" style = "padding-left:0px;" onclick = "getFramedImg('{{i.product_id}}', '{{i.image_width}}', '{{i.moulding_id| default_if_none:0}}', '{{i.mount__color| default_if_none:0}}','{{i.mount_size| default_if_none:0}}', '{{i.product__url}}');">
+													{{i.product__name|truncatechars:8 }}
+												</button>
+											</div>
+										</td>
+										<td>
+											{% with width=i.moulding__width_inner_inches|add_width_frame_mount:i.mount_size %}
+											<small>
+											{% if i.product_type == 'STOCK-COLLAGE' %}
+												EACH ITEM: <br/>
+											{% endif %}
+											{% if i.product_type == 'NON-RECTANGULAR' %}
+												EACH ROUND SHAPED ARTWORK: <br/>
+											{% endif %}
+											{% if i.product_type == 'ORIGINAL-ART' %}
+												<li>{{i.product__description}}</li>
+											{% else %}													
+												<li>Print surface {{i.print_medium_id|title}}</li>
+											{% endif %}
+											{% if i.moulding_id %}
+												<li>Print Size : 
+												{{ i.image_width|covert_inch_to_cm }} X {{i.image_height|covert_inch_to_cm }} cm
+												({{ i.image_width }}" X {{i.image_height }}")</li>
+												<li>Frame: {{i.moulding__name }} ({{i.moulding__width_inches}} inch, Polystyrene)</li>
+												{% if i.mount_id %}
+													<li>Mount: {{i.mount_size }}", Color: {{i.mount__name|title }} </li>
+												{% endif %}
+												<li>Finished Size: 
+													{{ i.image_width|add_width:width|add_width:width|covert_inch_to_cm }} X {{i.image_height|add_width:width|add_width:width|covert_inch_to_cm }} cm												
+													({{ i.image_width|add_width:width|add_width:width }}" X {{i.image_height|add_width:width|add_width:width }}" inch)</li>
+													
+											{% else %}
+												<li>Print Size : 
+												{{ i.image_width|covert_inch_to_cm }} X {{i.image_height|covert_inch_to_cm }}
+												({{ i.image_width }}" X {{i.image_height }}" inch)</li>
+												
+												{% if not i.stretch_id %}
+													<li>Print Only.</li>
+												{% endif %}
+											{% endif %}
+											{% if i.acrylic_id %}
+												<li>Acrylic covered</li>
+											{% endif %}
+											{% if i.stretch_id %}
+												<li>Canvas Stretched</li>
+											{% endif %}
+											</small>
+											{% endwith %}
+										</td>
+										<td style = "text-align:right">
+											{{i.quantity}}
+										</td>
+										<td style = "text-align:right">{{i.item_total|floatformat}}</td>
+
+									</tr>
+									{% endfor usercartitems %}
+									
+								</tbody>
+								<tfoot>
+									<tr>
+										<th colspan="3"><small>Shipping & Handing</small></th>
+										<th colspan="1" style = "text-align:right">
+											<small>{{order.shipping_cost|floatformat}}</small>
+										</th>
+										<th></th>
+									</tr>
+									<tr>
+										<th colspan="3">Order Total</th>
+										<th colspan="1" style = "text-align:right">
+											{{order.order_total|floatformat}}
+										</th>
+										<th></th>
+									</tr>
+								</tfoot>
+							</table>
+						</div>
+						<!-- /.row-->
+						<div class="row box-footer d-flex justify-content-between">
+							<div class = "col-6">
+								<a href="{% url 'show_cart' %}" class="btn btn-outline-secondary pull-left"><i class="fa fa-chevron-left"></i>Back to Cart</a>
+							</div>
+							{% if order.order_total > 0 %}
+							<div class = "col-6">
+								<div class="row">
+									<div class = "col-12">
+										<button type="submit" class="btn btn-primary pull-right" id = "online_btn"
+												form="order_confirm_form">
+											Pay Online<i class="fa fa-chevron-right"></i>
+										</button>
+									</div>
+									<div class = "col-12">
+										<button  type="submit" class="btn btn-primary pull-right mb-1" id = "cod_btn"
+												form="order_confirm_form">
+											Confirm COD Order<i class="fa fa-chevron-right"></i>
+										</button>
+									</div>
+									<div class = "col-12" id = "cod_ret">
+										<span style="font-size: 0.75rem; font-weight:700;" class = "pull-right"> 
+											<i class = "fa fa-exclamation-circle" style = "color: #FFC20F;"></i> 
+											Cash on Delivery (COD) order not eligible for returns
+										</span>
+									</div>
+								</div>
+							</div>
+							<div class = "col-12 mt-1 text-center">
+								<span class = "pull-right" id = "cod_span">
+									<button type="button" class="btn btn-outline-secondary pull-right mb-1" id = "cod_chk" 
+										name = "cod_chk" type = "checkbox" onclick="pay_cod();"> 
+										Cash on Delivery<i class="fa fa-chevron-right"></i>
+									</button>
+									<input hidden id = "cod_val" name = "cod_val" type = "checkbox">
+								</span>
+							</div>									
+							<div class = "col-12 mt-1 text-center">
+								<span style="font-size: 0.75rem; font-weight:700;" class = "pull-right"  id = "cod_text">  
+									<i class = "fa fa-exclamation-circle" style = "color: #FFC20F;"></i> 
+									Cash on Delivery(COD) order not eligible for returns
+								</span>
+							</div>
+							<div class = "col-12 mt-1 text-center">
+								<!--<span style="font-weight:700; font-size:0.9rem; border: 1px solid #11b6bd; border-radius: 0.25rem;" 
+									class = "pull-right p-2" id = "online_span" onclick="pay_online();"> -->									
+									<button class = "btn btn-artevenue pull-right p-2" id = "online_chk" name = "online_chk" type = "button" 
+										onclick="pay_online();" style = "border-radius: 0.25rem;"> 
+										<i class = "fa fa-check-circle"></i> Online Payment (Eligible for returns)
+									</button>
+									<input hidden id = "online_val" name = "online_val" type = "checkbox">
+								<!--</span> -->
+							</div>
+							{% else %}
+							<div class = "col-6">
+								<div class="row">
+									<div class = "col-12">
+										<button type="submit" class="btn btn-primary pull-right" id = "confirm_btn"
+												form="order_confirm_form">
+											Confirm Order<i class="fa fa-chevron-right"></i>
+										</button>
+									</div>
+								</div>
+							</div>
+							{% endif %}
+						</div>
+						<div class="box-footer row">
+							<div class="col-12 mb-3">
+								<div>Pay Using Any of These Modes</div>
+							</div>
+							<div class="col-2">
+								<img src = "{% static 'img/payment_icons/credit_debit_card.png' %}"
+									alt = "Credit/Debit Cards" width=50 style="margin-left:auto; margin-right:auto;display: block;"> 
+									<p class = "text-center">Credit, Debit Cards</p>
+							</div>
+							<div class="col-2">
+								<img src = "{% static 'img/payment_icons/net_banking.png' %}"
+									alt = "Credit/Debit Cards" width=50  style="margin-left:auto; margin-right:auto;display: block;"> 
+								<p class = "text-center">Net Banking</p>
+							</div>
+							<div class="col-2">
+								<img src = "{% static 'img/payment_icons/upi.png' %}"
+									alt = "Credit/Debit Cards" width=50  style="margin-left:auto; margin-right:auto;display: block;"> 
+								<p class = "text-center">UPI</p>
+							</div>
+							<div class="col-2">
+								<img src = "{% static 'img/payment_icons/wallet.png' %}"
+									alt = "Credit/Debit Cards" width=50 style="margin-left:auto; margin-right:auto;display: block;"> 
+								<p class = "text-center">Wallets</p>
+							</div>
+							<div class="col-2">
+								<img src = "{% static 'img/payment_icons/cod.png' %}"
+									alt = "Credit/Debit Cards" width=50 style="margin-left:auto; margin-right:auto;display: block;"> 
+								<p class = "text-center">Cash On Delivery</p>
+							</div>
+						</div>
+					</form>
+				</div>
+            </div>
+			
+			<div class="col-12 col-md-3">
+				<div id="order-summary" class="box">
+					<div class="box-header">
+						<h3 class="mb-0">Order No. {{order.order_number}}</h3>
+					</div>
+					<div class="table-responsive">
+						<table class="table">
+							<tbody>
+								<tr>
+									<td>Order subtotal</td>
+									<th class="pull-right">{{order.sub_total|floatformat}}</th>
+								</tr>
+								<tr>
+									<td>Tax</td>
+									<th class="pull-right">{{order.tax|floatformat}}</th>
+								</tr>					
+								<tr>
+									<td>Shipping & handling</td>
+									<th><span class="pull-right">{{order.shipping_cost|floatformat}}</span></th>
+								</tr>
+								<tr class="total">
+									<td>Order Total</td>
+									<th class="pull-right"><i class = "fa fa-inr"> </i> <span id ="cart_total" >{{order.order_total|floatformat:"0"|default:"0"}}</span></th>
+								</tr>
+
+							</tbody>
+						</table>
+						<ul>
+						{% if order.order_discount_amt > 0 %} 
+							<strong>Your Savings:</strong> <span style = "color:green">{{order.order_discount_amt|floatformat}}</span>
+						{% endif %}
+						{% if order.voucher %} 
+							<div id "vouch_text" style ="color: #999; font-size: 0.6rem;">
+								You have used coupan "{{ order.voucher.voucher_code }}". 
+								Discount of <i class = "fa fa-inr"></i> {{order.voucher_disc_amount |floatformat }} is applied
+							</div>
+						{% endif %}
+						</ul>
+					</div>
+				</div>
+			</div>
+
+			{% else %}
+				<div class="col-12 mb-5">
+					<span style = "font-size:1rem;">Please start the checkout process from Your Shopping Cart</span>
+					<a style = "border:1px solid Gainsboro;"
+						class = "btn" id = "goto-cart" 
+						href="{% url 'show_cart' %}">
+					<img src="/static/img/cart_icon.png">
+					</a>
+				</div>
+				
+				
+				
+			{% endif %}
+			
+		</div>
+		<!-- /.row-->
+    </div>
+
+	{% include 'artevenue/show-product.html' %}
+ 
+ 	{% endblock sitecontent %}
+	
+	
+	{% block jscripts %}
+	<script>
+		$("#online_btn").show();
+		$("#cod_btn").hide();
+		$("#cod_span").show();
+		$("#cod_text").show();
+		$("#online_span").hide();
+		$("#online_chk").hide();
+		$("#cod_ret").hide();
+		//$('#online_chk').prop('checked', true);
+		//$('#cod_chk').prop('checked', false);
+		$('#cod_val').prop('checked', false);
+		$('#online_val').prop('checked', true);
+	</script>
+	<script>
+	function pay_cod(){
+		$("#online_btn").hide();
+		$("#cod_btn").show();
+		$("#cod_span").hide();
+		$("#cod_text").hide();
+		$("#online_span").show();
+		$("#online_chk").show();
+		$("#cod_ret").show();
+		//$('#online_chk').prop('checked', false);
+		//$('#cod_chk').prop('checked', true);
+		$('#cod_val').prop('checked', true);
+		$('#online_val').prop('checked', false);
+	}
+	function pay_online(){
+		$("#online_btn").show();
+		$("#cod_btn").hide();
+		$("#cod_span").show();
+		$("#cod_text").show();
+		$("#online_span").hide();
+		$("#online_chk").hide();
+		$("#cod_ret").hide();
+		//$('#online_chk').prop('checked', true);
+		//$('#cod_chk').prop('checked', false);
+		$('#cod_val').prop('checked', false);
+		$('#online_val').prop('checked', true);
+	}
+	</script>
+	
+	<script>
+	$(document).ready(function () {
+		$("#order_confirm_form").submit(function () {
+			$("#cod_btn").prop("disabled", true);
+			$("#online_btn").prop("disabled", true);
+			return true;
+		});
+	});	
+	</script>
+	{% endblock jscripts %}

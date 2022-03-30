@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 from django.conf.urls import url, include
 from django.conf import settings
 from django.conf.urls.static import static
@@ -113,6 +113,7 @@ urlpatterns = [
 	path('art-print/<int:prod_id>/<int:iuser_width>/<int:iuser_height>', views.stock_image_detail, name='stock_image_detail'),
 	url(r'^art-prints-by-keywords/$', views.search_products_by_keywords, name='art_by_category'),
 	url(r'^art-prints/$', views.get_stock_images, name='art_by_category'),
+
 	path('art-prints/<str:cat_nm>/', views.get_stock_images, name='art_by_category'),
 	path('art-prints/<str:cat_nm>/<int:page>', views.get_stock_images, name='art_by_category'),
 	path('art-prints/<int:cat_id>/', views.get_stock_images, name='art_by_category'),
@@ -294,6 +295,9 @@ urlpatterns = [
 
 	url(r'^gcm_service_worker.js/$', (TemplateView.as_view(template_name="artevenue/gcm_service_worker.js", content_type='application/javascript', )), name='gcm_service_worker.js'),
 	url(r'^gcm_manifest.json/$', (TemplateView.as_view(template_name="artevenue/gcm_manifest.json", content_type='application/json', )), name='gcm_manifest.json'),
-	
+
+	url(r'^view-on-your-wall/', views.ar_info, name='ar_info'),	
+
+
 	] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

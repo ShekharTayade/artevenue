@@ -26,10 +26,14 @@ from artevenue.models import Referral, Egift_redemption, Egift, Order_items_view
 from artevenue.models import Order_shipping, Order_billing, Collage_stock_image,Voucher_used
 from artevenue.models import UserProfile, Business_profile, Profile_group, Discount_flat
 
+from av_products.models import Cart_round_artwork, Av_product_varient
+
 from .product_views import *
 from .user_image_views import *
 from .tax_views import *
 from .price_views import *
+
+from av_products.views import av_product_views
 
 today = datetime.date.today()
 ecom = get_object_or_404 (Ecom_site, store_id=settings.STORE_ID )
@@ -68,7 +72,7 @@ def show_cart(request):
 		order = Order.objects.filter(cart_id = usercart.cart_id).first()
 		if order:
 			shipping_cost = order.shipping_cost
-			
+
 		usercartitems = Cart_item_view.objects.select_related('product', 'promotion').filter(
 				cart = usercart.cart_id, product__product_type_id = F('product_type_id')).values(
 			'cart_item_id', 'product_id', 'product__publisher','quantity', 'item_total', 'moulding_id',
@@ -258,7 +262,8 @@ def show_cart(request):
 					).order_by('product_type')
 	else:
 		if not bus_user:
-			user_msg = "If you login and it's your first order, you can avail 15% off on all art prints"
+			#user_msg = "If you login and it's your first order, you can avail 15% off on all art prints"
+			user_msg = ""
 		else:
 			user_msg = ""
 		
@@ -420,14 +425,16 @@ def add_to_cart(request):
 
 	if prod.product_type_id == 'STOCK-IMAGE':
 		tax_rate = taxes['stock_image_tax_rate']
-	if prod.product_type_id == 'ORIGINAL-ART':
+	elif prod.product_type_id == 'ORIGINAL-ART':
 		tax_rate = taxes['original_art_tax_rate']
-	if prod.product_type_id == 'USER-IMAGE':
+	elif prod.product_type_id == 'USER-IMAGE':
 		tax_rate = taxes['user_image_tax_rate']
-	if prod.product_type_id == 'STOCK-COLLAGE':
+	elif prod.product_type_id == 'STOCK-COLLAGE':
 		tax_rate = taxes['stock_image_tax_rate']
-	if prod.product_type_id == 'FRAME':
+	elif prod.product_type_id == 'FRAME':
 		tax_rate = taxes['frame_tax_rate']
+	elif prod.product_type_id == 'NON-RECTANGULAR':
+		tax_rate = taxes['non_rectangular_tax_rate']
 	
 		
 	# Calculate tax and sub_total
@@ -1318,6 +1325,8 @@ def delete_cart_item(request):
 				oi = Order_stock_collage.objects.get(cart_item_id = cart_item.cart_item_id)
 			if order_item.product_type_id == 'ORIGINAL-ART':
 				oi = Order_original_art.objects.get(cart_item_id = cart_item.cart_item_id)
+			if order_item.product_type_id == 'NON-RECTANGULAR':
+				oi = Order_round_artwork.objects.get(cart_item_id = cart_item.cart_item_id)
 		
 			oi.delete()			
 		
@@ -1330,6 +1339,8 @@ def delete_cart_item(request):
 			ci = Cart_stock_collage.objects.get(cart_item_ptr_id = cart_item.cart_item_id)
 		if cart_item.product_type_id == 'ORIGINAL-ART':
 			ci = Cart_original_art.objects.get(cart_item_ptr_id = cart_item.cart_item_id)
+		if cart_item.product_type_id == 'NON-RECTANGULAR':
+			ci = Cart_round_artwork.objects.get(cart_item_ptr_id = cart_item.cart_item_id)
 
 		ci.delete()	
 			
@@ -1393,6 +1404,8 @@ def delete_cart_item(request):
 				tax_rate = taxes['original_art_tax_rate']
 			elif cart_item.product_type_id == 'FRAME' :
 				tax_rate = taxes['frame_tax_rate']
+			elif cart_item.product_type_id == 'NON-RECTANGULAR':
+				tax_rate = taxes['non_rectangular_tax_rate']
 
 			'''
 			########################################################
@@ -1752,7 +1765,11 @@ def add_to_cart_new(request):
 	prod_type = request.POST.get('prod_type', '')
 	qty = int(request.POST.get('qty', '0'))
 	cart_item_flag = request.POST.get('cart_item_flag', 'FALSE')
-	
+
+	## IDENTIFY IF IT'S A ROUND, U-SHAPRED ARTWORK
+	p_type = request.POST.get('p_type', '')
+
+
 	image_width = Decimal(request.POST.get('image_width', '0'))
 	image_height = Decimal(request.POST.get('image_height', '0'))
 	
@@ -1832,7 +1849,29 @@ def add_to_cart_new(request):
 
 	ip_address = get_ip_addr(request)
 
-	if prod_type == "STOCK-COLLAGE":	
+	if prod_type == "NON-RECTANGULAR":
+		if p_type == 'RD' or p_type == 'U':
+			item_price = 0
+			msg = 'Product not given'
+			cash_disc = 0
+			percent_disc = 0
+			item_unit_price = 0
+			item_disc_amt = 0
+			disc_applied = False
+			promotion_id = None
+		
+			price = av_product_views.get_varient_price_stretched_canvas(prod_id)
+			item_price = price['item_price']
+			msg = price['msg']
+			cash_disc = price['cash_disc']
+			percent_disc = price['percent_disc']
+			item_unit_price = price['item_unit_price']
+			item_price_withoutdisc = price['item_price_without_disc']
+			disc_amt = price['disc_amt']
+			disc_applied = price['disc_applied']
+			promotion_id = price['promotion_id']
+		
+	elif prod_type == "STOCK-COLLAGE":	
 
 		collages = Collage_stock_image.objects.filter(stock_collage_id = prod_id)
 		total_price = 0
@@ -1973,14 +2012,16 @@ def add_to_cart_new(request):
 	taxes = get_taxes()
 	if prod.product_type_id == 'STOCK-IMAGE':
 		tax_rate = taxes['stock_image_tax_rate']
-	if prod.product_type_id == 'ORIGINAL-ART':
+	elif prod.product_type_id == 'ORIGINAL-ART':
 		tax_rate = taxes['original_art_tax_rate']
-	if prod.product_type_id == 'USER-IMAGE':
+	elif prod.product_type_id == 'USER-IMAGE':
 		tax_rate = taxes['user_image_tax_rate']
-	if prod.product_type_id == 'STOCK-COLLAGE':
+	elif prod.product_type_id == 'STOCK-COLLAGE':
 		tax_rate = taxes['stock_image_tax_rate']
-	if prod.product_type_id == 'FRAME':
+	elif prod.product_type_id == 'FRAME':
 		tax_rate = taxes['frame_tax_rate']	
+	elif prod.product_type_id == 'NON-RECTANGULAR':
+		tax_rate = taxes['non_rectangular_tax_rate']	
 	
 	# Calculate tax and sub_total
 	item_unit_price = item_unit_price * qty
@@ -2063,6 +2104,7 @@ def add_to_cart_new(request):
 	########################################################
 	cart_disc_amt = 0
 	cart_item = {}
+
 	if cart_exists:
 		''' Check if product or user image exists in cart '''
 		if prod:
@@ -2253,6 +2295,9 @@ def add_to_cart_new(request):
 		elif prod.product_type_id == 'ORIGINAL-ART':
 			usercartitems = Cart_original_art()
 			usercartitems.original_art_id = prod.product_id
+		elif prod.product_type_id == 'NON-RECTANGULAR':
+			usercartitems = Cart_round_artwork()
+			usercartitems.av_product_variant_id = prod.product_id
 
 		## Update or Insert the cart item
 		if cart_item:
@@ -2405,18 +2450,21 @@ def apply_voucher_py_new(request, cart_id, voucher_code, cart_total, car_sub_tot
 	status = "SUCCESS"	
 	if voucher_code == '':
 		return JsonResponse({"status":"INVALID-CODE"})
+	
 	try: 
 		user = User.objects.get(username = request.user)
 	except User.DoesNotExist:
 		user = None	
-		
+	
 	voucher = Voucher.objects.filter(voucher_code = voucher_code, effective_from__lte = today, 
 			effective_to__gte = today, store_id = settings.STORE_ID).first()			
 	if not voucher :
 		return JsonResponse({"status":"INVALID-CODE"})
-
+	
+	'''
 	if not user :
 		return JsonResponse({"status":"NO-USER"})
+	'''
 	############################################
 	## Get eGift record for logged in user
 	############################################	
@@ -2656,6 +2704,7 @@ def apply_voucher_py_new(request, cart_id, voucher_code, cart_total, car_sub_tot
 	#cart_tax = new_cart_total - cart_sub_total
 	cart_tax =  round((new_cart_sub_total * tax_rate)/100 ,2)
 	new_cart_total = round(new_cart_sub_total + cart_tax)
+
 
 	#############################################
 	## Update cart and cart item. 
@@ -2933,9 +2982,10 @@ def update_cart_voucher_amounts(request, cart_id):
 				#    Get the item price for each
 				#####################################
 				for c in collages:
-					price = get_prod_price(ci.product_id, 
+					price = get_prod_price(c.stock_image_id, 
 							prod_type='STOCK-IMAGE',
-							image_width=ci.image_width, image_height=ci.image_height,
+							image_width=ci.image_width, 
+							image_height=ci.image_height,
 							print_medium_id = ci.print_medium_id,
 							acrylic_id = ci.acrylic_id,
 							moulding_id = ci.moulding_id,
@@ -2970,6 +3020,33 @@ def update_cart_voucher_amounts(request, cart_id):
 				item_price_withoutdisc = total_item_price_withoutdisc
 				disc_amt = total_disc_amt
 
+			elif ci.product_type_id == 'NON-RECTANGULAR':
+				item_price = 0
+				msg = 'Product not given'
+				cash_disc = 0
+				percent_disc = 0
+				item_unit_price = 0
+				item_disc_amt = 0
+				disc_applied = False
+				promotion_id = None
+                
+				p_type = ''
+				avp = Av_product_varient.objects.filter(product_varient_id = ci.product_id).first()
+				if avp:
+					p_type = avp.product.shape
+                
+				if p_type == 'RD' or p_type == 'U':		
+					price = av_product_views.get_varient_price_stretched_canvas(ci.product_id)
+					total_price = price['item_price']
+					msg = price['msg']
+					cash_disc = price['cash_disc']
+					percent_disc = price['percent_disc']
+					item_unit_price = price['item_unit_price']
+					item_price_withoutdisc = price['item_price_without_disc']
+					disc_amt = price['disc_amt']
+					disc_applied = price['disc_applied']
+					promotion_id = price['promotion_id']
+				
 			### IF NOT STOCK COLLAGE, ART SET
 			else :
 				
@@ -2986,6 +3063,7 @@ def update_cart_voucher_amounts(request, cart_id):
 						mount_id = ci.mount_id,
 						board_id = ci.board_id,
 						stretch_id = ci.stretch_id)
+						
 				total_price = price['item_price']
 				msg = price['msg']
 				cash_disc = price['cash_disc']
@@ -3008,6 +3086,8 @@ def update_cart_voucher_amounts(request, cart_id):
 				tax_rate = taxes['stock_collage_tax_rate']
 			if ci.product_type_id == 'ORIGINAL-ART':
 				tax_rate = taxes['original_art_tax_rate']
+			if ci.product_type_id == 'NON-RECTANGULAR':
+				tax_rate = taxes['non_rectangular_tax_rate']	
 
 
 			# Calculate 'before voucher discount' tax and sub_total
@@ -3054,6 +3134,10 @@ def update_cart_voucher_amounts(request, cart_id):
 					item_disc_amt = item_disc_amt, item_total = item_total)
 			if ci.product_type_id == 'ORIGINAL-ART':
 				c = Cart_original_art.objects.filter(cart_item_id = ci.cart_item_id).update(
+					item_sub_total = item_sub_total, item_tax = item_tax,
+					item_disc_amt = item_disc_amt, item_total = item_total)
+			if ci.product_type_id == 'NON-RECTANGULAR':
+				c = Cart_round_artwork.objects.filter(cart_item_id = ci.cart_item_id).update(
 					item_sub_total = item_sub_total, item_tax = item_tax,
 					item_disc_amt = item_disc_amt, item_total = item_total)
 
@@ -3104,6 +3188,7 @@ def remove_voucher(request, cart_id):
 		cart_disc_amt = 0 
 		cart_tax = 0
 		cart_total = 0
+
 		for ci in cart_items:
 			if ci.product_type_id == 'STOCK-COLLAGE':
 				collages = Collage_stock_image.objects.filter( stock_collage_id = ci.product_id )
@@ -3120,7 +3205,7 @@ def remove_voucher(request, cart_id):
 				#    Get the item price for each
 				#####################################
 				for c in collages:
-					price = get_prod_price(ci.product_id, 
+					price = get_prod_price(c.stock_image_id, 
 							prod_type='STOCK-IMAGE',
 							image_width=ci.image_width, image_height=ci.image_height,
 							print_medium_id = ci.print_medium_id,
@@ -3162,6 +3247,32 @@ def remove_voucher(request, cart_id):
 
 			### IF NOT STOCK COLLAGE, ART SET
 
+			elif ci.product_type_id == 'NON-RECTANGULAR':
+				item_price = 0
+				msg = 'Product not given'
+				cash_disc = 0
+				percent_disc = 0
+				item_unit_price = 0
+				item_disc_amt = 0
+				disc_applied = False
+				promotion_id = None
+                
+				p_type = ''
+				avp = Av_product_varient.objects.filter(product_varient_id = ci.product_id).first()
+				if avp:
+					p_type = avp.product.shape
+                
+				if p_type == 'RD' or p_type == 'U':		
+					price = av_product_views.get_varient_price_stretched_canvas(ci.product_id)
+					total_price = price['item_price']
+					msg = price['msg']
+					cash_disc = price['cash_disc']
+					percent_disc = price['percent_disc']
+					item_unit_price = price['item_unit_price']
+					item_price_withoutdisc = price['item_price_without_disc']
+					disc_amt = price['disc_amt']
+					disc_applied = price['disc_applied']
+					promotion_id = price['promotion_id']
 			else:
 
 				#####################################
@@ -3198,7 +3309,9 @@ def remove_voucher(request, cart_id):
 				tax_rate = taxes['stock_collage_tax_rate']
 			if ci.product_type_id == 'ORIGINAL-ART':
 				tax_rate = taxes['original_art_tax_rate']
-
+			if ci.product_type_id == 'NON-RECTANGULAR':
+				tax_rate = taxes['non_rectangular_tax_rate']	
+				
 			# Calculate tax and sub_total
 			# total price below includes the promotion discount, if any
 			item_unit_price = item_unit_price * ci.quantity
@@ -3235,6 +3348,11 @@ def remove_voucher(request, cart_id):
 						item_disc_amt = disc_amt, item_total = item_total)
 				if ci.product_type_id == 'ORIGINAL-ART':
 					c = Cart_original_art.objects.filter(cart_item_id = ci.cart_item_id).update(
+						item_unit_price = item_unit_price,
+						item_sub_total = item_sub_total, item_tax = item_tax,
+						item_disc_amt = disc_amt, item_total = item_total)
+				if ci.product_type_id == 'NON-RECTANGULAR':
+					c = Cart_round_artwork.objects.filter(cart_item_id = ci.cart_item_id).update(
 						item_unit_price = item_unit_price,
 						item_sub_total = item_sub_total, item_tax = item_tax,
 						item_disc_amt = disc_amt, item_total = item_total)
@@ -3309,6 +3427,8 @@ def delete_cart(request, cart_id=None):
 				oi = Order_stock_collage.objects.get(order_item_id = i.order_item_id)
 			if i.product_type_id == 'ORIGINAL-ART':
 				oi = Order_original_art.objects.get(order_item_id = i.order_item_id)
+			if i.product_type_id == 'NON-RECTANGULAR':
+				oi = Order_round_artwork.objects.get(order_item_id = i.order_item_id)
 		
 			oi.delete()			
 	
@@ -3323,6 +3443,8 @@ def delete_cart(request, cart_id=None):
 				ci = Cart_stock_collage.objects.get(cart_item_ptr_id = c.cart_item_id)
 			if c.product_type_id == 'ORIGINAL-ART':
 				ci = Cart_original_art.objects.get(cart_item_ptr_id = c.cart_item_id)
+			if c.product_type_id == 'NON-RECTANGULAR':
+				ci = Cart_round_artwork.objects.get(cart_item_ptr_id = c.cart_item_id)
 
 			ci.delete()	
 			

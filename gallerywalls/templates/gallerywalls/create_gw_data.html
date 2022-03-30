@@ -437,6 +437,11 @@
 {% block jscripts %}
 	<script>
 		$( document ).ready(function() {
+			$body = $("body");
+			$(document).on({
+				ajaxStart: function() { $body.addClass("loading");},
+				ajaxStop: function() { $body.removeClass("loading");},				
+			});
 		});	
 		
 		num_of_variations = 1;
@@ -772,7 +777,7 @@
 			}
 			
 			if ( $("#aspect_ratio"+ v + "_" + i).val() != '' ){
-				var ratio = $("#aspect_ratio" + i).val();
+				var ratio = $("#aspect_ratio_" + i).val();
 				$("#image_width_" + v + "_" + i).val( Math.round(height * ratio) );
 			}
 			finished_size(v, i);
@@ -812,17 +817,17 @@
 		} else {
 			var frame_height = parseInt($("#image_height_" + v + "_" + i).val());
 		}
-		if ( $("#moulding_id_" + i).val() == 'undefined' || $("#moulding_id_" + i).val() == '') {
+		if ( $("#moulding_id_" + i).val() == 'undefined' || $("#moulding_id_" + i).val() == '' || $("#moulding_id_" + i).val() == '0') {
 			var moulding_id = 0;
 		} else {
 			var moulding_id = parseInt($("#moulding_id_" + i).val());
 		}
-		if ( $("#mount_id_" +  i).val() == 'undefined' || $("#mount_id_" + i).val() == '') {
+		if ( $("#mount_id_" +  i).val() == 'undefined' || $("#mount_id_" + i).val() == '' || $("#mount_id_" + i).val() == '0') {
 			var mount_id = 0;
 		} else {
 			var mount_id = parseInt($("#mount_id_" + i).val());
 		}
-		if ( $("#mount_size_" + i).val() == 'undefined' || $("#mount_size_" + i).val() == '') {
+		if ( $("#mount_size_" + i).val() == 'undefined' || $("#mount_size_" + i).val() == '' || $("#mount_size_" + i).val() == '0') {
 			var mount_size = 0;
 		} else {
 			var mount_size = parseInt($("#mount_size_" + i).val());
@@ -830,34 +835,31 @@
 		var print_medium_id = $("#surface_" + i).val();
 
 		var fm_size = 0;
+		var mnt_size = 0;
 		
 		if (moulding_id != '0' && moulding_id != ''){
-			if (print_medium_id == 'PAPER'){
+			if (print_medium_id == 'PAPER') {
 				{% for f in paper_mouldings_show %}
 					if ('{{f.moulding_id}}' == moulding_id) {			
-						fm_size = {{f.moulding__width_inner_inches}};
+						fm_size = {{f.moulding__width_inner_inches}} * 2;
 					}
 				{% endfor %}
-				
 				if (mount_id != '0' && mount_id != '') {
-					frame_width = frame_width + mount_size*2;
-					frame_height = frame_height + mount_size*2;				
-				
-				} else {
-					{% for f in canvas_mouldings_show %}
-						if ('{{f.moulding_id}}' == moulding_id) {			
-							fm_size = {{f.moulding__width_inner_inches}};
-						}
-					{% endfor %}
+					mnt_size = mount_size*2;
 				}
-			
-			frame_width = frame_width + fm_size*2;
-			frame_height = frame_height + fm_size*2;
-			frame_width = Math.round(frame_width);
-			frame_height = Math.round(frame_height);			
-			$("#f_size_" + v + "_" + i).html( frame_width.toString() + " X " +  frame_height.toString());
 			}
+
+			if (print_medium_id == 'CANVAS') {
+				{% for f in canvas_mouldings_show %}
+					if ('{{f.moulding_id}}' == moulding_id) {			
+						fm_size = {{f.moulding__width_inner_inches}} * 2;
+					}
+				{% endfor %}
+			}			
 		}
+		var frame_width = Math.round(frame_width + fm_size + mnt_size);
+		var frame_height = Math.round(frame_height + fm_size + mnt_size);
+		$("#f_size_" + v + "_" + i).html( frame_width.toString() + " X " +  frame_height.toString());
 	}
 	</script>
 	

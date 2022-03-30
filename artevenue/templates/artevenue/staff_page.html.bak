@@ -1,0 +1,256 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+
+{% block page-title %} 
+<title>Arte'Venue | Staff Page</title>
+{% endblock page-title %} 
+  
+{% block page-description %}
+<meta name="description" content="Arte'Venue | Staff Page - Restricted Access">
+{% endblock page-description %}
+  
+{% block page-keywords %}
+<meta name="keywords" content="artevenue, staff ">
+{% endblock page-keywords %}
+  
+{% block page-author %}
+<meta name="author" content="Arte'Venue">
+{% endblock page-author %}
+
+{% block coursel-stylesheet %}
+{% endblock coursel-stylesheet %}
+
+{% block jqueryui-script %}
+{% endblock jqueryui-script %}
+
+{% block coursel-script %}
+{% endblock coursel-script %}
+
+{% block front.js %}
+{% endblock front.js %}
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+{% block sitecontent %}
+	<div class="container">
+		<div class = "row">
+			<div class="col-lg-12">
+				<!-- breadcrumb-->
+				<nav aria-label="breadcrumb">
+					<ol class="breadcrumb">
+						<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+						<li aria-current="page" class="breadcrumb-item active">Staff Page</li>
+					</ol>
+				</nav>
+			</div>
+		</div>
+		<div class = "row mb-5">
+			<div class = "col-12 col-md-6 text-center">
+				<div class="col-12 staffpg-card">
+					<h2 class = 'stitle'>CARTS</h2>
+					<ul class="nav flex-column">
+						<li class="nav-item">
+						  <a class="nav-link" href="{% url 'store_carts' %}">
+						  View Carts
+						  </a>
+						</li>
+						<li class="nav-item">
+						  <a class="nav-link" href="{% url 'cart_order_match_report' %}">
+						  Match Carts & Orders 
+						  </a>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class = "col-12 col-md-6 text-center">
+				<div class="col-12 staffpg-card">
+					<h2 class = 'stitle'>ORDERS</h2>
+					<ul class="nav flex-column">
+						<li class="nav-item">
+						  <a class="nav-link" href="{% url 'order_management' %}">
+						  Manage Orders
+						  </a>
+						</li>
+						<li class="nav-item">
+						  <a class="nav-link" href="{% url 'store_orders_by_payment_type' %}">
+						  Order Summary (By Payment Type)
+						  </a>
+						</li>
+						<li class="nav-item">
+						  <a class="nav-link" href="{% url 'store_orders' %}">
+						  Order Details
+						  </a>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class = "col-12 col-md-6 text-center">
+				<div class="col-12 staffpg-card">
+					<h2 class = 'stitle'>FACTORY</h2>
+					<ul class="nav flex-column">
+						<li class="nav-item">
+						  <a class="nav-link" href="{% url 'order_dashboard' %}">
+						  Orders Dashboard
+						  </a>
+						</li>
+						<li class="nav-item">
+						  <a class="nav-link" href="{% url 'start_production' %}">
+						  Start Order Production
+						  </a>
+						</li>
+						<li class="nav-item">
+						  <a class="nav-link" href="{% url 'make_ready_for_shipping' %}">
+						  Make Orders Ready for Shipping
+						  </a>
+						</li>
+						<li class="nav-item">
+						  <a class="nav-link" href="{% url 'order_shipping' %}">
+						  Ship Orders
+						  </a>
+						</li>
+						<li class="nav-item">
+						  <a class="nav-link" href="{% url 'generate_shipping_template' %}">
+						  Generate Shipping Template
+						  </a>
+						</li>
+						<li class="nav-item">
+						  <a class="nav-link" href="{% url 'order_delivery' %}">
+						  Order Delivery Update
+						  </a>
+						</li>
+						<li class="nav-item">
+						  <a class="nav-link" href="{% url 'generate_print_data_csv' %}">
+						  Generate Print Data Excel File
+						  </a>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class = "col-12 col-md-6 text-center">
+				<div class="col-12 staffpg-card">
+					<h2 class = 'stitle'>INVOICES</h2>
+					<ul class="nav flex-column">
+						<li class="nav-item">
+						  <a class="nav-link" href="{% url 'store_invoices' %}">
+						  Print Invoices
+						  </a>
+						</li>
+						<li class="nav-item">
+						  <a class="nav-link" href="{% url 'invoice_report' %}">
+						  Invoice Report
+						  </a>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class = "col-12 col-md-6 text-center">
+				<div class="col-12 staffpg-card">
+					<h2 class = 'stitle'>RETURNS</h2>
+					<ul class="nav flex-column">
+						<li class="nav-item">
+						  <a class="nav-link" href="{% url 'initiate_returns' %}">
+						  Returns - New Request, Modify, Cancel
+						  </a>
+						</li>
+						<li class="nav-item">
+						  <a class="nav-link" href="{% url 'get_active_return_request' %}">
+						  Update Return Requests
+						  </a>
+						</li>
+						<li class="nav-item">
+						  <a class="nav-link" href="{% url 'returns_report' %}">
+						  Returns Summary Report
+						  </a>
+						</li>
+					</ul>
+				</div>
+			</div>
+
+			<div class = "col-12 col-md-6 text-center">
+				<div class="col-12 staffpg-card">
+					<h2 class = 'stitle'>B2B</h2>
+					<p></p>
+					<ul class="nav flex-column">
+						<li class="nav-item">
+						  <a class="nav-link" href="{% url 'pending_business_accounts' %}">
+						  Approve Business Accounts
+						  </a>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class = "col-12 col-md-6 text-center">
+				<div class="col-12 staffpg-card">
+					<h2 class = 'stitle'>ARTISTS</h2>
+					<ul class="nav flex-column">
+						<li class="nav-item">
+						  <a class="nav-link" href="{% url 'original_artwork_approval' %}">
+						  Approve Artworks
+						  </a>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class = "col-12 col-md-6 text-center">
+				<div class="col-12 staffpg-card">
+					<h2 class = 'stitle'>COUPON MANAGEMENT</h2>
+					<ul class="nav flex-column">
+						<li class="nav-item">
+						  <a class="nav-link" href="{% url 'coupon_management' %}">
+						  Coupon Management
+						  </a>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class = "col-12 col-md-6 text-center">
+				<div class="col-12 staffpg-card">
+					<h2 class = 'stitle'>CREATE GALERY WALL/SET/SINGLE</h2>
+					<ul class="nav flex-column">
+						<li class="nav-item">
+						  <a class="nav-link" href="{% url 'create_gallery_wall' %}">
+						  Create A Gallery Wall
+						  </a>
+						</li>
+						<li class="nav-item">
+						  <a class="nav-link" href="{% url 'create_set_single' %}">
+						  Create A Set Or a Single Product
+						  </a>
+						</li>
+						<li class="nav-item">
+						  <a class="nav-link" href="{% url 'generate_set_prices' %}">
+						  Generate Prices for Sets/Singles
+						  </a>
+						</li>
+						<li class="nav-item">
+						  <hr class="solid">
+						</li>
+						<li class="nav-item">
+						  <a class="nav-link" href="{% url 'create_set_single_round_artwork' %}">
+						  ROUND ARTWORK - Create A Set Or a Single Product
+						  </a>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class = "col-12 col-md-6 text-center">
+				<div class="col-12 staffpg-card">
+					<h2 class = 'stitle'>IMAGE SEARCH</h2>
+					<ul class="nav flex-column">
+						<li class="nav-item">
+						  <a class="nav-link" href="{% url 'staff_image_search' %}">
+						  Image Search
+						  </a>
+						</li>
+					</ul>
+				</div>
+			</div>
+			
+		</div>
+	</div>
+	{% endblock sitecontent %}
+
+
+	{% block jscripts %}
+	{% endblock jscripts %}

@@ -1677,9 +1677,17 @@ def save_new_set_single(request):
 		msg = "System error has occured while saving data. Can't proceed."
 		
 	return( JsonResponse({'err_cd':err_cd, 'msg': msg }, safe=False) )
-	
-	
-@staff_member_required
+
+
+## Truncate a given number 'n' by given precision 'd'
+def truncate_n_d(n, d):
+	s = str(n)
+	dot = s.find(".")
+	l = s[:dot]
+	r = s[dot+1:dot+d+1]
+	truncated = float(l + "." + r)
+	return truncated
+
 def get_stock_images_staff(request):
 	
 	page = request.GET.get("page_num", 1)
@@ -1749,7 +1757,8 @@ def get_stock_images_staff(request):
 		category_prods = {}
 		products = Stock_image.objects.filter(is_published = True)
 
-	categories = Stock_image_category.objects.filter(store_id=settings.STORE_ID, trending = True )
+	categ = Stock_image_stock_image_category.objects.values('stock_image_category_id').distinct()
+	categories = Stock_image_category.objects.filter(category_id__in = categ).order_by('name')
 	
 	if f_product_id:
 		products = products.filter(product_id = f_product_id)
@@ -1792,12 +1801,6 @@ def get_stock_images_staff(request):
 		products = products.filter( min_width__lte = f_width, max_width__gte = f_width)
 	if f_height:
 		products = products.filter( min_height__lte = f_height, max_height__gte = f_height )
-
-	if f_width and f_height:
-		r = f_width / f_height
-		r_start = r - r *10/100
-		r_end = r + r *10/100
-		products = products.filter( aspect_ratio__gte = r_start, aspect_ratio__lte = r_end )
 	
 	if f_colors:
 		filter_color = Q()
@@ -1817,6 +1820,23 @@ def get_stock_images_staff(request):
 
 	if f_image_title:
 		products = products.filter( name__icontains = f_image_title )
+
+
+	if f_width and f_height:
+		ratio = truncate_n_d(f_width / f_height, 2)
+		#r_start = r - r *10/100
+		#r_end = r + r *10/100
+		#products = products.filter( aspect_ratio__gte = r_start, aspect_ratio__lte = r_end )
+		
+		#p = products.annotate(ratio = truncate_n_d('aspect_ratio', 1))
+		#products = products.filter( aspect_ratio = r )
+		p_arr = []
+		for p in products:
+			ar = truncate_n_d(p.aspect_ratio, 2)
+			if ar == ratio:
+				p_arr.append(p.product_id)		
+
+		products = products.filter(product_id__in = p_arr)
 
 	products = products.order_by('category_disp_priority', 'product_id')
 	
@@ -2596,7 +2616,7 @@ def remove_voucher_active_cart_required(request, cart_id, active_cart_required=T
 				#    Get the item price for each
 				#####################################
 				for c in collages:
-					price = get_prod_price(ci.product_id, 
+					price = get_prod_price(c.stock_image_id, 
 							prod_type='STOCK-IMAGE',
 							image_width=ci.image_width, 
 							image_height=ci.image_height,
@@ -2749,7 +2769,8 @@ def remove_voucher_active_cart_required(request, cart_id, active_cart_required=T
 
 
 def update_tracking(order_list=None):
-
+	from artevenue.models import Order_status_communication
+	
 	if env == 'PROD':
 		input_file = '/home/artevenue/website/estore/static/courier_tracking/tracking_file.txt'
 	else:
@@ -2758,6 +2779,7 @@ def update_tracking(order_list=None):
 	cnt = 0
 	not_found = 0		
 	
+	## UPDATE VIA API CALL
 	if order_number :		
 		for o in order_list:
 			cnt = cnt + 1
@@ -2765,7 +2787,7 @@ def update_tracking(order_list=None):
 			if order:
 				awb = ''
 				shipper_id = ''
-				## API call to fetch the tracking detaals
+				## API call to fetch the tracking details
 				
 				
 				upd = Order.objects.filter(order_number = o, 
@@ -2775,6 +2797,8 @@ def update_tracking(order_list=None):
 				if upd < 1:
 					print("customer order not found for " + full_name)
 					not_found = not_found + 1
+					
+	## UPDATE VIA FILE UPLOAD
 	else:
 		with open(input_file) as i_file:
 			file = csv.reader(i_file, delimiter='\t')
@@ -2795,6 +2819,31 @@ def update_tracking(order_list=None):
 				if upd < 1:
 					print("customer order not found for " + full_name)
 					not_found = not_found + 1
+
+				else:
+					if awb != '' :						
+						order = Order.objects.filter(order_shipping__full_name__icontains = full_name, 
+							order_date__isnull = False, invoice_date__isnull = False).first()
+						if order :
+							os = Order_status_communication.objects.filter(order_id = order.order_id).first()
+							if os:
+								oe = Order_status_communication.objects.filter(order_id = order.order_id).update(
+									tracking_info_sms_sent = False,
+									tracking_info_email_sent = False
+								)
+
+							else:
+								oe = Order_status_communication(
+									order_id = order.order_id,
+									tracking_info_sms_sent = False,
+									tracking_info_email_sent = False,
+									in_production_sms_sent = False,
+									in_production_email_sent = False,
+									ready_to_ship_sms_sent = False,
+									ready_to_ship_email_sent = False
+								)
+				
+
 				
 	print(str(cnt-1) + " rows processed")
 	print(str(not_found) + " names not found")

@@ -1,0 +1,86 @@
+{% load static %}
+<div class="d-none d-md-block col-md-12 text-center py-1" style = "background-color: #1f2c3f;">	
+	<!--<a style = "color: #fff; font-weight: 700; font-size:0.8rem;" 
+		target = '_blank' 
+		href = "{% url 'ar_info' %}">
+		BUY PREMIUM QUALITY PAINTINGS ONLINE | SEE OUR ARTWORKS ON YOUR WALL <img src = "{% static '/img/viewonyourwall/viewonyourwall_white_icon.png' %}" width=30>
+	</a>-->
+	<div class="glow">
+		FINAL CALL | SPRING SALE ENDS IN <span id="count_down1"> </span>
+	</div>
+	<a style = "color: #fff !important; font-weight: 700; font-size:0.8rem;" 
+		target = '_blank' 
+		href = "{% url 'offers' %}">
+		FLAT 25% OFF STOREWIDE| COUPON CODE: MAR25
+	</a>
+</div>
+<div class="d-block d-md-none col-12 text-center py-1" style = "background-color: #000;">	
+	<!--<a style = "color: #fff; font-weight: 700; font-size:0.8rem;" 
+		target = '_blank' 
+		href = "{% url 'ar_info' %}">
+		BUY PREMIUM QUALITY PAINTINGS ONLINE
+		<br/>SEE OUR ARTWORKS ON YOUR WALL <img src = "{% static '/img/viewonyourwall/viewonyourwall_white_icon.png' %}" width=30>
+	</a>-->
+	<a style = "color: #fff !important; font-weight: 700; font-size:0.8rem;" 
+		target = '_blank' 
+		href = "{% url 'offers' %}">
+		<span class="glow">
+		FINAL CALL | SALE ENDS IN <span id="count_down2"> </span>
+		</soan>
+	<br/>
+		FLAT 25% OFF | COUPON CODE: MAR25
+	</a>
+</div>
+
+<style>
+.glow {
+  font-size: 1rem;
+  color: #fff;
+  text-align: center;
+  -webkit-animation: glow 1s ease-in-out infinite alternate;
+  -moz-animation: glow 1s ease-in-out infinite alternate;
+  animation: glow 1s ease-in-out infinite alternate;
+}
+
+@-webkit-keyframes glow {
+  from {
+    text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #e60073, 0 0 40px #e60073, 0 0 50px #e60073, 0 0 60px #e60073, 0 0 70px #e60073;
+  }
+  to {
+    text-shadow: 0 0 20px #fff, 0 0 30px #ff4da6, 0 0 40px #ff4da6, 0 0 50px #ff4da6, 0 0 60px #ff4da6, 0 0 70px #ff4da6, 0 0 80px #ff4da6;
+  }
+}
+</style>
+
+<script>
+// Set the date we're counting down to
+var countDownDate = new Date("Mar 27, 2022 23:59:59").getTime();
+
+// Update the count down every 1 second
+var x = setInterval(function() {
+
+  // Get today's date and time
+  var now = new Date().getTime();
+
+  // Find the distance between now and the count down date
+  var distance = countDownDate - now;
+
+  // Time calculations for days, hours, minutes and seconds
+  var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+  var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+  // Display the result in the element with id="demo"
+  document.getElementById("count_down1").innerHTML = hours + "hrs "
+	+ minutes + "min ";
+  document.getElementById("count_down2").innerHTML = hours + "hrs "
+	+ minutes + "min ";
+
+  // If the count down is finished, write some text
+  if (distance < 0) {
+    clearInterval(x);
+    document.getElementById("count_down1").innerHTML = "EXPIRED";
+    document.getElementById("count_down2").innerHTML = "EXPIRED";
+  }
+}, 1000);
+</script>

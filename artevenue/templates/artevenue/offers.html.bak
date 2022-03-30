@@ -1,0 +1,149 @@
+
+<!-- READ THE INSTRUCTIONS BELOW BEFORE USING THIS TEMPLATE
+ 1. Start your page with this template and modify. Rename this template with HTML name and then modify.
+ 2. We keep as it is the header portion of the page (which is top hidden block and the navigation) 
+    and the footer portion (footer block) on each page.
+ 3. Override only the "slide-show", "features", and "jointhem-blog" blocks on each page
+ 4. Keep the top "hidden" clock and the nav-bar as it is, which forms the header section of the page.
+ 5. Overriding the parent blocks will start from "slide-show" block 
+ 6. Keep the <div>s  given below as it is in the "slide-show" and "features" blocks to keep the same styling matching the home page. 
+    If overriding the parent block without any content then remove the <div>s too, just keep block and endblock. 
+ 7. For most of the pages, you can keep the title of the page in "slide-show" block and put all the content in "features" block. 
+    The "jointhem-blog" block can be kept empty.
+ 8. PLEASE REMEBER :- 
+    TO OVERRIDE A BLOCK USE THE CORRESPONDING BLOCK AND <div>s, 
+    TO KEEP THE BLOCK EMPTY JUST USE THE BLOCK OPEN AND ENDBLOCK, 
+    AND TO KEEP ABLOCK AS IT IS DON'T USE THE BLOCK NAMES HERE SO THOSE BLOCKS FROM PARENT WILL BE USED AS IT IS. 
+ -->
+
+<!-- Extend the home page to keep the same styling for header and footer sections. -->
+
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% block page-title %} 
+	<title>Offers on Wall art paintings at Artevenue.com</title>
+{% endblock page-title %} 
+{% block page-description %}
+	<meta name="description" content="Currently running offers on wall art paintings at artevenue.com">
+{% endblock page-description %}
+{% block page-keywords %}
+	<meta name="keywords" content="Wall art painting, painting for bed room, painting for living room, paintings for home walls, paintings for home decor, offers on paintings, buy painting online, painting sale, wall art offers, photo framing offers">
+{% endblock page-keywords %}
+
+{% block page-author %}
+	<meta name="author" content="Arte'Venue">
+{% endblock page-author %}
+
+{% block coursel-stylesheet %}
+{% endblock coursel-stylesheet %}
+
+{% block jqueryui-script %}
+{% endblock jqueryui-script %}
+
+{% block coursel-script %}
+{% endblock coursel-script %}
+
+{% block front.js %}
+{% endblock front.js %}
+
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+    <div class="container">
+		<div class = "row">
+			<div class = "col-12 mt-4 text-center">
+				<h1 style="font-weight:700; font-size:1.2rem;">CURRENT OFFERS</h1>
+				<h3>Arte'Venue has following offers currently</h3>
+			</div>
+		</div>
+		<div class = "row">			
+			<div class = "col-12 mb-4 mt-3" style = "font-size:0.8rem;">
+				Please note: Multiple discount offers cannot be clubbed together. Only one coupon code/discount offer
+				can be used at one time.
+			</div>
+		</div>
+
+		<div class = "row mt-4">			
+			<div class = "col-12 d-flex justify-content-center d-flex-row">
+				<span class = "offer_num">1</span>
+				<span class = "offer_text" >SPRING SALE | FLAT 25% OFF</span>
+			</div>
+		</div>
+		<div class = "row">			
+			<div class = "col-12 col-md-6  sign-up-right">
+				<img src="{% static 'img/offers/spring_banner_1.jpg' %}" alt="" class="img-fluid" width="500">
+			</div>
+			<div class = "col-12 col-md-6 " style = "margin:auto;">
+				<div class = "row text-center" style="font-size: 1rem; font-weight: 700; color:#11b6bd;">
+					<div class = "col-12 text-center">"MAR25"</div>
+				</div>
+				<div style="margin-top:20px; color:#665d6f;">
+					<ul>
+						<li>All art prints carry <strong>25% flat discount</strong> on the listed prices</li>
+						<li>There is no minimum or maximum order value</li>
+						<li>Just add the products you like to the cart and apply the coupon <strong>"MAR25"</strong> in your shopping cart</li>
+						<li>If you have logged in and it's your first order the coupon "FIRST15" is applied by default. 
+							You can apply "MAR25" to avail the offer.</li>
+						<li>This offer starts on 19th Mar 2022 and ends on 27th Mar 2022
+						<li>This offer cannot be combined with other discount offers</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class = "row mt-4">			
+			<div class = "col-12 d-flex justify-content-center d-flex-row">
+				<span class = "offer_num">2</span>
+				<span class = "offer_text" >15% OFF</span>
+			</div>
+		</div>
+		<div class = "row">			
+			<div class = "col-12 col-md-6  sign-up-right">
+				<img src="{% static 'img/main-image/paintings_online_15_off.jpg' %}" alt="" class="img-fluid" width="500">
+			</div>
+			<div class = "col-12 col-md-6 " style = "margin:auto;">
+				<div class = "row text-center" style="font-size: 1rem; font-weight: 700; color:#11b6bd;">
+					<div class = "col-12 text-center">"FIRST15"</div>
+				</div>
+				<div style="margin-top:20px; color:#665d6f;">
+					<ul>
+						<li>All art prints carry 15% off</li>
+						<li>There is no minimum or maximum order value</li>
+						<li>Just add the products you like to the cart and apply the coupon "FIRST15"</li>
+						<li>If you have logged in and it's your first order the coupon "FIRST15" is applied automatically</li>
+						<li>This offer cannot be combined with other discount offers</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class = "row mt-4">			
+			<div class = "col-12 d-flex justify-content-center d-flex-row">
+				<span class = "offer_num">3</span>
+				<span class = "offer_text" >FREE DELIVERY</span>
+			</div>
+		</div>
+		<div class = "row">			
+			<div class = "col-12 col-md-6  sign-up-right">
+				<img src="{% static 'img/free_shipping.jpg' %}" alt="" class="img-fluid" width="500">
+			</div>
+			<div class = "col-12 col-md-6 " style = "margin:auto;">
+				<div style="margin-top:20px; color:#665d6f;">
+					<ul>
+						<li>All orders are shipped free of cost</li>
+						<li>No minimum or maximum order value</li>
+						<li>We ship anywhere in India</li>
+						<li>Shipments to other countries are charged at actuals</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+    </div>
+	{% endblock sitecontent %}
+	
+	
+	{% block jscripts %}
+	{% endblock jscripts %}
+	

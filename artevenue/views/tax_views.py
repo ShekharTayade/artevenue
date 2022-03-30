@@ -49,12 +49,16 @@ def get_taxes():
 			oth_tax_rate = t.tax_rate
 		if t.name == 'STRETCH':
 			stretch_tax_rate = t.tax_rate
+			oth_tax_rate = t.tax_rate			
+		if t.name == 'NON-RECTANGULAR':
+			non_rectangular_tax_rate = t.tax_rate
 			oth_tax_rate = t.tax_rate
+            
 
 	return ( {'stock_image_tax_rate':stock_image_tax_rate, 'user_image_tax_rate':user_image_tax_rate,
 		'stock_collage_tax_rate':stock_collage_tax_rate, 'original_art_tax_rate':original_art_tax_rate, 
 		'frame_tax_rate':frame_tax_rate, 'mount_tax_rate':mount_tax_rate, 
 		'acrylic_tax_rate':acrylic_tax_rate, 'board_tax_rate':board_tax_rate, 
-		'stretch_tax_rate':stretch_tax_rate, 'oth_tax_rate':oth_tax_rate} )
+		'stretch_tax_rate':stretch_tax_rate, 'oth_tax_rate':oth_tax_rate, 'non_rectangular_tax_rate': non_rectangular_tax_rate} )
 		
 		

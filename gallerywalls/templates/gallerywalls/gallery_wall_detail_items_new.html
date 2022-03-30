@@ -49,6 +49,7 @@
 									<input hidden name = "surface" value = "{{i.print_medium_id}}">
 									<input hidden name = "mount_id" value = "{{i.mount_id|default_if_none:''}}">
 									<input hidden name = "mount_color" value = "{{i.mount_color|default_if_none:''}}">
+									<input hidden name = "mount_size" value = "{{i.mount_size|default_if_none:'0'}}">
 									<input hidden name = "stretch_id" value = "{{i.stretch_id|default_if_none:''}}">
 									<button class = "btn btn-outline btn-sm" type = "submit" form="f_{{i.item_id}}"
 										target = "_blank"

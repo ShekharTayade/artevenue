@@ -1,0 +1,37 @@
+{% load static %}
+{% if ecom_site.show_frame_my_art_section %}
+
+<div class = "container-fluid mt-5">
+	<div class="row text-center">
+		<div class="col-12 col-12">
+			<a id = "" href="{% url 'user_image' %}">
+			<div class = "row d-flex justify-content-center align-items-center" style = "background-color: #fafafa; padding:10px; color:#212529;">
+				<div >
+					<h2 class="text-center">CUSTOM PHOTO FRAMES
+					</h2>
+					<h4>Upload your Photos, Artworks & Get Framed
+				</div>
+				<div style = "background-color: #fafafa; padding:10px;">
+						<i class = "fa fa-caret-right fa-3x" style = "color:#999999;" >
+						</i>
+				</div>			
+			</div>
+			</a>
+		</div>
+	</div>
+	<!--<div class="row text-center">
+		<div class = "col-12">
+		<a id = "" href="{% url 'user_image' %}">
+		<div class="curated-container">
+			<picture>
+				<source media="(max-width:465px)" srcset="{% static 'img/frame-my-pic-m.jpg' %}">
+				<source media="(min-width:465px)" srcset="{% static 'img/frame-my-pic.jpg' %}">
+				<img src="{% static 'img/frame-my-pic.jpg' %}" alt="Custom photo frames">
+			</picture>
+		</div>
+		</a>
+		</div>
+	</div>-->
+</div>
+
+{% endif %}

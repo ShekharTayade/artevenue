@@ -56,6 +56,7 @@ INSTALLED_APPS = [
 	'review.apps.ReviewConfig',	
 	'gallerywalls.apps.GallerywallsConfig',	
 	'returns.apps.ReturnsConfig',
+	'av_products.apps.Av_productsConfig',
 	'spinwheel.apps.SpinwheelConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -79,6 +80,7 @@ INSTALLED_APPS = [
 	'indian_numbers',
 	'webmaster_verification',
 	'django.contrib.redirects',
+	'django_user_agents',
 	]
 
 MIDDLEWARE = [
@@ -90,6 +92,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 	'django.contrib.redirects.middleware.RedirectFallbackMiddleware',
+	'django_user_agents.middleware.UserAgentMiddleware',
 ]
 
 ROOT_URLCONF = 'estore.urls'
@@ -147,7 +150,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 USE_L10N = False
 LANGUAGE_CODE = 'en-IN'
-USE_TZ = True
+USE_TZ = False
 TIME_ZONE = 'Asia/Calcutta'
 USE_THOUSAND_SEPARATOR = True
 THOUSAND_SEPARATOR = ','
@@ -290,3 +293,16 @@ TINYMCE_EXTRA_MEDIA = {
         ...
     ],
 }
+
+
+# Cache backend is optional, but recommended to speed up user agent parsing
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
+    }
+}
+
+# Name of cache backend to cache user agents. If it not specified default
+# cache alias will be used. Set to `None` to disable caching.
+USER_AGENTS_CACHE = 'default'

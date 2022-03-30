@@ -1,0 +1,410 @@
+{% load static %}
+{% load show_frame_my_art from prod_template_tags %}
+
+<div class = "container-fluid mt-5 text-center">
+	<div class="row">
+		<div class="col-12">
+			<h2 class="text-center">
+				EXQUISITE COLLECTION OF ART
+			</h2>
+		</div>
+	</div>
+	<div class="row text-center">
+		<div class = "col-12 mt-5">
+			<h3 >
+				<a class = "btn-link" href = "{% url 'get_gallery_walls' %}">
+				GALLERY WALLS
+				</a>
+			</h3>			
+			<h4 class = "curatedHeading2">A Must-Have</h4>
+			<a class = "btn-link" href = "{% url 'get_gallery_walls' %}">
+			<div class="curated-container">
+				<picture>
+					<source media="(min-width:1200px)" srcset="{% static 'img/hp_banners/may_2021/gallery_walls_lg.jpg' %}">
+					<source media="(min-width:992px)" srcset="{% static 'img/hp_banners/may_2021/gallery_walls_md.jpg' %}">
+					<source media="(min-width:768px" srcset="{% static 'img/hp_banners/may_2021/gallery_walls_sm.jpg' %}">
+					<source media="(max-width:600px)" srcset="{% static 'img/hp_banners/may_2021/gallery_walls_xs.jpg' %}">
+					<img class = "d-block lazyload" src="{% static 'img/hp_banners/may_2021/gallery_walls_lg.jpg' %}" alt="Art prints of Famous Paintings">
+				</picture>
+			</div>
+			</a>
+		</div>
+		<div class = "col-12 col-md-6 mt-5">
+			<form method = 'GET' action = "{% url 'framed_wall_art_collection' %}" id = "best_seller_form">
+				<input hidden name = "singles" value = 'YES'>
+				<button class = "btn-link" style = "border:none;" type = "submit"
+					form = "best_seller_form">
+				<h3>
+					BEST SELLERS
+				</h3>
+				</button>
+				<button class = "btn-link" style = "border:none;" type = "submit"
+					form = "best_seller_form">
+				<h4 class = "curatedHeading2">Liked By Most</h4>
+				<a class = "btn-link" href = "">
+				<div class="curated-container">
+					<picture>
+						<source media="(min-width:1200px)" srcset="{% static 'img/hp_banners/may_2021/framed_wall_art_lg.jpg' %}">
+						<source media="(min-width:992px)" srcset="{% static 'img/hp_banners/may_2021/framed_wall_art_md.jpg' %}">
+						<source media="(min-width:768px" srcset="{% static 'img/hp_banners/may_2021/framed_wall_art_sm.jpg' %}">
+						<source media="(max-width:600px)" srcset="{% static 'img/hp_banners/may_2021/framed_wall_art_xs.jpg' %}">
+						<img class = "d-block lazyload" src="{% static 'img/hp_banners/may_2021/framed_wall_art_lg.jpg' %}" alt="Abstract Prints">
+					<picture>
+				</div>
+				</button>
+			</form>
+		</div>
+		
+		<div class = "col-12 col-md-6 mt-5">
+			<h3>
+				<a class = "btn-link" href = "{% url 'stock_collage_products' %}">
+				SETS OF PAINTINGS
+				</a>
+			</h3>
+			<h4 class = "curatedHeading2">Cohesive and Well Styled</h4>
+			<a class="btn-link" href = "{% url 'stock_collage_products' %}">
+				<div class="curated-container">
+				<picture>
+					<source media="(min-width:1200px)" srcset="{% static 'img/hp_banners/may_2021/wall_art_sets_lg.jpg' %}">
+					<source media="(min-width:992px)" srcset="{% static 'img/hp_banners/may_2021/wall_art_sets_md.jpg' %}">
+					<source media="(min-width:768px" srcset="{% static 'img/hp_banners/may_2021/wall_art_sets_sm.jpg' %}">
+					<source media="(max-width:600px)" srcset="{% static 'img/hp_banners/may_2021/wall_art_sets_xs.jpg' %}">
+					
+					<img src="{% static 'img/hp_banners/may_2021/wall_art_sets_lg.jpg' %}" alt="Wall Art Collage Sets" style="width:100%"
+						class = "lazyload">
+				</picture>
+				</div>
+			</a>
+		</div>
+		
+		<div class = "col-12 col-md-6 mt-5">
+			<h3>
+				<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='abstract-wall-art' %}">
+				ABSTRACT
+				</a>
+			</h3>
+			<h4 class = "curatedHeading2">Wall Art To Fit Versatile Spaces</h4>
+			<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='abstract-wall-art' %}">
+			<div class="curated-container">
+				<picture>
+					<source media="(min-width:1200px)" srcset="{% static 'img/hp_banners/may_2021/abstract_lg.jpg' %}">
+					<source media="(min-width:992px)" srcset="{% static 'img/hp_banners/may_2021/abstract_md.jpg' %}">
+					<source media="(min-width:768px" srcset="{% static 'img/hp_banners/may_2021/abstract_sm.jpg' %}">
+					<source media="(max-width:600px)" srcset="{% static 'img/hp_banners/may_2021/abstract_xs.jpg' %}">
+
+					<img class = "lazyload" src="{% static 'img/hp_banners/may_2021/abstract_lg.jpg' %}" alt="Abstract Prints">
+				<picture>
+			</div>
+			</a>
+		</div>
+		
+		<div class = "col-12 col-md-6 mt-5">
+			<h3 >
+				<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='floral-paintings' %}">
+				FLORAL
+				</a>
+			</h3>
+			<h4  class = "curatedHeading2">Painting of Happiness</h4>
+			<a class="btn-link" href = "{% url 'curated_collections' cat_nm='floral-paintings' %}">
+				<div class="curated-container">
+				<picture>
+					<source media="(min-width:1200px)" srcset="{% static 'img/hp_banners/may_2021/floral_lg.jpg' %}">
+					<source media="(min-width:992px)" srcset="{% static 'img/hp_banners/may_2021/floral_md.jpg' %}">
+					<source media="(min-width:768px" srcset="{% static 'img/hp_banners/may_2021/floral_sm.jpg' %}">
+					<source media="(max-width:600px)" srcset="{% static 'img/hp_banners/may_2021/floral_xs.jpg' %}">
+
+					<img class = "lazyload" src="{% static 'img/hp_banners/may_2021/floral.jpg' %}" alt="Wall Art Collage Sets" style="width:100%">
+				</picture>
+				</div>
+			</a>
+		</div>
+		<div class = "col-6 col-md-3 mt-5">
+			<h3 >
+				FEMME
+			</h3>
+			<h4 class = "curatedHeading2">An Exclusive Section</h4>
+			<a class="btn-link" href = "{% url 'curated_collections' cat_nm='paintings-of-women' %}">
+				<div class="curated-container">
+				<picture>
+					<source media="(min-width:1200px)" srcset="{% static 'img/hp_banners/may_2021/femme_lg.jpg' %}">
+					<source media="(min-width:992px)" srcset="{% static 'img/hp_banners/may_2021/femme_md.jpg' %}">
+					<source media="(min-width:768px" srcset="{% static 'img/hp_banners/may_2021/femme_sm.jpg' %}">
+					<source media="(max-width:600px)" srcset="{% static 'img/hp_banners/may_2021/femme_xs.jpg' %}">
+
+					<img class = "lazyload" src="{% static 'img/hp_banners/may_2021/femme.jpg' %}" alt="Paintings of girls and women" style="width:100%">
+				</picture>
+				</div>
+			</a>
+		</div>
+		<div class = "col-6 col-md-3 mt-5">
+			<h3>
+				<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='buddha-wall-art' %}">
+				BUDDHA
+				</a>
+			</h3>
+			<h4  class = "curatedHeading2">Enlighten the Living</h4>
+			<a class="btn-link" href = "{% url 'curated_collections' cat_nm='buddha-paintings' %}">
+				<div class="curated-container">
+				<picture>
+					<source media="(min-width:1200px)" srcset="{% static 'img/hp_banners/may_2021/buddha_lg.jpg' %}">
+					<source media="(min-width:992px)" srcset="{% static 'img/hp_banners/may_2021/buddha_md.jpg' %}">
+					<source media="(min-width:768px" srcset="{% static 'img/hp_banners/may_2021/buddha_sm.jpg' %}">
+					<source media="(max-width:600px)" srcset="{% static 'img/hp_banners/may_2021/buddha_xs.jpg' %}">
+
+					<img class = "lazyload" src="{% static 'img/hp_banners/may_2021/buddha.jpg' %}" alt="Buddha Paintings" style="width:100%">
+				</picture>
+				</div>
+			</a>
+		</div>
+		<div class = "col-6 col-md-3 mt-5">
+			<h3>
+				<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='painting-of-horse' %}">
+				HORSE
+				</a>
+			</h3>
+			<h4  class = "curatedHeading2">Enhance the 'Chi'</h4>
+			<a class="btn-link" href = "{% url 'curated_collections' cat_nm='painting-of-horse' %}">
+				<div class="curated-container">
+				<picture>
+					<source media="(min-width:1200px)" srcset="{% static 'img/hp_banners/may_2021/horse_lg.jpg' %}">
+					<source media="(min-width:992px)" srcset="{% static 'img/hp_banners/may_2021/horse_md.jpg' %}">
+					<source media="(min-width:768px" srcset="{% static 'img/hp_banners/may_2021/horse_sm.jpg' %}">
+					<source media="(max-width:600px)" srcset="{% static 'img/hp_banners/may_2021/horse_xs.jpg' %}">
+
+					<img class = "lazyload" src="{% static 'img/hp_banners/may_2021/horse.jpg' %}" alt="Horse Paintings" style="width:100%">
+				</picture>
+				</div>
+			</a>
+		</div>
+		<div class = "col-6 col-md-3 mt-5">
+			<h3>
+				<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='ocean-paintings' %}">
+				COASTAL
+				</a>
+			</h3>
+			<h4  class = "curatedHeading2">Seascape Paintings</h4>
+			<a class="btn-link" href = "{% url 'curated_collections' cat_nm='ocean-paintings' %}">
+				<div class="curated-container">
+				<picture>
+					<source media="(min-width:1200px)" srcset="{% static 'img/hp_banners/may_2021/coastal_lg.jpg' %}">
+					<source media="(min-width:992px)" srcset="{% static 'img/hp_banners/may_2021/coastal_md.jpg' %}">
+					<source media="(min-width:768px" srcset="{% static 'img/hp_banners/may_2021/coastal_sm.jpg' %}">
+					<source media="(max-width:600px)" srcset="{% static 'img/hp_banners/may_2021/coastal_xs.jpg' %}">
+
+					<img class = "lazyload" src="{% static 'img/hp_banners/may_2021/coastal.jpg' %}" alt="Art Prints of Sea Paintings" style="width:100%">
+				</picture>
+				</div>
+			</a>
+		</div>
+		<div class = "col-12 mt-5">
+			<h3>
+				ART OVER CENTURIES
+			</h3>
+			<h4 class = "curatedHeading2">A Timeless Collection Of Paintings By Grand Masters</h4>
+			<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='world-famous-paintings' %}">
+			<div class="curated-container">
+				<picture>
+					<source media="(min-width:1200px)" srcset="{% static 'img/hp_banners/may_2021/masters_lg.jpg' %}">
+					<source media="(min-width:992px)" srcset="{% static 'img/hp_banners/may_2021/masters_md.jpg' %}">
+					<source media="(min-width:768px" srcset="{% static 'img/hp_banners/may_2021/masters_sm.jpg' %}">
+					<source media="(max-width:600px)" srcset="{% static 'img/hp_banners/may_2021/masters_xs.jpg' %}">
+
+					<img class = "lazyload" src="{% static 'img/hp_banners/may_2021/masters.jpg' %}" alt="Art prints of Famous Paintings">
+				</picture>
+			</div>
+			</a>
+		</div>
+		<div class = "col-6 col-lg-2 mt-1">		
+			<a href = "{% url 'curated_collections' cat_nm='vincent-van-gogh-paintings' %}"  >
+				<h3 style="background-color:; font-size:0.7rem; font-weight:600; color: #5d5566;">
+					<!-- gold:  -->
+					 Van Gogh Paintings
+				</h3> 
+			</a>
+		</div>
+		<div class = "col-6 col-lg-2 mt-1">	
+			<a href = "{% url 'curated_collections' cat_nm='leonardo-da-vinci-art' %}" >
+				<h3 style="background-color:; font-size:0.7rem; font-weight:600; color: #5d5566;">
+					Da Vinci Paintings
+				</h3> 
+			</a>
+		</div>
+		<div class = "col-6 col-lg-2 mt-1">	
+			<a href = "{% url 'curated_collections' cat_nm='claude-monet-paintings' %}">
+				<h3 style="background-color:; font-size:0.7rem; font-weight:600; color: #5d5566;">
+					Monet Paintings
+				</h3> 
+			</a>
+		</div>
+		<div class = "col-6 col-lg-2 mt-1">
+			<a href = "{% url 'curated_collections' cat_nm='michelangelo-paintings' %}"  >
+				<h3 style="background-color:; font-size:0.7rem; font-weight:600; color: #5d5566;">
+					Michelangelo Paintings
+				</h3> 
+			</a>
+		</div>
+		<div class = "col-6 col-lg-2 mt-1">	
+			<a href = "{% url 'curated_collections' cat_nm='gustav-klimt-paintings' %}"  >
+				<h3 style="background-color:; font-size:0.7rem; font-weight:600; color: #5d5566;">
+					Klimt Paintings 
+				</h3> 
+			</a>
+		</div>
+		<div class = "col-6 col-lg-2 mt-1">
+			<a href = "{% url 'curated_collections' cat_nm='johannes-vermeer' %}" >
+				<h3 style="background-color:; font-size:0.7rem; font-weight:600; color: #5d5566;">
+					Vermeer Paintings
+				</h3> 
+			</a>
+		</div>
+
+
+		<div class = "col-12 mt-5">
+			<h2>POPULAR WALL ART COLLECTION</h2>
+		</div>
+	</div>
+	<div class="row text-center">
+		<div class = "col-6 col-md-3 mt-5">		
+			<h3>
+				<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='landscape-paintings' %}">
+				LANDSCAPE
+				</a>
+			</h3>
+			<h4  class = "curatedHeading2">Paintings to Dwell In</h4>
+			<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='landscape-paintings' %}">
+				<div class="curated-container">
+					<picture>
+					<source media="(min-width:1200px)" srcset="{% static 'img/hp_banners/may_2021/landscape_lg.jpg' %}">
+					<source media="(min-width:992px)" srcset="{% static 'img/hp_banners/may_2021/landscape_md.jpg' %}">
+					<source media="(min-width:768px" srcset="{% static 'img/hp_banners/may_2021/landscape_sm.jpg' %}">
+					<source media="(max-width:600px)" srcset="{% static 'img/hp_banners/may_2021/landscape_xs.jpg' %}">
+
+					<img class = "lazyload" src="{% static 'img/hp_banners/may_2021/landscape.jpg' %}" alt="Art prints of Landscape Paintings">
+					</picture>
+				</div>
+			</a>
+		</div>
+		<div class = "col-6 col-md-3 mt-5">
+			<h3>
+				<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='black-and-white-art' %}">
+				BLACK & WHITE
+				</a>
+			</h3>
+			<h4  class = "curatedHeading2">Art of Balance</h4>
+			<a class="btn-link" href = "{% url 'curated_collections' cat_nm='black-and-white-art' %}">
+				<div class="curated-container">
+				<picture>
+					<source media="(min-width:1200px)" srcset="{% static 'img/hp_banners/may_2021/black_white_lg.jpg' %}">
+					<source media="(min-width:992px)" srcset="{% static 'img/hp_banners/may_2021/black_white_md.jpg' %}">
+					<source media="(min-width:768px" srcset="{% static 'img/hp_banners/may_2021/black_white_sm.jpg' %}">
+					<source media="(max-width:600px)" srcset="{% static 'img/hp_banners/may_2021/black_white_xs.jpg' %}">
+
+					<img class = "lazyload" src="{% static 'img/hp_banners/may_2021/black_white.jpg' %}" alt="Art Print of Black and White Paintings" style="width:100%">
+				</picture>
+				</div>
+			</a>
+		</div>
+		<div class = "col-6 col-md-3 mt-5">
+			<h3>
+				<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='photography-prints' %}">
+				PHOTOGRAPHY
+				</a>
+			</h3>
+			<h4  class = "curatedHeading2">Prints of Life Captured</h4>
+			<a class="btn-link" href = "{% url 'curated_collections' cat_nm='photography-prints' %}">
+				<div class="curated-container">
+				<picture>
+					<source media="(min-width:1200px)" srcset="{% static 'img/hp_banners/may_2021/photography_lg.jpg' %}">
+					<source media="(min-width:992px)" srcset="{% static 'img/hp_banners/may_2021/photography_md.jpg' %}">
+					<source media="(min-width:768px" srcset="{% static 'img/hp_banners/may_2021/photography_sm.jpg' %}">
+					<source media="(max-width:600px)" srcset="{% static 'img/hp_banners/may_2021/photography_xs.jpg' %}">
+
+					<img class = "lazyload" src="{% static 'img/hp_banners/may_2021/photography.jpg' %}" alt="Photography Art Prints" style="width:100%">
+				</picture>
+				</div>
+			</a>
+		</div>
+		<div class = "col-6 col-md-3 mt-5">
+			<h3>
+				<span class="d-block d-md-none"><br /></span>
+				<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='vintage-posters-for-sale' %}">
+				VINTAGE
+				</a>
+			</h3>
+			<h4  class = "curatedHeading2">The Old World Charm</h4>
+			<a class="btn-link" href = "{% url 'curated_collections' cat_nm='vintage-posters-for-sale' %}">
+				<div class="curated-container">
+				<picture>
+					<source media="(min-width:1200px)" srcset="{% static 'img/hp_banners/may_2021/vintage_lg.jpg' %}">
+					<source media="(min-width:992px)" srcset="{% static 'img/hp_banners/may_2021/vintage_md.jpg' %}">
+					<source media="(min-width:768px" srcset="{% static 'img/hp_banners/may_2021/vintage_sm.jpg' %}">
+					<source media="(max-width:600px)" srcset="{% static 'img/hp_banners/may_2021/vintage_xs.jpg' %}">
+
+					<img class = "lazyload" src="{% static 'img/hp_banners/may_2021/vintage.jpg' %}" alt="Art Prints of Vintage Paintings" style="width:100%">
+				</picture>
+				</div>
+			</a>
+		</div>
+		<div class = "col-12 mt-5">
+			<h3>
+				<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='gold-paintings' %}">
+				GOLD SERIES
+				</a>
+			</h3>
+			<h4 class = "curatedHeading2">For the Cr&#232;me De La Cr&#232;me</h4>
+			<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='gold-paintings' %}">
+			<div class="curated-container">
+				<picture>
+					<source media="(min-width:1200px)" srcset="{% static 'img/hp_banners/may_2021/gold_lg.jpg' %}">
+					<source media="(min-width:992px)" srcset="{% static 'img/hp_banners/may_2021/gold_md.jpg' %}">
+					<source media="(min-width:768px" srcset="{% static 'img/hp_banners/may_2021/gold_sm.jpg' %}">
+					<source media="(max-width:600px)" srcset="{% static 'img/hp_banners/may_2021/gold_xs.jpg' %}">
+
+					<img class = "lazyload" src="{% static 'img/hp_banners/may_2021/gold.jpg' %}" alt="Artworks in Gold Color">
+				</picture>
+			</div>
+			</a>
+		</div>
+		<div class = "col-12 col-md-6 mt-5">
+			<h3>
+				<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='botanical-paintings' %}">
+				BOTANICAL
+				</a>
+			</h3>
+			<h4  class = "curatedHeading2">Into the Tropics</h4>
+			<a class="btn-link" href = "{% url 'curated_collections' cat_nm='botanical-paintings' %}">
+				<div class="curated-container">
+				<picture>
+					<source media="(min-width:1200px)" srcset="{% static 'img/hp_banners/may_2021/botanical_lg.jpg' %}">
+					<source media="(min-width:992px)" srcset="{% static 'img/hp_banners/may_2021/botanical_md.jpg' %}">
+					<source media="(min-width:768px" srcset="{% static 'img/hp_banners/may_2021/botanical_sm.jpg' %}">
+					<source media="(max-width:600px)" srcset="{% static 'img/hp_banners/may_2021/botanical_xs.jpg' %}">
+
+					<img class = "lazyload" src="{% static 'img/hp_banners/may_2021/botanical.jpg' %}" alt="Botanical wall art" style="width:100%">
+				</picture>
+				</div>
+			</a>
+		</div>
+		<div class = "col-12 col-md-6 mt-5">
+			<h3 >
+				<span class="d-block d-md-none"><br /></span>
+				<a class = "btn-link" href = "{% url 'curated_collections' cat_nm='minimalistic-art' %}">
+				MINIMALISTIC
+				</a>
+			</h3>
+			<h4  class = "curatedHeading2">Art-Where Less is More</h4>
+			<a class="btn-link" href = "{% url 'curated_collections' cat_nm='minimalistic-art' %}">
+				<div class="curated-container">
+				<picture>
+					<source media="(min-width:1200px)" srcset="{% static 'img/hp_banners/may_2021/minimalistic_lg.jpg' %}">
+					<source media="(min-width:992px)" srcset="{% static 'img/hp_banners/may_2021/minimalistic_md.jpg' %}">
+					<source media="(min-width:768px" srcset="{% static 'img/hp_banners/may_2021/minimalistic_sm.jpg' %}">
+					<source media="(max-width:600px)" srcset="{% static 'img/hp_banners/may_2021/minimalistic_xs.jpg' %}">
+
+					<img class = "d-block" src="{% static 'img/hp_banners/may_2021/minimalistic.jpg' %}" alt="Minimalistic paintings" style="width:100%">
+				</picture>
+				</div>
+			</a>
+		</div>
+	</div>	
+</div>	

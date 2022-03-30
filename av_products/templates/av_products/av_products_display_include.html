@@ -1,0 +1,105 @@
+{% load static %}
+{% load utils %}
+
+						<div class = "row">					
+						<div class="col-12 mt-1">
+							<span class = "pull-left">Showing {{prods|length}} sets</span>
+							<span class = "pull-right">
+								Sort by Price
+								<select id = "priceSort">								
+									<option value="NONE"></option>
+									<option value="L2H">Low to High</option>
+									<option value="H2L">High to Low</option>							
+								</select>							
+							</span>
+						</div>
+						{% for c in prods %}
+							<div class="col-12 col-md-4 mt-3 mb-3">
+								<a id = "alink_{{c.product_id}}" href="{% url 'av_product_page' c.product_varient_id %}">
+									<img id = "coll_{{c.product_id}}" src="{% static c.product.display_url %}" alt="Set of round shaped wall art painting,{{c.name}}"  class="img-fluid lazyload">
+								</a>
+								<div id = "">
+									<div class = "row">
+										<div class = "col-12">
+											<span>
+												{{c.product.title}} | 
+												{% if singles == 'NO' %}
+													a set of {{c.product.set_of}} on {{c.product.print_medium_id|lower}} from
+												{% else %}
+													a wall art on {{c.product.print_medium_id|lower}} from
+												{% endif %}
+												{% for k, v in prices.items %}
+													{% if k == c.product_varient_id %}				
+													<i class = "fa fa-inr"></i> 
+													<span  style = "color:#11b6bd;">
+														{{v|floatformat:'0'}}
+													</span>
+													{% endif %}
+												{% endfor %}
+												<span class = "pull-right">
+													{% if c.product_id in wishlist_prods %}
+													<span id = "fav_{{c.product_id}}">
+														<i class = "fa fa-heart"  
+															onclick = "deleteItem('{{c.product_id}}')" 
+															style="color:red; padding-right:5px;cursor:alias;" data-toggle="tooltip" title="Added to Favorites!"></i>
+													</span>
+													{% else %}
+													<span  id = "fav_{{c.product_id}}">
+														<i class = "fa fa-heart-o"  
+															onclick = "addToFav({{c.product_id}}, {% if c.max_width > 16 %} 16 {%else%} {{c.max_width}} {%endif%}, {{c.aspect_ratio}}, 0, '', 0, 0, 0);"
+															style="color:red; padding-right:5px;cursor:alias;" data-toggle="tooltip" title="Add to Favourites!"></i>
+													</span>
+													{% endif %}
+												</span>												
+												<br />
+												<span class = "text-muted" style = "font-size:0.7rem;">
+													Multiple Sizes Available
+												</span>												
+											</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						{% endfor %}
+						</div>
+						<div class="box-cat info-bar">
+							<div class="row">
+								<div class="col-md-12 col-lg-12 text-cetner">
+									<ul class = "pagination justify-content-center"style="margin-bottom:0px !important">
+										{% if coll.has_previous %}
+										<li class="page-item">
+											<!--<button class="page-link" onclick="getAllFilters(page='1', sort='{{sortOrder}}', show='{{show}}', keywords='{{ikeywords}}');" aria-label="Previous">-->
+											<button class="page-link" onclick="getSets('', '', '', page='1');" aria-label="Next">
+											<span aria-hidden="true">&laquo; First</span>
+											<span class="sr-only">begin</span>
+										  </button>
+										</li>   {% endif %}
+
+										{% for n in coll.paginator.page_range %}
+										  {% if coll.number == n %}
+											<li class="page-item active">
+											  <span class="page-link">{{ n }}<span class="sr-only">(current)</span></span>
+											</li>
+										  {% elif n > coll.number|add:'-5' and n < coll.number|add:'5' %}
+											<li class="page-item">
+												<!--<button class="page-link" onclick="getAllFilters(page='{{n}}', sort='{{sortOrder}}', show='{{show}}', keywords='{{ikeywords}}');">{{ n }}-->
+												<button class="page-link" onclick="getSets('', '', '', page='{{n}}');" aria-label="Next">
+													<span aria-hidden="true">{{n}}</span>
+												</button>
+											</li>
+										  {% endif %}
+										{% endfor %}
+
+										{% if coll.has_next %}
+										  <li class="page-item">
+											<!--<button class="page-link" onclick="getAllFilters(page='{{coll.paginator.num_pages}}', sort='{{sortOrder}}', show='{{show}}', keywords='{{ikeywords}}');" aria-label="Next">-->
+												<button class="page-link" onclick="getSets('', '', '', page='{{coll.paginator.num_pages}}');" aria-label="Next">											
+												<span aria-hidden="true">Last &raquo;</span>
+												<span class="sr-only">end</span>
+											</button>
+										  </li>
+										  {% endif %}   
+									</ul> 
+								</div>
+							</div>
+						</div>

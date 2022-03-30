@@ -1,0 +1,83 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load utils %}
+{% load widget_tweaks %}
+{% block page-title %} 
+<title>Arte'Venue | Artist Page</title>
+{% endblock page-title %} 
+{% block page-description %}
+<meta name="description" content="Arte'Venue | Artist's Page - Update profile, Artworks, View Sales">
+{% endblock page-description %}
+{% block page-keywords %}
+<meta name="keywords" content="Art, artevenue, original artwork,  artist sales">
+{% endblock page-keywords %}
+
+
+{% block coursel-stylesheet %}
+{% endblock coursel-stylesheet %}
+
+{% block jqueryui-script %}
+{% endblock jqueryui-script %}
+
+{% block coursel-script %}
+{% endblock coursel-script %}
+
+{% block front.js %}
+{% endblock front.js %}
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+{% block google-recaptcha-3 %}
+{% endblock google-recaptcha-3 %}
+
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+        <div class="container mb-5">
+			<div class="row">
+				<!-- breadcrumb-->
+				<div class="col-12">
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+							<li aria-current="page" class="breadcrumb-item active">Information for Artists</li>
+						</ol>
+					</nav>
+				</div>
+			</div>
+
+
+			<div class="row">
+				<div class="col-12">
+					<h1 class = "text-center"><strong>INFORMATION FOR ARTIST</strong></h1>
+				</div>
+				<div class="col-12 mt-3">
+					<small><span class = "pull-right">Last Update: 20 Mar 2022 </span></small>
+				</div>
+				<div class="col-12 mt-3 text-center">
+					We are preparing to get our platform ready for artists
+				</div>
+				<div class="col-12 mt-3" style = "margin: auto;">								
+						<img src = "{% static '/img/artist/coming_soon.jpg' %}" style = "max-width: 80%; height: auto; margin-left:auto; margin-right:auto;">
+				</div>
+
+			</div>
+			<div class="row mt-5">
+				<div class="col-12">
+					<h4 class = "text-center">
+						(<a href = "https:/www.ArteVenue.com">ArteVenue.com</a> platform is developed and owned by Montage Art Pvt Ltd. All rights reserved.)
+					</h4>
+				</div>
+			</div>
+		</div>
+	{% endblock sitecontent %}
+	
+	{% block jscripts %}	
+	<script>
+		$( document ).ready(function() {
+		});	
+	</script>
+	{% endblock jscripts %}
+			
+	{% block tawkto %} 
+	{% endblock tawkto %} 

@@ -1,11 +1,15 @@
 {% load static %}
 {% load utils %}
-<div id="footer" style="background-color:#000; color:#fff;">
+<div id="footer" style="background-color:#1f2c3f; color:#fff;">
 	<div class="row">
 		<div class="col-lg-3 col-md-6">
-			<img src="{% static 'img/layer_2_0.png' %}" alt="{{ecom_site.store_name}} Logo" style="width:164px; height:29px; display:block;">
-			<p class="mt-3 about-us" style="font-size:0.85rem;">
-			Give life to your walls! <br /><span style = "font-style:italic;"> 
+			<!--<img src="{% static 'img/layer_2_0.png' %}" alt="{{ecom_site.store_name}} Logo" style="width:164px; height:29px; display:block;">-->
+			<img src="{% static 'img/logo/av_logo_white_rectangular.png' %}" alt="{{ecom_site.store_name}} Logo" style="width:120px; min-height:10px; display:block;">
+			<p class="mt-1 about-us" style="font-size:0.85rem;">
+			<span style = "color: #fff;"> 
+			Give Life To Your Walls!<br />
+			</span>
+			<span style = "font-style:italic;"> 
 			Buy paintings online. Beautiful collection of wall art prints and paintings 
 			for home and office decor</span>.
 			Over 3+ lakh artworks, 4500+ artists, and 70+ categories to pick from.<br/>
@@ -22,7 +26,7 @@
 			</p>
 		</div>
 		<div class="col-lg-3 col-md-6 mt-3">
-			<p class="footer-heading " style="font-size:0.85rem; font-weight:700;">
+			<p class="footer-heading ">
 				POPULAR CATEGORIES
 			</p>
 			<div class = "row mt-2" style = "font-size:0.75rem; padding-left:0px;">
@@ -58,35 +62,9 @@
 					{% endif %}
 				{% endfor %}				
 			</div>			
-			<!--
-			<div class = "d-none d-lg-block row mt-4 ml-1 mr-1" style = "font-size:0.75rem; border: 1px solid #cfcfcf; border-radius: 5px;">
-				<div class = "col-12 d-flex flex-column align-items-center justify-content-center h-100">
-					<div class = "mb-2 d-flex flex-row align-items-center">
-						<img class = "mt-1" src = "{% static 'img/why_artevenue/top_quality.png' %}" alt= "Check Out Our Quality" width=70>
-						<span class = "ml-2 text-center"> 
-							Our Customers Are Loving Our Artwork Quality.
-							<br/>
-							<span style = "font-weight:600;">See Our Quality Up-Close!</span>
-						</span>
-					</div>
-				</div>
-			</div>
-			<div class = "d-block d-mb-none d-lg-none row m-4" style = "font-size:0.75rem; border: 1px solid #cfcfcf; border-radius: 5px;">
-				<div class = "col-12 d-flex flex-column align-items-center justify-content-center h-100">
-					<div class = "mb-2 d-flex flex-row align-items-center">
-						<img class = "mt-1" src = "{% static 'img/why_artevenue/top_quality.png' %}" alt= "Check Out Our Quality" width=100>
-						<span class = "ml-2 text-center"> 
-							Our Customers Are Loving Our Artwork Quality.
-							<br/>
-							<span style = "font-weight:600;">See Our Quality Up-Close!</span>
-						</span>
-					</div>
-				</div>
-			</div>
-			-->
 		</div>
 		<div class="col-lg-3 col-md-6 mt-3" style = "color:#fff;">
-			<p class="footer-heading" style="font-size:0.85rem; font-weight:700;">IMPORTANT LINKS</p>
+			<p class="footer-heading">IMPORTANT LINKS</p>
 			<div class = "row mt-2">
 				<div class="col-6">
 					<ul class="list-unstyled" style = "font-size:0.75rem; color:fff !important; line-height:2;">
@@ -142,11 +120,11 @@
 				</div>				
 			</div>
 		</div>
-		<div class="col-lg-3 col-md-6" style = "font-size:0.75rem; background-color: #000; color:#fff;">
+		<div class="col-lg-3 col-md-6" style = "font-size:0.75rem; background-color: #1f2c3f; color:#fff;">
 			<div class="newsletter">
-				<h5 style="font-size:0.8rem; font-weight:700;">
-					NEWS LETTER
-				</h5>
+				<h4 style="color:#fff;">
+					NEWSLETTER
+				</h4>
 				<div class = "mt-3" style = "font-size:0.75rem; color:fff !important;">
 					<form action = "{% url 'newsletter_subscription' %}">
 						<!--<div class="input-group">-->
@@ -162,14 +140,11 @@
 						</div>
 						
 					</form>
-					<p class="social mt-3">
+					<p class="mt-3">
 						Visit Us On:
-						<a href="https://www.facebook.com/Artevenueofficial/" class="facebook external"><i class="fa fa-facebook"></i></a>
-						<!--<a href="#" class="twitter external"><i class="fa fa-twitter"></i></a>-->
-						<a href="https://www.instagram.com/artevenue/" class="instagram external"><i class="fa fa-instagram"></i></a>
-						<a href="https://in.pinterest.com/artevenueofficial/" class="pinterest external"><i class="fa fa-pinterest"></i></a>
-						<!--<a href="#" class="gplus external"><i class="fa fa-google-plus"></i></a>-->
-						<!--<a href="#" class="email external"><i class="fa fa-envelope"></i></a>-->
+						<a  class = "ml-3" href="https://www.facebook.com/Artevenueofficial/" class="facebook external"><i class="fa fa-facebook fa-lg"></i></a>
+						<a class = "ml-3" href="https://www.instagram.com/artevenue/" class="instagram external"><i class="fa fa-instagram fa-lg"></i></a>
+						<a class = "ml-3" href="https://in.pinterest.com/artevenueofficial/" class="pinterest external"><i class="fa fa-pinterest fa-lg"></i></a>
 					</p>
 				</div>
 			</div>

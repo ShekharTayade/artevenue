@@ -1,0 +1,81 @@
+				{% load static %}
+				{% load utils %}
+				<div class = "row mb-2">
+					<div class = "col-6">
+						<span class = "block-title mb-2"> FRAME:</span>
+					</div>
+					<!--
+					<div class = "col-6">
+						<button class = "btn btn-outline btn-sm pull-right" onclick="removeFrame();"><i class = "pull-right fa fa-remove" > Remove Frame</i></button>
+					</div>
+					-->
+				</div>
+				<div class = "row">
+					<div class = "col-12">
+						<span id = "paper-frames">
+						<div class="dropdown" id = "frames-slider-paper">
+							
+							<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu_paper" 
+									data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" 
+									style = " width:100%; background-color: #fff; color: inherit; text-align:left;
+									border: 1px solid #cfcfcf;">
+								No Frame
+							</button>
+
+							<div class="dropdown-menu text-center" aria-labelledby="dropdownMenu2" style="column-count: 3; column-gap: 10px; position: absolute; z-index:999;">
+
+								<button class="dropdown-item mb-2 pl-0 pr-0" type="button" 									
+									onclick = "$('#paper-noframe-button').click();"
+									style = "cursor: pointer; border: 1px solid #cfcfcf;"> 
+									<img data-src="{% static 'img/moulding/frame/no_frame.png' %}" class="lazyload" width=50 height=50>
+									<span style = "font-size:0.6rem; display:block;">No Frame</span>
+								</button>
+
+							{% for f in paper_mouldings_show %}
+								<button class="dropdown-item mb-2 pl-0 pr-0" type="button" onclick = "moulding_change('{{f.moulding_id}}');" class = ""
+										style = "cursor: pointer; border: 1px solid #cfcfcf;"> 
+									{% with 'img/'|add:f.url as image_static %}
+									<img data-src="{% static image_static %}" class="lazyload" width=50 height=50>
+									{% endwith %}
+									<span style = "font-size:0.6rem; display:block;">{{f.moulding__name}}</span>
+								</button>
+							{% endfor %}
+							</div>
+						</div>
+						</span>
+
+						<span id = "canvas-frames">
+						<!--<input hidden id = "in_stretched" type = "checkbox" onchange="stretch_changed();">-->
+						<div class="dropdown mb-4" id = "frames-slider-canvas" >
+							<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu_canvas" 
+									data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" 
+									style = "width:100%; background-color: #fff; color: inherit; text-align:left;">
+								No Frame
+							</button>
+							<div class="dropdown-menu text-center" aria-labelledby="dropdownMenu2" style="column-count: 3; column-gap: 10px; position: absolute; z-index:999;">
+								<button class="dropdown-item mb-2 pl-0 pr-0" type="button" onclick = "$('#canvas-noframe-button').click();" class = ""
+									style = "cursor: pointer; border: 1px solid #cfcfcf;"> 
+									<img data-src="{% static 'img/moulding/frame/no_frame.png' %}" class="lazyload" width=50 height=50>
+									<span style = "font-size:0.6rem; display:block;">No Frame</span>
+								</button>
+
+								<button class="dropdown-item mb-2 pl-0 pr-0" type="button" onclick = "$('#canvas-stretched-button').click();"
+									style = "cursor: pointer; border: 1px solid #cfcfcf;"> 
+									<img data-src="{% static 'img/moulding/frame/stretched_canv.png' %}" class="lazyload" width=50 height=50>
+									<span style = "font-size:0.6rem; display:block;">Stretched Canvas</span>
+								</button>
+
+							{% for f in canvas_mouldings_show %}
+								<button class="dropdown-item mb-2 pl-0 pr-0" type="button" onclick = "moulding_change('{{f.moulding_id}}');" class = ""
+									style = "cursor: pointer; border: 1px solid #cfcfcf; "> 
+									{% with 'img/'|add:f.url as image_static %}
+									<img data-src="{% static image_static %}" class="lazyload" width=50 height=50>
+									{% endwith %}
+									<span style = "font-size:0.6rem; display:block;">{{f.moulding__name}}</span>
+								</button>
+							{% endfor %}
+							</div>
+						</div>
+						</span>
+					</div>
+				</div>

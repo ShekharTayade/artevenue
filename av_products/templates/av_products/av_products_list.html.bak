@@ -1,0 +1,476 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% block page-title %} 
+{% if singles == 'NO' %}
+<title>Buy Premium Wall Art Sets | Arte'Venue</title>
+{% else %}
+<title>Buy Premium Framed Wall Art | Arte'Venue</title>
+{% endif %}
+{% endblock page-title %} 
+{% block page-description %}
+{% if singles == 'NO' %}
+<meta name="description" content="Buy designer curated round shaped wall art sets. Set of paintings ready for hanging. Available in multiple sizes. Customizable.">
+{% else %}
+<meta name="description" content="Buy the best round shaped wall art. Available in multiple sizes. Customizable.">
+{% endif %}
+{% endblock page-description %}
+{% block page-keywords %}
+<meta name="keywords" content="round shaped wall art, paingtings, round paintings, circular, framed paintings, framed wall art, paintings on canvas, paintings on paper">
+{% endblock page-keywords %}
+{% block page-author %}
+<meta name="author" content="Arte'venue">
+{% endblock page-author %}
+
+
+{% block coursel-stylesheet %}
+{% endblock coursel-stylesheet %}
+
+{% block jqueryui-script %}
+{% endblock jqueryui-script %}
+
+{% block coursel-script %}
+{% endblock coursel-script %}
+
+{% block front.js %}
+{% endblock front.js %}
+
+{% block lazysizes %}
+<script src="{% static '/vendor/lazysizes/lazysizes.min.js' %}" async=""></script>
+{% endblock lazysizes %}
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+{% block gmap-script %}
+{% endblock gmap-script %}
+
+
+{% block popper-script %}
+	<script src="{% static 'vendor/popper.js/umd/popper.min.js' %}"> </script>
+{% endblock popper-script %}
+
+
+	<!-- Only Override the site content block -->
+	{% block sitecontent %}
+        <div class="container-fluid">
+			<div class="row mb-5">
+
+				<!-- breadcrumb-->
+				<div class="col-12">
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+							{% if singles == 'NO' %}
+							<li aria-current="page" class="breadcrumb-item active">Round Shaped Wall Art Sets</li>
+							{% else %}
+							<li aria-current="page" class="breadcrumb-item active">Round Shaped Wall Arts</li>
+							{% endif %}
+						</ol>
+					</nav>
+				</div>
+
+				<div class = "col-12">	
+					
+					<button onclick="topFunction();" id="scrollBtn" title="Go to top">
+						<i class = "fa fa-chevron-up fa-lg"></i>
+					</button>				
+				
+					<div class="text-center">
+						{% if singles == 'NO' %}
+						<h1 style = "font-size: 1.2rem;">Round Shaped Wall Art Sets</h1>
+						<h4>Buy round shaped wall art sets. Well styled and designer curated sets for your home and office walls.
+						</h4>
+						{% else %}
+						<h1 style = "font-size: 1.2rem;">Framed Wall Art</h1>
+						<h4>Buy best quality round wall arts for your home or office decor&#232;.
+						</h4>
+						{% endif %}
+						<h4>
+							Comes ready for hanging. Available in multiple sizes.
+						</h4>
+					 </div>
+				</div>
+				<div class = "col-12">
+					<div class = "row">
+						<!--
+						<div class = "col-6 col-md-3 text-center mt-2">
+						{% if singles == 'NO' %}
+						<a class="btn btn-link" style = "text-decoration: underline; color: #212529;" 
+							href = "{% url 'stock_collage_products' set_of=3 %}"> 
+							Shop Set of 3 Wall Arts
+						</a>
+						</div>
+						<div class = "col-6 col-md-3 text-center mt-2">
+						<a class="btn btn-link" style = "text-decoration: underline; color: #212529;" 
+							href = "{% url 'stock_collage_products' set_of=2 %}">
+							Shop Set of 2 Wall Arts
+						</a>
+						{% endif %}
+						</div>
+						<div class = "col-6 col-md-3 text-center mt-2">
+						<form id = "f-canvas" action = "{% url 'stock_collage_products' print_medium='canvas' %}" method = "GET">
+							<input hidden name = "singles" value = "{{singles}}">
+							<button class="btn btn-link" style = "text-decoration: underline; color: #212529;" 
+								type = "submit" form = "f-canvas"> 
+								{% if singles == 'NO' %}
+									Shop Sets on Canvas
+								{% else %}
+									Framed Artworks on Canvas
+								{% endif %}
+							</button>
+						</form>
+						</div>
+						<div class = "col-6 col-md-3 text-center mt-2">
+						<form id = "f-paper" action = "{% url 'stock_collage_products' print_medium='paper' %}" method = "GET">
+							<input hidden name = "singles" value = "{{singles}}">
+							<button class="btn btn-link" style = "text-decoration: underline; color: #212529;" 
+								type = "submit" form = "f-paper"> 
+								{% if singles == 'NO' %}
+									Shop Sets on Paper
+								{% else %}
+									Framed Artworks on Paper
+								{% endif %}
+							</button>
+						</form>
+						</div>
+						-->
+					</div>
+				</div>
+				<div class = "col-12  mt-2 sticky-header" id="sticky-header">
+					<div class = "row" 
+							style = "padding: 5px; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; background-color:#f6f6f6;" >
+						<div class="col-3 d-flex align-items-center">
+							Filter By:
+						</div>
+						{% if singles == 'NO' %}
+						<div class="col-3 text-center">
+							<div class="dropdown">
+								<button class="btn btn-default dropdown-toggle" 
+								style = "color: #212529; background-color: #f6f6f6;"
+								type="button" id="dropdownMenuButton" 
+								data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									Set Of
+								</button>
+								<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+									{% for s in sets_of_list %}
+										<li class="dropdown-item" onclick="getSets('{{s}}', '', '', '')">{{s}}</li>										
+									{% endfor %}
+										<li class="dropdown-item" onclick="showAll('SET');"
+											style = "text-decoration: underline; cursor:pointer;">
+											Show All
+										</li>
+								</div>
+							</div>
+						</div>
+						{% endif %}
+						<div class="col-3 text-center">
+							<button class="btn btn-default dropdown-toggle" 
+							style = "color: #212529; background-color: #f6f6f6;"
+							type="button" id="dropdownMenuButton" 
+							data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+								Color
+							</button>
+							<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+								{% for c in colors_list %}
+									<div class= "text-center color-col mr-1" 
+										style = "display: inline-block; background-color:{{c}}; 
+											{% if c == 'White' %} border:1px solid gainsboro{% endif %}; 
+											border-radius:50%; width:30px; height:30px; 
+											margin:3px 3px; cursor:pointer;
+											color:{% if c == 'White' or c == 'Yellow'%} black {% else %} white {% endif %};"
+										onclick="getSets('', '{{c}}', '', '')">	
+									</div>
+								{% endfor %}
+								<span style = "text-decoration: underline; cursor:pointer;" 
+									onclick="showAll('COLOR');">Show All</span><br/>
+							</div>
+						</div>
+						<div class="col-3 text-center">
+							<div class="dropdown">
+								<button class="btn btn-default dropdown-toggle" 
+								style = "color: #212529; background-color: #f6f6f6;"
+								type="button" id="dropdownMenuButton" 
+								data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									Theme
+								</button>
+								<div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+									{% for c in categories_list %}
+										<li class="dropdown-item" onclick="getSets('', '', '{{c}}', '')">{{c}}</li>
+									{% endfor %}
+										<li class="dropdown-item" onclick="showAll('THEME');"
+											style = "text-decoration: underline; cursor:pointer;">
+											Show All
+										</li>
+								</div>
+							</div>
+						</div>
+						<form hidden id="cat-form" action = "{% url 'stock_collage_products' %}">
+							<input hidden id = "id_singles" name = "singles" value = "{{singles}}">
+							<input hidden id = "id_page_num" name = "page">
+							<input hidden id = "id_sort" name = "sort">
+							<input hidden id = "id_keywords" name = "keywords">
+							<input hidden id = "id_color" name = "color">
+							<input hidden id = "id_set_of" name = "set_of">
+							<input hidden id = "id_category" name = "category">
+						</form>
+					</div>
+
+					{% if filt_applied %}								
+					<div id = "filter" class = "row mt-1 " >
+						{% if print_medium %}
+						<div class="col-4 col-md-2 mt-2">
+						<span  id = "set_{{s}}" 
+							onclick = "removeFilter('PRINT', '{{print_medium}}')" class = "chip">
+							{{print_medium|title}}&nbsp;&nbsp;
+							<i class = "fa fa-remove" 
+								style = " font-size: 0.75rem; color: #aaa;">
+							</i>
+						</span>
+						</div>
+						{% endif %}
+						{% for s in f_set_of %}
+						<div class="col-4 col-md-2 mt-2">
+						<span  id = "set_{{s}}"
+							onclick = "removeFilter('SET', '{{s}}')" class = "chip">
+							Set of {{s}}&nbsp;&nbsp;
+							<i class = "fa fa-remove" 
+								style = " font-size: 0.75rem; color: #aaa;">
+							</i>
+						</span>
+						</div>
+						{% endfor %}
+						{% for c in f_color %}
+						<div class="col-4 col-md-2 mt-2">
+						<span id = "color_{{c}}" 
+							onclick = "removeFilter('COLOR', '{{c}}')" class = "chip">
+						{{c}}&nbsp;&nbsp;
+						<i class = "fa fa-remove"  id = "colx_{{c}}" onclick = "removeFilter('COLOR', '{{c}}')"
+							style = " font-size: 0.75rem; color: #aaa;">
+						</i>
+						</span>
+						</div>
+						{% endfor %}
+						{% for c in f_category %}
+						<div class="col-4 col-md-2 mt-2">
+						<span id = "theme_{{s}}"
+							onclick = "removeFilter('THEME', '{{c}}')" class = "chip">
+							{{c}}&nbsp;&nbsp;
+							<i class = "fa fa-remove" 
+								style = " font-size: 0.75rem; color: #aaa;">
+							</i>
+						</span>
+						</div>
+						{% endfor %}
+						<div class="col-4 col-md-2 mt-2" style = "color: #11b6bd;">
+							<span onclick="getSetsAll();"
+								style = "text-decoration: underline; font-size: 0.75rem; cursor: pointer">
+								Clear All Filters
+							</span>
+						</div>
+					</div>
+							
+
+					<div class = "row mt-3" style = "border-bottom: 1px solid #ddd;">
+						<div class="col-12">
+						</div>
+					</div>
+					{% endif %}
+				</div>
+				<div class = "sticky-content">
+					<div class="col-12 ">
+						<div id = "img-display mt-5">
+							{% include 'artevenue/av_products_display_include.html' %}
+						</div>
+					</div>
+				</div>
+				{% include 'artevenue/wishlist-add-message.html' %}
+				{% include 'artevenue/message-modal_ok.html' %}
+			</div>
+		</div>
+	{% endblock sitecontent %}
+
+	
+	{% block jscripts %}
+
+	<script>
+
+		jQuery(document).ready(function(){
+
+			$(document).on({
+				ajaxStart: function() { $body.addClass("loading");},
+				ajaxStop: function() { $body.removeClass("loading");},
+			});
+			
+			{% for c in f_category %}
+				$('#id_category').val($('#id_category').val() + "," + "{{c}}");
+			{% endfor %}
+			{% for s in f_set_of %}
+				$('#id_set_of').val($('#id_set_of').val() + "," + "{{s}}");
+			{% endfor %}
+			{% for c in f_color %}
+				$('#id_color').val($('#id_color').val() + "," + "{{c}}");
+			{% endfor %}
+
+			{% if singles == 'NO' %}			
+			wigzo('track', 'categoryview', 'https://artevenue.com/wall-art-sets/');
+			{% else %}
+			wigzo('track', 'categoryview', 'https://artevenue.com/framed-wall-art/?singles=YES');
+			{% endif %}
+
+		});
+
+		$("#id_page_num").val('{{page}}');
+		$("#id_sort").val('{{sortOrder}}');
+		$("#priceSort").val('{{sortOrder}}');
+		$("#id_print_medium").val('{{print_medium}}');
+
+		$("#dd").on('click', function() {
+			if ( $("#caret").attr('class') == 'fa fa-caret-down fa-lg' ) {
+				$("#caret").removeClass('fa fa-caret-down fa-lg');
+				$("#caret").addClass('fa fa-caret-up fa-lg');
+			} else {
+				$("#caret").removeClass('fa fa-caret-up fa-lg');
+				$("#caret").addClass('fa fa-caret-down fa-lg');
+			}
+		});
+	</script>
+
+	<script>
+		function getSets(set_of, color, cate, page='1'){ 				
+			if (cate != '') {
+				var c = $('#id_category').val();
+				if (c.indexOf(cate) == -1) {
+					$('#id_category').val( c + "," + cate);
+				}
+			}
+			if (color != '') {
+				var c = $('#id_color').val();
+				if (c.indexOf(color) == -1) {
+					$('#id_color').val(c  + "," + color);
+				}
+			}
+			if (set_of != '') {
+				var s = $('#id_set_of').val();
+				if (s.indexOf(set_of) == -1) {
+					$('#id_set_of').val(s + "," + set_of);
+				}
+			}
+			$('#id_page_num').val(page);
+			$("#cat-form").submit();
+
+		}
+
+		function getSetsCanvasPaper(type){ 		
+			if (type == 'CANVAS') {
+				$('#id_print_medium').val( 'CANVAS');
+			} else if (type == 'PAPER') {
+				$('#id_print_medium').val( 'PAPER');
+			} else {
+				$('#id_print_medium').val( '');
+			}
+			
+			$("#cat-form").submit();
+		}
+		
+		$('#priceSort').on('change', function() {
+		  $("#id_sort").val(this.value );
+		  $("#cat-form").submit();
+		});
+	</script>
+	
+	<script>
+	function getSetsAll(){
+		$("#id_sort").val('NONE');
+		$("#id_page_num").val('1');
+		$('#id_print_medium').val('');
+		$('#id_category').val('');
+		$('#id_color').val('');
+		$('#id_set_of').val('');	
+		$("#cat-form").submit();
+	}
+	</script>
+	<script>
+		function removeFilter(type, filt){
+			switch (type){
+				case 'THEME':
+					var f = $('#id_category').val().replace(filt, "");
+					$('#id_category').val(f);
+					break;
+				case 'COLOR':
+					var f = $('#id_color').val().replace(filt, "");
+					$('#id_color').val(f);
+					break;
+				case 'SET':
+					var f = $('#id_set_of').val().replace(filt, "");
+					$('#id_set_of').val(f);
+					break;
+				case 'PRINT':
+					$('#id_print_medium').val('');
+					break;
+			}
+			$("#cat-form").submit();
+		}
+	</script>
+	
+	<script>
+		function showAll(type){
+			switch (type){
+				case 'THEME':
+					$('#id_category').val('');
+					break;
+				case 'COLOR':
+					$('#id_color').val('');
+					break;
+				case 'SET':
+					$('#id_set_of').val('');
+					break;
+			}
+			$("#cat-form").submit();			
+		
+		}
+	</script>
+	<script>
+		function select_color(ele){
+			if (ele.innerHTML == "<i class=\"fa fa-check\"></i>"){
+				ele.innerHTML = "";
+			} else {
+				ele.innerHTML = "<i class ='fa fa-check'></i>";
+			}
+		}
+	</script>
+		
+
+	<script>
+	window.onscroll = function() {stkFunc(), scrollFunction()};
+
+	var header = document.getElementById("sticky-header");
+	var sticky = header.offsetTop;
+
+	function stkFunc() {
+	  if (window.pageYOffset > sticky) {
+		header.classList.add("l-sticky");
+	  } else {
+		header.classList.remove("l-sticky");
+	  }
+	}
+
+	var scrbutton = document.getElementById("scrollBtn");
+
+	function scrollFunction() {
+	  if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+		scrbutton.style.display = "block";
+	  } else {
+		scrbutton.style.display = "none";
+	  }
+	}
+
+	// When the user clicks on the button, scroll to the top of the document
+	function topFunction() {
+	  document.body.scrollTop = 0;
+	  document.documentElement.scrollTop = 0;
+	}
+	</script>
+	
+	{% endblock jscripts %}
+			
+	

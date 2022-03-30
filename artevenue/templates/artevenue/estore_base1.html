@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+
+{% load static %}
+{% load topbar from estore_base %}
+{% load menubar from estore_base %}
+{% load announcement from announcement %}
+{% load show_main_slider_section from prod_template_tags %}
+{% load show_featured_products_section from prod_template_tags %}
+{% load show_trending_categories from prod_template_tags %}
+{% load show_curated_collections from prod_template_tags %}
+{% load show_create_your_space from prod_template_tags %}
+{% load show_egift from prod_template_tags %}
+{% load show_referral from estore_base %}
+{% load client_speak from estore_base %}
+{% load show_frame_my_art from prod_template_tags %}
+{% load site_footer from estore_base %}
+{% load copy_right from estore_base %}
+{% load promo_display from show_promo %}
+{% load artevenue_text from estore_base %}
+{% load why_artevenue_text from estore_base %}
+{% load pick_style from prod_template_tags %}
+{% load best_sellers from prod_template_tags %}
+{% load speciality_art from prod_template_tags %}
+{% load signup_banner from estore_base %}
+{% load how_to_tips from estore_base %}
+
+ 
+<html class = "gr__artevenue_com" lang="en-IN">
+	<head>
+		{% block html-head %}
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<!--** Pick up from DB (ecom_site_title)-->
+		
+		<meta name="{{ecom_site.html_meta_name}}" content="">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="robots" content="all,follow">
+		<meta name="p:domain_verify" content="70f50ce7e84f7c0bf1219c51b7012042" />
+		<meta name="msvalidate.01" content="C0A40BC9E7C942FC76951D60DC9355A9" />
+		<meta name="facebook-domain-verification" content="yzfyc1jul8t1otg35ak4n4d06fk4ot" />
+		{% block page-title %}
+		<title>Buy Paintings Online | Premium Quality | Give Life to Your Walls</title>
+		{% endblock page-title %}
+		
+		{% block page-description %}
+		<meta name="description" content="Huge collection of 3.5+ lakh paintings from world over. Licensed artworks. Paintings on canvas or paper. Customize size, frame & more. Free Shipping, Returns.">
+		{% endblock page-description %}
+		  
+		{% block page-keywords %}
+		<meta name="keywords" content="buy paintings online, paintings on canvas, framed paintings, paintings for living room, paintings for bedroom, framed wall art, framed art prints, canvas wall art, canvas prints online, canvas prints , fine art prints, paintings for home walls, wall art paintings, painting for home decor, wall paintings for bedroom, wall paintings for living room, online photo framing, online printing and framing, canvas paintings online india">
+		{% endblock page-keywords %}
+		
+		{% block page-author %} 
+		<meta name="author" content="Arte'Venue">
+		{% endblock page-author %} 
+		<meta name="google-site-verification" content="imxpctTd8QKEpWKA_jq2ZQGhFP96nSBEUVLHZex73Oo" />			
+		<link rel="stylesheet" href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}">				
+		{% block jqueryui-stylesheet %}
+		<!--<link rel="stylesheet" href="{% static 'vendor/jquery-ui-1.12.1/jquery-ui.min.css' %}">-->
+		{% endblock jqueryui-stylesheet %}		
+		<link rel="stylesheet" href="{% static 'vendor/font-awesome/css/font-awesome.min.css' %}">
+		<!--<link rel="stylesheet" href="{% static 'vendor/font-awesome-5.10.1-web/css/all.min.css' %}">-->		
+		<!--<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,500,700,300,100">-->
+		<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300&display=swap" rel="stylesheet">		
+		{% block coursel-stylesheet %}
+		<!--
+		<link rel="stylesheet" href="{% static 'vendor/owl.carousel/assets/owl.carousel.css' %}" async>
+		<link rel="stylesheet" href="{% static 'vendor/owl.carousel/assets/owl.theme.default.css' %}" async>
+		-->
+		{% endblock coursel-stylesheet %}
+		<link rel="shortcut icon" href="{% static 'img/favicon.png' %}">
+		<!--<link href="https://fonts.googleapis.com/css?family=Dosis" rel="stylesheet">-->		
+		<script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>		
+		{% block jqueryui-script %}
+		<!--<script src="{% static '/vendor/jquery-ui-1.12.1/jquery-ui.min.js' %}"></script> -->
+		{% endblock jqueryui-script %}		
+		{% block popper-script %}
+		<!-- <script src="{% static 'vendor/popper.js/umd/popper.min.js' %}"> </script>-->
+		{% endblock popper-script %}
+		<script src="{% static 'vendor/bootstrap/js/bootstrap.min.js' %}" async></script>
+		{% block slick-slider %}
+		<link rel="stylesheet" type="text/css" href="{% static 'vendor/slick/slick.css' %}"/>
+		<link rel="stylesheet" type="text/css" href="{% static 'vendor/slick/slick-theme.css' %}"/>	
+		{% endblock %}
+		<link rel="stylesheet" href="{% static  'css/custom.css' %}">
+		<link rel="stylesheet" href="{% static 'css/style.default.min.css' %}" id="theme-stylesheet">
+		<!--<link rel="stylesheet" href="{% static 'css/home-page-style.css' %}" id="theme-stylesheet">-->
+		{% block js-cookie %}
+		<!--<script src="{% static 'vendor/jquery.cookie/jquery.cookie.js' %}" async> </script>-->
+		{% endblock js-cookie %}		
+		{% block coursel-script %}
+		<!--
+		<script src="{% static 'vendor/owl.carousel/owl.carousel.min.js' %}" async ></script>
+		<script src="{% static 'vendor/owl.carousel2.thumbs/owl.carousel2.thumbs.js' %}" async></script>
+		-->
+		{% endblock coursel-script %}
+
+		{% block gmap-script %}
+		<!-- <script src="https://maps.googleapis.com/maps/api/js"></script>-->
+		{% endblock gmap-script %}
+		
+		{% block front.js %}
+		<script src="{% static 'js/front.js' %}" async></script>	
+		{% endblock front.js %}
+		
+		{% block waypoint-script %}
+		<!--<script src="{% static 'vendor/waypoints/waypoints.min.js' %}"></script>-->
+		{% endblock waypoint-script %}
+
+		{% block counterup-script %}
+		<!--<script src="{% static 'vendor/counterup/counterup.min.js' %}"></script>-->
+		{% endblock counterup-script %}
+
+		{% block imagemap-resize-script %}
+		<script src="{% static 'vendor/imagemap/imageMapResizer.min.js' %}" async></script>
+		{% endblock imagemap-resize-script %}
+
+		{% block lazysizes %}
+		<script src="{% static '/vendor/lazysizes/lazysizes.min.js' %}" async=""></script>
+		{% endblock lazysizes %}
+		
+		{% block google-recaptcha-3 %}
+		<script async defer src="https://www.google.com/recaptcha/api.js?render=6Le2ZqAUAAAAAIAvZ7dRPJkj5zLI2IYAxfPktXqE"></script>
+		{% endblock google-recaptcha-3 %}
+
+		{% block yt-scr %}
+		<link rel="stylesheet" href="{% static 'vendor/ytlite/lite-yt-embed.css' %}" />
+		<script src="{% static 'vendor/ytlite/lite-yt-embed.js' %}"></script>
+		{% endblock yt-scr %}
+
+		{% if env == 'PROD' %}
+		<script type="application/ld+json">
+		{
+		  "@context": "https://schema.org",
+		  "@type": "WebSite",
+		  "url": "https://artevenue.com/",
+		  "potentialAction": {
+			"@type": "SearchAction",
+			"target": "https://artevenue.com/art-prints/?keywords={search_term_string}",
+			"query-input": "required name=search_term_string"
+			}
+		}
+		
+		</script>
+		<script type="application/ld+json">
+		{
+			"@context" : "https://schema.org",
+			"@type" : "Organization",
+			"Name" : "Arte'Venue",
+			"URL" : "https://artevenue.com",
+			"contactPoint" : [{
+				"@type" : "ContactPoint",
+				"telephone" : "+91-9535805505",
+				"contactType" : "Customer Service"
+			}],
+			"logo" : "https://artevenue.com/static/img/av_logo_circle2.png",
+			"sameAs" : [
+				"https://www.facebook.com/Artevenueofficial/",
+				"https://www.instagram.com/artevenue",
+				"https://www.youtube.com/channel/UC0TVlmfR8tPiqB0U_AOGNQg"
+			]
+		}
+			
+		</script>
+		{% endif %}
+		
+		{% block JSON-LD %}
+		{% endblock JSON-LD %}
+
+		{% if env == 'PROD' %}
+		<!-- Google Tag Manager -->
+		<script async defer>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+		new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+		j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+		'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+		})(window,document,'script','dataLayer','GTM-KKN69MB');</script>
+		<!-- End Google Tag Manager -->
+
+		<!-- Global site tag (gtag.js) - Google Analytics -->
+		{% block google-analytics %}
+		<script async defer src="https://www.googletagmanager.com/gtag/js?id=UA-145310649-1"></script>
+		<script async defer>
+		  window.dataLayer = window.dataLayer || [];
+		  function gtag(){dataLayer.push(arguments);}
+		  gtag('js', new Date());
+		  gtag('config', 'UA-145310649-1');
+		  gtag('config', 'AW-704394330');
+		  gtag('config', 'AW-766463166');
+		  
+		</script>
+		{% endblock google-analytics %}
+		
+		{% endif %}
+	
+		{% block cropper %}
+		<!-- <link  href="{% static 'vendor/cropper.js/cropper.css' %}" rel="stylesheet">-->
+		<!-- <script src="{% static 'vendor/cropper.js/cropper.js' %}"></script>-->
+		{% endblock cropper %}
+
+		{% if env == 'PROD' %}
+		{% block hotjar %}
+		<!-- Hotjar Tracking Code for www.artevenue.com -->
+		<!--<script>
+			(function(h,o,t,j,a,r){
+				h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+				h._hjSettings={hjid:1698652,hjsv:6};
+				a=o.getElementsByTagName('head')[0];
+				r=o.createElement('script');r.async=1;
+				r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+				a.appendChild(r);
+			})(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+		</script>-->
+		{% endblock hotjar %}
+		{% endif %}
+		
+		{% block wigzo %}
+		<script>
+		(function(w,i,g,z,o){
+			var a,m;w[ 'WigzoObject' ]=o;w[o]=w[o]|| function()
+			{(w[o].q=w[o].q||[]).push(arguments)},w[o].l=1* new Date()
+			;w[o].h=z;a=i.createElement(g)
+			,m=i.getElementsByTagName(g)[0];a.async=1;a.src=z;m.parentNode.insertBefore(a,m)
+		}) 
+		(window,document, 'script','//app.wigzo.com/wigzo.compressed.js','wigzo');
+		wigzo ('configure', 'RrvUq9T8Txqldo_oJ3klsA');
+		</script>		
+		{% endblock wigzo %}
+		
+		{% block add_to_head %}
+		{% endblock add_to_head %}
+		
+		{% endblock html-head %}
+	</head>
+
+	<body data-gr-c-s-loaded="true" cz-shortcut-listen="true">	
+		{% if env == 'PROD' %}
+			<!-- Google Tag Manager (noscript) -->
+			<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KKN69MB"
+			height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+			<!-- End Google Tag Manager (noscript) -->
+
+			<script
+				type="text/javascript"
+				async defer
+				src="//assets.pinterest.com/js/pinit.js">
+			</script>	
+		{% endif %}
+
+		{% announcement request %}
+		
+		<!-- Header Section with top slim line, logo/search/cart and menu-->
+		{% block siteheader %}
+		<header class="header">
+
+			{% include 'artevenue/whatsapp.html' %}
+			
+			{% block menu %}				
+			{% menubar request messages %}
+			{% endblock menu %}	
+			
+		</header>
+		{% endblock siteheader %}
+		<!-- END: Header Section with top slim line, logo/search/cart and menu-->
+
+		<div id="all">
+			<div id="content" class= "" style="background-color:#fff">
+				{% block sitecontent %}
+														
+				{% show_main_slider_section request %}
+
+				{% show_trending_categories %}
+
+				{% show_curated_collections %}
+				
+				{% speciality_art %}
+				
+				{% why_artevenue_text %}
+
+				{% show_frame_my_art request %}			
+
+				{% signup_banner %}
+
+				{% how_to_tips request %}
+				
+
+				{% endblock sitecontent %}
+
+				<!--
+				{% promo_display request %}
+				-->
+				{% site_footer request %}
+				
+				<!--  Site Footer -->
+				<div class = "container-fluid"  style = "background-color: #000;">
+					<div class="row" style = "margin-top: 0px;">
+						<div class="col-12 text-center" style = "text-align:justify; color: #979797; 
+								margin-top:0px; font-size:11px; margin-bottom:0px; line-height: 1;
+								background-color: #000;">
+								
+							<p>
+								Buy premium quality & affordable paintings, wall art for home and office interiors at Arte'Venue.
+								Buying paintings online is made easier with our 
+								largest and awesome collection of licensed art prints in India. All our art prints
+								are fully customizable. With these elegant art prints we have made the interiors
+								and decor affordable.
+							</p>
+							{% block footer-text %}
+							{% endblock footer-text %}
+
+						</div>
+					</div>				 
+				</div>
+				<!-- *** FOOTER END ***-->
+	
+				<!--COPYRIGHT -->
+				{% copy_right request %}
+				 				
+			</div>
+			<div class="ajax-modal"></div>
+			
+			
+			<div id="new-signup-modal" tabindex="-1" role="dialog" aria-labelledby="New Sign Up" aria-hidden="true" class="modal fade">
+				<div class="modal-dialog modal-sm">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title"></h5>
+							<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
+						</div>
+						<div class="modal-body">	
+							<div class="panel panel-default">
+								<div class="panel-body">
+									<div class = "row text-center">
+										<div class = "col-12" style = "font-size:1rem;">
+										<strong>Thank you for signing up! </strong>
+										</div>
+										<div class = "col-12 mt-3">
+											Your Arte'Venue account -
+										</div>
+										<div class = "col-12">
+											Username: {{request.user}}
+										</div>
+										<div class = "col-12">
+											Email: {{request.user.email}}
+										</div>
+										<div class = "col-12 mt-3">
+											You are now logged in. <br />
+											To login next time, you can use above username
+											(or email) and password to login to your Arte'Venue 
+											account.
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+		</div>
+
+
+		{% block jscripts %}
+			{% block image-resize-script %}
+			{% endblock image-resize-script %}
+		{% endblock jscripts %}
+		
+
+		<script type="text/javascript" src="{% static 'vendor/slick/slick.min.js' %}"></script>	
+		<script type="text/javascript"></script>
+
+		<script>
+			$( document ).ready(function() {
+			
+				/*
+				val = sessionStorage.getItem("HomePopupShown");
+				if ( val == null){
+					setTimeout(function () {
+						$('#promo').modal('show');
+						sessionStorage.setItem("HomePopupShown", "yes");
+					}, 1000 );
+				}
+				*/			
+			});
+		</script>
+		
+		<script>
+			function updateCartItemsNum(num){
+				$('#itemsincart').html(num);
+				$('#itemsincart_m').html(num);
+			}
+			
+			function synch_cart(){
+				// Sync session cart and user cart
+				$.ajax({
+					url: "{% url 'sync_cart_session_user' %}", 
+					dataType: 'text', 
+					type: 'post',
+					success: function (data) {
+						data = JSON.parse(data);
+						console.log("SYNC STATUS : "  + data.status);
+					},
+					error: function(xhr){
+						alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+					}
+				});
+			}
+		</script>
+		
+		<script async>
+			// In case of invalid login, let's trigger the login modal
+			$(document).ready(function(){
+				{% if messages %}
+					{% for message in messages %}
+						{% if message.level == 40 %} 
+							$('#show-loginerror').html("<div class='alert alert-danger'><button type='button' class='close' data-dismiss='alert'></button>{{message}}</div>");
+							$('#login-modal').modal('show'); 
+						{% endif %}
+						{% if message.level == 90 %} 
+							$('#new-signup-modal').modal('show'); 
+
+							wigzo ("identify", 
+								{
+								email: "{{request.user.email}}",
+								phone: "",
+								fullName: "{{request.user.first_name}} {{request.user.last_name}}" 
+								}
+							);
+							
+						{% endif %}
+					{% endfor %}
+				{% endif %}
+				show_persistant_menu_on_click();
+				
+			});		
+			
+			function show_persistant_menu_on_click(){
+				$('ul.navbar-nav li.dropdown').hover(function() {
+				  $(this).find('.dropdown-menu').stop(true, true).delay(200).fadeIn(500);
+				}, function() {
+				  $(this).find('.dropdown-menu').stop(true, true).delay(200).fadeOut(500);
+				});	
+			}
+		</script>
+		
+		<script>
+			
+			function getCookie(cname) {
+				var name = cname + "=";
+				var decodedCookie = decodeURIComponent(document.cookie);
+				var ca = decodedCookie.split(';');
+				for (var i = 0; i < ca.length; i++) {
+					var c = ca[i];
+					while (c.charAt(0) == ' ') {
+						c = c.substring(1);
+					}
+					if (c.indexOf(name) == 0) {
+						return c.substring(name.length, c.length);
+					}
+				}
+				return "";
+			} 
+					
+		</script>
+
+		<script>
+			/*
+			function copyPromocode() {
+			  var copyText = document.getElementById("pcode_inv");
+
+			  copyText.select();
+			  copyText.setSelectionRange(0, 99999);
+
+			  document.execCommand("copy");
+			}
+			*/
+		</script>
+
+		<!--
+		{% if env == 'PROD' %}
+			{% block tawkto %} 
+			<script async type="text/javascript">		
+				var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+				(function(){
+				var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+				s1.async=true;
+				s1.src='https://embed.tawk.to/5da6fe47fbec0f2fe3ba07cc/default';
+				s1.charset='UTF-8';
+				s1.setAttribute('crossorigin','*');
+				s0.parentNode.insertBefore(s1,s0);
+				})();
+			</script>
+			<!--End of Tawk.to Script-->
+			{% endblock tawkto %}		
+		{% endif %}
+		-->
+		<script type="text/javascript">
+		_linkedin_partner_id = "3434276";
+		window._linkedin_data_partner_ids = window._linkedin_data_partner_ids || [];
+		window._linkedin_data_partner_ids.push(_linkedin_partner_id);
+		</script><script type="text/javascript">
+		(function(l) {
+		if (!l){window.lintrk = function(a,b){window.lintrk.q.push([a,b])};
+		window.lintrk.q=[]}
+		var s = document.getElementsByTagName("script")[0];
+		var b = document.createElement("script");
+		b.type = "text/javascript";b.async = true;
+		b.src = "https://snap.licdn.com/li.lms-analytics/insight.min.js";
+		s.parentNode.insertBefore(b, s);})(window.lintrk);
+		</script>
+		<noscript>
+		<img height="1" width="1" style="display:none;" alt="" src="https://px.ads.linkedin.com/collect/?pid=3434276&fmt=gif" />
+		</noscript>		
+	</body>
+	
+</html>

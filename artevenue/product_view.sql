@@ -15,7 +15,8 @@ SELECT "store_id" as store_id, "product_id" as product_id, "name" as name, "desc
 	0 as original_art_price, 
 	0 as available_qty,	
 	0 as sold_qty,	
-	0 as stock_image_id
+	0 as stock_image_id,
+	'' as p_type
 FROM "artevenue_stock_image"
 
 UNION
@@ -35,7 +36,8 @@ SELECT 0 as store_id, "product_id" as product_id, '' as name, '' as description,
 	0 as original_art_price, 
 	0 as available_qty,	
 	0 as sold_qty,	
-	0 as stock_image_id
+	0 as stock_image_id,
+	'' as p_type
 FROM "artevenue_user_image"
 
 UNION
@@ -54,7 +56,8 @@ SELECT 0 as store_id, "product_id" as product_id, "name" as name, '' as descript
 	0 as original_art_price, 
 	0 as available_qty,	
 	0 as sold_qty,	
-	0 as stock_image_id
+	0 as stock_image_id,
+	'' as p_type
 FROM "artevenue_stock_collage"
 
 UNION
@@ -75,5 +78,31 @@ SELECT 0 as store_id, "product_id" as product_id, "name" as name, "description" 
 	"original_art_price" as original_art_price, 
 	"available_qty" as available_qty,
 	"sold_qty" as sold_qty,
-	"stock_image_id" as stock_image_id
+	"stock_image_id" as stock_image_id,
+	'' as p_type
 FROM "artevenue_original_art"
+
+UNION
+SELECT 0 as store_id, "product_varient_id" as product_id, b."title" as name, 
+	"product_varient_size" as description,
+	"price" as price, CURRENT_DATE as available_on, CURRENT_DATE as updated_at,
+	CAST("product_varient_id" as text) as part_number, "product_type_id" as product_type_id, b."is_published" as is_published,  
+	'' as seo_description, '' as seo_title, TRUE as charge_taxes, 
+	"featured" as featured, TRUE as has_variants, b."aspect_ratio" as aspect_ratio, 
+	"image_type" as image_type, '' as orientation, "max_width" as max_width,
+	b."max_height" as max_height, b."min_width" as min_width, 
+	b."publisher" as publisher, b."artist" as artist,
+	b."colors" as colors, b."key_words" as key_words, 
+	"url" as url, "thumbnail_url" as thumbnail_url,
+	'' as session_id, 0 as user_id, '' as image_to_frame, '' as status, CURRENT_DATE as created_date, 
+	CURRENT_DATE as updated_date, 0 as collage_layout_id, ''  as image_to_frame_thumbnail,
+	0 as art_width , 0 as art_height, '' as art_medium, '' as art_surface, '' as art_surface_desc,
+	'' as high_resolution_url, "category_disp_priority" as category_disp_priority,
+	true as art_print_allowed,
+	0 as original_art_price, 
+	0 as available_qty,	
+	0 as sold_qty,	
+	0 as stock_image_id,
+	'NOT-RECTANGLE' as p_type
+FROM "av_products_av_product_varient" a, "av_products_av_product" b
+WHERE a.product_id = b.product_id

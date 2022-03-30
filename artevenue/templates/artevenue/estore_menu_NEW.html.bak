@@ -1,0 +1,587 @@
+{% load static %}
+{% load utils %}
+<nav class="navbar navbar-expand-lg" style = "padding:0px; border-bottom: 1px solid #eee; margin: 5px 1rem 0px;">
+
+	<div class = "d-none d-md-flex align-self-md-center">
+		<a href="{% url 'index' %}" class="navbar-brand"  style = "padding-top: 0px;">
+			<!--<img src="{% static 'img/av_logo_circle2.png' %}" alt="Arte'Venue Logo" class="d-none d-md-inline-block" style="width:90px; min-height:90px;">-->
+			<img src="{% static 'img/logo/av_logo_round.png' %}" alt="Arte'Venue Logo" class="" style="width:90px; height:90px; image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges;">
+			<span class="sr-only">{{ecom_site.store_name}} - go to homepage</span>
+		</a>
+	</div>
+
+	<div class = "w-100 d-flex  d-md-none d-flex justify-content-between">
+		<a href="{% url 'index' %}" class="navbar-brand"  style = "padding-top: 2px;">
+			<!--<img src="{% static 'img/av_logo_circle2_m1.png' %}" alt="Arte'Venue Logo" class="d-inline-block d-md-none"  style="width:175px; min-height:47px;">-->
+			<img src="{% static 'img/logo/av_logo_rectangular.png' %}" alt="Arte'Venue Logo" class="d-inline-block d-md-none"  style="width:120px; min-height:10px; image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges;">
+			<span class="sr-only">{{ecom_site.store_name}} - go to homepage</span>
+		</a>
+
+		<span class = "navbar-toggler" style = "padding-top: 15px;">
+			<a href="{% url 'show_cart' %}" class="cart_top" 
+				style="">
+				<img src="{% static 'img/cart_icon_new.png' %}" width=20 height=20 alt="Show cart icon">
+				<span id="itemsincart_m">{% if usercart %} {{usercart.quantity}} {%else%} 0 {%endif %}
+				</span>
+			</a>
+		</span>
+		<button data-toggle="collapse" data-target="#navigation" 
+			class="navbar-toggler" style="padding: 0px;">
+			<img src="{% static 'img/bars.png' %}" width=30 alt="Menu" height=23>
+			<span class="sr-only">Toggle navigation</span>
+		</button>
+	</div>  
+	<div class="d-flex flex-column w-100" 
+		style = "font-size: 0.85rem; background-color: #fcfcfc; align-items: flex-start; !important;">
+		<ul class="d-none navbar-nav d-md-flex w-100" style = "background-color:#fff;">
+			<div class = "d-none d-md-flex" style = "width: 70%">
+				<li class="list-inline-item clickable w-100">
+				<form id = "search_form"role="search" class="form-inline d-none d-md-block search_form" action = "{% url 'art_by_category' %}" method = 'POST'>
+					{% csrf_token %}
+					<input type="text" placeholder="Ex. Van Gogh, Blue, Abstract etc." id ="keywords" name="keywords" class="form-control w-100" required>
+					<button class="btn btn-outline-success" type="submit" style = "background-color: #000; border-radius: 0;" form= "search_form">
+						<!--<img src="{% static 'img/search_head_white.png' %}" alt = "Search Button" width=20 height=20>-->
+						<i class="fa fa-search" style="color:#fff;"></i>
+					</button>
+				</form>
+				</li>
+			</div>
+			<div class = "d-none d-md-flex align-item-end w-100 justify-content-end align-items-center" style="font-size:0.8rem;">
+				{% if ecom_site.phone_support_available %}
+				<li class="list-inline-item clickable">
+					<a class = "clickable" data-toggle="modal" data-target="#phone-help" style = "color: #77899e;">
+						<img src="{% static 'img/help.png' %}" alt="Phone Support" width=15> Help
+						<!--<img src="{% static 'img/help.png' %}" alt="Phone Support" width=15> Contact us-->
+					</a>
+				</li>
+				{% endif %}
+
+				<li class= "list-inline-item clickable">
+					<a href="{% url 'show_wishlist' %}"  style = "color: #77899e;">
+						<img src="{% static 'img/favorite.png' %}" width=15 alt = "Favicon"> Favourites
+					</a>
+				</li>
+				
+				{% if user.is_authenticated %}
+					<li class="list-inline-item clickable">
+						<a href="#" data-toggle="dropdown"  style = "color: #77899e;">
+						<img src = "{% static 'img/user.png' %}" alt="User Icon" width=15>
+							{{user.username}}<i class = "fa fa-chevron-down"></i>
+						</a>
+						<ul class="dropdown-menu dropdown-menu-login" >
+							{% if is_artist %}
+							<li style = "margin-top:8px;"> <a href="{% url 'artist_page' %}"  style = "color: #77899e;">Artist's Page</a></li> 
+							<li class= "dropdown-divider" style = "margin-top:5px;" ></li>
+							{% endif %}
+
+							{% if not livuser %}
+							<li style = "margin-top:8px;"><a href="{% url 'logout' %}"  style = "color: #77899e;">Logout</a></li>
+							{% endif %}
+							<li style = "margin-top:8px;"> <a href="{% url 'password_change' %}"  style = "color: #77899e;">Change Password</a></li>   
+							<li class= "dropdown-divider" style = "margin-top:5px;" ></li>
+							<li style = "margin-top:8px;"><a href="{% url 'my_account' %}"  style = "color: #77899e;">My Account</a></li>
+							<li style = "margin-top:8px;"><a href="{% url 'my_orders' %}"  style = "color: #77899e;">My Orders</a></li>
+							{% if business_user %}
+								<li style = "margin-top:8px;"><a href="{% url 'my_business_report_wrap' %}" style = "color: #77899e;">My Business Report</a></li>
+								{% if livadmin %}
+								<li style = "margin-top:8px;"><a href="{% url 'livspace_accounts_of_designers' %}" style = "color: #77899e;">Accnts of Designers</a></li>
+								{% endif %}
+							{% endif %}
+						</ul>
+
+					</li>
+				{% else %}
+					<li class="list-inline-item clickable" >
+						<!--<a href="{% url 'register' %}" style = "padding-right:0px !important; color: #77899e;"> 
+							<img src = "{% static 'img/user.png' %}" alt="User" width=15>
+							Sign Up 
+						</a>-->
+						<a data-toggle="modal" data-target="#signup_popup-modal" style = "padding-left:5px !important; border-left:1px solid #aeaeae; color: #77899e;">
+							<img src = "{% static 'img/user.png' %}" alt="User Icon" width=15>
+							Sign Up
+						</a>
+						<a data-toggle="modal" data-target="#login-modal" style = "padding-left:5px !important; border-left:1px solid #aeaeae; color: #77899e;">Login</a>
+					</li>
+				{% endif %}
+				<li id="basket-overview" class="list-inline-item clickable">
+					<a href="{% url 'show_cart' %}" class="cart_top d-xl-block d-lg-block d-none">
+						<img src="{% static 'img/cart_icon_new.png' %}" width=20 alt="Show cart icon" height=20>
+						<span id="itemsincart">{% if usercart %} {{usercart.quantity}} {%else%} 0 {%endif %}</span>
+					</a>
+				</li>
+			</div>
+		</ul>	
+		<div  id="navigation" class="collapse navbar-collapse w-100" 
+			style = "font-size: 0.85rem; background-color: #f6f6f6; align-items: flex-start !important; border-top: 1px solid #ddd; 
+				position:relative; z-index: 99;">
+			<ul class="d-flex d-md-none justify-content-between" 
+					style = "border-bottom: 1px solid #eaeaea; padding:15px;
+					max-width: 400px; left: 0; bottom: 0;">
+				{% if user.is_authenticated %}
+					<li class="list-inline-item clickable">
+						<a href="#" data-toggle="dropdown"  style = "color: #77899e;">
+						<img src = "{% static 'img/user.png' %}" alt="User Icon" width=15>
+							{{user.username}}<i class = "fa fa-chevron-down"></i>
+						</a>
+						<ul class="dropdown-menu dropdown-menu-login" >
+							{% if is_artist %}
+							<li style = "margin-top:8px;"> <a href="{% url 'artist_page' %}"  style = "color: #77899e;">Artist's Page</a></li> 
+							<li class= "dropdown-divider" style = "margin-top:5px;" ></li>
+							{% endif %}
+							
+							{% if not livuser %}
+							<li style = "margin-top:8px;"><a href="{% url 'logout' %}"  style = "color: #77899e;">Logout</a></li>
+							{% endif %}
+							<li style = "margin-top:8px;"> <a href="{% url 'password_change' %}"  style = "color: #77899e;">Change Password</a></li>   
+							<li class= "dropdown-divider" style = "margin-top:5px;" ></li>
+							<li style = "margin-top:8px;"><a href="{% url 'my_account' %}"  style = "color: #77899e;">My Account</a></li>
+							<li style = "margin-top:8px;"><a href="{% url 'my_orders' %}"  style = "color: #77899e;">My Orders</a></li>
+							{% if business_user %}
+								<li style = "margin-top:8px;"><a href="{% url 'my_business_report_wrap' %}" style = "color: #77899e;">My Business Report</a></li>
+								{% if livuser %}
+								<li style = "margin-top:8px;"><a href="{% url 'livspace_accounts_of_designers' %}" style = "color: #77899e;">Accounts of Designers</a></li>
+								{% endif %}
+							{% endif %}
+						</ul>
+
+					</li>
+				{% else %}
+					<li class="list-inline-item clickable" >
+						<a data-toggle="modal" data-target="#signup_popup-modal" style = "padding-left:5px !important; border-left:1px solid #aeaeae; color: #77899e;">
+							<img src = "{% static 'img/user.png' %}" alt="User Icon" width=15>
+							Sign Up
+						</a>
+						<a data-toggle="modal" data-target="#login-modal" style = "padding-left:5px !important; border-left:1px solid #aeaeae; color: #77899e;">Login</a>
+					</li>
+				{% endif %}
+				<li class= "list-inline-item clickable">
+					<a href="{% url 'show_wishlist' %}"  style = "padding-left:5px !important; border-left:1px solid #aeaeae; color: #77899e;">
+						<img src="{% static 'img/favorite.png' %}" width=15 alt = "Favicon"> Favourites
+					</a>
+				</li>
+				
+				{% if ecom_site.phone_support_available %}
+				<li class="list-inline-item clickable">
+					<a class = "clickable" data-toggle="modal" data-target="#phone-help" style = "color: #77899e;">
+						<img src="{% static 'img/help.png' %}" alt="Phone Support" width=15> Help
+						<!--<img src="{% static 'img/phone_support.png' %}" alt="Phone Support" width=15> Contact us-->
+					</a>
+				</li>
+				{% endif %}
+			
+			</ul>
+			<ul class="navbar-nav flex-md-row mt-1 pt-2 pb-2 mx-auto">
+				{% for main in level0_menuitems %}
+					{% if main.name|upper == 'CATEGORIES' %}
+				
+					<li class="mb-2 nav-item dropdown menu-large">
+						<a href="#" data-toggle="dropdown" data-hover="dropdown" 
+							id = "art_id"
+							class="dropdown-toggle nav-link"
+							style = "text-decoration:underline;">
+							{{main.name}}
+							<i class="fa fa-caret" style="color:#11b6bd; margin:-5px;"></i>
+						</a>
+						{% if level1_menuitems %}
+						<ul class="dropdown-menu megamenu">
+							<li class = "dropdown">
+								<div class="row">									
+									{% for level1 in level1_menuitems %}
+									{% if forloop.counter == 1 %}
+										<div class="col-12 mb-2 text-center"  style = "font-size: 0.7rem; font-weight:700;">
+											TOP CATEGORIES
+										</div>
+									{% endif %}
+									{% if level1.name != '' %} 
+									<div class="col-6 col-md-3 col-lg-2 text-center">
+										{% if level1.url_suffix %}
+											<a style = "color: #082a4c !important;" href="{% url 'art_by_category' level1.url_suffix %}" class="nav-link">
+										{% else %}
+											<a style = "color: #082a4c !important;" href="{% url 'art_by_category' level1.name %}" class="nav-link">
+										{% endif %}
+											{% if forloop.counter < 7 %}
+												{% if level1.url %}
+													{% with 'img/'|add:level1.url as image_static %}
+													<img class = "img-in-menu" src = "{% static image_static %}" alt="{{level1.name|replace:' ,-'}}">
+													{% endwith %}
+												{% endif %}
+											{% endif %}
+											<div class = "">
+												<h4>{{level1.name|title}}</h4>
+											</div>
+										</a>
+										<ul class="list-unstyled mb-3">
+										{% for level2 in level2_menuitems %}
+										{% if level2.parent_id == level1.name|replace:' ,-' %}
+											<li class="nav-item"><a style = "color: #082a4c;"  href="{% url 'art_by_category' level2.category_id %}" class="nav-link">{{level2.name|title}}</a></li>
+										{% endif %}
+										{% endfor level2_menu %}
+										</ul>
+									</div>
+
+									{% endif %}
+									{% if forloop.counter == 7 %}
+										<div class="col-12 mb-2 mt-1  text-center" style = "font-size: 0.7rem; font-weight:700;">
+											MORE CATEGORIES
+										</div>
+									{% endif %}
+									{% endfor level1_menu %}
+
+									<div class="col-12 text-center">
+										<a class = "btn btn-artevenue" style = "color: #082a4c; !important; text-decoration:underline; font-size: 0.7rem; font-weight:700;" href="{% url 'show_all_categories' %}" class="nav-link">ALL CATEGORIES <i class = "fa fa-chevron-right"></i></a>
+									</div>
+
+								</div>
+							</li>
+						</ul>
+						{% endif %}
+					</li>
+					{% endif %}
+					
+
+				{% endfor %}
+
+				<li class= "mt-2 mb-2 mt-md-0 mb-md-0">
+					<a href="{% url 'get_gallery_walls' %}"
+							style = "text-decoration:underline;">
+						Gallery Walls
+					</a>
+				</li>
+				<li class= "mt-2 mb-2 mt-md-0 mb-md-0">
+					<a href="{% url 'stock_collage_products' %}"
+							style = "text-decoration:underline;">
+						Wall Art Sets
+					</a>
+				</li>
+
+				<div class="dropdown menu-large mt-2 mb-2 mt-md-0 mb-md-0">
+					<span class="dropdown-toggle room-ideas-menu" style = "text-decoration: underline; padding: 0px 10px 0px; font-size: 14px; font-weight: 500; color: #082a4c; letter-spacing: 0.1rem;" 
+								data-toggle="dropdown"> <a> Art By Room</a>
+					<span class="caret"></span></span>
+					<ul class="dropdown-menu textmenu">
+						<li>
+							<a class = "nav-link" style = "color: #082a4c !important;" href = "{% url 'curated_collections' cat_nm='paintings-for-living-room'%}">
+								Living Room
+							</a>
+						</li>
+						<li>
+							<a class = "nav-link mt-2" style = "color: #082a4c !important;" href = "{% url 'curated_collections' cat_nm='bedroom-wall-art'%}">
+								Bed Room
+							</a>
+						</li>
+						<li>
+							<a class = "nav-link mt-2" style = "color: #082a4c !important;" href = "{% url 'curated_collections' cat_nm='kitchen-wall-art'%}">
+								Kitchen
+							</a>
+						</li>
+						<li>
+							<a class = "nav-link mt-2" style = "color: #082a4c !important;" href = "{% url 'curated_collections' cat_nm='art-prints-for-stairway'%}">
+								Stairway
+							</a>
+						</li>
+						<li>
+							<a class = "nav-link mt-2" style = "color: #082a4c !important;" href = "{% url 'curated_collections' cat_nm='art-prints-for-study'%}">
+								Study
+							</a>
+						</li>
+					</ul>
+				</div>
+				<!--
+				<div class="dropdown menu-large mt-2 mb-2 mt-md-0 mb-md-0">
+					<span class="dropdown-toggle room-ideas-menu" data-toggle="dropdown">Original Paintings
+					<span class="caret"></span></span>
+					<ul class="dropdown-menu textmenu">
+						<li>
+							<a class = "nav-link" style = "color: #082a4c !important;" href = "{% url 'show_all_original_art_categories'%}">
+							Browse Categories
+							</a>
+						</li>
+						<li>
+							<a class = "nav-link mt-2" style = "color: #082a4c !important;" href = "{% url 'original_art_by_category'%}">
+								All Original Art
+							</a>
+						</li>
+					</ul>
+				</div>
+				-->
+				<!--
+				<li class= "mt-2 mb-2 mt-md-0 mb-md-0">
+					<a href="{% url 'user_image' %}"
+						style = "text-decoration:underline;">
+						Custom Photo Frames
+					</a>
+				</li>				
+				-->
+				
+				{% if not livuser %}
+				<li class= "mt-2 mb-2 mt-md-0 mb-md-0">
+					<a href="{% url 'show_av_products' %}"
+						style = "text-decoration:underline;">
+						Round-Shaped Wall Art
+						<sup style ="background-color:red; color:#fff; text-decoration:none; padding:0px 2px; border-radius: 20%;">New</sup>
+					</a>
+				</li>
+				<li class= "mt-2 mb-2 mt-md-0 mb-md-0">
+					<a href="{% url 'offers' %}"
+						style = "text-decoration:underline;">
+						Offers
+					</a>
+				</li>
+				<!--
+				<li class= "mt-2 mb-2 mt-md-0 mb-md-0">
+					<a href="{% url 'business_registration' %}"
+						style = "text-decoration:underline;">
+						Business Sales
+					</a>
+				</li>-->
+				{% endif %}
+				
+				{% if user.is_staff %}
+				<li class= "mt-2 mb-2 mt-md-0 mb-md-0">
+					<a href="{% url 'staff_page' %}"
+						style = "text-decoration:underline;">
+						Staff Page
+					</a>
+				</li>				
+				{% endif %}
+			</ul>	
+		</div>
+	</div>	
+	
+	<div class="navbar-buttons d-flex justify-content-end">
+	
+	</div>		
+</nav>
+
+<!-- Search open up -->
+<div id="search" class="d-block d-md-none">
+	<div class="container">
+		<form id = "search_form_m" role="search"  class="form-inline search_form" action = "{% url 'art_by_category' %}" method='post'>
+			{% csrf_token %}
+			<div class="input-group" style = "width:100% !important; float:right;">
+				<input type="text" placeholder="Ex. Van Gogh, Blue, Abstract etc." id ="keywords_m" name="keywords" class="form-control keywords" required>
+				<div class="input-group-append">
+					<button type="submit" class="btn btn-primary" form = "search_form_m" style = "background-color: #000; border-radius: 0;" >
+						<i class="fa fa-search"></i>
+					</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+
+<div id="phone-help" tabindex="-1" role="dialog" aria-labelledby="Login" aria-hidden="true" class="modal fade">
+	<div class="modal-dialog modal-md">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h3 class="modal-title">
+					<strong> Get In Touch</strong>
+				</h3>
+				<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
+			</div>
+			<div class="modal-body">	
+				<div id = "framing-card" class = "row">
+					<div class = "col-6 text-center mt-2">
+						<p>Customer Support</p>
+						<a href = "https://wa.me/919535805505?text=Hi,%20I%20need%20help%20with"
+							style = "font-size: 0.75rem;" 
+							target = "_blank">
+							<img src = "{% static 'img/whatsapp_logo.png' %}" width=20 alt="WhatsApp Logo"> 
+							<span style = "text-decoration: underline;
+								font-family: 'Lato', sans-serif; font-size: 14px; color: #212529;
+								letter-spacing: 0.5px;">
+								95358 05505
+							</span>
+						</a>						
+					</div>
+					<div class = "col-6 text-center mt-2">
+						<p>Sales/Bulk Orders </p>
+						<img src = "{% static 'img/phone_support.png' %}" width=20 alt="Phone Support"> 
+						<a href="tel:{{ecom_site.support_phonenumber }}">
+							<span style = "text-decoration: underline;
+								font-family: 'Lato', sans-serif; font-size: 14px; color: #212529;
+								letter-spacing: 0.5px;">
+								<!--{{ecom_site.support_phonenumber }}-->
+								96115 03626 
+							</span>
+						</a>
+					</div>
+					<div class="card col-12 mt-3">
+						<div class="card-body">
+							<h3 class="card-title">Have a question or need some help?</h3>
+							<p class = "card-text mt-3">
+								<ul>
+									<li>How to choose artworks and size</li>
+									<li>How to customize artworks</li>
+									<li>Questions on ordering, shipping, returns, status</li>
+									<li>Ask our designers for recommedations</li>
+									<li>Anything else....</li>
+								</ul>
+								For Most General Questions:
+								<a href="{% url 'faq' %}">FAQ</a>
+								<hr>
+								<span class = "pull-left">
+									We are here to help!<br />
+									<p style = "font-size:0.65rem;">Timing: {{ecom_site.phone_support_start_time}} to {{ecom_site.phone_support_end_time}}</p>
+								</span>
+								<!--
+								<span class = "pull-right" style = "font-size: 1.5rem;">
+									<img src="{% static 'img/phone_support.png' %}" alt="Phone Support" width=15> {{ecom_site.support_phonenumber }}
+								</span>
+								-->
+							</p>
+						</div>			
+					</div>
+				</div>
+			
+			</div>
+		</div>
+	</div>
+</div>
+
+	
+<div id="login-modal" tabindex="-1" role="dialog" aria-labelledby="Login" aria-hidden="true" class="modal fade">
+	<div class="modal-dialog modal-md">
+		<div class="modal-content">
+			<div class="modal-header" style = "background-color:#11b6bd;color:#fff">
+				<h3 class="modal-title" >Customer login</h3>
+				<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
+			</div>
+			<div class="modal-body">
+				<form action = "{% url 'login'%}" method="post" accept-charset="UTF-8" role="form" method="POST">
+					{% csrf_token %}
+					{% load socialaccount %}	
+					{% providers_media_js %}
+					<div class="form-group">
+						<div style = "font-size:0.75rem;" >
+							Please Enter Your User Name or Email and password
+						</div>
+						<div class = "row">
+							<div class ="col-12 col-md-5">
+								<input name = "username" type="text" class="form-control" placeholder="Username">
+							</div>
+							<div class ="col-12 col-md-1 text-center">
+								OR
+							</div>
+							<div class ="col-12 col-md-6">
+								<input id="email-modal" name = "email" type="text" placeholder="email" class="form-control">
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<input id="password-modal" name = "password" type="password" placeholder="password" class="form-control">
+					</div>
+					<input name="remember" type="checkbox" value="Remember Me" checked> Remember Me						
+					<input hidden id="curr_pg" name="curr_pg" value="{{request.path}}" >						
+					<br />
+					<p>
+						<div class="text-center">
+							<button id="submit-btn" type = "submit" class="btn btn-primary" style = "width: 150px;"><i class="fa fa-sign-in"></i> Log in</button>
+						</div>
+						<div style = "font-size:0.65rem;" class= "text-center mt-2">
+							<a class = " text-secondary" style = "text-decoration:underline;" href="{% url 'password_reset' %}">Forgot Username/Password</a>
+						</div>
+					</p>
+					<div id = "show-loginerror">
+					</div>
+				</form>
+				<hr>
+			
+				<div style = "font-size: 0.75rem;">
+					<div class = "row">
+						<div class = "col-12 text-center ">
+							<span class="text-muted">Not signed up yet?</span>
+							<span class="text-muted"><a href="{% url 'register' %}"><strong  class = "text-primary">Sign Up now</strong>!</a>
+						</div>
+					</div>
+					<div class = "row">
+						<div class = "col-12 text-center text-muted">
+							It is easy, done in a minute and gives you access to special offers, discounts!</p>
+						</div>
+					</div>
+				</div>
+				<hr>
+				<div style = "font-size:0.8rem;" >
+					Or Login Using Your Social Media Account
+				</div>
+				<div class = "well">
+					<div class = "row">
+						<div class="col-12 text-center"
+								style = "padding:10px;">
+							<a class="btn auth-provider-button" href="{% provider_login_url 'facebook' method='js_sdk' %}"
+								style = "padding:0px;">
+							  <img src="{% static 'img/fb_login.png' %}" alt="Facebook Login" style="height:auto; border:0; width:150px; ">
+							</a>
+						</div>
+						<!--
+						<div class="col-12 text-center"
+								style = "padding:10px;">
+							<a class="btn auth-provider-button" href="{% provider_login_url 'instagram' %}"
+								style = "padding:0px;">
+							  <img src="{% static 'img/instagram_login.png' %}" alt="Instagram Login" style="height:auto; border:0; width:150px; ">
+							</a>
+						</div>
+						-->
+						<div class="col-12 text-center"
+								style = "padding:10px;">
+							<a class="btn auth-provider-button" href="{% provider_login_url 'google' %}"
+								style = "padding:0px;">
+							  <img src="{% static 'img/google_login.png' %}" alt="Google Login" style="height:auto; border:0; width:150px; ">
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>	
+</div>
+
+{% include 'artevenue/signup_modal.html' %}
+
+
+<div id="changepassword-modal" tabindex="-1" role="dialog" aria-labelledby="Login" aria-hidden="true" class="modal fade">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title"></h5>
+				<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
+			</div>
+			<div class="modal-body">	
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">
+						Change Password
+						</h3>
+					</div>
+					<div class="panel-body">
+						<form method="post" novalidate action = "{% url 'password_change' %}" id = "f_pwd">
+							{% csrf_token %}
+							{% include 'includes/form.html' %}
+							<input class="btn btn-lg btn-primary btn-block" type="submit" value="Change">
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	$("#search_form_m").submit(function(){
+		var s_txt = $("#keywords_m").val();		
+		var txt = s_txt.replace(/[&<>]/g, '');
+		txt = txt.replace('document.domain', '');
+		txt = txt.replace('<script', '');
+		$("#keywords_m").val(txt);
+		wigzo ("track", "search", txt);
+	});
+	$("#search_form").submit(function(){
+		var s_txt = $("#keywords").val();
+		var txt = s_txt.replace(/[&<>]/g, '');
+		txt = txt.replace('document.domain', '');
+		txt = txt.replace('<script', '');
+		$("#keywords").val(txt);
+		wigzo ("track", "search", txt);
+	});
+</script>

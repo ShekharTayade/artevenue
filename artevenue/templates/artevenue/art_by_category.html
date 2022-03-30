@@ -122,11 +122,11 @@
 						{% autoescape off %}
 						{% if ikeywords %}
 							<h1>Art Prints for Your Search "{{ikeywords}}"</h1>
-							<h3><span style = "font-style: italic;">
+							<h4><span style = "font-style: italic;">
 								Wall art</span> is a must when it comes to 
 								paintings for home decor, office or any other space.
 							    Choose from our largest collection of beautiful artworks. 
-							</h3>
+							</h4>
 						{% else %}
 							<h1>
 							{% if product_category %} 
@@ -141,7 +141,7 @@
 								{% endif %}
 							{% endif %}
 							</h1>
-							<h3>
+							<h4>
 							{% if product_category.description %} 
 								{{product_category.description}}
 							{% else %}
@@ -149,14 +149,14 @@
 								for home decor, office and interiors. Framed canvas or
 								paper prints.
 							{% endif %}
-							</h3>
-							<h3>
+							</h4>
+							<h4>
 							{% if product_category.second_description %} 								
 								{{product_category.second_description}}
 							{% else %}
 								Licensed | Premium Quality | Fully Customizable
 							{% endif %}							
-							</h3>
+							</h4>
 						{% endif %}
 						{% endautoescape %}
 					</div>

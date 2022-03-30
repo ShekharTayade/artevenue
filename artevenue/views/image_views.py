@@ -1962,3 +1962,8 @@ def img_polygon_crop(img):
 	
 	return result
 
+
+def ar_info(request):
+	from django.shortcuts import render, get_object_or_404
+	return render(request, "artevenue/ar_info.html", {})
+    

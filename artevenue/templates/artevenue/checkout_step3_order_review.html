@@ -106,10 +106,13 @@
 										</td>
 										<td>
 											{% with width=i.moulding__width_inner_inches|add_width_frame_mount:i.mount_size %}
-											<small>
 											{% if i.product_type == 'STOCK-COLLAGE' %}
 												EACH ITEM: <br/>
 											{% endif %}
+											{% if i.product_type == 'NON-RECTANGULAR' %}
+												EACH ROUND SHAPED ARTWORK: <br/>
+											{% endif %}
+											<small>
 											{% if i.product_type == 'ORIGINAL-ART' %}
 												<li>{{i.product__description}}</li>
 											{% else %}													

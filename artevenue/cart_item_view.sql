@@ -35,3 +35,12 @@ CREATE OR REPLACE VIEW cart_item_view AS
 		"updated_date", 'ORIGINAL-ART' as product_type_id, "url" as url, "thumbnail_url" as thumbnail_url
 	FROM "artevenue_cart_item", "artevenue_cart_original_art" b
 	WHERE "artevenue_cart_item"."cart_item_id" = b.cart_item_ptr_id
+
+	UNION
+	SELECT 	"cart_item_id", "cart_id", b."av_product_variant_id" as "product_id", "promotion_id", "quantity", "item_unit_price", "item_sub_total",
+		"item_disc_amt", "item_tax", "item_total", "moulding_id", "moulding_size", "print_medium_id", 
+		"print_medium_size", "mount_id", "mount_size", "board_id", "board_size", "acrylic_id",
+		"acrylic_size", "stretch_id", "stretch_size", "image_width", "image_height", "created_date",
+		"updated_date", 'NON-RECTANGULAR' as product_type_id, "url" as url, "thumbnail_url" as thumbnail_url
+	FROM "artevenue_cart_item", "av_products_cart_round_artwork" b
+	WHERE "artevenue_cart_item"."cart_item_id" = b.cart_item_ptr_id

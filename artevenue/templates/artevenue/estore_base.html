@@ -8,20 +8,17 @@
 {% load show_featured_products_section from prod_template_tags %}
 {% load show_trending_categories from prod_template_tags %}
 {% load show_curated_collections from prod_template_tags %}
-{% load show_create_your_space from prod_template_tags %}
-{% load show_egift from prod_template_tags %}
-{% load show_referral from estore_base %}
-{% load client_speak from estore_base %}
+
+
 {% load show_frame_my_art from prod_template_tags %}
 {% load site_footer from estore_base %}
 {% load copy_right from estore_base %}
 {% load promo_display from show_promo %}
 {% load artevenue_text from estore_base %}
 {% load why_artevenue_text from estore_base %}
-{% load pick_style from prod_template_tags %}
+
 {% load best_sellers from prod_template_tags %}
 {% load speciality_art from prod_template_tags %}
-{% load signup_banner from estore_base %}
 {% load how_to_tips from estore_base %}
 
  
@@ -39,7 +36,7 @@
 		<meta name="msvalidate.01" content="C0A40BC9E7C942FC76951D60DC9355A9" />
 		<meta name="facebook-domain-verification" content="yzfyc1jul8t1otg35ak4n4d06fk4ot" />
 		{% block page-title %}
-		<title>Buy Paintings Online | Premium Quality | Give Life to Your Walls</title>
+		<title>TESTING: Buy Paintings Online | Premium Quality | Give Life to Your Walls</title>
 		{% endblock page-title %}
 		
 		{% block page-description %}
@@ -53,63 +50,60 @@
 		{% block page-author %} 
 		<meta name="author" content="Arte'Venue">
 		{% endblock page-author %} 
+
 		<meta name="google-site-verification" content="imxpctTd8QKEpWKA_jq2ZQGhFP96nSBEUVLHZex73Oo" />			
 		<link rel="stylesheet" href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}">				
+
 		{% block jqueryui-stylesheet %}
 		<!--<link rel="stylesheet" href="{% static 'vendor/jquery-ui-1.12.1/jquery-ui.min.css' %}">-->
 		{% endblock jqueryui-stylesheet %}		
+
 		<link rel="stylesheet" href="{% static 'vendor/font-awesome/css/font-awesome.min.css' %}">
-		<!--<link rel="stylesheet" href="{% static 'vendor/font-awesome-5.10.1-web/css/all.min.css' %}">-->		
-		<!--<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,500,700,300,100">-->
-		<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300&display=swap" rel="stylesheet">		
+		<!-- <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300&display=swap" rel="stylesheet">	-->
+
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Montserrat&family=Oswald&family=Playfair+Display&display=swap" rel="stylesheet">
+		<!--<link href="https://fonts.googleapis.com/css2?family=Playfair+Display&display=swap" rel="stylesheet">-->
+
+
 		{% block coursel-stylesheet %}
-		<!--
-		<link rel="stylesheet" href="{% static 'vendor/owl.carousel/assets/owl.carousel.css' %}" async>
-		<link rel="stylesheet" href="{% static 'vendor/owl.carousel/assets/owl.theme.default.css' %}" async>
-		-->
 		{% endblock coursel-stylesheet %}
+
 		<link rel="shortcut icon" href="{% static 'img/favicon.png' %}">
-		<!--<link href="https://fonts.googleapis.com/css?family=Dosis" rel="stylesheet">-->		
+
 		<script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>		
+
 		{% block jqueryui-script %}
 		<!--<script src="{% static '/vendor/jquery-ui-1.12.1/jquery-ui.min.js' %}"></script> -->
 		{% endblock jqueryui-script %}		
+
 		{% block popper-script %}
 		<!-- <script src="{% static 'vendor/popper.js/umd/popper.min.js' %}"> </script>-->
 		{% endblock popper-script %}
+
 		<script src="{% static 'vendor/bootstrap/js/bootstrap.min.js' %}" async></script>
+
 		{% block slick-slider %}
 		<link rel="stylesheet" type="text/css" href="{% static 'vendor/slick/slick.css' %}"/>
 		<link rel="stylesheet" type="text/css" href="{% static 'vendor/slick/slick-theme.css' %}"/>	
 		{% endblock %}
-		<link rel="stylesheet" href="{% static  'css/custom.min.css' %}">
-		<link rel="stylesheet" href="{% static 'css/style.default.min.css' %}" id="theme-stylesheet">
-		<!--<link rel="stylesheet" href="{% static 'css/home-page-style.css' %}" id="theme-stylesheet">-->
+
+		<link rel="stylesheet" href="{% static  'css/av_base.min.css' %}">
+
 		{% block js-cookie %}
 		<!--<script src="{% static 'vendor/jquery.cookie/jquery.cookie.js' %}" async> </script>-->
 		{% endblock js-cookie %}		
-		{% block coursel-script %}
-		<!--
-		<script src="{% static 'vendor/owl.carousel/owl.carousel.min.js' %}" async ></script>
-		<script src="{% static 'vendor/owl.carousel2.thumbs/owl.carousel2.thumbs.js' %}" async></script>
-		-->
-		{% endblock coursel-script %}
+
 
 		{% block gmap-script %}
 		<!-- <script src="https://maps.googleapis.com/maps/api/js"></script>-->
 		{% endblock gmap-script %}
 		
 		{% block front.js %}
-		<script src="{% static 'js/front.js' %}" async></script>	
+		<script src="{% static 'js/av_base.js' %}" async></script>	
 		{% endblock front.js %}
 		
-		{% block waypoint-script %}
-		<!--<script src="{% static 'vendor/waypoints/waypoints.min.js' %}"></script>-->
-		{% endblock waypoint-script %}
-
-		{% block counterup-script %}
-		<!--<script src="{% static 'vendor/counterup/counterup.min.js' %}"></script>-->
-		{% endblock counterup-script %}
 
 		{% block imagemap-resize-script %}
 		<script src="{% static 'vendor/imagemap/imageMapResizer.min.js' %}" async></script>
@@ -198,19 +192,6 @@
 		{% endblock cropper %}
 
 		{% if env == 'PROD' %}
-		{% block hotjar %}
-		<!-- Hotjar Tracking Code for www.artevenue.com -->
-		<!--<script>
-			(function(h,o,t,j,a,r){
-				h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
-				h._hjSettings={hjid:1698652,hjsv:6};
-				a=o.getElementsByTagName('head')[0];
-				r=o.createElement('script');r.async=1;
-				r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
-				a.appendChild(r);
-			})(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
-		</script>-->
-		{% endblock hotjar %}
 		{% endif %}
 		
 		{% block wigzo %}
@@ -248,7 +229,6 @@
 
 		{% announcement request %}
 		
-		<!-- Header Section with top slim line, logo/search/cart and menu-->
 		{% block siteheader %}
 		<header class="header">
 
@@ -260,7 +240,6 @@
 			
 		</header>
 		{% endblock siteheader %}
-		<!-- END: Header Section with top slim line, logo/search/cart and menu-->
 
 		<div id="all">
 			<div id="content" class= "" style="background-color:#fff">
@@ -278,7 +257,6 @@
 
 				{% show_frame_my_art request %}			
 
-				{% signup_banner %}
 
 				{% how_to_tips request %}
 				
@@ -317,45 +295,7 @@
 				 				
 			</div>
 			<div class="ajax-modal"></div>
-			
-			
-			<div id="new-signup-modal" tabindex="-1" role="dialog" aria-labelledby="New Sign Up" aria-hidden="true" class="modal fade">
-				<div class="modal-dialog modal-sm">
-					<div class="modal-content">
-						<div class="modal-header">
-							<h5 class="modal-title"></h5>
-							<button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
-						</div>
-						<div class="modal-body">	
-							<div class="panel panel-default">
-								<div class="panel-body">
-									<div class = "row text-center">
-										<div class = "col-12" style = "font-size:1rem;">
-										<strong>Thank you for signing up! </strong>
-										</div>
-										<div class = "col-12 mt-3">
-											Your Arte'Venue account -
-										</div>
-										<div class = "col-12">
-											Username: {{request.user}}
-										</div>
-										<div class = "col-12">
-											Email: {{request.user.email}}
-										</div>
-										<div class = "col-12 mt-3">
-											You are now logged in. <br />
-											To login next time, you can use above username
-											(or email) and password to login to your Arte'Venue 
-											account.
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			
+						
 		</div>
 
 
@@ -367,21 +307,6 @@
 
 		<script type="text/javascript" src="{% static 'vendor/slick/slick.min.js' %}"></script>	
 		<script type="text/javascript"></script>
-
-		<script>
-			$( document ).ready(function() {
-			
-				/*
-				val = sessionStorage.getItem("HomePopupShown");
-				if ( val == null){
-					setTimeout(function () {
-						$('#promo').modal('show');
-						sessionStorage.setItem("HomePopupShown", "yes");
-					}, 1000 );
-				}
-				*/			
-			});
-		</script>
 		
 		<script>
 			function updateCartItemsNum(num){
@@ -462,54 +387,6 @@
 					
 		</script>
 
-		<script>
-			/*
-			function copyPromocode() {
-			  var copyText = document.getElementById("pcode_inv");
-
-			  copyText.select();
-			  copyText.setSelectionRange(0, 99999);
-
-			  document.execCommand("copy");
-			}
-			*/
-		</script>
-
-		<!--
-		{% if env == 'PROD' %}
-			{% block tawkto %} 
-			<script async type="text/javascript">		
-				var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-				(function(){
-				var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-				s1.async=true;
-				s1.src='https://embed.tawk.to/5da6fe47fbec0f2fe3ba07cc/default';
-				s1.charset='UTF-8';
-				s1.setAttribute('crossorigin','*');
-				s0.parentNode.insertBefore(s1,s0);
-				})();
-			</script>
-			<!--End of Tawk.to Script-->
-			{% endblock tawkto %}		
-		{% endif %}
-		-->
-		<script type="text/javascript">
-		_linkedin_partner_id = "3434276";
-		window._linkedin_data_partner_ids = window._linkedin_data_partner_ids || [];
-		window._linkedin_data_partner_ids.push(_linkedin_partner_id);
-		</script><script type="text/javascript">
-		(function(l) {
-		if (!l){window.lintrk = function(a,b){window.lintrk.q.push([a,b])};
-		window.lintrk.q=[]}
-		var s = document.getElementsByTagName("script")[0];
-		var b = document.createElement("script");
-		b.type = "text/javascript";b.async = true;
-		b.src = "https://snap.licdn.com/li.lms-analytics/insight.min.js";
-		s.parentNode.insertBefore(b, s);})(window.lintrk);
-		</script>
-		<noscript>
-		<img height="1" width="1" style="display:none;" alt="" src="https://px.ads.linkedin.com/collect/?pid=3434276&fmt=gif" />
-		</noscript>		
 	</body>
 	
 </html>

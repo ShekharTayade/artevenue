@@ -36,9 +36,29 @@
 
 
 
+<style>
+.glow {
+  font-size: 1rem;
+  color: #fff;
+  text-align: center;
+  -webkit-animation: glow 1s ease-in-out infinite alternate;
+  -moz-animation: glow 1s ease-in-out infinite alternate;
+  animation: glow 1s ease-in-out infinite alternate;
+}
+
+@-webkit-keyframes glow {
+  from {
+    text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #e60073, 0 0 40px #e60073, 0 0 50px #e60073, 0 0 60px #e60073, 0 0 70px #e60073;
+  }
+  to {
+    text-shadow: 0 0 20px #fff, 0 0 30px #ff4da6, 0 0 40px #ff4da6, 0 0 50px #ff4da6, 0 0 60px #ff4da6, 0 0 70px #ff4da6, 0 0 80px #ff4da6;
+  }
+}
+</style>
+
 <script>
 // Set the date we're counting down to
-var countDownDate = new Date("Oct 17, 2021 23:59:59").getTime();
+var countDownDate = new Date("Mar 27, 2022 23:59:59").getTime();
 
 // Update the count down every 1 second
 var x = setInterval(function() {
@@ -56,14 +76,15 @@ var x = setInterval(function() {
 
   // Display the result in the element with id="demo"
   document.getElementById("count_down1").innerHTML = hours + "hrs "
-	+ minutes + "min " + seconds + "sec ";
+	+ minutes + "min ";
   document.getElementById("count_down2").innerHTML = hours + "hrs "
-	+ minutes + "min " + seconds + "sec ";
+	+ minutes + "min ";
 
   // If the count down is finished, write some text
   if (distance < 0) {
     clearInterval(x);
-    document.getElementById("counter").innerHTML = "EXPIRED";
+    document.getElementById("count_down1").innerHTML = "EXPIRED";
+    document.getElementById("count_down2").innerHTML = "EXPIRED";
   }
 }, 1000);
 </script>

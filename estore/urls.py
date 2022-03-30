@@ -16,6 +16,7 @@ urlpatterns = [
 	url('^', include('review.urls')),
     url('^', include('gallerywalls.urls')),
     url('^', include('returns.urls')),
+    url('^', include('av_products.urls')),
     url('^', include('spinwheel.urls')),
 	url(r'', include('webmaster_verification.urls')),
     path('', include(router.urls)),

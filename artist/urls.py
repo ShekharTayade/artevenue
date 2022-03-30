@@ -18,7 +18,8 @@ sitemaps = {
 urlpatterns = [
 	
 	url(r'^create-artist-group/$', views.create_artist_group, name='create_artist_group'),
-	url(r'^artist-signup/$', views.register_as_artist, name='artist_signup'),
+	#url(r'^artist-signup/$', views.register_as_artist, name='artist_signup'),
+	url(r'^artist-signup/$', views.coming_soon, name='artist_signup'),
 	path('artist-registration-confirmation/<int:id>', views.artist_registration_confirmation, name='artist_registration_confirmation'),
 	path('artist/<str:url_name>', views.artist_webpage, name='artist_webpage'),
 	url(r'^artist-profile/$', views.create_artist_profile, name='artist_profile'),
@@ -45,7 +46,8 @@ urlpatterns = [
 	url(r'^get-my-artworks/$', views.get_my_artworks, name='get_my_artworks'),
 	path('delist-artwork/<str:part_number>/', views.delist_artwork, name='delist_artwork'),
 
-	url(r'^artist-page/$', views.artist_page, name='artist_page'),
+	#url(r'^artist-page/$', views.artist_page, name='artist_page'),
+	url(r'^artist-page/$', views.coming_soon, name='artist_page'),
 	url(r'^artist-terms/$', views.artist_terms, name='artist_terms'),
 
 	#url(r'^original-art-by-category/$', views.get_original_arts, name='original_art_by_category'),

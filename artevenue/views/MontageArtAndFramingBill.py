@@ -23,24 +23,24 @@ def get_production_cost(yrmonth):
 		product__product_type_id = F('product_type_id')).exclude(order__order_status = 'PP').exclude(order__order_status = 'CN')
 
 	printroyalty = Decimal(1.4)
-	paperinkrate = Decimal(0.3)
-	paperrate = Decimal(0.21)
+	paperinkrate = Decimal(0.29)
+	paperrate = Decimal(0.20)
 
-	printroyalty = Decimal(1.4)
-	canvasrate = Decimal(0.63)
-	canvasinkrate = Decimal(0.4)
+	printroyalty = Decimal(1.3)
+	canvasrate = Decimal(0.6)
+	canvasinkrate = Decimal(0.35)
 
-	acrrate = Decimal(0.57)
-	mntrate = Decimal(0.12)
+	acrrate = Decimal(0.5)
+	mntrate = Decimal(0.11)
 	hardbrdrate = Decimal(0.08)
-	pastingbrdrate = Decimal(0.17)
+	pastingbrdrate = Decimal(0.16)
 
-	stretcherrate = Decimal(2.92)
+	stretcherrate = Decimal(2.90)
 
 	#framerate_box = 2.17
 	#framerate_simple1 = 1.42
 	#framerate_simple2 = 2.5
-	frame_cost = {'11': 1.42, '22': 1.42, '8': 1.42, '23': 2.5, '24': 2.5, '10': 2.17, '25': 2.17, '26': 2.17, '18': 1.42, '20':  2.17, '6': 2.17}
+	frame_cost = {'11': 1.40, '22': 1.40, '8': 1.40, '23': 2.4, '24': 2.4, '10': 2.1, '25': 2.1, '26': 2.1, '18': 1.40, '20':  2.1, '6': 2.1, '29':2.1, '30': 2.1}
 	
 
 	with open('Production_Cost_' + yrmonth + '.csv', 'w', newline='') as myfile:
@@ -110,6 +110,8 @@ def get_production_cost(yrmonth):
 					mnt_cost = mntrate * mnt_size_w * mnt_size_h
 				else:
 					mnt_cost = 0
+					mnt_size_w = 0
+					mnt_size_h = 0
 					
 				if moulding:
 					if i.mount_size:

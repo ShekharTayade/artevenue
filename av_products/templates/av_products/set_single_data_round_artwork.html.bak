@@ -1,0 +1,710 @@
+{% extends 'artevenue/estore_base.html' %}
+{% load static %}
+{% load utils %}
+
+{% block page-title %} 
+	<title>
+		Arte'Venue | Sets, Singles
+	</title>
+{% endblock page-title %} 
+
+{% block page-description %}
+<meta name="description" content="Enter Data for a Set or Single">
+{% endblock page-description %}
+  
+{% block page-keywords %}
+<meta name="keywords" content="">
+{% endblock page-keywords %}
+  
+{% block page-author %}
+<meta name="author" content="Arte'venue">
+{% endblock page-author %}
+
+
+{% block jqueryui-stylesheet %}
+<link rel="stylesheet" href="{% static 'vendor/jquery-ui-1.12.1/jquery-ui.min.css' %}">
+{% endblock jqueryui-stylesheet %}
+
+{% block jqueryui-script %}
+<script src="{% static '/vendor/jquery-ui-1.12.1/jquery-ui.min.js' %}"></script>
+{% endblock jqueryui-script %}
+
+{% block popper-script %}
+	<script src="{% static 'vendor/popper.js/umd/popper.min.js' %}"> </script>
+{% endblock popper-script %}
+
+{% block imagemap-resize-script %}
+{% endblock imagemap-resize-script %}
+
+{% block lazysizes %}
+<script src="{% static '/vendor/lazysizes/lazysizes.min.js' %}" async=""></script>
+{% endblock lazysizes %}
+
+{% load moulding_url %}
+{% load update_cart_message from estore_base %}
+
+
+{% block sitecontent %}
+<div class="container  mb-5">
+	<div class="row">
+		<!-- breadcrumb-->
+		<div class="col-sm-12">
+			<nav aria-label="breadcrumb">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+					<li class="breadcrumb-item"><a href="{% url 'staff_page' %}">Staff Page</a></li>
+					<li class="breadcrumb-item"><a href="{% url 'create_set_single' %}">Create A Round Artwork Set or Single</a></li>
+					<li aria-current="page" class="breadcrumb-item active">Enter Data For a Round Set or a Single</li>
+				</ol>
+			</nav>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-12 tex-center">
+			{% if set_of == '1' %}
+			<h1 class="text-center">DATA FOR A SINGLE ROUND ARTWORK</h1>
+			{% else %}
+			<h1 class="text-center">DATA FOR A SET {{set_of}} ROUND ARTWORKS</h1>
+			{% endif %}
+		</div>
+	</div>
+	
+	<div class="row mt-3">	
+		<div class = "col-12 mt-3">
+			<div class="form-group">
+				<label for="name">NAME/TITLE:</label>
+				<input type="text" class="form-control" id="name" style="width: 100%;">
+				<span style = "font-size: 0.65rem;">To be used as title on product page/social media post</span>
+			</div>
+		</div>
+		<div class = "col-12 mt-3">
+			<div class="form-group">
+				<label for="name">2nd LINE/DESCRIPTION:</label>
+				<input type="text" class="form-control" id="desc" style="width: 100%;">
+				<span style = "font-size: 0.65rem;">To be used as second line on product page/social media post</span>
+			</div>
+		</div>
+		<div class = "col-12">
+			<div class="form-group">
+				<label for="colors">COLORS:</label>
+				<input type="text" class="form-control" id="colors" style="width: 100%;">
+				<span style = "font-size: 0.65rem;">Comma separated primary colors that customers
+					will use to filter by color</span>
+			</div>
+		</div>
+		<div class = "col-12">
+			<div class="form-group">
+				<label for="s-keywords">KEYWORDS:</label>
+				<input type="text" class="form-control" id="s-keywords" style="width: 100%;">
+				<span style = "font-size: 0.65rem;">Comma separted keywords that customers will use to 
+					search artworks</span>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class = "col-12">
+			<hr>
+		</div>
+	</div>
+
+	<div class="row mt-5" style = "border: 1px solid #ddd; padding:5px;">
+		<div class = "col-12">
+			ENTER PARAMETERS
+		</div>
+		<div class = "col-12 col-md-6 mt-3">
+			<div class="form-group">
+			  <label>PRINT SURFACE:</label>
+			  <select class="form-control" id="surface" onchange = "set_stretched();"> 
+				{% for p in printmedium %}
+				<option value = "{{p}}">{{p}}</option>
+				{% endfor %}
+			  </select>
+			</div>					
+		</div>
+		<div>
+			<input hidden type="text" class="form-control" id="duplicate_image" value = "NO">
+		</div>
+		<div hidden class = "col-12 col-md-6 mt-3">
+			 <label>IMAGE SIZE:</label>		
+			<form class="form-inline">
+				<div class="form-group">
+					<label for="width">Width:</label>
+					<input type="number" class="form-control" id="width"
+						onchange = "getHeight( $(this).val() );">
+				</div>
+				<div class="form-group">
+					<label for="pwd">Height:</label>
+					<input type="number" class="form-control"id="height"
+						onchange = "getWidth( $(this).val() );">
+				</div>
+			</form>			
+		</div>
+
+		<div class = "col-12">
+			<div class = "row">
+				<div class = "col-6">
+					<input id = "stretched" type = "checkbox" disabled checked>
+					Stretched Canvas?
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-12">
+			<hr>
+		</div>
+	</div>
+	<div class="row" style = "border: 1px solid #ddd; padding:5px;">
+		<div class="col-6 tex-center mt-3">
+			<span id = "upload_creative" class="" style = "width: 50%;">
+				ROOMVIEW / CREATIVE
+			</span>
+		</div>
+		<div class = "col-6">
+			<div id = "upload-pics" class = "row">
+				<div class = "photos-div">
+					<div class="file-upload-content" id = "content-1">
+						<img id = "cust-img1" class="file-upload-image" alt="User Photo 1" 
+							style = "padding:0px;" width=150/>
+						<i title="Remove Photo" 
+							class = "fa fa-trash pull-right" 
+							id = "delete-photo1"
+							style = "cursor: ponter; display:block;"
+							onclick = "removeUpload('1');">
+						</i> 
+					</div>
+					<div class = "row">
+						<div class = "col-12">
+							<div class="image-upload-wrap" id = "wrap-1" style = "margin-top: 0px; border: 2px solid  #e6e6e6;">
+								<div class="btn-default btn-file drag-text" style = "display: block;">
+									<input class="file-upload-input"  id = "input-1" 
+										type='file' 
+										onchange="readURL(this, '1');" 
+										accept="image/png, image/jpeg, image/gif, image/bmp" 
+										name="user_photo1" 
+										class="form-control"
+										style = "box-sizing: border-box;"/>
+									<div id = "upload-show1" onclick="$('#input-1').trigger( 'click' );">
+										<span style = "font-size: 0.7rem;" class = "text-center">
+											Click to Upload or Drag & Drop
+										</span>
+										<img id = "img-1" src = "{% static 'img/custom_framing/upload_icon.png' %}" 
+											class = "mt-4 mb-4"
+											alt="Upload Image Icon" 
+											width=40 style="  display: block; margin-left: auto; margin-right: auto; width: 30%;">
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+			</div>
+		</div>
+	</div>
+	<div class = "row" style = "">
+		<div class = "col-12">
+			<hr>
+		</div>
+	</div>
+	{% for i in set_range %}
+	<div class = "row" style = "border: 1px solid #ddd; padding:10px;">
+		<div class = "col-12">
+			ENTER IMAGE IDs
+		</div>
+		<div class = "col-12 col-md-6 mt-3">
+			<div class = "row">
+				<div class = "col-12">
+					<span class = "offer_num pull-left">{{i|add:1}}</span>
+				</div>
+			</div>
+		
+			<div class = "row">
+				<div class = "col-12">
+					<label >Product ID:</label>
+					<input hidden value="" type = "number" id = "aspect_ratio_{{i|add:1}}">
+					<input hidden type="text" class="form-control" id="category_id_{{i|add:1}}" max_length="8">
+					<input hidden type="text" class="form-control" id="category_name_{{i|add:1}}" max_length="8">
+				</div>
+				<div class = "col-4">
+					<div class="form-group">
+					  <input type="text" class="form-control" id="product_id_{{i|add:1}}" max_length="8">
+					</div>
+				</div>
+				<div class = "col-8">
+					  <input readonly type="text" class="form-control" id="product_name_{{i|add:1}}">
+				</div>
+			</div>
+			<div class = "row" id = "prod_{{i|add:1}}">
+				<div class = "col-12 pull-right">
+					<button id = "fetch_{{i|add:1}}" class = "btn btn-secondary" type = "button" 
+						onclick="get_product('{{i|add:1}}'); getFramedImg('');">
+						<i class = "fa fa-caret-right"></i>
+					</button>
+				</div>
+			</div>
+		</div>
+		<div class = "col-12 col-md-6 mt-3 gal_items">
+			<div class="img-container" style= "background-color: transparent; position: relative;">
+				<img id = "prod-img_{{i|add:1}}" src="" alt="Wall art:" class="img-fluid image-display lazyload" 
+						style = "display: block; margin-left: auto; margin-right: auto;">
+			</div>
+		</div>
+		<div class = "col-12 col-md-6 mt-3 gal_items">
+			<strong>UPLOAD INDIVIDUAL PRODUCT IMAGE</strong>
+			<div class = "photos-div">
+				<div class="file-upload-content" id = "p-content-{{i|add:1}}">
+					<img id = "p-img-{{i|add:1}}" class="file-upload-image" alt="User Photo 1" 
+						style = "padding:0px;" width=150/>
+					<i title="Remove Photo" 
+						class = "fa fa-trash pull-right" 
+						id = "delete-photo1"
+						style = "cursor: ponter; display:block;"
+						onclick = "removeUpload_prod('{{i|add:1}}');">
+					</i> 
+				</div>
+				<div class="image-upload-wrap" id = "prod-wrap-{{i|add:1}}" style = "margin-top: 0px; border: 2px solid  #e6e6e6;">
+					<div class="btn-default btn-file drag-text" style = "display: block;">
+						<input class="file-upload-input"  id = "img_{{i|add:1}}" 
+							type='file' 
+							onchange="readURL_prod(this, '{{i|add:1}}');" 
+							accept="image/png, image/jpeg, image/gif, image/bmp" 
+							name="user_photo1" 
+							class="form-control"
+							style = "box-sizing: border-box;"/>
+						<div id = "upload-show1" onclick="$('#img_{{i|add:1}}').trigger( 'click' );">
+							<span style = "font-size: 0.7rem;" class = "text-center">
+								Click to Upload or Drag & Drop
+							</span>
+							<img id = "img-1" src = "{% static 'img/custom_framing/upload_icon.png' %}" 
+								class = "mt-4 mb-4"
+								alt="Upload Image Icon" 
+								width=40 style="  display: block; margin-left: auto; margin-right: auto; width: 30%;">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	{% endfor %}	
+	<div class="row">
+		<div class="col-12 text-center mt-3">
+			{% if set_of == '1' %}
+			<button id = "create_single" class="btn btn-primary" style = "width: 50%;"
+				onclick = " save_set_single();">
+				CREATE PRODUCT
+			</button>
+			{% else %}
+			<button id = "create_set" class="btn btn-primary" style = "width: 50%;"
+				onclick = "save_set_single();">
+				CREATE SET
+			</button>
+			{% endif %}
+		</div>
+	</div>
+	{% include 'artevenue/message-modal_ok.html' %}		
+	{% include 'artevenue/modal_yesno.html' %}		
+</div>
+
+{% endblock sitecontent %}
+
+{% block jscripts %}
+	<script>
+		$( document ).ready(function() {
+		});	
+	</script>
+
+
+	<script>
+		function get_product(seq){
+			var prod_id = $("#product_id_"+seq).val();
+			
+			if (prod_id == 'undefined' || prod_id == ''){
+				return
+			}
+
+			$.ajax({
+					url: "{% url 'get_product' %}", 
+					data: {'prod_id':prod_id, 
+						}, 
+					dataType: 'text', 
+				success: function (data) {
+					response = JSON.parse(data); 
+					$("#aspect_ratio_" + seq).val(response.aspect_ratio);
+					$("#product_name_" + seq).val(response.product_name);
+					if ($("#name").val() == ''){
+						$("#name").val(response.product_name);
+					}
+					$("#category_id_" + seq).val(response.product_category_id);
+					$("#category_name_" + seq).val(response.category_name);
+					
+					var wdt = $("#width").val();
+					if (wdt != 'undefined' && wdt != ''){
+						getHeight( wdt );
+					}
+					
+				},
+				error: function(xhr){
+					alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+				}
+			});					
+		}
+	
+		function getFramedImg () {
+			{% for i in set_range %}
+			var currwidth = $("#width").val();
+			if (currwidth == 'undefined' || currwidth == '') {
+				currwidth = 10;	
+				$("#width").val(10);
+			}
+			
+			var prod_id = $("#product_id_{{i|add:1}}").val();
+			if (prod_id != 'undefined' && prod_id != '' ){			
+
+				var str_canvas = 'NO';
+				if ( $('#stretched').prop('checked') == true) {
+					str_canvas = 'YES';			
+				}
+				
+				
+				// Get the framed image
+				$.ajax({
+						url: "{% url 'get_framed_image' %}", 
+						data: {'prod_id':prod_id, 'moulding_id': '',
+								'mount_color':'', 'mount_size':0, 'image_width':currwidth,
+								'stretched_canvas': str_canvas, 'imgtilt': 'NO', 'dropshadow': 'YES'
+							}, 
+						dataType: 'text', 
+					success: function (data) {
+						document.getElementById("prod-img_{{i|add:1}}").src = "data:image/png;base64," + data;						
+						},
+					error: function(xhr){
+						alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+					}
+				});
+			}
+			{% endfor %}
+		}
+		
+		function validate_all_data(){
+			var width = $("#width").val();
+			if ( width == 'undefined' || width == '' ){
+				$('#msg').html("Image width is not entered");
+				$('#msg-modal').modal('show');
+				return false;
+			}
+			var surface = $("#surface").val();
+			if ( surface == 'undefined' || surface == '' ){
+				$('#msg').html("Print surface is not selected");
+				$('#msg-modal').modal('show');
+				return false;
+			}
+			
+			
+			// Check data
+			{% if set_of > '1' %}			
+				var ratio = [];
+				var prod_arr = [];
+				var valid_flg = true;
+				var all_prods = true;
+
+				{% for i in set_range %}
+					var pid = $("#product_id_{{i|add:1}}").val(); 
+					var img = $("#prod-img_{{i|add:1}}").prop('src'); 
+					
+					ratio.push($("#aspect_ratio_{{i|add:1}}").val());
+					prod_arr.push(pid);
+					
+					if ( pid == 'undefined' || pid == ''){
+						all_prods = false;
+						valid_flg = false;
+					}
+					if (img == 'undefined' || img == ''){
+						$('#msg').html("Please fetch images for all products");
+						$('#msg-modal').modal('show');
+						return false;
+					}
+						
+
+					if ( $("#p-img-{{i|add:1}}").prop('src') == '' ) {
+						$('#msg').html("All individual artwork images (round shape) are not uploaded.");
+						$('#msg-modal').modal('show');
+						return  false;
+					}
+				{% endfor %}
+				if (all_prods == false){
+					$('#msg').html("Please enter product ID for all");
+					$('#msg-modal').modal('show');
+					return false;
+				}
+
+				let findDuplicates = arr => arr.filter((item, index) => arr.indexOf(item) != index)
+
+				arr = findDuplicates(prod_arr)
+				if (arr.length > 0) {
+					$('#msg').html("Duplicate products");
+					$('#msg-modal').modal('show');
+					return false;
+				}
+				
+				var first_flg = true;
+				var diff_found = false;
+				var alen = ratio.length;
+				var val = '';
+				for (i = 0; i < alen; i++) {
+					if (first_flg){
+						first_flg = false;
+						val = ratio[i];
+						continue;
+					}
+					if (val != ratio[i]) {
+						diff_found = true;
+						valid_flg = false;
+					}
+				}				
+				if (diff_found){
+					$('#msg').html("Aspect ratio of all the products should be same. Can not create.");
+					$('#msg-modal').modal('show');
+					
+					/////////////Validation disabled temporarily
+					///return false;
+				}
+								
+			{% else %}
+				var prod_id = $("#product_id_0").val();
+				if (prod_id == 'undefined' && prod_id == '' ){
+					$('#msg').html("Please enter product ID.");
+					$('#msg-modal').modal('show');
+					return;
+				}					
+			{% endif %}	
+			
+			
+			if ( $("#cust-img1").prop('src') == '' ) {
+				$('#msg').html("Room view/creative image is not uploaded.");
+				$('#msg-modal').modal('show');
+				return false;
+			}
+		
+		}
+	</script>
+	
+
+
+	<script>
+		function readURL(input, num) {
+		    if (input.files && input.files[0]) {
+				var reader = new FileReader();
+				var upd_wrap = '#wrap-' + num;
+				var upd_img = '#cust-img' + num
+				var upd_content = '#content-' + num;
+				reader.onload = function(e) {
+				$(upd_wrap).hide();
+				$(upd_img).attr('src', e.target.result);
+				$(upd_content).show();
+			};
+			reader.readAsDataURL(input.files[0]);
+		  } else {
+			removeUpload(num);
+		  }
+		}
+
+		function readURL_prod(input, num) {
+		    if (input.files && input.files[0]) {
+				var reader = new FileReader();
+				var upd_wrap = '#prod-wrap-' + num;
+				var upd_img = '#p-img-' + num
+				var upd_content = '#p-content-' + num;
+				reader.onload = function(e) {
+				$(upd_wrap).hide();
+				$(upd_img).attr('src', e.target.result);
+				$(upd_content).show();
+			};
+			reader.readAsDataURL(input.files[0]);
+		  } else {
+			removeUpload(num);
+		  }
+		}
+
+		function removeUpload(num) {
+			var upd_wrap = '#wrap-' + num;
+			var upd_img = '#cust-img' + num
+			var upd_inp = '#upd-input-' + num
+			var upd_content = '#content-' + num;
+			var inp = "#input-" + num;
+			$(upd_inp).replaceWith($(upd_inp).clone());
+			$(upd_content).hide();
+			$(upd_wrap).show();
+			$("#cust-img1").prop('src', '');
+		}
+
+		function removeUpload_prod(num) {
+			var upd_wrap = '#prod-wrap-' + num;
+			var upd_img = '#p-img-' + num
+			var upd_inp = '#upd-input-' + num
+			var upd_content = '#p-content-' + num;
+			var inp = "#input-" + num;
+			$(upd_inp).replaceWith($(upd_inp).clone());
+			$(upd_content).hide();
+			$(upd_wrap).show();
+			$("#cust-img1").prop('src', '');
+		}
+	</script>
+
+	<script>
+		$('.image-upload-wrap').bind('dragover', function () {
+			$('.image-upload-wrap').addClass('image-dropping');
+		});
+		$('.image-upload-wrap').bind('dragleave', function () {
+			$('.image-upload-wrap').removeClass('image-dropping');
+		});
+	</script>	
+
+	
+	<script>
+		function save_set_single(){
+			if (validate_all_data() == false) {
+				return;
+			}
+		
+			var fileInput = document.getElementById('input-1');
+			var file1 = fileInput.files[0];
+			var formData = new FormData();
+			formData.append('file1', file1);
+
+			var ratio = [];
+			var prod_arr = [];
+			var category_id_str = '';
+			var valid_flg = true;
+			var all_prods = true;
+
+			{% for i in set_range %}
+				var pid = $("#product_id_{{i|add:1}}").val(); 
+				category_id_str = $("#category_id_{{i|add:1}}").val();
+				prod_arr.push(pid);
+
+				var fInput = document.getElementById('img_{{i|add:1}}');
+				var f1 = fInput.files[0];
+				formData.append('img_{{i|add:1}}', f1);
+
+			{% endfor %}
+
+			var set_of = {{set_of}};
+			var surface = $("#surface").val();
+			var width = $("#width").val();
+			var height = $("#height").val();
+			var moulding_id = $("#moulding_id").val();
+			var mount_color = $("#mount_color").val();
+			var mount_size = $("#mount_size").val();
+			
+			formData.append('set_of', set_of);
+			formData.append('prod_arr', prod_arr);
+			formData.append('image_width', width);
+			formData.append('image_height', height);
+			formData.append('category_id_str', category_id_str);
+			formData.append('print_surface', surface);
+			formData.append('moulding_id', moulding_id);
+			formData.append('mount_color', mount_color);
+			formData.append('mount_size', mount_size);
+			
+			var stretched = false;
+			if ( $("#stretched").prop('checked') ){
+				stretched = true;
+			}
+			formData.append('stretched', stretched);
+
+			var name = $("#name").val();
+			var keywords = $("#s-keywords").val();
+			var colors = $("#colors").val();
+			
+			formData.append('name', name);
+			formData.append('desc', desc);
+			formData.append('colors', colors);
+			formData.append('keywords', keywords);
+			formData.append('aspect_ratio', $("#aspect_ratio_1").val());
+			formData.append('duplicate_image', $("#duplicate_image").val());
+			$.ajax({
+				url: '{% url "save_set_single_round_artwork" %}', 
+				data:formData,
+				processData: false,
+				contentType: false,
+				type: 'post',				
+				success: function (data) {
+					//data = JSON.parse(data);
+					if (data.err_cd == "01") {
+						$("#yesno-title").html("Image being used again!");
+						$("#yesno-question").html(data.msg);
+						$("#modal-yesno").modal('show');
+					} else if (data.err_cd == "99") {
+						$('#msg').html(data.msg);
+						$('#msg-modal').modal('show');
+					} else if (data.err_cd == "00") {
+						$('#msg').html("SET IS CREATED SUCCESSFULLY!");
+						$('#msg-modal').modal('show');
+						$("#create_single").prop('disabled', 'true');
+						$("#create_set").prop('disabled', 'true');
+					}
+				},
+				error: function(xhr){
+					alert("An error occured: " + xhr.status + " " + xhr.statusText); 
+					return;
+				}
+			});				
+		}	
+	</script>
+	
+
+	<script>
+		function getHeight(wdt){
+			var width = parseInt(wdt);
+			if (width == 'undefined' || width == 0){
+				return;
+			}
+			
+			if ( $("#aspect_ratio_1").val() != '' ){
+				ratio = $("#aspect_ratio_1").val();
+				$("#height").val( Math.round(width / ratio) );
+			}
+		}
+		
+		function getWidth(hgt){
+			var height = parseInt(hgt);
+			if (height == 'undefined' || height == 0){
+				return;
+			}
+			
+			if ( $("#aspect_ratio_1").val() != '' ){
+				ratio = $("#aspect_ratio_1").val();
+				$("#width").val( Math.round(height * ratio) );
+			}
+		}
+	</script>
+	
+	<script>
+		function answerNo(){
+			$("#modal-yesno").modal('hide');
+		}
+		function answerYes(){
+			$("#modal-yesno").modal('hide');
+			$("#duplicate_image").val('YES');
+			{% if set_of == '1' %}
+				$('#msg').html("Click on CREATE SET button again to procced.");
+			{% else %}
+				$('#msg').html("Click on CREATE SINGLE button again to procced.");
+			{% endif %}
+			$('#msg-modal').modal('show');
+		}
+	</script>
+	
+	<script>
+	function set_stretched(){
+		if ( $("#moulding_id").val() == '0' && $("#surface").val() == 'CANVAS' ){
+			$("#stretched").prop('checked', true);
+		} else {
+			$("#stretched").prop('checked', false);
+		}
+	}
+	</script>
+{% endblock jscripts %}
+	

@@ -2,16 +2,18 @@
 {% load utils %}
 <nav class="navbar navbar-expand-lg" style = "padding:0px; border-bottom: 1px solid #eee; margin: 5px 1rem 0px;">
 
-	<div class = "d-none d-md-block">
-		<a href="{% url 'index' %}" class="navbar-brand"  style = "padding-top: 2px;">
-			<img src="{% static 'img/av_logo_circle2.png' %}" alt="Arte'Venue Logo" class="d-none d-md-inline-block" style="width:90px; min-height:90px;">
+	<div class = "d-none d-md-flex align-self-md-center">
+		<a href="{% url 'index' %}" class="navbar-brand"  style = "padding-top: 0px;">
+			<!--<img src="{% static 'img/av_logo_circle2.png' %}" alt="Arte'Venue Logo" class="d-none d-md-inline-block" style="width:90px; min-height:90px;">-->
+			<img src="{% static 'img/logo/av_logo_round.png' %}" alt="Arte'Venue Logo" class="" style="width:90px; height:90px; image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges;">
 			<span class="sr-only">{{ecom_site.store_name}} - go to homepage</span>
 		</a>
 	</div>
 
 	<div class = "w-100 d-flex  d-md-none d-flex justify-content-between">
 		<a href="{% url 'index' %}" class="navbar-brand"  style = "padding-top: 2px;">
-			<img src="{% static 'img/av_logo_circle2_m1.png' %}" alt="Arte'Venue Logo" class="d-inline-block d-md-none"  style="width:175px; min-height:47px;">
+			<!--<img src="{% static 'img/av_logo_circle2_m1.png' %}" alt="Arte'Venue Logo" class="d-inline-block d-md-none"  style="width:175px; min-height:47px;">-->
+			<img src="{% static 'img/logo/av_logo_rectangular.png' %}" alt="Arte'Venue Logo" class="d-inline-block d-md-none"  style="width:120px; min-height:10px; image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges;">
 			<span class="sr-only">{{ecom_site.store_name}} - go to homepage</span>
 		</a>
 
@@ -30,12 +32,12 @@
 		</button>
 	</div>  
 	<div class="d-flex flex-column w-100" 
-		style = "font-size: 0.85rem; background-color: #fcfcfc; 
-		align-items: flex-start; !important;">
+		style = "font-size: 0.85rem; background-color: #fcfcfc; align-items: flex-start; !important;">
 		<ul class="d-none navbar-nav d-md-flex w-100" style = "background-color:#fff;">
 			<div class = "d-none d-md-flex" style = "width: 70%">
 				<li class="list-inline-item clickable w-100">
-				<form id = "search_form"role="search" class="form-inline d-none d-md-block search_form" action = "{% url 'art_by_category' %}">
+				<form id = "search_form"role="search" class="form-inline d-none d-md-block search_form" action = "{% url 'art_by_category' %}" method = 'POST'>
+					{% csrf_token %}
 					<input type="text" placeholder="Ex. Van Gogh, Blue, Abstract etc." id ="keywords" name="keywords" class="form-control w-100" required>
 					<button class="btn btn-outline-success" type="submit" style = "background-color: #000; border-radius: 0;" form= "search_form">
 						<!--<img src="{% static 'img/search_head_white.png' %}" alt = "Search Button" width=20 height=20>-->
@@ -172,7 +174,7 @@
 				{% for main in level0_menuitems %}
 					{% if main.name|upper == 'CATEGORIES' %}
 				
-					<li class="nav-item dropdown menu-large">
+					<li class="mb-2 nav-item dropdown menu-large">
 						<a href="#" data-toggle="dropdown" data-hover="dropdown" 
 							id = "art_id"
 							class="dropdown-toggle nav-link"
@@ -208,7 +210,7 @@
 												<h4>{{level1.name|title}}</h4>
 											</div>
 										</a>
-										<ul class="list-unstyled mb-3">
+										<ul class="list-unstyled">
 										{% for level2 in level2_menuitems %}
 										{% if level2.parent_id == level1.name|replace:' ,-' %}
 											<li class="nav-item"><a style = "color: #082a4c;"  href="{% url 'art_by_category' level2.category_id %}" class="nav-link">{{level2.name|title}}</a></li>
@@ -253,7 +255,8 @@
 				</li>
 
 				<div class="dropdown menu-large mt-2 mb-2 mt-md-0 mb-md-0">
-					<span class="dropdown-toggle room-ideas-menu" data-toggle="dropdown">Art By Room
+					<span class="dropdown-toggle room-ideas-menu" style = "text-decoration: underline; padding: 0px 10px 0px; font-size: 14px; font-weight: 500; color: #082a4c; letter-spacing: 0.1rem;" 
+								data-toggle="dropdown"> <a> Art By Room</a>
 					<span class="caret"></span></span>
 					<ul class="dropdown-menu textmenu">
 						<li>
@@ -312,17 +315,25 @@
 				
 				{% if not livuser %}
 				<li class= "mt-2 mb-2 mt-md-0 mb-md-0">
+					<a href="{% url 'show_av_products' %}"
+						style = "text-decoration:underline;">
+						Round-Shaped Wall Art
+						<sup style ="background-color:red; color:#fff; text-decoration:none; padding:0px 2px; border-radius: 20%;">New</sup>
+					</a>
+				</li>
+				<li class= "mt-2 mb-2 mt-md-0 mb-md-0">
 					<a href="{% url 'offers' %}"
 						style = "text-decoration:underline;">
 						Offers
 					</a>
 				</li>
+				<!--
 				<li class= "mt-2 mb-2 mt-md-0 mb-md-0">
 					<a href="{% url 'business_registration' %}"
 						style = "text-decoration:underline;">
 						Business Sales
 					</a>
-				</li>
+				</li>-->
 				{% endif %}
 				
 				{% if user.is_staff %}
@@ -345,11 +356,12 @@
 <!-- Search open up -->
 <div id="search" class="d-block d-md-none">
 	<div class="container">
-		<form id = "search_form_m" role="search"  class="form-inline search_form" action = "{% url 'art_by_category' %}">
+		<form id = "search_form_m" role="search"  class="form-inline search_form" action = "{% url 'art_by_category' %}" method='post'>
+			{% csrf_token %}
 			<div class="input-group" style = "width:100% !important; float:right;">
 				<input type="text" placeholder="Ex. Van Gogh, Blue, Abstract etc." id ="keywords_m" name="keywords" class="form-control keywords" required>
 				<div class="input-group-append">
-					<button type="submit" class="btn btn-primary" form = "search_form_m">
+					<button type="submit" class="btn btn-primary" form = "search_form_m" style = "background-color: #000; border-radius: 0;" >
 						<i class="fa fa-search"></i>
 					</button>
 				</div>
@@ -559,12 +571,16 @@
 	$("#search_form_m").submit(function(){
 		var s_txt = $("#keywords_m").val();		
 		var txt = s_txt.replace(/[&<>]/g, '');
+		txt = txt.replace('document.domain', '');
+		txt = txt.replace('<script', '');
 		$("#keywords_m").val(txt);
 		wigzo ("track", "search", txt);
 	});
 	$("#search_form").submit(function(){
 		var s_txt = $("#keywords").val();
 		var txt = s_txt.replace(/[&<>]/g, '');
+		txt = txt.replace('document.domain', '');
+		txt = txt.replace('<script', '');
 		$("#keywords").val(txt);
 		wigzo ("track", "search", txt);
 	});
